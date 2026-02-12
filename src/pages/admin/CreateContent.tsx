@@ -778,44 +778,87 @@ const ReadingCreator: React.FC<{
   );
 };
 
-// ─── Listening Creator ────────────────────────
-const ListeningCreator: React.FC<{
-  sectionTitle: string; onSectionTitleChange: (v: string) => void;
-  difficulty: string; onDifficultyChange: (v: string) => void;
-  duration: string; onDurationChange: (v: string) => void;
-  transcript: string; onTranscriptChange: (v: string) => void;
-  groups: QuestionGroup[]; onGroupsChange: (g: QuestionGroup[]) => void;
-}> = ({ sectionTitle, onSectionTitleChange, difficulty, onDifficultyChange, duration, onDurationChange, transcript, onTranscriptChange, groups, onGroupsChange }) => {
+// ─── Listening Section Types ──────────────────
+interface ListeningSectionState {
+  id: number;
+  title: string;
+  transcript: string;
+  audioFileName: string;
+  questionGroups: QuestionGroup[];
+}
+
+const SECTION_LABELS = [
+  { id: 1, label: "Section 1", desc: "Social / Conversation", placeholder: "e.g. Library Registration" },
+  { id: 2, label: "Section 2", desc: "Social / Monologue", placeholder: "e.g. City Cycling Tour Guide" },
+  { id: 3, label: "Section 3", desc: "Educational / Discussion", placeholder: "e.g. Research Project Discussion" },
+  { id: 4, label: "Section 4", desc: "Academic / Lecture", placeholder: "e.g. Psychology of Decision-Making" },
+];
+
+const emptySections = (): ListeningSectionState[] =>
+  SECTION_LABELS.map((s) => ({
+    id: s.id,
+    title: "",
+    transcript: "",
+    audioFileName: "",
+    questionGroups: [emptyGroup()],
+  }));
+
+// Per-section editor
+const ListeningSectionEditor: React.FC<{
+  section: ListeningSectionState;
+  meta: (typeof SECTION_LABELS)[number];
+  onChange: (patch: Partial<ListeningSectionState>) => void;
+}> = ({ section, meta, onChange }) => {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Context badge */}
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
+          {meta.desc}
+        </Badge>
+        <Badge variant="outline" className="text-[10px]">
+          {section.questionGroups.reduce((a, g) => a + g.questions.length, 0)} questions
+        </Badge>
+      </div>
+
       {/* Audio upload */}
       <Card>
-        <CardContent className="p-6 space-y-4">
-          <Label className="text-base font-semibold">Audio Source</Label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
-            <Upload className="h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground text-center">Drag & drop an audio file here, or click to browse</p>
-            <p className="text-xs text-muted-foreground">MP3, WAV up to 50MB</p>
+        <CardContent className="p-5 space-y-3">
+          <Label className="text-sm font-semibold">Audio Source</Label>
+          <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
+            <Upload className="h-6 w-6 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground text-center">Drag & drop audio or click to browse</p>
+            <p className="text-[10px] text-muted-foreground">MP3, WAV up to 50MB</p>
           </div>
           {/* Mock player */}
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-            <div className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-              <Headphones className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+            <div className="h-9 w-9 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+              <Headphones className="h-4 w-4 text-violet-600 dark:text-violet-400" />
             </div>
             <div className="flex-1 space-y-1">
-              <div className="h-2 bg-border rounded-full overflow-hidden">
+              <div className="h-1.5 bg-border rounded-full overflow-hidden">
                 <div className="h-full w-1/3 bg-violet-500 rounded-full" />
               </div>
               <div className="flex justify-between text-[10px] text-muted-foreground">
-                <span>01:23</span>
-                <span>04:15</span>
+                <span>00:00</span>
+                <span>--:--</span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Section Title */}
+      <div className="space-y-2">
+        <Label>Section Title</Label>
+        <Input
+          placeholder={meta.placeholder}
+          value={section.title}
+          onChange={(e) => onChange({ title: e.target.value })}
+        />
+      </div>
 
       {/* Transcript */}
       <Collapsible open={transcriptOpen} onOpenChange={setTranscriptOpen}>
@@ -828,17 +871,70 @@ const ListeningCreator: React.FC<{
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <Textarea placeholder="Paste the full audio transcript here for accessibility..." className="min-h-[200px] text-sm" value={transcript} onChange={(e) => onTranscriptChange(e.target.value)} />
+              <Textarea
+                placeholder="Paste the audio transcript for this section..."
+                className="min-h-[150px] text-sm"
+                value={section.transcript}
+                onChange={(e) => onChange({ transcript: e.target.value })}
+              />
             </CardContent>
           </CollapsibleContent>
         </Card>
       </Collapsible>
 
-      {/* Metadata */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {/* Questions */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">Time-Synced Questions</h3>
+        <QuestionBuilder
+          groups={section.questionGroups}
+          onChange={(g) => onChange({ questionGroups: g })}
+          showTimestamp
+        />
+      </div>
+    </div>
+  );
+};
+
+// ─── Listening Creator (4-Section Tabs) ───────
+const ListeningCreator: React.FC<{
+  testTitle: string; onTestTitleChange: (v: string) => void;
+  difficulty: string; onDifficultyChange: (v: string) => void;
+  duration: string; onDurationChange: (v: string) => void;
+  sections: ListeningSectionState[]; onSectionsChange: (s: ListeningSectionState[]) => void;
+}> = ({ testTitle, onTestTitleChange, difficulty, onDifficultyChange, duration, onDurationChange, sections, onSectionsChange }) => {
+  const [activeSection, setActiveSection] = useState(0);
+
+  const updateSection = (idx: number, patch: Partial<ListeningSectionState>) => {
+    const next = [...sections];
+    next[idx] = { ...next[idx], ...patch };
+    onSectionsChange(next);
+  };
+
+  const duplicateSection = (fromIdx: number, toIdx: number) => {
+    const next = [...sections];
+    next[toIdx] = {
+      ...JSON.parse(JSON.stringify(next[fromIdx])),
+      id: toIdx + 1,
+      title: "",
+    };
+    onSectionsChange(next);
+  };
+
+  const getSectionStatus = (s: ListeningSectionState) => {
+    const hasTitle = s.title.trim().length > 0;
+    const hasQuestions = s.questionGroups.some((g) => g.questions.some((q) => q.text.trim() || q.options.some((o) => o.text.trim()) || q.completionGaps.some((g) => g.answer.trim()) || q.matchingPairs.some((p) => p.left.trim())));
+    if (hasTitle && hasQuestions) return "complete";
+    if (hasTitle || hasQuestions) return "partial";
+    return "empty";
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Global metadata */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label>Section Title</Label>
-          <Input placeholder="e.g. Section 4: Marine Biology" value={sectionTitle} onChange={(e) => onSectionTitleChange(e.target.value)} />
+          <Label>Test Title</Label>
+          <Input placeholder="e.g. IELTS Listening Practice Test 1" value={testTitle} onChange={(e) => onTestTitleChange(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label>Difficulty</Label>
@@ -852,15 +948,68 @@ const ListeningCreator: React.FC<{
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Duration</Label>
-          <Input placeholder="e.g. 30 mins" value={duration} onChange={(e) => onDurationChange(e.target.value)} />
+          <Label>Total Duration</Label>
+          <Input placeholder="e.g. 40 mins" value={duration} onChange={(e) => onDurationChange(e.target.value)} />
         </div>
       </div>
 
-      {/* Questions with timestamps */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold">Time-Synced Questions</h3>
-        <QuestionBuilder groups={groups} onChange={onGroupsChange} showTimestamp />
+      {/* Section Tabs */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-1 rounded-lg bg-muted p-1 overflow-x-auto">
+          {SECTION_LABELS.map((meta, idx) => {
+            const status = getSectionStatus(sections[idx]);
+            return (
+              <button
+                key={meta.id}
+                onClick={() => setActiveSection(idx)}
+                className={cn(
+                  "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all flex-1 justify-center min-w-0",
+                  activeSection === idx
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
+                )}
+              >
+                <span className={cn(
+                  "h-2 w-2 rounded-full shrink-0",
+                  status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                )} />
+                <span className="truncate">{meta.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Duplicate hint */}
+        {activeSection > 0 && (
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1.5 text-muted-foreground"
+              onClick={() => duplicateSection(activeSection - 1, activeSection)}
+            >
+              <ListChecks className="h-3.5 w-3.5" />
+              Duplicate from Section {activeSection}
+            </Button>
+          </div>
+        )}
+
+        {/* Active section editor */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSection}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ListeningSectionEditor
+              section={sections[activeSection]}
+              meta={SECTION_LABELS[activeSection]}
+              onChange={(patch) => updateSection(activeSection, patch)}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -1014,12 +1163,11 @@ const CreateContent: React.FC = () => {
   const [readingDuration, setReadingDuration] = useState("60 mins");
   const [readingGroups, setReadingGroups] = useState<QuestionGroup[]>([emptyGroup()]);
 
-  // ── Lifted Listening State ──
-  const [listeningTitle, setListeningTitle] = useState("");
+  // ── Lifted Listening State (4-section) ──
+  const [listeningTestTitle, setListeningTestTitle] = useState("");
   const [listeningDifficulty, setListeningDifficulty] = useState("7");
-  const [listeningDuration, setListeningDuration] = useState("30 mins");
-  const [listeningTranscript, setListeningTranscript] = useState("");
-  const [listeningGroups, setListeningGroups] = useState<QuestionGroup[]>([emptyGroup()]);
+  const [listeningDuration, setListeningDuration] = useState("40 mins");
+  const [listeningSections, setListeningSections] = useState<ListeningSectionState[]>(emptySections());
 
   // ── Lifted Writing State ──
   const [writingTaskType, setWritingTaskType] = useState<"task1" | "task2">("task1");
@@ -1086,11 +1234,10 @@ const CreateContent: React.FC = () => {
         </TabPanel>
         <TabPanel active={activeTab === "listening"}>
           <ListeningCreator
-            sectionTitle={listeningTitle} onSectionTitleChange={setListeningTitle}
+            testTitle={listeningTestTitle} onTestTitleChange={setListeningTestTitle}
             difficulty={listeningDifficulty} onDifficultyChange={setListeningDifficulty}
             duration={listeningDuration} onDurationChange={setListeningDuration}
-            transcript={listeningTranscript} onTranscriptChange={setListeningTranscript}
-            groups={listeningGroups} onGroupsChange={setListeningGroups}
+            sections={listeningSections} onSectionsChange={setListeningSections}
           />
         </TabPanel>
         <TabPanel active={activeTab === "writing"}>
@@ -1137,11 +1284,10 @@ const CreateContent: React.FC = () => {
           questionGroups: readingGroups,
         }}
         listening={{
-          sectionTitle: listeningTitle,
+          testTitle: listeningTestTitle,
           difficulty: listeningDifficulty,
           duration: listeningDuration,
-          transcript: listeningTranscript,
-          questionGroups: listeningGroups,
+          sections: listeningSections,
         }}
         writing={{
           taskType: writingTaskType,
