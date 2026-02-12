@@ -1,129 +1,299 @@
-import React, { useState } from "react";
-import { Play, Pause, SkipForward, Volume2, Headphones } from "lucide-react";
-import { listeningQuestions } from "@/data/mockData";
+import React, { useState, useCallback, useRef } from "react";
+import { Headphones, ChevronRight, Lock, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import SectionStepper from "@/components/listening/SectionStepper";
+import AudioPlayer from "@/components/listening/AudioPlayer";
+import QuestionCard from "@/components/listening/QuestionCard";
+import ResultsCard from "@/components/listening/ResultsCard";
+import { mockListeningTest } from "@/data/listeningTestData";
+import { cn } from "@/lib/utils";
 
 const ListeningModule: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(35);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const test = mockListeningTest;
+  const totalSections = test.sections.length;
 
-  const allQuestions = listeningQuestions.flatMap((s) => s.questions);
+  const [activeSection, setActiveSection] = useState(0);
+  const [unlockedSections, setUnlockedSections] = useState<boolean[]>([
+    true,
+    false,
+    false,
+    false,
+  ]);
+  const [completedSections, setCompletedSections] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [audioEnded, setAudioEnded] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [testFinished, setTestFinished] = useState(false);
+  const [reviewMode, setReviewMode] = useState(false);
 
-  const handleAnswer = (qId: number, value: string) => {
-    if (submitted) return;
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTop = () => {
+    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleAudioEnded = useCallback(
+    (sectionIndex: number) => {
+      setAudioEnded((prev) => {
+        const next = [...prev];
+        next[sectionIndex] = true;
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleAnswer = (qId: string, value: string) => {
+    if (testFinished) return;
     setAnswers((prev) => ({ ...prev, [qId]: value }));
   };
 
-  const getScore = () => allQuestions.filter((q) => answers[q.id]?.toLowerCase() === q.answer.toLowerCase()).length;
+  const handleSubmitSection = () => {
+    const nextIndex = activeSection + 1;
+
+    setCompletedSections((prev) => {
+      const next = [...prev];
+      next[activeSection] = true;
+      return next;
+    });
+
+    if (nextIndex < totalSections) {
+      setUnlockedSections((prev) => {
+        const next = [...prev];
+        next[nextIndex] = true;
+        return next;
+      });
+      setActiveSection(nextIndex);
+      scrollToTop();
+    } else {
+      setTestFinished(true);
+      scrollToTop();
+    }
+  };
+
+  const handleRetry = () => {
+    setActiveSection(0);
+    setUnlockedSections([true, false, false, false]);
+    setCompletedSections([false, false, false, false]);
+    setAudioEnded([false, false, false, false]);
+    setAnswers({});
+    setTestFinished(false);
+    setReviewMode(false);
+    scrollToTop();
+  };
+
+  const currentSection = test.sections[activeSection];
+  const sectionQuestions = currentSection.questions;
+  const answeredCount = sectionQuestions.filter((q) => answers[q.id]?.trim()).length;
+  const canSubmit = audioEnded[activeSection] || answeredCount === sectionQuestions.length;
+  // Global question numbering offset
+  const globalOffset = test.sections
+    .slice(0, activeSection)
+    .reduce((acc, s) => acc + s.questions.length, 0);
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <div className="flex items-center gap-2">
-              <Headphones className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-bold text-foreground">Listening Practice</h1>
-            </div>
-
-            {submitted && (
-              <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 text-center">
-                <span className="text-2xl font-bold text-primary">{getScore()}/{allQuestions.length}</span>
-                <span className="text-sm text-muted-foreground block mt-1">Correct Answers</span>
-              </div>
-            )}
-
-            {listeningQuestions.map((section) => (
-              <div key={section.id} className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider">{section.section}</span>
+      <TooltipProvider>
+        <div className="flex flex-col h-[calc(100vh-4rem)]">
+          {/* Sticky Header */}
+          <div className="shrink-0 border-b border-border bg-card px-4 py-3 md:px-8 space-y-3">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Headphones className="h-5 w-5 text-primary" />
+                  <h1 className="text-lg font-bold text-foreground">
+                    {test.title}
+                  </h1>
                 </div>
-                <h2 className="text-lg font-bold text-foreground mb-4">{section.title}</h2>
+                {!testFinished && (
+                  <Badge variant="outline" className="text-xs">
+                    Section {activeSection + 1} of {totalSections}
+                  </Badge>
+                )}
+              </div>
 
-                <div className="space-y-4">
-                  {section.questions.map((q, i) => (
-                    <div key={q.id} className="rounded-xl bg-background border border-border p-4">
-                      <p className="text-sm font-semibold text-foreground mb-3">Q{q.id}. {q.text}</p>
-                      {q.type === "fill" ? (
-                        <input
-                          type="text"
-                          value={answers[q.id] || ""}
-                          onChange={(e) => handleAnswer(q.id, e.target.value)}
-                          disabled={submitted}
-                          placeholder="Type your answer..."
-                          className="w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
-                        />
-                      ) : (
-                        <div className="space-y-2">
-                          {q.options?.map((opt) => (
-                            <button
-                              key={opt}
-                              onClick={() => handleAnswer(q.id, opt)}
-                              className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-                                answers[q.id] === opt
-                                  ? "border-primary bg-primary/10 text-primary"
-                                  : "border-border text-muted-foreground hover:bg-secondary"
-                              } ${submitted && q.answer === opt ? "!border-success !bg-success/10 !text-success" : ""}`}
+              {/* Stepper */}
+              <div className="mt-3">
+                <SectionStepper
+                  totalSections={totalSections}
+                  activeSection={activeSection}
+                  completedSections={completedSections}
+                  unlockedSections={unlockedSections}
+                  onSectionClick={(i) => {
+                    if (unlockedSections[i]) {
+                      setActiveSection(i);
+                      scrollToTop();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Scrollable Content */}
+          <div ref={contentRef} className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="max-w-4xl mx-auto">
+              <AnimatePresence mode="wait">
+                {testFinished ? (
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    <ResultsCard
+                      test={test}
+                      answers={answers}
+                      reviewMode={reviewMode}
+                      onToggleReview={() => setReviewMode((r) => !r)}
+                      onRetry={handleRetry}
+                    />
+
+                    {/* Review mode: show all sections */}
+                    {reviewMode && (
+                      <div className="space-y-6">
+                        {test.sections.map((section) => {
+                          const offset = test.sections
+                            .slice(0, section.id - 1)
+                            .reduce((acc, s) => acc + s.questions.length, 0);
+                          return (
+                            <div
+                              key={section.id}
+                              className="rounded-2xl border border-border bg-card p-6 space-y-4"
                             >
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {submitted && (
-                        <p className={`mt-2 text-xs font-medium ${answers[q.id]?.toLowerCase() === q.answer.toLowerCase() ? "text-success" : "text-destructive"}`}>
-                          {answers[q.id]?.toLowerCase() === q.answer.toLowerCase() ? "✓ Correct" : `✗ Answer: ${q.answer}`}
+                              <div>
+                                <Badge variant="secondary" className="text-[10px] uppercase tracking-wider mb-2">
+                                  {section.context}
+                                </Badge>
+                                <h3 className="text-base font-bold text-foreground">
+                                  {section.title}
+                                </h3>
+                              </div>
+                              <div className="space-y-3">
+                                {section.questions.map((q, qi) => (
+                                  <QuestionCard
+                                    key={q.id}
+                                    question={q}
+                                    index={offset + qi + 1}
+                                    answer={answers[q.id] || ""}
+                                    onAnswer={() => {}}
+                                    submitted={true}
+                                    reviewMode={true}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={`section-${activeSection}`}
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -40 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Section Header */}
+                    <div className="rounded-2xl border border-border bg-card p-6">
+                      <Badge variant="secondary" className="text-[10px] uppercase tracking-wider mb-2">
+                        {currentSection.context}
+                      </Badge>
+                      <h2 className="text-xl font-bold text-foreground">
+                        {currentSection.title}
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {currentSection.subtitle}
+                      </p>
+                      <Separator className="my-4" />
+
+                      {/* Audio Player */}
+                      <AudioPlayer
+                        sectionIndex={activeSection}
+                        onEnded={() => handleAudioEnded(activeSection)}
+                        disabled={completedSections[activeSection]}
+                      />
+
+                      {/* Instructions */}
+                      <div className="mt-4 flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/10 p-3">
+                        <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <p className="text-xs text-foreground leading-relaxed">
+                          {currentSection.instructions}
                         </p>
-                      )}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
 
-            {!submitted ? (
-              <button
-                onClick={() => setSubmitted(true)}
-                className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
-              >
-                Check Answers
-              </button>
-            ) : (
-              <button
-                onClick={() => { setAnswers({}); setSubmitted(false); }}
-                className="w-full rounded-xl border border-border py-3 text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
-              >
-                Try Again
-              </button>
-            )}
-          </div>
-        </div>
+                    {/* Questions */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-foreground">
+                          Questions {globalOffset + 1}–{globalOffset + sectionQuestions.length}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {answeredCount}/{sectionQuestions.length} answered
+                        </p>
+                      </div>
+                      {sectionQuestions.map((q, qi) => (
+                        <QuestionCard
+                          key={q.id}
+                          question={q}
+                          index={globalOffset + qi + 1}
+                          answer={answers[q.id] || ""}
+                          onAnswer={(val) => handleAnswer(q.id, val)}
+                          submitted={testFinished}
+                          reviewMode={reviewMode}
+                        />
+                      ))}
+                    </div>
 
-        {/* Audio Player Bar */}
-        <div className="shrink-0 border-t border-border bg-card px-4 py-3 md:px-8">
-          <div className="max-w-3xl mx-auto flex items-center gap-4">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:scale-105 transition-transform"
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
-            </button>
-            <div className="flex-1">
-              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
-                <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} />
-              </div>
-              <div className="flex justify-between mt-1 text-[10px] text-muted-foreground font-mono">
-                <span>02:48</span>
-                <span>08:00</span>
-              </div>
+                    {/* Submit */}
+                    <Button
+                      onClick={handleSubmitSection}
+                      disabled={!canSubmit}
+                      className="w-full gap-2 rounded-xl py-3 text-sm font-semibold shadow-lg shadow-primary/20"
+                      size="lg"
+                    >
+                      {activeSection < totalSections - 1 ? (
+                        <>
+                          Submit & Continue to Section {activeSection + 2}
+                          <ChevronRight className="h-4 w-4" />
+                        </>
+                      ) : (
+                        "Submit & View Results"
+                      )}
+                    </Button>
+
+                    {!canSubmit && (
+                      <p className="text-center text-xs text-muted-foreground">
+                        Listen to the full audio or answer all questions to proceed.
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
           </div>
         </div>
-      </div>
+      </TooltipProvider>
     </DashboardLayout>
   );
 };
