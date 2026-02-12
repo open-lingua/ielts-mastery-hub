@@ -15,6 +15,16 @@ import {
   Image as ImageIcon,
   ChevronDown,
   ChevronUp,
+  ListChecks,
+  CheckSquare,
+  ArrowRightLeft,
+  AlignLeft,
+  FileText,
+  MessageSquare,
+  Table2,
+  GitBranch,
+  MapPin,
+  Type,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,48 +51,411 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────
-interface QuestionOption {
+const QUESTION_TYPES = [
+  // Identification
+  { value: "multiple-choice", label: "Multiple Choice", category: "choice", color: "bg-blue-500" },
+  { value: "tfng", label: "True / False / Not Given", category: "identification", color: "bg-sky-500" },
+  { value: "ynng", label: "Yes / No / Not Given", category: "identification", color: "bg-cyan-500" },
+  // Matching
+  { value: "matching-headings", label: "Matching Headings", category: "matching", color: "bg-violet-500" },
+  { value: "matching-information", label: "Matching Information", category: "matching", color: "bg-purple-500" },
+  { value: "matching-features", label: "Matching Features", category: "matching", color: "bg-fuchsia-500" },
+  { value: "matching-sentence-endings", label: "Matching Sentence Endings", category: "matching", color: "bg-pink-500" },
+  // Completion
+  { value: "sentence-completion", label: "Sentence Completion", category: "completion", color: "bg-emerald-500" },
+  { value: "summary-completion", label: "Summary Completion", category: "completion", color: "bg-green-500" },
+  { value: "note-completion", label: "Note Completion", category: "completion", color: "bg-teal-500" },
+  { value: "table-completion", label: "Table Completion", category: "completion", color: "bg-lime-500" },
+  { value: "flow-chart-completion", label: "Flow-chart Completion", category: "completion", color: "bg-emerald-600" },
+  // Other
+  { value: "diagram-labeling", label: "Diagram Labeling", category: "completion", color: "bg-amber-500" },
+  { value: "short-answer", label: "Short Answer Questions", category: "other", color: "bg-orange-500" },
+] as const;
+
+type QuestionType = (typeof QUESTION_TYPES)[number]["value"];
+
+interface MCOption {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
+
+interface MatchingPair {
+  id: string;
+  left: string;
+  right: string;
+}
+
+interface CompletionGap {
+  id: string;
+  gapText: string;
+  answer: string;
+}
+
+interface AcceptedAnswer {
   id: string;
   text: string;
 }
 
-interface Question {
+interface QuestionItem {
   id: string;
   text: string;
-  type: "mc" | "tfng" | "matching";
-  options: QuestionOption[];
   answer: string;
-  timestamp?: string; // for listening
+  options: MCOption[];
+  matchingPairs: MatchingPair[];
+  completionGaps: CompletionGap[];
+  acceptedAnswers: AcceptedAnswer[];
+  timestamp?: string;
 }
 
 interface QuestionGroup {
   id: string;
-  type: "Multiple Choice" | "True/False/Not Given" | "Matching Headings";
-  questions: Question[];
+  type: QuestionType;
+  instructions: string;
+  wordLimit: string;
+  hasWordBank: boolean;
+  wordBank: string[];
+  sequentialOrder: boolean;
+  multipleSelection: boolean;
+  selectCount: number;
+  questions: QuestionItem[];
 }
 
 // ─── Helpers ──────────────────────────────────
 let idCounter = 0;
 const uid = () => `q-${++idCounter}-${Date.now()}`;
 
-const emptyOption = (): QuestionOption => ({ id: uid(), text: "" });
-const emptyQuestion = (type: Question["type"] = "mc"): Question => ({
+const emptyOption = (idx: number): MCOption => ({ id: uid(), text: "", isCorrect: idx === 0 });
+const emptyPair = (): MatchingPair => ({ id: uid(), left: "", right: "" });
+const emptyGap = (): CompletionGap => ({ id: uid(), gapText: "", answer: "" });
+const emptyAccepted = (): AcceptedAnswer => ({ id: uid(), text: "" });
+
+const emptyQuestion = (): QuestionItem => ({
   id: uid(),
   text: "",
-  type,
-  options: type === "mc" ? [emptyOption(), emptyOption(), emptyOption(), emptyOption()] : [],
   answer: "",
-});
-const emptyGroup = (): QuestionGroup => ({
-  id: uid(),
-  type: "Multiple Choice",
-  questions: [emptyQuestion("mc")],
+  options: [emptyOption(0), emptyOption(1), emptyOption(2), emptyOption(3)],
+  matchingPairs: [],
+  completionGaps: [],
+  acceptedAnswers: [],
 });
 
-const groupTypeToQuestionType = (gt: QuestionGroup["type"]): Question["type"] => {
-  if (gt === "Multiple Choice") return "mc";
-  if (gt === "True/False/Not Given") return "tfng";
-  return "matching";
+const emptyGroup = (type: QuestionType = "multiple-choice"): QuestionGroup => ({
+  id: uid(),
+  type,
+  instructions: "",
+  wordLimit: "",
+  hasWordBank: false,
+  wordBank: [],
+  sequentialOrder: true,
+  multipleSelection: false,
+  selectCount: 1,
+  questions: [emptyQuestion()],
+});
+
+const getTypeMeta = (type: QuestionType) =>
+  QUESTION_TYPES.find((t) => t.value === type) || QUESTION_TYPES[0];
+
+const getCategoryBadge = (category: string) => {
+  switch (category) {
+    case "choice": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+    case "identification": return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
+    case "matching": return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
+    case "completion": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+    default: return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+  }
+};
+
+// ─── Sub-Components for Each Type ─────────────
+
+// Multiple Choice
+const MCQuestionEditor: React.FC<{
+  q: QuestionItem;
+  group: QuestionGroup;
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, group, onChange }) => {
+  const updateOpt = (idx: number, patch: Partial<MCOption>) => {
+    const next = [...q.options];
+    next[idx] = { ...next[idx], ...patch };
+    onChange({ options: next });
+  };
+  const toggleCorrect = (idx: number) => {
+    const next = q.options.map((o, i) => ({
+      ...o,
+      isCorrect: group.multipleSelection ? (i === idx ? !o.isCorrect : o.isCorrect) : i === idx,
+    }));
+    onChange({ options: next });
+  };
+  const addOpt = () => onChange({ options: [...q.options, { id: uid(), text: "", isCorrect: false }] });
+  const removeOpt = (idx: number) => onChange({ options: q.options.filter((_, i) => i !== idx) });
+
+  return (
+    <div className="space-y-2">
+      {q.options.map((opt, oIdx) => (
+        <div key={opt.id} className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => toggleCorrect(oIdx)}
+            className={cn(
+              "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
+              opt.isCorrect
+                ? "border-emerald-500 bg-emerald-500 text-white"
+                : "border-muted-foreground/30 hover:border-muted-foreground/60"
+            )}
+          >
+            {opt.isCorrect && <CheckSquare className="h-3 w-3" />}
+          </button>
+          <span className="text-xs text-muted-foreground w-4 shrink-0">{String.fromCharCode(65 + oIdx)}.</span>
+          <Input
+            placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
+            value={opt.text}
+            onChange={(e) => updateOpt(oIdx, { text: e.target.value })}
+            className="text-sm h-8 flex-1"
+          />
+          {q.options.length > 2 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeOpt(oIdx)}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={addOpt}>
+        <Plus className="h-3 w-3" /> Add Option
+      </Button>
+    </div>
+  );
+};
+
+// TFNG / YNNG
+const IdentificationEditor: React.FC<{
+  q: QuestionItem;
+  type: "tfng" | "ynng";
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, type, onChange }) => {
+  const options = type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"] : ["YES", "NO", "NOT GIVEN"];
+  return (
+    <div className="flex items-center gap-2">
+      <Label className="text-xs text-muted-foreground shrink-0">Answer:</Label>
+      <Select value={q.answer} onValueChange={(v) => onChange({ answer: v })}>
+        <SelectTrigger className="w-40 h-8 text-xs">
+          <SelectValue placeholder="Select..." />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>{o}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
+// Matching (Headings, Information, Features, Sentence Endings)
+const MatchingEditor: React.FC<{
+  q: QuestionItem;
+  type: QuestionType;
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, type, onChange }) => {
+  const pairs = q.matchingPairs.length ? q.matchingPairs : [emptyPair()];
+
+  const updatePair = (idx: number, patch: Partial<MatchingPair>) => {
+    const next = [...pairs];
+    next[idx] = { ...next[idx], ...patch };
+    onChange({ matchingPairs: next });
+  };
+  const addPair = () => onChange({ matchingPairs: [...pairs, emptyPair()] });
+  const removePair = (idx: number) => onChange({ matchingPairs: pairs.filter((_, i) => i !== idx) });
+
+  const leftLabel =
+    type === "matching-headings" ? "Paragraph" :
+    type === "matching-information" ? "Detail" :
+    type === "matching-features" ? "Name / Entity" :
+    "Sentence Stem";
+
+  const rightLabel =
+    type === "matching-headings" ? "Heading (e.g. iv)" :
+    type === "matching-information" ? "Paragraph (A, B...)" :
+    type === "matching-features" ? "Statement" :
+    "Ending Option";
+
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 items-center">
+        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{leftLabel}</span>
+        <span />
+        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{rightLabel}</span>
+        <span />
+      </div>
+      {pairs.map((pair, idx) => (
+        <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 items-center">
+          <Input
+            placeholder={leftLabel}
+            value={pair.left}
+            onChange={(e) => updatePair(idx, { left: e.target.value })}
+            className="text-sm h-8"
+          />
+          <ArrowRightLeft className="h-3 w-3 text-muted-foreground shrink-0" />
+          <Input
+            placeholder={rightLabel}
+            value={pair.right}
+            onChange={(e) => updatePair(idx, { right: e.target.value })}
+            className="text-sm h-8"
+          />
+          {pairs.length > 1 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removePair(idx)}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={addPair}>
+        <Plus className="h-3 w-3" /> Add Pair
+      </Button>
+    </div>
+  );
+};
+
+// Completion types (Sentence, Summary, Note, Table, Flow-chart)
+const CompletionEditor: React.FC<{
+  q: QuestionItem;
+  type: QuestionType;
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, onChange }) => {
+  const gaps = q.completionGaps.length ? q.completionGaps : [emptyGap()];
+
+  const updateGap = (idx: number, patch: Partial<CompletionGap>) => {
+    const next = [...gaps];
+    next[idx] = { ...next[idx], ...patch };
+    onChange({ completionGaps: next });
+  };
+  const addGap = () => onChange({ completionGaps: [...gaps, emptyGap()] });
+  const removeGap = (idx: number) => onChange({ completionGaps: gaps.filter((_, i) => i !== idx) });
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] text-muted-foreground">Use <code className="bg-muted px-1 rounded text-[10px]">{`{{gap}}`}</code> in the text to mark blanks.</p>
+      {gaps.map((gap, idx) => (
+        <div key={gap.id} className="flex items-start gap-2">
+          <span className="text-xs text-muted-foreground mt-2 w-4 shrink-0">{idx + 1}.</span>
+          <div className="flex-1 space-y-1">
+            <Input
+              placeholder="Sentence with {{gap}} marker..."
+              value={gap.gapText}
+              onChange={(e) => updateGap(idx, { gapText: e.target.value })}
+              className="text-sm h-8"
+            />
+            <Input
+              placeholder="Correct answer"
+              value={gap.answer}
+              onChange={(e) => updateGap(idx, { answer: e.target.value })}
+              className="text-sm h-7 text-xs bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50"
+            />
+          </div>
+          {gaps.length > 1 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0 mt-1" onClick={() => removeGap(idx)}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={addGap}>
+        <Plus className="h-3 w-3" /> Add Gap
+      </Button>
+    </div>
+  );
+};
+
+// Diagram Labeling
+const DiagramLabelingEditor: React.FC<{
+  q: QuestionItem;
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, onChange }) => {
+  const gaps = q.completionGaps.length ? q.completionGaps : [emptyGap()];
+
+  const updateGap = (idx: number, patch: Partial<CompletionGap>) => {
+    const next = [...gaps];
+    next[idx] = { ...next[idx], ...patch };
+    onChange({ completionGaps: next });
+  };
+  const addGap = () => onChange({ completionGaps: [...gaps, emptyGap()] });
+  const removeGap = (idx: number) => onChange({ completionGaps: gaps.filter((_, i) => i !== idx) });
+
+  return (
+    <div className="space-y-3">
+      <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 bg-muted/30">
+        <ImageIcon className="h-6 w-6 text-muted-foreground" />
+        <p className="text-xs text-muted-foreground">Upload diagram image</p>
+      </div>
+      <div className="space-y-2">
+        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Labels</span>
+        {gaps.map((gap, idx) => (
+          <div key={gap.id} className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[10px] shrink-0 w-8 justify-center">{idx + 1}</Badge>
+            <Input
+              placeholder="Label position / part name"
+              value={gap.gapText}
+              onChange={(e) => updateGap(idx, { gapText: e.target.value })}
+              className="text-sm h-8 flex-1"
+            />
+            <Input
+              placeholder="Answer"
+              value={gap.answer}
+              onChange={(e) => updateGap(idx, { answer: e.target.value })}
+              className="text-sm h-8 w-32"
+            />
+            {gaps.length > 1 && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeGap(idx)}>
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        ))}
+        <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={addGap}>
+          <Plus className="h-3 w-3" /> Add Label
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Short Answer
+const ShortAnswerEditor: React.FC<{
+  q: QuestionItem;
+  onChange: (patch: Partial<QuestionItem>) => void;
+}> = ({ q, onChange }) => {
+  const accepted = q.acceptedAnswers.length ? q.acceptedAnswers : [emptyAccepted()];
+
+  const updateAccepted = (idx: number, text: string) => {
+    const next = [...accepted];
+    next[idx] = { ...next[idx], text };
+    onChange({ acceptedAnswers: next });
+  };
+  const addAccepted = () => onChange({ acceptedAnswers: [...accepted, emptyAccepted()] });
+  const removeAccepted = (idx: number) => onChange({ acceptedAnswers: accepted.filter((_, i) => i !== idx) });
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs text-muted-foreground">Accepted Answers (variations)</Label>
+      {accepted.map((a, idx) => (
+        <div key={a.id} className="flex items-center gap-2">
+          <Input
+            placeholder={idx === 0 ? "Primary answer" : "Alternative (e.g. plural)"}
+            value={a.text}
+            onChange={(e) => updateAccepted(idx, e.target.value)}
+            className="text-sm h-8 flex-1"
+          />
+          {accepted.length > 1 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeAccepted(idx)}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={addAccepted}>
+        <Plus className="h-3 w-3" /> Add Variant
+      </Button>
+    </div>
+  );
 };
 
 // ─── Question Builder ─────────────────────────
@@ -97,21 +470,15 @@ const QuestionBuilder: React.FC<{
     onChange(next);
   };
 
-  const updateQuestion = (gIdx: number, qIdx: number, patch: Partial<Question>) => {
+  const updateQuestion = (gIdx: number, qIdx: number, patch: Partial<QuestionItem>) => {
     const next = [...groups];
     next[gIdx].questions[qIdx] = { ...next[gIdx].questions[qIdx], ...patch };
     onChange(next);
   };
 
-  const updateOption = (gIdx: number, qIdx: number, oIdx: number, text: string) => {
-    const next = [...groups];
-    next[gIdx].questions[qIdx].options[oIdx] = { ...next[gIdx].questions[qIdx].options[oIdx], text };
-    onChange(next);
-  };
-
   const addQuestion = (gIdx: number) => {
     const next = [...groups];
-    next[gIdx].questions.push(emptyQuestion(groupTypeToQuestionType(next[gIdx].type)));
+    next[gIdx].questions.push(emptyQuestion());
     onChange(next);
   };
 
@@ -125,127 +492,226 @@ const QuestionBuilder: React.FC<{
     onChange(groups.filter((_, i) => i !== gIdx));
   };
 
-  const changeGroupType = (gIdx: number, type: QuestionGroup["type"]) => {
-    const qt = groupTypeToQuestionType(type);
+  const changeGroupType = (gIdx: number, type: QuestionType) => {
     const next = [...groups];
-    next[gIdx] = {
-      ...next[gIdx],
-      type,
-      questions: next[gIdx].questions.map((q) => ({
-        ...q,
-        type: qt,
-        options: qt === "mc" ? (q.options.length ? q.options : [emptyOption(), emptyOption(), emptyOption(), emptyOption()]) : [],
-      })),
-    };
+    next[gIdx] = { ...next[gIdx], type, questions: [emptyQuestion()] };
     onChange(next);
   };
 
+  const isMatching = (t: QuestionType) => t.startsWith("matching");
+  const isCompletion = (t: QuestionType) =>
+    ["sentence-completion", "summary-completion", "note-completion", "table-completion", "flow-chart-completion"].includes(t);
+  const isIdentification = (t: QuestionType) => t === "tfng" || t === "ynng";
+
+  const renderQuestionEditor = (group: QuestionGroup, q: QuestionItem, gIdx: number, qIdx: number) => {
+    const update = (patch: Partial<QuestionItem>) => updateQuestion(gIdx, qIdx, patch);
+    const type = group.type;
+
+    if (type === "multiple-choice") return <MCQuestionEditor q={q} group={group} onChange={update} />;
+    if (isIdentification(type)) return <IdentificationEditor q={q} type={type as "tfng" | "ynng"} onChange={update} />;
+    if (isMatching(type)) return <MatchingEditor q={q} type={type} onChange={update} />;
+    if (isCompletion(type)) return <CompletionEditor q={q} type={type} onChange={update} />;
+    if (type === "diagram-labeling") return <DiagramLabelingEditor q={q} onChange={update} />;
+    if (type === "short-answer") return <ShortAnswerEditor q={q} onChange={update} />;
+    return null;
+  };
+
+  // For matching/completion, we show a single editor per question (not text + editor)
+  const needsQuestionText = (t: QuestionType) => !isMatching(t) && !isCompletion(t) && t !== "diagram-labeling";
+
   return (
     <div className="space-y-4">
-      {groups.map((group, gIdx) => (
-        <Card key={group.id} className="border-violet-200 dark:border-violet-900/50">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <div className="flex items-center gap-3 flex-1">
-              <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-              <Select value={group.type} onValueChange={(v) => changeGroupType(gIdx, v as QuestionGroup["type"])}>
-                <SelectTrigger className="w-52 h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                  <SelectItem value="True/False/Not Given">True/False/Not Given</SelectItem>
-                  <SelectItem value="Matching Headings">Matching Headings</SelectItem>
-                </SelectContent>
-              </Select>
-              <Badge variant="secondary" className="text-[10px]">{group.questions.length} Qs</Badge>
-            </div>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeGroup(gIdx)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {group.questions.map((q, qIdx) => (
-              <motion.div
-                key={q.id}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="rounded-lg border border-border p-4 space-y-3 bg-muted/30"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-xs font-semibold text-muted-foreground mt-2">Q{qIdx + 1}</span>
-                  <div className="flex-1 space-y-2">
-                    <Input
-                      placeholder="Enter question text..."
-                      value={q.text}
-                      onChange={(e) => updateQuestion(gIdx, qIdx, { text: e.target.value })}
-                      className="text-sm"
-                    />
-                    {showTimestamp && (
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                        <Input
-                          placeholder="e.g. 02:15"
-                          value={q.timestamp || ""}
-                          onChange={(e) => updateQuestion(gIdx, qIdx, { timestamp: e.target.value })}
-                          className="w-28 h-8 text-xs"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeQuestion(gIdx, qIdx)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+      {groups.map((group, gIdx) => {
+        const meta = getTypeMeta(group.type);
+        return (
+          <Card key={group.id} className="border-border overflow-hidden">
+            {/* Group Header */}
+            <CardHeader className="pb-3 flex flex-row items-center justify-between bg-muted/30">
+              <div className="flex items-center gap-3 flex-1 flex-wrap">
+                <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab shrink-0" />
+                <div className={cn("h-3 w-3 rounded-full shrink-0", meta.color)} />
+                <Select value={group.type} onValueChange={(v) => changeGroupType(gIdx, v as QuestionType)}>
+                  <SelectTrigger className="w-56 h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem disabled value="__choice" className="text-[10px] font-semibold text-muted-foreground uppercase">── Choice ──</SelectItem>
+                    <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
+                    <SelectItem disabled value="__id" className="text-[10px] font-semibold text-muted-foreground uppercase">── Identification ──</SelectItem>
+                    <SelectItem value="tfng">True / False / Not Given</SelectItem>
+                    <SelectItem value="ynng">Yes / No / Not Given</SelectItem>
+                    <SelectItem disabled value="__match" className="text-[10px] font-semibold text-muted-foreground uppercase">── Matching ──</SelectItem>
+                    <SelectItem value="matching-headings">Matching Headings</SelectItem>
+                    <SelectItem value="matching-information">Matching Information</SelectItem>
+                    <SelectItem value="matching-features">Matching Features</SelectItem>
+                    <SelectItem value="matching-sentence-endings">Matching Sentence Endings</SelectItem>
+                    <SelectItem disabled value="__comp" className="text-[10px] font-semibold text-muted-foreground uppercase">── Completion ──</SelectItem>
+                    <SelectItem value="sentence-completion">Sentence Completion</SelectItem>
+                    <SelectItem value="summary-completion">Summary Completion</SelectItem>
+                    <SelectItem value="note-completion">Note Completion</SelectItem>
+                    <SelectItem value="table-completion">Table Completion</SelectItem>
+                    <SelectItem value="flow-chart-completion">Flow-chart Completion</SelectItem>
+                    <SelectItem value="diagram-labeling">Diagram Labeling</SelectItem>
+                    <SelectItem disabled value="__other" className="text-[10px] font-semibold text-muted-foreground uppercase">── Other ──</SelectItem>
+                    <SelectItem value="short-answer">Short Answer Questions</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Badge className={cn("text-[10px] border-0", getCategoryBadge(meta.category))}>
+                  {meta.category}
+                </Badge>
+                <Badge variant="secondary" className="text-[10px]">{group.questions.length} Qs</Badge>
+              </div>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeGroup(gIdx)}>
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </CardHeader>
 
-                {/* Options for MC */}
-                {group.type === "Multiple Choice" && (
-                  <div className="pl-6 space-y-2">
-                    {q.options.map((opt, oIdx) => (
-                      <div key={opt.id} className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground w-4">{String.fromCharCode(65 + oIdx)}.</span>
+            <CardContent className="space-y-4 pt-4">
+              {/* Group-level settings */}
+              <div className="space-y-3">
+                <Input
+                  placeholder="Instructions for this question group (e.g. 'Choose the correct heading for paragraphs A-D')..."
+                  value={group.instructions}
+                  onChange={(e) => updateGroup(gIdx, { instructions: e.target.value })}
+                  className="text-sm h-9"
+                />
+                <div className="flex flex-wrap gap-3 items-center">
+                  {/* MC multi-select toggle */}
+                  {group.type === "multiple-choice" && (
+                    <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+                      <Switch
+                        id={`multi-${group.id}`}
+                        checked={group.multipleSelection}
+                        onCheckedChange={(v) => updateGroup(gIdx, { multipleSelection: v })}
+                      />
+                      <Label htmlFor={`multi-${group.id}`} className="text-xs cursor-pointer">Multiple Selection</Label>
+                      {group.multipleSelection && (
                         <Input
-                          placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
-                          value={opt.text}
-                          onChange={(e) => updateOption(gIdx, qIdx, oIdx, e.target.value)}
-                          className="text-sm h-8 flex-1"
+                          type="number"
+                          min={2}
+                          value={group.selectCount}
+                          onChange={(e) => updateGroup(gIdx, { selectCount: parseInt(e.target.value) || 2 })}
+                          className="w-14 h-7 text-xs"
+                          placeholder="2"
                         />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Answer key */}
-                <div className="pl-6">
-                  <Label className="text-xs text-muted-foreground">Correct Answer</Label>
-                  {group.type === "True/False/Not Given" ? (
-                    <Select value={q.answer} onValueChange={(v) => updateQuestion(gIdx, qIdx, { answer: v })}>
-                      <SelectTrigger className="w-40 h-8 text-xs mt-1">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="True">True</SelectItem>
-                        <SelectItem value="False">False</SelectItem>
-                        <SelectItem value="Not Given">Not Given</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Input
-                      placeholder={group.type === "Multiple Choice" ? "e.g. A" : "Enter answer..."}
-                      value={q.answer}
-                      onChange={(e) => updateQuestion(gIdx, qIdx, { answer: e.target.value })}
-                      className="w-40 h-8 text-xs mt-1"
-                    />
+                      )}
+                    </div>
+                  )}
+                  {/* Sequential order for identification */}
+                  {isIdentification(group.type) && (
+                    <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+                      <Switch
+                        id={`seq-${group.id}`}
+                        checked={group.sequentialOrder}
+                        onCheckedChange={(v) => updateGroup(gIdx, { sequentialOrder: v })}
+                      />
+                      <Label htmlFor={`seq-${group.id}`} className="text-xs cursor-pointer">Sequential Order</Label>
+                    </div>
+                  )}
+                  {/* Word limit for completion */}
+                  {(isCompletion(group.type) || group.type === "short-answer" || group.type === "diagram-labeling") && (
+                    <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+                      <Type className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        placeholder="e.g. NO MORE THAN TWO WORDS"
+                        value={group.wordLimit}
+                        onChange={(e) => updateGroup(gIdx, { wordLimit: e.target.value })}
+                        className="w-56 h-7 text-xs"
+                      />
+                    </div>
+                  )}
+                  {/* Word bank for completion */}
+                  {isCompletion(group.type) && (
+                    <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+                      <Switch
+                        id={`wb-${group.id}`}
+                        checked={group.hasWordBank}
+                        onCheckedChange={(v) => updateGroup(gIdx, { hasWordBank: v })}
+                      />
+                      <Label htmlFor={`wb-${group.id}`} className="text-xs cursor-pointer">Word Bank</Label>
+                    </div>
                   )}
                 </div>
-              </motion.div>
-            ))}
-            <Button variant="outline" size="sm" className="gap-2 w-full" onClick={() => addQuestion(gIdx)}>
-              <Plus className="h-3.5 w-3.5" /> Add Question
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
+                {/* Word bank input */}
+                {group.hasWordBank && isCompletion(group.type) && (
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Word Bank (comma-separated)</Label>
+                    <Input
+                      placeholder="e.g. increase, decline, stable, fluctuate"
+                      value={group.wordBank.join(", ")}
+                      onChange={(e) => updateGroup(gIdx, { wordBank: e.target.value.split(",").map((w) => w.trim()) })}
+                      className="text-sm h-8"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Timeline connector + questions */}
+              <div className="relative ml-2 border-l-2 border-muted space-y-4 pl-6">
+                {group.questions.map((q, qIdx) => (
+                  <motion.div
+                    key={q.id}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="relative"
+                  >
+                    {/* Timeline dot */}
+                    <div className={cn(
+                      "absolute -left-[calc(1.5rem+5px)] top-4 h-2.5 w-2.5 rounded-full border-2 border-background",
+                      meta.color
+                    )} />
+
+                    <div className="rounded-lg border border-border p-4 space-y-3 bg-card">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold text-muted-foreground mt-1 shrink-0">Q{qIdx + 1}</span>
+                        <div className="flex-1 space-y-3">
+                          {needsQuestionText(group.type) && (
+                            <Input
+                              placeholder={
+                                group.type === "short-answer"
+                                  ? "Enter question..."
+                                  : isIdentification(group.type)
+                                  ? "Enter statement..."
+                                  : "Enter question text..."
+                              }
+                              value={q.text}
+                              onChange={(e) => updateQuestion(gIdx, qIdx, { text: e.target.value })}
+                              className="text-sm"
+                            />
+                          )}
+                          {showTimestamp && (
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                              <Input
+                                placeholder="e.g. 02:15"
+                                value={q.timestamp || ""}
+                                onChange={(e) => updateQuestion(gIdx, qIdx, { timestamp: e.target.value })}
+                                className="w-28 h-7 text-xs"
+                              />
+                            </div>
+                          )}
+                          {renderQuestionEditor(group, q, gIdx, qIdx)}
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeQuestion(gIdx, qIdx)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Button variant="outline" size="sm" className="gap-2 w-full" onClick={() => addQuestion(gIdx)}>
+                <Plus className="h-3.5 w-3.5" /> Add Question
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
+
       <Button
         variant="outline"
         className="gap-2 w-full border-dashed border-violet-300 dark:border-violet-800 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20"
