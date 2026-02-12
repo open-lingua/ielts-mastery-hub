@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight, Library } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ import {
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Test Library", path: "/tests", icon: Library },
   { label: "Writing", path: "/writing", icon: PenTool },
   { label: "Reading", path: "/reading", icon: BookOpen },
   { label: "Listening", path: "/listening", icon: Headphones },

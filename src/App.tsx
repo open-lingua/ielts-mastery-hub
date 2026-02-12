@@ -13,6 +13,7 @@ import ReadingModule from "./pages/ReadingModule";
 import ListeningModule from "./pages/ListeningModule";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import TestLibrary from "./pages/TestLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/writing" element={<WritingSimulator />} />
               <Route path="/reading" element={<ReadingModule />} />
               <Route path="/listening" element={<ListeningModule />} />
+              <Route path="/tests" element={<TestLibrary />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
