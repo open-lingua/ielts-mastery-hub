@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, User, Chrome } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDecorativePanel } from "@/components/AuthDecorativePanel";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -55,10 +56,39 @@ const RegisterPage: React.FC = () => {
             <span className="font-medium text-foreground">Mastery Hub</span>
           </div>
 
-          <h1 className="text-3xl font-bold text-foreground">Create an Account</h1>
-          <p className="mt-2 text-muted-foreground">Start your journey to Band 9 today.</p>
+          <h1 className="text-3xl font-bold text-foreground">Create your account</h1>
+          <p className="mt-2 text-muted-foreground">Start your IELTS preparation journey today.</p>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          {/* Google Sign Up */}
+          <button
+            onClick={async () => {
+              setGoogleLoading(true);
+              await new Promise((r) => setTimeout(r, 1500));
+              login({ name: "New User", email: "google_user@example.com" });
+              toast({ title: "Account created! 🎉", description: "Signed up with Google." });
+              navigate("/dashboard");
+            }}
+            disabled={googleLoading || loading}
+            className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card py-3 text-sm font-medium text-foreground transition-all hover:bg-secondary disabled:opacity-60"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            ) : (
+              <>
+                <Chrome className="h-5 w-5" />
+                Sign up with Google
+              </>
+            )}
+          </button>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Or continue with email</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">Full Name</label>
               <div className="relative">
@@ -135,7 +165,7 @@ const RegisterPage: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:hover:scale-100"
             >
               {loading ? (
