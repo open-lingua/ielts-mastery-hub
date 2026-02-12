@@ -725,54 +725,291 @@ const QuestionBuilder: React.FC<{
   );
 };
 
-// ─── Reading Creator ──────────────────────────
+// ─── Reading Passage Types ────────────────────
+interface ReadingPassageState {
+  id: number;
+  title: string;
+  content: string;
+  notes: string;
+  questionGroups: QuestionGroup[];
+}
+
+const PASSAGE_LABELS = [
+  { id: 1, label: "Passage 1", desc: "Short factual text" },
+  { id: 2, label: "Passage 2", desc: "Descriptive / analytical text" },
+  { id: 3, label: "Passage 3", desc: "Complex argumentative text" },
+];
+
+const emptyPassages = (): ReadingPassageState[] =>
+  PASSAGE_LABELS.map((p) => ({
+    id: p.id,
+    title: "",
+    content: "",
+    notes: "",
+    questionGroups: [emptyGroup()],
+  }));
+
+const ReadingPassageEditor: React.FC<{
+  passage: ReadingPassageState;
+  meta: (typeof PASSAGE_LABELS)[number];
+  onChange: (patch: Partial<ReadingPassageState>) => void;
+}> = ({ passage, meta, onChange }) => {
+  const [notesOpen, setNotesOpen] = useState(false);
+  const wordCount = passage.content.trim() ? passage.content.trim().split(/\s+/).length : 0;
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
+          {meta.desc}
+        </Badge>
+        <Badge variant="outline" className="text-[10px]">
+          {wordCount} words
+        </Badge>
+        <Badge variant="outline" className="text-[10px]">
+          {passage.questionGroups.reduce((a, g) => a + g.questions.length, 0)} questions
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left - Passage content */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Passage Title</Label>
+            <Input
+              placeholder={`e.g. ${meta.id === 1 ? "The Rise of Renewable Energy" : meta.id === 2 ? "Ancient Civilizations of the Andes" : "The Psychology of Workplace Motivation"}`}
+              value={passage.title}
+              onChange={(e) => onChange({ title: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Passage Content</Label>
+            <Textarea
+              placeholder="Paste the full reading passage here..."
+              className="min-h-[300px] font-serif text-sm leading-relaxed"
+              value={passage.content}
+              onChange={(e) => onChange({ content: e.target.value })}
+            />
+          </div>
+          <Collapsible open={notesOpen} onOpenChange={setNotesOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-xs text-muted-foreground w-full justify-start">
+                {notesOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                <MessageSquare className="h-3 w-3" />
+                Instructor Notes
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Textarea
+                placeholder="Private notes, keywords, or pedagogical hints..."
+                className="min-h-[80px] text-sm mt-2"
+                value={passage.notes}
+                onChange={(e) => onChange({ notes: e.target.value })}
+              />
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* Right - Questions */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Question Builder</h3>
+            <Badge variant="secondary" className="text-[10px]">
+              {passage.questionGroups.reduce((a, g) => a + g.questions.length, 0)} Qs
+            </Badge>
+          </div>
+          <QuestionBuilder
+            groups={passage.questionGroups}
+            onChange={(g) => onChange({ questionGroups: g })}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Reading Creator (3-Passage) ──────────────
 const ReadingCreator: React.FC<{
-  title: string; onTitleChange: (v: string) => void;
-  passage: string; onPassageChange: (v: string) => void;
+  testTitle: string; onTestTitleChange: (v: string) => void;
+  testType: string; onTestTypeChange: (v: string) => void;
   difficulty: string; onDifficultyChange: (v: string) => void;
   duration: string; onDurationChange: (v: string) => void;
-  groups: QuestionGroup[]; onGroupsChange: (g: QuestionGroup[]) => void;
-}> = ({ title, onTitleChange, passage, onPassageChange, difficulty, onDifficultyChange, duration, onDurationChange, groups, onGroupsChange }) => {
+  passages: ReadingPassageState[]; onPassagesChange: (p: ReadingPassageState[]) => void;
+}> = ({ testTitle, onTestTitleChange, testType, onTestTypeChange, difficulty, onDifficultyChange, duration, onDurationChange, passages, onPassagesChange }) => {
+  const [activePassage, setActivePassage] = useState(0);
+
+  const updatePassage = (idx: number, patch: Partial<ReadingPassageState>) => {
+    const next = [...passages];
+    next[idx] = { ...next[idx], ...patch };
+    onPassagesChange(next);
+  };
+
+  const duplicatePassage = (fromIdx: number, toIdx: number) => {
+    const next = [...passages];
+    next[toIdx] = {
+      ...JSON.parse(JSON.stringify(next[fromIdx])),
+      id: toIdx + 1,
+      title: "",
+      content: "",
+    };
+    onPassagesChange(next);
+  };
+
+  const clearPassageQuestions = (idx: number) => {
+    const next = [...passages];
+    next[idx] = { ...next[idx], questionGroups: [emptyGroup()] };
+    onPassagesChange(next);
+  };
+
+  const getPassageStatus = (p: ReadingPassageState) => {
+    const hasTitle = p.title.trim().length > 0;
+    const hasContent = p.content.trim().length > 0;
+    const hasQuestions = p.questionGroups.some((g) =>
+      g.questions.some((q) => q.text.trim() || q.options.some((o) => o.text.trim()) || q.completionGaps.some((g) => g.answer.trim()) || q.matchingPairs.some((p) => p.left.trim()))
+    );
+    if (hasTitle && hasContent && hasQuestions) return "complete";
+    if (hasTitle || hasContent || hasQuestions) return "partial";
+    return "empty";
+  };
+
+  const totalQuestions = passages.reduce(
+    (a, p) => a + p.questionGroups.reduce((b, g) => b + g.questions.length, 0),
+    0
+  );
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left - Content */}
-      <div className="space-y-4">
-        <div className="space-y-2">
+    <div className="space-y-6">
+      {/* Global metadata */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-2 md:col-span-2">
           <Label>Test Title</Label>
-          <Input placeholder="e.g. Academic Reading: The History of Glass" value={title} onChange={(e) => onTitleChange(e.target.value)} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Difficulty (Band)</Label>
-            <Select value={difficulty} onValueChange={onDifficultyChange}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
-                  <SelectItem key={b} value={b}>Band {b}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Duration</Label>
-            <Input placeholder="e.g. 60 mins" value={duration} onChange={(e) => onDurationChange(e.target.value)} />
-          </div>
+          <Input placeholder="e.g. Academic Reading Practice Test 14" value={testTitle} onChange={(e) => onTestTitleChange(e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label>Reading Passage</Label>
-          <Textarea placeholder="Paste the full reading passage here..." className="min-h-[300px] font-serif text-sm leading-relaxed" value={passage} onChange={(e) => onPassageChange(e.target.value)} />
+          <Label>Test Type</Label>
+          <Select value={testType} onValueChange={onTestTypeChange}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Academic">Academic</SelectItem>
+              <SelectItem value="General">General Training</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Difficulty</Label>
+          <Select value={difficulty} onValueChange={onDifficultyChange}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
+                <SelectItem key={b} value={b}>Band {b}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Right - Questions */}
+      {/* Test summary card */}
+      <Card className="border-border">
+        <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span>{totalQuestions}/40 questions</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              <Input
+                placeholder="60 mins"
+                value={duration}
+                onChange={(e) => onDurationChange(e.target.value)}
+                className="w-24 h-7 text-xs"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {passages.map((p, idx) => {
+              const status = getPassageStatus(p);
+              const qCount = p.questionGroups.reduce((a, g) => a + g.questions.length, 0);
+              return (
+                <Badge key={idx} variant="outline" className="text-[10px] gap-1">
+                  <span className={cn(
+                    "h-1.5 w-1.5 rounded-full inline-block",
+                    status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                  )} />
+                  P{idx + 1}: {qCount}Qs
+                </Badge>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Passage Tabs */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Question Builder</h3>
-          <Badge variant="secondary" className="text-[10px]">
-            {groups.reduce((a, g) => a + g.questions.length, 0)} questions total
-          </Badge>
+        <div className="flex items-center gap-1 rounded-lg bg-muted p-1 overflow-x-auto">
+          {PASSAGE_LABELS.map((meta, idx) => {
+            const status = getPassageStatus(passages[idx]);
+            return (
+              <button
+                key={meta.id}
+                onClick={() => setActivePassage(idx)}
+                className={cn(
+                  "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all flex-1 justify-center min-w-0",
+                  activePassage === idx
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
+                )}
+              >
+                <span className={cn(
+                  "h-2 w-2 rounded-full shrink-0",
+                  status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                )} />
+                <span className="truncate">{meta.label}</span>
+              </button>
+            );
+          })}
         </div>
-        <QuestionBuilder groups={groups} onChange={onGroupsChange} />
+
+        {/* Bulk actions */}
+        <div className="flex justify-end gap-2">
+          {activePassage > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1.5 text-muted-foreground"
+              onClick={() => duplicatePassage(activePassage - 1, activePassage)}
+            >
+              <ListChecks className="h-3.5 w-3.5" />
+              Duplicate questions from P{activePassage}
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs gap-1.5 text-destructive"
+            onClick={() => clearPassageQuestions(activePassage)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Clear Questions
+          </Button>
+        </div>
+
+        {/* Active passage editor */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activePassage}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ReadingPassageEditor
+              passage={passages[activePassage]}
+              meta={PASSAGE_LABELS[activePassage]}
+              onChange={(patch) => updatePassage(activePassage, patch)}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -1156,12 +1393,12 @@ const CreateContent: React.FC = () => {
   );
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  // ── Lifted Reading State ──
-  const [readingTitle, setReadingTitle] = useState("");
-  const [readingPassage, setReadingPassage] = useState("");
+  // ── Lifted Reading State (3-passage) ──
+  const [readingTestTitle, setReadingTestTitle] = useState("");
+  const [readingTestType, setReadingTestType] = useState("Academic");
   const [readingDifficulty, setReadingDifficulty] = useState("7");
   const [readingDuration, setReadingDuration] = useState("60 mins");
-  const [readingGroups, setReadingGroups] = useState<QuestionGroup[]>([emptyGroup()]);
+  const [readingPassages, setReadingPassages] = useState<ReadingPassageState[]>(emptyPassages());
 
   // ── Lifted Listening State (4-section) ──
   const [listeningTestTitle, setListeningTestTitle] = useState("");
@@ -1225,11 +1462,11 @@ const CreateContent: React.FC = () => {
         {/* Eagerly mounted tab panels */}
         <TabPanel active={activeTab === "reading"}>
           <ReadingCreator
-            title={readingTitle} onTitleChange={setReadingTitle}
-            passage={readingPassage} onPassageChange={setReadingPassage}
+            testTitle={readingTestTitle} onTestTitleChange={setReadingTestTitle}
+            testType={readingTestType} onTestTypeChange={setReadingTestType}
             difficulty={readingDifficulty} onDifficultyChange={setReadingDifficulty}
             duration={readingDuration} onDurationChange={setReadingDuration}
-            groups={readingGroups} onGroupsChange={setReadingGroups}
+            passages={readingPassages} onPassagesChange={setReadingPassages}
           />
         </TabPanel>
         <TabPanel active={activeTab === "listening"}>
@@ -1277,11 +1514,16 @@ const CreateContent: React.FC = () => {
         onOpenChange={setPreviewOpen}
         activeModule={activeTab}
         reading={{
-          title: readingTitle,
-          passage: readingPassage,
+          testTitle: readingTestTitle,
+          testType: readingTestType,
           difficulty: readingDifficulty,
           duration: readingDuration,
-          questionGroups: readingGroups,
+          passages: readingPassages.map((p) => ({
+            id: p.id,
+            title: p.title,
+            content: p.content,
+            questionGroups: p.questionGroups,
+          })),
         }}
         listening={{
           testTitle: listeningTestTitle,
