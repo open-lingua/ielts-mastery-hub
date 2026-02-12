@@ -49,6 +49,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { AdminLayout } from "@/components/AdminLayout";
+import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────
@@ -725,21 +726,25 @@ const QuestionBuilder: React.FC<{
 };
 
 // ─── Reading Creator ──────────────────────────
-const ReadingCreator: React.FC = () => {
-  const [groups, setGroups] = useState<QuestionGroup[]>([emptyGroup()]);
-
+const ReadingCreator: React.FC<{
+  title: string; onTitleChange: (v: string) => void;
+  passage: string; onPassageChange: (v: string) => void;
+  difficulty: string; onDifficultyChange: (v: string) => void;
+  duration: string; onDurationChange: (v: string) => void;
+  groups: QuestionGroup[]; onGroupsChange: (g: QuestionGroup[]) => void;
+}> = ({ title, onTitleChange, passage, onPassageChange, difficulty, onDifficultyChange, duration, onDurationChange, groups, onGroupsChange }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left - Content */}
       <div className="space-y-4">
         <div className="space-y-2">
           <Label>Test Title</Label>
-          <Input placeholder="e.g. Academic Reading: The History of Glass" />
+          <Input placeholder="e.g. Academic Reading: The History of Glass" value={title} onChange={(e) => onTitleChange(e.target.value)} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Difficulty (Band)</Label>
-            <Select defaultValue="7">
+            <Select value={difficulty} onValueChange={onDifficultyChange}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
@@ -750,12 +755,12 @@ const ReadingCreator: React.FC = () => {
           </div>
           <div className="space-y-2">
             <Label>Duration</Label>
-            <Input placeholder="e.g. 60 mins" defaultValue="60 mins" />
+            <Input placeholder="e.g. 60 mins" value={duration} onChange={(e) => onDurationChange(e.target.value)} />
           </div>
         </div>
         <div className="space-y-2">
           <Label>Reading Passage</Label>
-          <Textarea placeholder="Paste the full reading passage here..." className="min-h-[300px] font-serif text-sm leading-relaxed" />
+          <Textarea placeholder="Paste the full reading passage here..." className="min-h-[300px] font-serif text-sm leading-relaxed" value={passage} onChange={(e) => onPassageChange(e.target.value)} />
         </div>
       </div>
 
@@ -767,15 +772,20 @@ const ReadingCreator: React.FC = () => {
             {groups.reduce((a, g) => a + g.questions.length, 0)} questions total
           </Badge>
         </div>
-        <QuestionBuilder groups={groups} onChange={setGroups} />
+        <QuestionBuilder groups={groups} onChange={onGroupsChange} />
       </div>
     </div>
   );
 };
 
 // ─── Listening Creator ────────────────────────
-const ListeningCreator: React.FC = () => {
-  const [groups, setGroups] = useState<QuestionGroup[]>([emptyGroup()]);
+const ListeningCreator: React.FC<{
+  sectionTitle: string; onSectionTitleChange: (v: string) => void;
+  difficulty: string; onDifficultyChange: (v: string) => void;
+  duration: string; onDurationChange: (v: string) => void;
+  transcript: string; onTranscriptChange: (v: string) => void;
+  groups: QuestionGroup[]; onGroupsChange: (g: QuestionGroup[]) => void;
+}> = ({ sectionTitle, onSectionTitleChange, difficulty, onDifficultyChange, duration, onDurationChange, transcript, onTranscriptChange, groups, onGroupsChange }) => {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   return (
@@ -818,7 +828,7 @@ const ListeningCreator: React.FC = () => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <Textarea placeholder="Paste the full audio transcript here for accessibility..." className="min-h-[200px] text-sm" />
+              <Textarea placeholder="Paste the full audio transcript here for accessibility..." className="min-h-[200px] text-sm" value={transcript} onChange={(e) => onTranscriptChange(e.target.value)} />
             </CardContent>
           </CollapsibleContent>
         </Card>
@@ -828,11 +838,11 @@ const ListeningCreator: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label>Section Title</Label>
-          <Input placeholder="e.g. Section 4: Marine Biology" />
+          <Input placeholder="e.g. Section 4: Marine Biology" value={sectionTitle} onChange={(e) => onSectionTitleChange(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label>Difficulty</Label>
-          <Select defaultValue="7">
+          <Select value={difficulty} onValueChange={onDifficultyChange}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
@@ -843,23 +853,29 @@ const ListeningCreator: React.FC = () => {
         </div>
         <div className="space-y-2">
           <Label>Duration</Label>
-          <Input placeholder="e.g. 30 mins" defaultValue="30 mins" />
+          <Input placeholder="e.g. 30 mins" value={duration} onChange={(e) => onDurationChange(e.target.value)} />
         </div>
       </div>
 
       {/* Questions with timestamps */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold">Time-Synced Questions</h3>
-        <QuestionBuilder groups={groups} onChange={setGroups} showTimestamp />
+        <QuestionBuilder groups={groups} onChange={onGroupsChange} showTimestamp />
       </div>
     </div>
   );
 };
 
 // ─── Writing Creator ──────────────────────────
-const WritingCreator: React.FC = () => {
-  const [taskType, setTaskType] = useState<"task1" | "task2">("task1");
-
+const WritingCreator: React.FC<{
+  taskType: "task1" | "task2"; onTaskTypeChange: (v: "task1" | "task2") => void;
+  title: string; onTitleChange: (v: string) => void;
+  difficulty: string; onDifficultyChange: (v: string) => void;
+  suggestedTime: string; onSuggestedTimeChange: (v: string) => void;
+  prompt: string; onPromptChange: (v: string) => void;
+  minWords: number; onMinWordsChange: (v: number) => void;
+  maxWords: string; onMaxWordsChange: (v: string) => void;
+}> = ({ taskType, onTaskTypeChange, title, onTitleChange, difficulty, onDifficultyChange, suggestedTime, onSuggestedTimeChange, prompt, onPromptChange, minWords, onMinWordsChange, maxWords, onMaxWordsChange }) => {
   return (
     <div className="space-y-6">
       {/* Task Selector */}
@@ -867,7 +883,7 @@ const WritingCreator: React.FC = () => {
         <Label className="text-sm font-semibold">Task Type</Label>
         <div className="inline-flex items-center rounded-lg bg-muted p-1">
           <button
-            onClick={() => setTaskType("task1")}
+            onClick={() => onTaskTypeChange("task1")}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
               taskType === "task1" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -876,7 +892,7 @@ const WritingCreator: React.FC = () => {
             Task 1 – Visual
           </button>
           <button
-            onClick={() => setTaskType("task2")}
+            onClick={() => onTaskTypeChange("task2")}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
               taskType === "task2" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -892,12 +908,12 @@ const WritingCreator: React.FC = () => {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Title</Label>
-            <Input placeholder={taskType === "task1" ? "e.g. Bar Chart – International Tourism" : "e.g. Essay on Technology in Education"} />
+            <Input placeholder={taskType === "task1" ? "e.g. Bar Chart – International Tourism" : "e.g. Essay on Technology in Education"} value={title} onChange={(e) => onTitleChange(e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Difficulty</Label>
-              <Select defaultValue="7">
+              <Select value={difficulty} onValueChange={onDifficultyChange}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
@@ -908,7 +924,7 @@ const WritingCreator: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label>Suggested Time</Label>
-              <Input placeholder="e.g. 20 mins" defaultValue={taskType === "task1" ? "20 mins" : "40 mins"} />
+              <Input placeholder="e.g. 20 mins" value={suggestedTime} onChange={(e) => onSuggestedTimeChange(e.target.value)} />
             </div>
           </div>
 
@@ -936,16 +952,18 @@ const WritingCreator: React.FC = () => {
                   : "Write about the following topic:\n\nSome people believe that...\n\nDiscuss both views and give your own opinion."
               }
               className="min-h-[200px] text-sm"
+              value={prompt}
+              onChange={(e) => onPromptChange(e.target.value)}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Min. Words</Label>
-              <Input type="number" defaultValue={taskType === "task1" ? 150 : 250} />
+              <Input type="number" value={minWords} onChange={(e) => onMinWordsChange(parseInt(e.target.value) || 0)} />
             </div>
             <div className="space-y-2">
               <Label>Max. Words (optional)</Label>
-              <Input type="number" placeholder="No limit" />
+              <Input type="number" placeholder="No limit" value={maxWords} onChange={(e) => onMaxWordsChange(e.target.value)} />
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
@@ -987,6 +1005,30 @@ const CreateContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabValue>(
     tabParam && VALID_TABS.includes(tabParam) ? tabParam : "reading"
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  // ── Lifted Reading State ──
+  const [readingTitle, setReadingTitle] = useState("");
+  const [readingPassage, setReadingPassage] = useState("");
+  const [readingDifficulty, setReadingDifficulty] = useState("7");
+  const [readingDuration, setReadingDuration] = useState("60 mins");
+  const [readingGroups, setReadingGroups] = useState<QuestionGroup[]>([emptyGroup()]);
+
+  // ── Lifted Listening State ──
+  const [listeningTitle, setListeningTitle] = useState("");
+  const [listeningDifficulty, setListeningDifficulty] = useState("7");
+  const [listeningDuration, setListeningDuration] = useState("30 mins");
+  const [listeningTranscript, setListeningTranscript] = useState("");
+  const [listeningGroups, setListeningGroups] = useState<QuestionGroup[]>([emptyGroup()]);
+
+  // ── Lifted Writing State ──
+  const [writingTaskType, setWritingTaskType] = useState<"task1" | "task2">("task1");
+  const [writingTitle, setWritingTitle] = useState("");
+  const [writingDifficulty, setWritingDifficulty] = useState("7");
+  const [writingSuggestedTime, setWritingSuggestedTime] = useState("20 mins");
+  const [writingPrompt, setWritingPrompt] = useState("");
+  const [writingMinWords, setWritingMinWords] = useState(150);
+  const [writingMaxWords, setWritingMaxWords] = useState("");
 
   // Sync URL
   useEffect(() => {
@@ -1010,7 +1052,7 @@ const CreateContent: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab Navigation (standalone, not wrapping content) */}
+        {/* Tab Navigation */}
         <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
           {VALID_TABS.map((tab) => {
             const Icon = tab === "reading" ? BookOpen : tab === "listening" ? Headphones : PenTool;
@@ -1032,15 +1074,35 @@ const CreateContent: React.FC = () => {
           })}
         </div>
 
-        {/* Eagerly mounted tab panels — no unmount/remount, preserves form state */}
+        {/* Eagerly mounted tab panels */}
         <TabPanel active={activeTab === "reading"}>
-          <ReadingCreator />
+          <ReadingCreator
+            title={readingTitle} onTitleChange={setReadingTitle}
+            passage={readingPassage} onPassageChange={setReadingPassage}
+            difficulty={readingDifficulty} onDifficultyChange={setReadingDifficulty}
+            duration={readingDuration} onDurationChange={setReadingDuration}
+            groups={readingGroups} onGroupsChange={setReadingGroups}
+          />
         </TabPanel>
         <TabPanel active={activeTab === "listening"}>
-          <ListeningCreator />
+          <ListeningCreator
+            sectionTitle={listeningTitle} onSectionTitleChange={setListeningTitle}
+            difficulty={listeningDifficulty} onDifficultyChange={setListeningDifficulty}
+            duration={listeningDuration} onDurationChange={setListeningDuration}
+            transcript={listeningTranscript} onTranscriptChange={setListeningTranscript}
+            groups={listeningGroups} onGroupsChange={setListeningGroups}
+          />
         </TabPanel>
         <TabPanel active={activeTab === "writing"}>
-          <WritingCreator />
+          <WritingCreator
+            taskType={writingTaskType} onTaskTypeChange={setWritingTaskType}
+            title={writingTitle} onTitleChange={setWritingTitle}
+            difficulty={writingDifficulty} onDifficultyChange={setWritingDifficulty}
+            suggestedTime={writingSuggestedTime} onSuggestedTimeChange={setWritingSuggestedTime}
+            prompt={writingPrompt} onPromptChange={setWritingPrompt}
+            minWords={writingMinWords} onMinWordsChange={setWritingMinWords}
+            maxWords={writingMaxWords} onMaxWordsChange={setWritingMaxWords}
+          />
         </TabPanel>
 
         {/* Floating Action Bar */}
@@ -1051,7 +1113,7 @@ const CreateContent: React.FC = () => {
               <Button variant="outline" className="gap-2">
                 <Save className="h-4 w-4" /> Save Draft
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={() => setPreviewOpen(true)}>
                 <Eye className="h-4 w-4" /> Preview
               </Button>
               <Button className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
@@ -1061,6 +1123,36 @@ const CreateContent: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      <TestPreviewModal
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        activeModule={activeTab}
+        reading={{
+          title: readingTitle,
+          passage: readingPassage,
+          difficulty: readingDifficulty,
+          duration: readingDuration,
+          questionGroups: readingGroups,
+        }}
+        listening={{
+          sectionTitle: listeningTitle,
+          difficulty: listeningDifficulty,
+          duration: listeningDuration,
+          transcript: listeningTranscript,
+          questionGroups: listeningGroups,
+        }}
+        writing={{
+          taskType: writingTaskType,
+          title: writingTitle,
+          difficulty: writingDifficulty,
+          suggestedTime: writingSuggestedTime,
+          prompt: writingPrompt,
+          minWords: writingMinWords,
+          maxWords: writingMaxWords,
+        }}
+      />
     </AdminLayout>
   );
 };
