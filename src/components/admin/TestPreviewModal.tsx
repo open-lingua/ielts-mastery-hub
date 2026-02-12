@@ -81,12 +81,19 @@ interface QuestionGroup {
   questions: QuestionItem[];
 }
 
-export interface PreviewReadingState {
+export interface PreviewReadingPassage {
+  id: number;
   title: string;
-  passage: string;
+  content: string;
+  questionGroups: QuestionGroup[];
+}
+
+export interface PreviewReadingState {
+  testTitle: string;
+  testType: string;
   difficulty: string;
   duration: string;
-  questionGroups: QuestionGroup[];
+  passages: PreviewReadingPassage[];
 }
 
 export interface PreviewListeningSectionState {
@@ -344,53 +351,80 @@ const PaneToggle: React.FC<{
 // ─── Reading Preview ────────────────────────────
 
 const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolean }> = ({ data, split }) => {
+  const [activePassage, setActivePassage] = useState(0);
   const [activePane, setActivePane] = useState<"content" | "questions">("content");
-  const hasContent = data.title.trim() || data.passage.trim();
-  const hasQuestions = data.questionGroups.some((g) => g.questions.length > 0 && (g.questions[0].text || g.questions[0].options.some((o) => o.text) || g.questions[0].matchingPairs.length > 0 || g.questions[0].completionGaps.length > 0));
-  const totalQs = data.questionGroups.reduce((a, g) => a + g.questions.length, 0);
 
-  if (!hasContent && !hasQuestions) {
-    return <EmptyPreview message="Add a title and passage in the Reading editor to see the student view." />;
+  const hasAny = data.passages.some(
+    (p) => p.title.trim() || p.content.trim() || p.questionGroups.some((g) => g.questions.length > 0 && (g.questions[0].text || g.questions[0].options.some((o) => o.text) || g.questions[0].matchingPairs.length > 0 || g.questions[0].completionGaps.length > 0))
+  );
+
+  if (!hasAny && !data.testTitle.trim()) {
+    return <EmptyPreview message="Add passage titles and content in the Reading editor to see the student view." />;
   }
+
+  const currentPassage = data.passages[activePassage];
+  const totalQs = currentPassage?.questionGroups.reduce((a, g) => a + g.questions.length, 0) || 0;
+
+  const passageTabs = (
+    <div className="flex items-center gap-1 p-1 rounded-lg bg-muted overflow-x-auto">
+      {data.passages.map((p, i) => (
+        <button
+          key={p.id}
+          onClick={() => { setActivePassage(i); setActivePane("content"); }}
+          className={cn(
+            "flex-1 min-w-0 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-all text-center",
+            activePassage === i
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:bg-background/50"
+          )}
+        >
+          Passage {i + 1}
+        </button>
+      ))}
+    </div>
+  );
 
   const passageContent = (
     <div className={cn(split ? "p-5" : "p-4")}>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         <BookOpen className="h-4 w-4 text-primary" />
-        <span className="text-sm font-semibold text-foreground">Reading Passage</span>
+        <span className="text-sm font-semibold text-foreground">
+          {data.testTitle || "Reading Test"}
+        </span>
       </div>
-      {data.title && (
-        <h2 className={cn("font-serif font-bold text-foreground mb-4", split ? "text-xl" : "text-lg")}>{data.title}</h2>
+      {passageTabs}
+      {currentPassage?.title && (
+        <h2 className={cn("font-serif font-bold text-foreground mt-4 mb-4", split ? "text-xl" : "text-lg")}>
+          {currentPassage.title}
+        </h2>
       )}
-      {data.passage ? (
-        data.passage.split("\n\n").map((para, i) => (
+      {currentPassage?.content ? (
+        currentPassage.content.split("\n\n").map((para, i) => (
           <p key={i} className={cn("font-serif text-foreground/90 mb-3", split ? "text-sm leading-[1.8]" : "text-xs leading-[1.7]")}>{para}</p>
         ))
       ) : (
-        <p className="text-sm text-muted-foreground italic">Passage content will appear here...</p>
+        <p className="text-sm text-muted-foreground italic mt-4">Passage content will appear here...</p>
       )}
     </div>
   );
 
-  // Split layout (Desktop / Tablet)
   if (split) {
     return (
       <div className="flex flex-row h-full min-h-[500px]">
         <div className="flex-1 overflow-y-auto border-r border-border bg-card">
           {passageContent}
         </div>
-        <QuestionsPanel groups={data.questionGroups} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
+        <QuestionsPanel groups={currentPassage?.questionGroups || []} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
       </div>
     );
   }
 
-  // Stacked layout (Mobile)
   return (
     <div className="p-3">
       <PaneToggle activePane={activePane} onToggle={setActivePane} contentLabel="Passage" questionCount={totalQs} />
       <AnimatePresence mode="wait">
         <motion.div
-          key={activePane}
+          key={`${activePassage}-${activePane}`}
           initial={{ opacity: 0, x: activePane === "content" ? -10 : 10 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
@@ -400,7 +434,7 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
           {activePane === "content" ? (
             passageContent
           ) : (
-            <QuestionsPanel groups={data.questionGroups} compact className="p-3" />
+            <QuestionsPanel groups={currentPassage?.questionGroups || []} compact className="p-3" />
           )}
         </motion.div>
       </AnimatePresence>
