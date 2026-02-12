@@ -1,17 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Clock,
-  ChevronDown,
-  AlignLeft,
   CheckCircle,
   AlertCircle,
   Maximize2,
   RefreshCw,
   X,
-  BookOpen,
+  AlignLeft,
+  PenTool,
+  FileText,
+  Info,
+  Image as ImageIcon,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
-import { writingTasks } from "@/data/mockData";
+import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { academicWritingTest, generalWritingTest, type WritingTest, type WritingTask } from "@/data/writingTestData";
+import writingChartImage from "@/assets/writing-task1-chart.png";
+
+// ─── Types ───────────────────────────────────────────────────────────
+
+interface TaskDraft {
+  text: string;
+  wordCount: number;
+}
 
 interface Scores {
   overall: string;
@@ -22,11 +39,10 @@ interface Scores {
   feedback: string;
 }
 
+// ─── Score Card ──────────────────────────────────────────────────────
+
 const ScoreCard: React.FC<{ label: string; score: string; colorClass: string; bgClass: string }> = ({
-  label,
-  score,
-  colorClass,
-  bgClass,
+  label, score, colorClass, bgClass,
 }) => (
   <div className={`rounded-xl p-3 ${bgClass} border border-border transition-all hover:shadow-sm`}>
     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-tight">{label}</span>
@@ -34,38 +50,114 @@ const ScoreCard: React.FC<{ label: string; score: string; colorClass: string; bg
   </div>
 );
 
+// ─── Image Viewer ────────────────────────────────────────────────────
+
+const ImageViewer: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const [zoomed, setZoomed] = useState(false);
+
+  return (
+    <>
+      <div className="relative group rounded-xl overflow-hidden border border-border bg-secondary">
+        <img src={src} alt={alt} className="w-full h-auto object-contain" />
+        <button
+          onClick={() => setZoomed(true)}
+          className="absolute top-2 right-2 rounded-lg bg-card/80 backdrop-blur-sm p-1.5 opacity-0 group-hover:opacity-100 transition-opacity border border-border"
+        >
+          <ZoomIn className="h-4 w-4 text-foreground" />
+        </button>
+      </div>
+      {zoomed && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-md p-8"
+          onClick={() => setZoomed(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <img src={src} alt={alt} className="w-full h-auto rounded-xl border border-border shadow-2xl" />
+            <button
+              onClick={() => setZoomed(false)}
+              className="absolute top-3 right-3 rounded-full bg-card p-2 border border-border hover:bg-secondary transition-colors"
+            >
+              <ZoomOut className="h-4 w-4 text-foreground" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+// ─── Main Component ──────────────────────────────────────────────────
+
 const WritingSimulator: React.FC = () => {
-  const [essayText, setEssayText] = useState("");
-  const [selectedTask, setSelectedTask] = useState(writingTasks[0]);
-  const [timeLeft, setTimeLeft] = useState(selectedTask.timeMinutes * 60);
+  const [testType, setTestType] = useState<"Academic" | "General">("Academic");
+  const test: WritingTest = testType === "Academic" ? academicWritingTest : generalWritingTest;
+
+  const [activeTask, setActiveTask] = useState(0); // 0 = Task 1, 1 = Task 2
+  const [drafts, setDrafts] = useState<[TaskDraft, TaskDraft]>([
+    { text: "", wordCount: 0 },
+    { text: "", wordCount: 0 },
+  ]);
+  const [timeLeft, setTimeLeft] = useState(test.totalTime);
   const [isActive, setIsActive] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-  const [scores, setScores] = useState<Scores>({
-    overall: "0",
-    task: "0",
-    coherence: "0",
-    lexical: "0",
-    grammar: "0",
-    feedback: "",
-  });
+  const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const currentTask = test.tasks[activeTask];
+  const currentDraft = drafts[activeTask];
+
+  // ── Timer ──
   useEffect(() => {
     if (!isActive || timeLeft <= 0) return;
     const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
   }, [isActive, timeLeft]);
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    setEssayText(text);
-    const words = text.trim().split(/\s+/).filter((w) => w.length > 0);
-    setWordCount(words.length);
-    if (!isActive && timeLeft > 0 && text.length > 0) setIsActive(true);
-  };
+  // ── Auto-save every 30s ──
+  useEffect(() => {
+    autoSaveRef.current = setInterval(() => {
+      if (drafts[0].text || drafts[1].text) {
+        localStorage.setItem("ielts_writing_drafts", JSON.stringify(drafts));
+      }
+    }, 30000);
+    return () => { if (autoSaveRef.current) clearInterval(autoSaveRef.current); };
+  }, [drafts]);
+
+  // ── Load saved drafts ──
+  useEffect(() => {
+    const saved = localStorage.getItem("ielts_writing_drafts");
+    if (saved) {
+      try { setDrafts(JSON.parse(saved)); } catch {}
+    }
+  }, []);
+
+  // ── Reset on test type change ──
+  useEffect(() => {
+    setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
+    setTimeLeft(test.totalTime);
+    setActiveTask(0);
+    setIsActive(false);
+    setShowResults(false);
+    localStorage.removeItem("ielts_writing_drafts");
+  }, [testType]);
+
+  const countWords = (text: string) => text.trim().split(/\s+/).filter((w) => w.length > 0).length;
+
+  const handleTextChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const text = e.target.value;
+      const wc = countWords(text);
+      setDrafts((prev) => {
+        const next = [...prev] as [TaskDraft, TaskDraft];
+        next[activeTask] = { text, wordCount: wc };
+        return next;
+      });
+      if (!isActive && timeLeft > 0 && text.length > 0) setIsActive(true);
+    },
+    [activeTask, isActive, timeLeft],
+  );
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -79,10 +171,14 @@ const WritingSimulator: React.FC = () => {
     return "text-foreground";
   };
 
+  const getWordCountColor = (wc: number, min: number) =>
+    wc >= min ? "text-success" : wc > 0 ? "text-warning" : "text-muted-foreground";
+
   const handleSubmit = () => {
     setIsActive(false);
-    const base = wordCount > selectedTask.minWords ? 7.0 : 6.0;
-    const rand = () => (Math.random() * 1.0 - 0.5);
+    const totalWords = drafts[0].wordCount + drafts[1].wordCount;
+    const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
+    const rand = () => Math.random() * 1.0 - 0.5;
     setScores({
       overall: (base + 0.5).toFixed(1),
       task: (base + rand()).toFixed(1),
@@ -90,182 +186,275 @@ const WritingSimulator: React.FC = () => {
       lexical: (base + 1.0 + rand()).toFixed(1),
       grammar: (base + rand()).toFixed(1),
       feedback:
-        wordCount < selectedTask.minWords
-          ? "Your essay is under the word count limit, which may penalize your Task Achievement score. Focus on expanding your supporting arguments."
-          : "Good length. You've developed your ideas well. To improve further, try to use more varied sentence structures and less common vocabulary.",
+        drafts[0].wordCount < test.tasks[0].minWords || drafts[1].wordCount < test.tasks[1].minWords
+          ? "One or both tasks are under the minimum word count. Task Achievement may be affected. Focus on developing your ideas more fully."
+          : "Good job meeting the word requirements for both tasks. To improve, focus on varied sentence structures and precise vocabulary.",
     });
     setShowResults(true);
+    localStorage.removeItem("ielts_writing_drafts");
   };
 
-  const handleTaskSelect = (task: typeof writingTasks[0]) => {
-    setSelectedTask(task);
-    setShowDropdown(false);
-    setEssayText("");
-    setWordCount(0);
-    setTimeLeft(task.timeMinutes * 60);
+  const handleReset = () => {
+    setShowResults(false);
+    setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
+    setTimeLeft(test.totalTime);
+    setActiveTask(0);
     setIsActive(false);
+    localStorage.removeItem("ielts_writing_drafts");
   };
+
+  const bothAttempted = drafts[0].wordCount > 0 && drafts[1].wordCount > 0;
 
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Writing Header */}
-        <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 md:px-6 shrink-0">
-          <div className="relative">
-            <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
-            >
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">{selectedTask.type}: {selectedTask.title}</span>
-              <span className="sm:hidden">{selectedTask.type}</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-            {showDropdown && (
-              <div className="absolute top-full left-0 mt-2 w-80 rounded-xl border border-border bg-card shadow-xl z-50">
-                {writingTasks.map((task) => (
-                  <button
-                    key={task.id}
-                    onClick={() => handleTaskSelect(task)}
-                    className="w-full text-left px-4 py-3 hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-primary uppercase">{task.type}</span>
-                      <span className="text-xs text-muted-foreground">· {task.category}</span>
-                    </div>
-                    <div className="text-sm font-medium text-foreground">{task.title}</div>
-                  </button>
-                ))}
-              </div>
-            )}
+        {/* ─── Header ─── */}
+        <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
+          {/* Test type toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              {(["Academic", "General"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTestType(t)}
+                  className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    testType === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className={`flex items-center gap-2 rounded-xl border border-border px-3 py-2 font-mono text-lg font-medium tabular-nums ${getTimerColor()}`}>
+          {/* Task switcher */}
+          <div className="flex items-center gap-1">
+            {test.tasks.map((task, idx) => {
+              const draft = drafts[idx];
+              const isActive = activeTask === idx;
+              const statusColor = draft.wordCount >= task.minWords
+                ? "bg-success/10 border-success/30 text-success"
+                : draft.wordCount > 0
+                ? "bg-warning/10 border-warning/30 text-warning"
+                : "";
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => setActiveTask(idx)}
+                  className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border ${
+                    isActive
+                      ? "bg-primary/10 border-primary/30 text-primary shadow-sm"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <PenTool className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Task {idx + 1}</span>
+                  <span className="sm:hidden">T{idx + 1}</span>
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] px-1.5 py-0 ${statusColor}`}
+                  >
+                    {draft.wordCount}/{task.minWords}+
+                  </Badge>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Timer */}
+          <div className={`flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 font-mono text-base font-medium tabular-nums ${getTimerColor()}`}>
             <Clock className="h-4 w-4 opacity-75" />
             {formatTime(timeLeft)}
           </div>
         </div>
 
-        {/* Two-Pane Layout */}
+        {/* ─── Split Layout ─── */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* Editor */}
-          <div className="flex-1 flex flex-col bg-card">
-            <div className="flex-1 p-6 md:p-10 overflow-y-auto">
-              <textarea
-                ref={textareaRef}
-                value={essayText}
-                onChange={handleTextChange}
-                placeholder="Start typing your essay here..."
-                className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
-                spellCheck={false}
-              />
-            </div>
+          {/* Left: Prompt & Reference */}
+          <div className="w-full md:w-[420px] lg:w-[480px] border-b md:border-b-0 md:border-r border-border bg-background overflow-hidden shrink-0 flex flex-col">
+            <ScrollArea className="flex-1">
+              <div className="p-6">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`prompt-${activeTask}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Task badge */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
+                        {currentTask.title}
+                      </Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        {testType} · {currentTask.suggestedTime}
+                      </Badge>
+                    </div>
 
-            {/* Footer Bar */}
-            <div className="border-t border-border bg-card px-4 py-3 md:px-6 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-4">
-                <div>
-                  <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">Words</span>
-                  <span className={`text-lg font-bold ${wordCount < selectedTask.minWords ? "text-warning" : "text-success"}`}>
-                    {wordCount}
-                    <span className="text-xs font-normal text-muted-foreground"> / {selectedTask.minWords}+</span>
-                  </span>
-                </div>
-                <div className="hidden md:flex items-center text-xs text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-                  {isActive ? (
-                    <span className="flex items-center text-primary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...</span>
-                  ) : (
-                    <span className="flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>
-                  )}
-                </div>
+                    {/* Academic T1 chart image */}
+                    {activeTask === 0 && testType === "Academic" && (
+                      <div className="mb-5">
+                        <ImageViewer src={writingChartImage} alt="IELTS Task 1 Chart" />
+                      </div>
+                    )}
+
+                    {/* Prompt card */}
+                    <div className="rounded-2xl border border-border bg-card p-5 mb-5">
+                      <h2 className="text-base font-serif font-bold text-foreground leading-relaxed whitespace-pre-line">
+                        {currentTask.prompt}
+                      </h2>
+                      <Separator className="my-4" />
+                      <p className="text-sm text-muted-foreground italic leading-relaxed">
+                        {currentTask.context}
+                      </p>
+                    </div>
+
+                    {/* Tips */}
+                    <div className="space-y-3">
+                      <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Info className="h-3.5 w-3.5 text-primary" />
+                        Writing Tips
+                      </h3>
+                      {activeTask === 0 ? (
+                        <>
+                          <TipRow icon={<FileText className="h-4 w-4" />} title="Paraphrase the prompt" desc="Rewrite the question in your own words in the introduction." color="success" />
+                          <TipRow icon={<AlignLeft className="h-4 w-4" />} title={testType === "Academic" ? "Report key trends" : "Match the tone"} desc={testType === "Academic" ? "Identify and describe the main patterns in the data." : "Use appropriate formality: formal, semi-formal, or informal."} color="primary" />
+                        </>
+                      ) : (
+                        <>
+                          <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Plan your structure" desc="Introduction → Body 1 → Body 2 → Conclusion." color="success" />
+                          <TipRow icon={<Clock className="h-4 w-4" />} title="Budget your time" desc="~5 min planning, ~30 min writing, ~5 min reviewing." color="warning" />
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <button
-                onClick={handleSubmit}
-                disabled={wordCount === 0}
-                className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
-              >
-                Submit Essay <CheckCircle className="h-4 w-4" />
-              </button>
-            </div>
+            </ScrollArea>
           </div>
 
-          {/* Right Panel */}
-          <div className="w-full md:w-[420px] lg:w-[480px] border-t md:border-t-0 md:border-l border-border bg-background overflow-y-auto shrink-0">
-            <div className="p-6">
-              <div className="rounded-2xl border border-border bg-card p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary uppercase tracking-wide">
-                    {selectedTask.type} · {selectedTask.category}
-                  </span>
-                  <Maximize2 className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-primary transition-colors" />
+          {/* Right: Editor */}
+          <div className="flex-1 flex flex-col bg-card">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`editor-${activeTask}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 flex flex-col"
+              >
+                <div className="flex-1 p-6 md:p-10 overflow-y-auto">
+                  <textarea
+                    ref={textareaRef}
+                    value={currentDraft.text}
+                    onChange={handleTextChange}
+                    placeholder={
+                      activeTask === 0
+                        ? testType === "Academic"
+                          ? "Begin your report here..."
+                          : "Dear Sir or Madam,\n\nI am writing to..."
+                        : "Start typing your essay here..."
+                    }
+                    className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
+                    spellCheck={false}
+                  />
                 </div>
-                <h2 className="text-lg font-serif font-bold text-foreground leading-snug whitespace-pre-line">
-                  {selectedTask.question}
-                </h2>
-                <hr className="my-4 border-border" />
-                <p className="text-sm text-muted-foreground italic leading-relaxed">{selectedTask.context}</p>
-              </div>
 
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold text-foreground uppercase tracking-widest">Examiner's Advice</h3>
-                <div className="flex gap-3 items-start">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
-                    <AlignLeft className="h-4 w-4" />
+                {/* Footer */}
+                <div className="border-t border-border bg-card px-4 py-3 md:px-6 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">Words</span>
+                      <span className={`text-lg font-bold ${getWordCountColor(currentDraft.wordCount, currentTask.minWords)}`}>
+                        {currentDraft.wordCount}
+                        <span className="text-xs font-normal text-muted-foreground"> / {currentTask.minWords}+</span>
+                      </span>
+                    </div>
+                    <div className="hidden md:flex items-center text-xs text-muted-foreground bg-secondary px-3 py-1 rounded-full">
+                      {isActive ? (
+                        <span className="flex items-center text-primary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...</span>
+                      ) : (
+                        <span className="flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground">Structure your paragraphs</h4>
-                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                      Ensure each paragraph has a clear topic sentence and one main idea.
-                    </p>
+
+                  <div className="flex items-center gap-2">
+                    {activeTask === 0 ? (
+                      <button
+                        onClick={() => setActiveTask(1)}
+                        className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                      >
+                        Go to Task 2 →
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setActiveTask(0)}
+                        className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                      >
+                        ← Back to Task 1
+                      </button>
+                    )}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={handleSubmit}
+                            disabled={!bothAttempted}
+                            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+                          >
+                            Submit Test <CheckCircle className="h-4 w-4" />
+                          </button>
+                        </TooltipTrigger>
+                        {!bothAttempted && (
+                          <TooltipContent>
+                            <p>Both tasks must be attempted before submitting</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
-                <div className="flex gap-3 items-start">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning">
-                    <Clock className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground">Watch your timing</h4>
-                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                      Spend ~5 min planning, ~30 min writing, and ~5 min checking.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {/* Results Modal */}
+      {/* ─── Results Modal ─── */}
       {showResults && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-2xl bg-card shadow-2xl overflow-hidden border border-border">
             <div className="bg-primary p-6 flex justify-between items-start text-primary-foreground">
               <div>
-                <h2 className="text-2xl font-bold">Evaluation Report</h2>
-                <p className="text-primary-foreground/70 text-sm mt-1">AI-Powered Assessment based on IELTS Criteria</p>
+                <h2 className="text-2xl font-bold">Writing Summary</h2>
+                <p className="text-primary-foreground/70 text-sm mt-1">{testType} Writing Test · AI Assessment</p>
               </div>
               <button onClick={() => setShowResults(false)} className="rounded-full bg-primary-foreground/10 p-2 hover:bg-primary-foreground/20 transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="p-6 md:p-8">
+              {/* Word count summary */}
+              <div className="flex gap-3 mb-6">
+                {test.tasks.map((task, idx) => (
+                  <div key={task.id} className="flex-1 rounded-xl border border-border bg-secondary/50 p-4">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">Task {idx + 1}</span>
+                    <div className={`text-2xl font-bold mt-1 ${getWordCountColor(drafts[idx].wordCount, task.minWords)}`}>
+                      {drafts[idx].wordCount} <span className="text-sm font-normal text-muted-foreground">/ {task.minWords}+ words</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Band score */}
               <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
-                <div className="relative h-32 w-32 shrink-0">
+                <div className="relative h-28 w-28 shrink-0">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="hsl(var(--border))"
-                      strokeWidth="3"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="3"
-                      strokeDasharray={`${(parseFloat(scores.overall) / 9) * 100}, 100`}
-                    />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray={`${(parseFloat(scores.overall) / 9) * 100}, 100`} />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-3xl font-bold text-foreground">{scores.overall}</span>
@@ -279,6 +468,7 @@ const WritingSimulator: React.FC = () => {
                   <ScoreCard label="Grammatical Range" score={scores.grammar} colorClass="text-warning" bgClass="bg-warning/5" />
                 </div>
               </div>
+
               <div className="rounded-xl bg-secondary p-5 border border-border">
                 <h3 className="flex items-center text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
                   <AlertCircle className="h-4 w-4 mr-2 text-primary" /> AI Feedback
@@ -288,19 +478,10 @@ const WritingSimulator: React.FC = () => {
             </div>
             <div className="border-t border-border bg-secondary/50 p-4 flex justify-end gap-3">
               <button onClick={() => setShowResults(false)} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Review Essay
+                Review Essays
               </button>
-              <button
-                onClick={() => {
-                  setShowResults(false);
-                  setEssayText("");
-                  setWordCount(0);
-                  setTimeLeft(selectedTask.timeMinutes * 60);
-                  setIsActive(false);
-                }}
-                className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                Start New Task
+              <button onClick={handleReset} className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+                Start New Test
               </button>
             </div>
           </div>
@@ -309,5 +490,21 @@ const WritingSimulator: React.FC = () => {
     </DashboardLayout>
   );
 };
+
+// ─── Tip Row ─────────────────────────────────────────────────────────
+
+const TipRow: React.FC<{ icon: React.ReactNode; title: string; desc: string; color: string }> = ({
+  icon, title, desc, color,
+}) => (
+  <div className="flex gap-3 items-start">
+    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-${color}/10 text-${color}`}>
+      {icon}
+    </div>
+    <div>
+      <h4 className="text-sm font-semibold text-foreground">{title}</h4>
+      <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">{desc}</p>
+    </div>
+  </div>
+);
 
 export default WritingSimulator;
