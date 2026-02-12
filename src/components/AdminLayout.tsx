@@ -27,7 +27,7 @@ const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
   { label: "Content Library", icon: Library, path: "/admin/content" },
   { label: "Create New", icon: PlusCircle, path: "/admin/create" },
-  { label: "Students", icon: Users, path: "/admin/students" },
+  { label: "Students", icon: Users, path: "/admin/users" },
   { label: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
