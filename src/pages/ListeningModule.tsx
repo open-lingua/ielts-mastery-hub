@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { Headphones, ChevronRight, Lock, Info, AlertTriangle } from "lucide-react";
+import { Headphones, ChevronRight, Lock, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +10,7 @@ import SectionStepper from "@/components/listening/SectionStepper";
 import AudioPlayer from "@/components/listening/AudioPlayer";
 import QuestionCard from "@/components/listening/QuestionCard";
 import ResultsCard from "@/components/listening/ResultsCard";
-import TestTimer from "@/components/listening/TestTimer";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import { mockListeningTest } from "@/data/listeningTestData";
 import { cn } from "@/lib/utils";
 
@@ -19,28 +19,14 @@ const ListeningModule: React.FC = () => {
   const totalSections = test.sections.length;
 
   const [activeSection, setActiveSection] = useState(0);
-  const [unlockedSections, setUnlockedSections] = useState<boolean[]>([
-    true,
-    false,
-    false,
-    false,
-  ]);
-  const [completedSections, setCompletedSections] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-  ]);
-  const [audioEnded, setAudioEnded] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [unlockedSections, setUnlockedSections] = useState<boolean[]>([true, false, false, false]);
+  const [completedSections, setCompletedSections] = useState<boolean[]>([false, false, false, false]);
+  const [audioEnded, setAudioEnded] = useState<boolean[]>([false, false, false, false]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [testFinished, setTestFinished] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [timerKey, setTimerKey] = useState(0); // for resetting timer on retry
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -48,16 +34,13 @@ const ListeningModule: React.FC = () => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleAudioEnded = useCallback(
-    (sectionIndex: number) => {
-      setAudioEnded((prev) => {
-        const next = [...prev];
-        next[sectionIndex] = true;
-        return next;
-      });
-    },
-    []
-  );
+  const handleAudioEnded = useCallback((sectionIndex: number) => {
+    setAudioEnded((prev) => {
+      const next = [...prev];
+      next[sectionIndex] = true;
+      return next;
+    });
+  }, []);
 
   const handleAnswer = (qId: string, value: string) => {
     if (testFinished) return;
@@ -66,13 +49,11 @@ const ListeningModule: React.FC = () => {
 
   const handleSubmitSection = () => {
     const nextIndex = activeSection + 1;
-
     setCompletedSections((prev) => {
       const next = [...prev];
       next[activeSection] = true;
       return next;
     });
-
     if (nextIndex < totalSections) {
       setUnlockedSections((prev) => {
         const next = [...prev];
@@ -90,7 +71,6 @@ const ListeningModule: React.FC = () => {
   const handleTimeUp = useCallback(() => {
     if (testFinished) return;
     setAutoSubmitted(true);
-    // Mark all sections as completed
     setCompletedSections([true, true, true, true]);
     setTestFinished(true);
   }, [testFinished]);
@@ -104,6 +84,7 @@ const ListeningModule: React.FC = () => {
     setTestFinished(false);
     setReviewMode(false);
     setAutoSubmitted(false);
+    setTimerKey((k) => k + 1);
     scrollToTop();
   };
 
@@ -112,7 +93,6 @@ const ListeningModule: React.FC = () => {
   const answeredCount = sectionQuestions.filter((q) => answers[q.id]?.trim()).length;
   const hasAtLeastOne = answeredCount > 0;
   const canSubmit = hasAtLeastOne;
-  // Global question numbering offset
   const globalOffset = test.sections
     .slice(0, activeSection)
     .reduce((acc, s) => acc + s.questions.length, 0);
@@ -121,8 +101,9 @@ const ListeningModule: React.FC = () => {
     <DashboardLayout>
       <TooltipProvider>
         <div className="flex flex-col h-[calc(100vh-4rem)]">
-          {/* Countdown Timer + Progress Bar */}
-          <TestTimer
+          {/* Unified Timer */}
+          <UnifiedTimer
+            key={timerKey}
             totalSeconds={1800}
             onTimeUp={handleTimeUp}
             testFinished={testFinished}
@@ -134,9 +115,7 @@ const ListeningModule: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Headphones className="h-5 w-5 text-primary" />
-                  <h1 className="text-lg font-bold text-foreground">
-                    {test.title}
-                  </h1>
+                  <h1 className="text-lg font-bold text-foreground">{test.title}</h1>
                 </div>
                 {!testFinished && (
                   <Badge variant="outline" className="text-xs">
@@ -144,8 +123,6 @@ const ListeningModule: React.FC = () => {
                   </Badge>
                 )}
               </div>
-
-              {/* Stepper */}
               <div className="mt-3">
                 <SectionStepper
                   totalSections={totalSections}
@@ -183,8 +160,6 @@ const ListeningModule: React.FC = () => {
                       onToggleReview={() => setReviewMode((r) => !r)}
                       onRetry={handleRetry}
                     />
-
-                    {/* Review mode: show all sections */}
                     {reviewMode && (
                       <div className="space-y-6">
                         {test.sections.map((section) => {
@@ -192,17 +167,12 @@ const ListeningModule: React.FC = () => {
                             .slice(0, section.id - 1)
                             .reduce((acc, s) => acc + s.questions.length, 0);
                           return (
-                            <div
-                              key={section.id}
-                              className="rounded-2xl border border-border bg-card p-6 space-y-4"
-                            >
+                            <div key={section.id} className="rounded-2xl border border-border bg-card p-6 space-y-4">
                               <div>
                                 <Badge variant="secondary" className="text-[10px] uppercase tracking-wider mb-2">
                                   {section.context}
                                 </Badge>
-                                <h3 className="text-base font-bold text-foreground">
-                                  {section.title}
-                                </h3>
+                                <h3 className="text-base font-bold text-foreground">{section.title}</h3>
                               </div>
                               <div className="space-y-3">
                                 {section.questions.map((q, qi) => (
@@ -232,36 +202,24 @@ const ListeningModule: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
-                    {/* Section Header */}
                     <div className="rounded-2xl border border-border bg-card p-6">
                       <Badge variant="secondary" className="text-[10px] uppercase tracking-wider mb-2">
                         {currentSection.context}
                       </Badge>
-                      <h2 className="text-xl font-bold text-foreground">
-                        {currentSection.title}
-                      </h2>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {currentSection.subtitle}
-                      </p>
+                      <h2 className="text-xl font-bold text-foreground">{currentSection.title}</h2>
+                      <p className="text-sm text-muted-foreground mt-1">{currentSection.subtitle}</p>
                       <Separator className="my-4" />
-
-                      {/* Audio Player */}
                       <AudioPlayer
                         sectionIndex={activeSection}
                         onEnded={() => handleAudioEnded(activeSection)}
                         disabled={completedSections[activeSection]}
                       />
-
-                      {/* Instructions */}
                       <div className="mt-4 flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/10 p-3">
                         <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <p className="text-xs text-foreground leading-relaxed">
-                          {currentSection.instructions}
-                        </p>
+                        <p className="text-xs text-foreground leading-relaxed">{currentSection.instructions}</p>
                       </div>
                     </div>
 
-                    {/* Questions */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-semibold text-foreground">
@@ -284,7 +242,6 @@ const ListeningModule: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* Submit */}
                     <motion.div
                       animate={canSubmit ? { scale: [1, 1.02, 1] } : {}}
                       transition={{ duration: 0.4 }}
@@ -296,16 +253,12 @@ const ListeningModule: React.FC = () => {
                         size="lg"
                       >
                         {activeSection < totalSections - 1 ? (
-                          <>
-                            Submit & Continue to Section {activeSection + 2}
-                            <ChevronRight className="h-4 w-4" />
-                          </>
+                          <>Submit & Continue to Section {activeSection + 2} <ChevronRight className="h-4 w-4" /></>
                         ) : (
                           "Submit & View Results"
                         )}
                       </Button>
                     </motion.div>
-
                     {!canSubmit && (
                       <p className="text-center text-xs text-muted-foreground">
                         Answer at least one question to proceed.
@@ -318,34 +271,7 @@ const ListeningModule: React.FC = () => {
           </div>
         </div>
 
-        {/* Auto-submit overlay */}
-        <AnimatePresence>
-          {autoSubmitted && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="rounded-2xl border border-border bg-card p-8 shadow-2xl max-w-md text-center space-y-4"
-              >
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-                  <AlertTriangle className="h-7 w-7 text-destructive" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground">Time's Up!</h2>
-                <p className="text-sm text-muted-foreground">
-                  Your answers have been automatically submitted. You can now review your results.
-                </p>
-                <Button onClick={() => setAutoSubmitted(false)} className="w-full">
-                  View Results
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <TimeUpOverlay show={autoSubmitted} onDismiss={() => setAutoSubmitted(false)} />
       </TooltipProvider>
     </DashboardLayout>
   );

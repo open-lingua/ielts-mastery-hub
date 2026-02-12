@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Clock,
   CheckCircle,
   AlertCircle,
-  Maximize2,
   RefreshCw,
   X,
   AlignLeft,
   PenTool,
   FileText,
   Info,
-  Image as ImageIcon,
   ZoomIn,
   ZoomOut,
+  Clock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -20,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import { academicWritingTest, generalWritingTest, type WritingTest, type WritingTask } from "@/data/writingTestData";
 import writingChartImage from "@/assets/writing-task1-chart.png";
 
@@ -92,14 +91,15 @@ const WritingSimulator: React.FC = () => {
   const [testType, setTestType] = useState<"Academic" | "General">("Academic");
   const test: WritingTest = testType === "Academic" ? academicWritingTest : generalWritingTest;
 
-  const [activeTask, setActiveTask] = useState(0); // 0 = Task 1, 1 = Task 2
+  const [activeTask, setActiveTask] = useState(0);
   const [drafts, setDrafts] = useState<[TaskDraft, TaskDraft]>([
     { text: "", wordCount: 0 },
     { text: "", wordCount: 0 },
   ]);
-  const [timeLeft, setTimeLeft] = useState(test.totalTime);
   const [isActive, setIsActive] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
   const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -107,13 +107,6 @@ const WritingSimulator: React.FC = () => {
 
   const currentTask = test.tasks[activeTask];
   const currentDraft = drafts[activeTask];
-
-  // ── Timer ──
-  useEffect(() => {
-    if (!isActive || timeLeft <= 0) return;
-    const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
-    return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
 
   // ── Auto-save every 30s ──
   useEffect(() => {
@@ -136,10 +129,11 @@ const WritingSimulator: React.FC = () => {
   // ── Reset on test type change ──
   useEffect(() => {
     setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
-    setTimeLeft(test.totalTime);
     setActiveTask(0);
     setIsActive(false);
     setShowResults(false);
+    setAutoSubmitted(false);
+    setTimerKey((k) => k + 1);
     localStorage.removeItem("ielts_writing_drafts");
   }, [testType]);
 
@@ -154,25 +148,33 @@ const WritingSimulator: React.FC = () => {
         next[activeTask] = { text, wordCount: wc };
         return next;
       });
-      if (!isActive && timeLeft > 0 && text.length > 0) setIsActive(true);
+      if (!isActive && text.length > 0) setIsActive(true);
     },
-    [activeTask, isActive, timeLeft],
+    [activeTask, isActive],
   );
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
-  };
-
-  const getTimerColor = () => {
-    if (timeLeft < 300) return "text-destructive";
-    if (timeLeft < 600) return "text-warning";
-    return "text-foreground";
-  };
 
   const getWordCountColor = (wc: number, min: number) =>
     wc >= min ? "text-success" : wc > 0 ? "text-warning" : "text-muted-foreground";
+
+  const handleTimeUp = useCallback(() => {
+    if (showResults) return;
+    setAutoSubmitted(true);
+    setIsActive(false);
+    // Auto-submit with scores
+    const totalWords = drafts[0].wordCount + drafts[1].wordCount;
+    const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
+    const rand = () => Math.random() * 1.0 - 0.5;
+    setScores({
+      overall: (base + 0.5).toFixed(1),
+      task: (base + rand()).toFixed(1),
+      coherence: (base + 0.5 + rand()).toFixed(1),
+      lexical: (base + 1.0 + rand()).toFixed(1),
+      grammar: (base + rand()).toFixed(1),
+      feedback: "Time expired. Your essays have been automatically submitted for evaluation.",
+    });
+    setShowResults(true);
+    localStorage.removeItem("ielts_writing_drafts");
+  }, [showResults, drafts]);
 
   const handleSubmit = () => {
     setIsActive(false);
@@ -196,10 +198,11 @@ const WritingSimulator: React.FC = () => {
 
   const handleReset = () => {
     setShowResults(false);
+    setAutoSubmitted(false);
     setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
-    setTimeLeft(test.totalTime);
     setActiveTask(0);
     setIsActive(false);
+    setTimerKey((k) => k + 1);
     localStorage.removeItem("ielts_writing_drafts");
   };
 
@@ -208,6 +211,14 @@ const WritingSimulator: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
+        {/* Unified Timer */}
+        <UnifiedTimer
+          key={timerKey}
+          totalSeconds={test.totalTime}
+          onTimeUp={handleTimeUp}
+          testFinished={showResults}
+        />
+
         {/* ─── Header ─── */}
         <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
           {/* Test type toggle */}
@@ -231,7 +242,7 @@ const WritingSimulator: React.FC = () => {
           <div className="flex items-center gap-1">
             {test.tasks.map((task, idx) => {
               const draft = drafts[idx];
-              const isActive = activeTask === idx;
+              const isActiveTask = activeTask === idx;
               const statusColor = draft.wordCount >= task.minWords
                 ? "bg-success/10 border-success/30 text-success"
                 : draft.wordCount > 0
@@ -242,7 +253,7 @@ const WritingSimulator: React.FC = () => {
                   key={task.id}
                   onClick={() => setActiveTask(idx)}
                   className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border ${
-                    isActive
+                    isActiveTask
                       ? "bg-primary/10 border-primary/30 text-primary shadow-sm"
                       : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary"
                   }`}
@@ -259,12 +270,6 @@ const WritingSimulator: React.FC = () => {
                 </button>
               );
             })}
-          </div>
-
-          {/* Timer */}
-          <div className={`flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 font-mono text-base font-medium tabular-nums ${getTimerColor()}`}>
-            <Clock className="h-4 w-4 opacity-75" />
-            {formatTime(timeLeft)}
           </div>
         </div>
 
@@ -487,6 +492,8 @@ const WritingSimulator: React.FC = () => {
           </div>
         </div>
       )}
+
+      <TimeUpOverlay show={autoSubmitted} onDismiss={() => setAutoSubmitted(false)} />
     </DashboardLayout>
   );
 };
