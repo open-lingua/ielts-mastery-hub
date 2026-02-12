@@ -1,46 +1,87 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, User, Chrome } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, User, Chrome, Globe, GraduationCap, Building } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDecorativePanel } from "@/components/AuthDecorativePanel";
 import { useToast } from "@/hooks/use-toast";
+import { CountryPicker } from "@/components/CountryPicker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const registerSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+    email: z.string().trim().min(1, "Email is required").email("Enter a valid email"),
+    password: z.string().min(6, "Must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    country: z.string().min(1, "Please select your country"),
+    educationLevel: z.string().min(1, "Please select your education level"),
+    institution: z.string().max(200, "Must be less than 200 characters").optional().or(z.literal("")),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterFormData = z.infer<typeof registerSchema>;
+
+const educationOptions = [
+  { value: "high_school", label: "High School" },
+  { value: "undergraduate", label: "Undergraduate" },
+  { value: "graduate", label: "Graduate" },
+  { value: "postgraduate", label: "Postgraduate" },
+  { value: "professional", label: "Professional" },
+  { value: "other", label: "Other" },
+];
 
 const RegisterPage: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const validate = () => {
-    const newErrors: typeof errors = {};
-    if (!name.trim()) newErrors.name = "Name is required";
-    if (!email.trim()) newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Enter a valid email";
-    if (!password.trim()) newErrors.password = "Password is required";
-    else if (password.length < 6) newErrors.password = "Must be at least 6 characters";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      country: "",
+      educationLevel: "",
+      institution: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const password = watch("password");
+  const passwordStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
+  const strengthColors = ["", "bg-destructive", "bg-warning", "bg-success"];
+  const strengthLabels = ["", "Weak", "Fair", "Strong"];
+
+  const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
-    login({ name, email });
+    login({ name: data.name, email: data.email });
     toast({ title: "Account created! 🎉", description: "Welcome to IELTS Mastery Hub." });
     navigate("/dashboard");
   };
 
-  const passwordStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
-  const strengthColors = ["", "bg-destructive", "bg-warning", "bg-success"];
-  const strengthLabels = ["", "Weak", "Fair", "Strong"];
+  const inputClass = (hasError: boolean) =>
+    `w-full rounded-xl border bg-card py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-2 focus:ring-primary/30 ${
+      hasError ? "border-destructive ring-2 ring-destructive/20" : "border-border"
+    }`;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -88,53 +129,46 @@ const RegisterPage: React.FC = () => {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Full Name */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: undefined })); }}
+                  {...register("name")}
                   placeholder="John Doe"
-                  className={`w-full rounded-xl border bg-card py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-2 focus:ring-primary/30 ${
-                    errors.name ? "border-destructive ring-2 ring-destructive/20" : "border-border"
-                  }`}
+                  className={inputClass(!!errors.name)}
                 />
               </div>
-              {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>}
             </div>
 
+            {/* Email */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
+                  {...register("email")}
                   type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setErrors((p) => ({ ...p, email: undefined })); }}
                   placeholder="you@example.com"
-                  className={`w-full rounded-xl border bg-card py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-2 focus:ring-primary/30 ${
-                    errors.email ? "border-destructive ring-2 ring-destructive/20" : "border-border"
-                  }`}
+                  className={inputClass(!!errors.email)}
                 />
               </div>
-              {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email.message}</p>}
             </div>
 
+            {/* Password */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
+                  {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: undefined })); }}
                   placeholder="Min. 6 characters"
-                  className={`w-full rounded-xl border bg-card py-3 pl-10 pr-12 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-2 focus:ring-primary/30 ${
-                    errors.password ? "border-destructive ring-2 ring-destructive/20" : "border-border"
-                  }`}
+                  className={`${inputClass(!!errors.password)} !pr-12`}
                 />
                 <button
                   type="button"
@@ -144,8 +178,7 @@ const RegisterPage: React.FC = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
-              {/* Password strength */}
+              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password.message}</p>}
               {password.length > 0 && (
                 <div className="mt-2 flex items-center gap-2">
                   <div className="flex flex-1 gap-1">
@@ -162,6 +195,93 @@ const RegisterPage: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  {...register("confirmPassword")}
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Repeat your password"
+                  className={`${inputClass(!!errors.confirmPassword)} !pr-12`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="mt-1 text-xs text-destructive">{errors.confirmPassword.message}</p>}
+            </div>
+
+            {/* Country & Education - animated section */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="space-y-4 pt-2"
+            >
+              {/* Country */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Country</label>
+                <div className="relative">
+                  <Globe className="absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <CountryPicker
+                    value={watch("country")}
+                    onChange={(v) => setValue("country", v, { shouldValidate: true })}
+                    hasError={!!errors.country}
+                  />
+                </div>
+                {errors.country && <p className="mt-1 text-xs text-destructive">{errors.country.message}</p>}
+              </div>
+
+              {/* Education Level */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Education Level</label>
+                <div className="relative">
+                  <GraduationCap className="absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <Select
+                    value={watch("educationLevel")}
+                    onValueChange={(v) => setValue("educationLevel", v, { shouldValidate: true })}
+                  >
+                    <SelectTrigger
+                      className={`w-full rounded-xl border bg-card py-3 pl-10 pr-4 text-sm h-auto outline-none transition-all focus:ring-2 focus:ring-primary/30 ${
+                        errors.educationLevel ? "border-destructive ring-2 ring-destructive/20" : "border-border"
+                      }`}
+                    >
+                      <SelectValue placeholder="Select education level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {educationOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {errors.educationLevel && <p className="mt-1 text-xs text-destructive">{errors.educationLevel.message}</p>}
+              </div>
+
+              {/* Institution */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">School / University</label>
+                <div className="relative">
+                  <Building className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    {...register("institution")}
+                    placeholder="e.g. University of Cambridge"
+                    className={inputClass(!!errors.institution)}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">Optional: Provide the name of your current or most recent institution.</p>
+                {errors.institution && <p className="mt-1 text-xs text-destructive">{errors.institution.message}</p>}
+              </div>
+            </motion.div>
 
             <button
               type="submit"
