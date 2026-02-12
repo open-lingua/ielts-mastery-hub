@@ -89,12 +89,19 @@ export interface PreviewReadingState {
   questionGroups: QuestionGroup[];
 }
 
+export interface PreviewListeningSectionState {
+  id: number;
+  title: string;
+  transcript: string;
+  audioFileName: string;
+  questionGroups: QuestionGroup[];
+}
+
 export interface PreviewListeningState {
-  sectionTitle: string;
+  testTitle: string;
   difficulty: string;
   duration: string;
-  transcript: string;
-  questionGroups: QuestionGroup[];
+  sections: PreviewListeningSectionState[];
 }
 
 export interface PreviewWritingState {
@@ -404,25 +411,54 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
 // ─── Listening Preview ──────────────────────────
 
 const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: boolean }> = ({ data, split }) => {
+  const [previewSection, setPreviewSection] = useState(0);
   const [activePane, setActivePane] = useState<"content" | "questions">("content");
-  const hasContent = data.sectionTitle.trim() || data.transcript.trim();
-  const hasQuestions = data.questionGroups.some((g) => g.questions.length > 0);
-  const totalQs = data.questionGroups.reduce((a, g) => a + g.questions.length, 0);
 
-  if (!hasContent && !hasQuestions) {
-    return <EmptyPreview message="Add a section title and questions in the Listening editor to see the student view." />;
+  const hasSections = data.sections.some(
+    (s) => s.title.trim() || s.questionGroups.some((g) => g.questions.length > 0)
+  );
+
+  if (!hasSections && !data.testTitle.trim()) {
+    return <EmptyPreview message="Add section titles and questions in the Listening editor to see the student view." />;
   }
+
+  const currentSection = data.sections[previewSection];
+  const totalQs = currentSection?.questionGroups.reduce((a, g) => a + g.questions.length, 0) || 0;
+
+  const sectionTabs = (
+    <div className="flex items-center gap-1 p-1 rounded-lg bg-muted overflow-x-auto">
+      {data.sections.map((s, i) => (
+        <button
+          key={s.id}
+          onClick={() => { setPreviewSection(i); setActivePane("content"); }}
+          className={cn(
+            "flex-1 min-w-0 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-all text-center",
+            previewSection === i
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:bg-background/50"
+          )}
+        >
+          S{i + 1}
+        </button>
+      ))}
+    </div>
+  );
 
   const audioContent = (
     <div className={cn(split ? "p-5" : "p-4", "space-y-4")}>
       <div className="flex items-center gap-2">
         <Headphones className="h-4 w-4 text-primary" />
-        <span className="text-sm font-semibold text-foreground">Listening Section</span>
+        <span className="text-sm font-semibold text-foreground">
+          {data.testTitle || "Listening Test"}
+        </span>
       </div>
-      {data.sectionTitle && (
-        <h2 className={cn("font-bold text-foreground", split ? "text-xl" : "text-lg")}>{data.sectionTitle}</h2>
+      {sectionTabs}
+      {currentSection?.title && (
+        <h2 className={cn("font-bold text-foreground", split ? "text-lg" : "text-base")}>
+          Section {previewSection + 1}: {currentSection.title}
+        </h2>
       )}
-      {/* Audio player */}
+      {/* Audio player mock */}
       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
         <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
           <Headphones className="h-4 w-4 text-primary" />
@@ -437,11 +473,11 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
           </div>
         </div>
       </div>
-      {data.transcript && (
+      {currentSection?.transcript && (
         <div className="space-y-1">
           <p className="text-xs font-semibold text-muted-foreground">Transcript</p>
           <div className="rounded-lg border border-border bg-background p-3">
-            {data.transcript.split("\n\n").map((para, i) => (
+            {currentSection.transcript.split("\n\n").map((para, i) => (
               <p key={i} className="text-xs text-foreground/90 mb-2">{para}</p>
             ))}
           </div>
@@ -456,7 +492,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
         <div className="flex-1 overflow-y-auto border-r border-border bg-card">
           {audioContent}
         </div>
-        <QuestionsPanel groups={data.questionGroups} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
+        <QuestionsPanel groups={currentSection?.questionGroups || []} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
       </div>
     );
   }
@@ -466,7 +502,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
       <PaneToggle activePane={activePane} onToggle={setActivePane} contentLabel="Audio" questionCount={totalQs} />
       <AnimatePresence mode="wait">
         <motion.div
-          key={activePane}
+          key={`${previewSection}-${activePane}`}
           initial={{ opacity: 0, x: activePane === "content" ? -10 : 10 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
@@ -476,7 +512,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
           {activePane === "content" ? (
             audioContent
           ) : (
-            <QuestionsPanel groups={data.questionGroups} compact className="p-3" />
+            <QuestionsPanel groups={currentSection?.questionGroups || []} compact className="p-3" />
           )}
         </motion.div>
       </AnimatePresence>
