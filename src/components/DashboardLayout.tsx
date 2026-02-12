@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut } from "lucide-react";
+import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -19,9 +19,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const isGuest = !user;
   const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : "?";
+    : "G";
 
   const handleLogout = () => {
     logout();
@@ -110,16 +111,29 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             >
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
-            <button
-              onClick={handleLogout}
-              className="rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
-              aria-label="Logout"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-              {initials}
-            </div>
+            {isGuest ? (
+              <Link
+                to="/register"
+                className="flex items-center gap-2 rounded-xl border border-primary bg-primary/5 px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+              >
+                <UserPlus className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Sign Up to Save Progress</span>
+                <span className="sm:hidden">Sign Up</span>
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
+                  aria-label="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {initials}
+                </div>
+              </>
+            )}
           </div>
         </header>
 

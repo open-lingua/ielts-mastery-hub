@@ -147,12 +147,18 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link to="/register" className="font-semibold text-primary hover:underline">
               Sign up
             </Link>
           </p>
+          <Link
+            to="/dashboard"
+            className="mt-3 block text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip to Dashboard →
+          </Link>
         </div>
       </div>
     </div>
