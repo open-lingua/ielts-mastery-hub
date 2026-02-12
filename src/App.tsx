@@ -17,6 +17,7 @@ import TestLibrary from "./pages/TestLibrary";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ContentLibrary from "./pages/admin/ContentLibrary";
 import CreateContent from "./pages/admin/CreateContent";
+import UserManagement from "./pages/admin/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/content" element={<ContentLibrary />} />
               <Route path="/admin/create" element={<CreateContent />} />
+              <Route path="/admin/users" element={<UserManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
