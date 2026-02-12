@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus } from "lucide-react";
+import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -18,6 +24,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const isGuest = !user;
   const initials = user?.name
@@ -39,49 +46,89 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card transition-transform duration-300 md:static md:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-300 ease-in-out md:static md:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          collapsed ? "w-[70px]" : "w-64"
         )}
       >
-        <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <BookOpen className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold text-primary">IELTS</span>
-          <span className="text-lg font-medium text-foreground">Mastery Hub</span>
+        {/* Brand */}
+        <div className={cn(
+          "flex h-16 items-center border-b border-border transition-all duration-300",
+          collapsed ? "justify-center px-2" : "gap-2 px-6"
+        )}>
+          <BookOpen className="h-6 w-6 shrink-0 text-primary" />
+          {!collapsed && (
+            <>
+              <span className="text-lg font-bold text-primary">IELTS</span>
+              <span className="text-lg font-medium text-foreground">Mastery Hub</span>
+            </>
+          )}
         </div>
 
-        <nav className="flex-1 space-y-1 p-4">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Nav */}
+        <TooltipProvider delayDuration={0}>
+          <nav className={cn("flex-1 space-y-1 p-4 transition-all duration-300", collapsed && "px-2")}>
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              const linkContent = (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    "flex items-center rounded-xl text-sm font-medium transition-colors",
+                    collapsed ? "justify-center px-0 py-3" : "gap-3 px-4 py-3",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </Link>
+              );
 
-        <div className="border-t border-border p-4">
-          <div className="rounded-xl bg-primary/10 p-4">
-            <p className="text-sm font-semibold text-foreground">Go Premium ✨</p>
-            <p className="mt-1 text-xs text-muted-foreground">Unlock unlimited practice & AI feedback</p>
-            <Link
-              to="/#pricing"
-              className="mt-3 block rounded-lg bg-warning px-3 py-2 text-center text-xs font-bold text-warning-foreground transition-transform hover:scale-105"
-            >
-              Upgrade Now
-            </Link>
+              if (collapsed) {
+                return (
+                  <Tooltip key={item.path}>
+                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+                    <TooltipContent side="right" sideOffset={8}>
+                      {item.label}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              }
+
+              return linkContent;
+            })}
+          </nav>
+        </TooltipProvider>
+
+        {/* Premium CTA - hide when collapsed */}
+        {!collapsed && (
+          <div className="border-t border-border p-4">
+            <div className="rounded-xl bg-primary/10 p-4">
+              <p className="text-sm font-semibold text-foreground">Go Premium ✨</p>
+              <p className="mt-1 text-xs text-muted-foreground">Unlock unlimited practice & AI feedback</p>
+              <Link
+                to="/#pricing"
+                className="mt-3 block rounded-lg bg-warning px-3 py-2 text-center text-xs font-bold text-warning-foreground transition-transform hover:scale-105"
+              >
+                Upgrade Now
+              </Link>
+            </div>
           </div>
+        )}
+
+        {/* Collapse toggle */}
+        <div className={cn("hidden md:flex border-t border-border p-3", collapsed ? "justify-center" : "justify-end")}>
+          <button
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label="Toggle Sidebar"
+            className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
         </div>
       </aside>
 
