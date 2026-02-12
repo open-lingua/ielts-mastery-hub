@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { Headphones, ChevronRight, Lock, Info } from "lucide-react";
+import { Headphones, ChevronRight, Lock, Info, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +10,7 @@ import SectionStepper from "@/components/listening/SectionStepper";
 import AudioPlayer from "@/components/listening/AudioPlayer";
 import QuestionCard from "@/components/listening/QuestionCard";
 import ResultsCard from "@/components/listening/ResultsCard";
+import TestTimer from "@/components/listening/TestTimer";
 import { mockListeningTest } from "@/data/listeningTestData";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ const ListeningModule: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [testFinished, setTestFinished] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +87,14 @@ const ListeningModule: React.FC = () => {
     }
   };
 
+  const handleTimeUp = useCallback(() => {
+    if (testFinished) return;
+    setAutoSubmitted(true);
+    // Mark all sections as completed
+    setCompletedSections([true, true, true, true]);
+    setTestFinished(true);
+  }, [testFinished]);
+
   const handleRetry = () => {
     setActiveSection(0);
     setUnlockedSections([true, false, false, false]);
@@ -93,6 +103,7 @@ const ListeningModule: React.FC = () => {
     setAnswers({});
     setTestFinished(false);
     setReviewMode(false);
+    setAutoSubmitted(false);
     scrollToTop();
   };
 
@@ -110,6 +121,13 @@ const ListeningModule: React.FC = () => {
     <DashboardLayout>
       <TooltipProvider>
         <div className="flex flex-col h-[calc(100vh-4rem)]">
+          {/* Countdown Timer + Progress Bar */}
+          <TestTimer
+            totalSeconds={1800}
+            onTimeUp={handleTimeUp}
+            testFinished={testFinished}
+          />
+
           {/* Sticky Header */}
           <div className="shrink-0 border-b border-border bg-card px-4 py-3 md:px-8 space-y-3">
             <div className="max-w-4xl mx-auto">
@@ -299,6 +317,35 @@ const ListeningModule: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Auto-submit overlay */}
+        <AnimatePresence>
+          {autoSubmitted && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="rounded-2xl border border-border bg-card p-8 shadow-2xl max-w-md text-center space-y-4"
+              >
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                  <AlertTriangle className="h-7 w-7 text-destructive" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground">Time's Up!</h2>
+                <p className="text-sm text-muted-foreground">
+                  Your answers have been automatically submitted. You can now review your results.
+                </p>
+                <Button onClick={() => setAutoSubmitted(false)} className="w-full">
+                  View Results
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </TooltipProvider>
     </DashboardLayout>
   );
