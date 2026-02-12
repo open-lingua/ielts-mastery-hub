@@ -27,7 +27,7 @@ import type {
   FlowchartCompletionQuestion,
   ShortAnswerQuestion,
 } from "@/data/readingTestData";
-import { tfngQuestions, mcQuestions, ynngQuestions } from "@/data/readingTestData";
+import { tfngQuestions as defaultTfng, mcQuestions as defaultMc, ynngQuestions as defaultYnng } from "@/data/readingTestData";
 
 // ─── Types ──────────────────────────────────────────
 
@@ -38,6 +38,9 @@ interface SectionProps {
   answers: Answers;
   onAnswer: (key: string, value: string) => void;
   submitted: boolean;
+  tfngOverride?: typeof defaultTfng;
+  mcOverride?: typeof defaultMc;
+  ynngOverride?: typeof defaultYnng;
 }
 
 // ─── Status icon helper ─────────────────────────────
@@ -51,7 +54,8 @@ const AnswerStatus = ({ correct }: { correct: boolean }) =>
 
 // ─── 1. TRUE / FALSE / NOT GIVEN ────────────────────
 
-const TFNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted }) => {
+const TFNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, tfngOverride }) => {
+  const tfngQuestions = tfngOverride || defaultTfng;
   const options = ["TRUE", "FALSE", "NOT GIVEN"];
   return (
     <div className="space-y-4">
@@ -100,7 +104,8 @@ const TFNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted }) 
 
 // ─── 2. YES / NO / NOT GIVEN ────────────────────────
 
-const YNNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted }) => {
+const YNNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, ynngOverride }) => {
+  const ynngQuestions = ynngOverride || defaultYnng;
   const options = ["YES", "NO", "NOT GIVEN"];
   return (
     <div className="space-y-4">
@@ -149,7 +154,8 @@ const YNNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted }) 
 
 // ─── 3. MULTIPLE CHOICE ─────────────────────────────
 
-const MCRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted }) => {
+const MCRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, mcOverride }) => {
+  const mcQuestions = mcOverride || defaultMc;
   return (
     <div className="space-y-5">
       {mcQuestions.map((q) => {
@@ -779,6 +785,9 @@ interface QuestionRendererProps {
   answers: Answers;
   onAnswer: (key: string, value: string) => void;
   submitted: boolean;
+  tfngOverride?: typeof defaultTfng;
+  mcOverride?: typeof defaultMc;
+  ynngOverride?: typeof defaultYnng;
 }
 
 const typeBadgeColors: Record<string, string> = {
@@ -818,13 +827,16 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   answers,
   onAnswer,
   submitted,
+  tfngOverride,
+  mcOverride,
+  ynngOverride,
 }) => {
   const type = section.data.type;
   const badgeColor = typeBadgeColors[type] || "";
   const label = typeLabels[type] || type;
 
   const renderSection = () => {
-    const props: SectionProps = { data: section.data, answers, onAnswer, submitted };
+    const props: SectionProps = { data: section.data, answers, onAnswer, submitted, tfngOverride, mcOverride, ynngOverride };
     switch (type) {
       case "TRUE_FALSE_NOT_GIVEN": return <TFNGRenderer {...props} />;
       case "YES_NO_NOT_GIVEN": return <YNNGRenderer {...props} />;
