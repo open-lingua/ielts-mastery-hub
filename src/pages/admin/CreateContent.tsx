@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -957,9 +958,46 @@ const WritingCreator: React.FC = () => {
   );
 };
 
+// ─── Tab Content Wrapper (eager mount, CSS visibility) ──────
+const TabPanel: React.FC<{ active: boolean; children: React.ReactNode }> = ({ active, children }) => (
+  <div className={active ? "block mt-6" : "hidden"} aria-hidden={!active}>
+    <AnimatePresence mode="wait">
+      {active && (
+        <motion.div
+          key="panel"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
 // ─── Main Page ────────────────────────────────
+const VALID_TABS = ["reading", "listening", "writing"] as const;
+type TabValue = (typeof VALID_TABS)[number];
+
 const CreateContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("reading");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("type") as TabValue | null;
+  const [activeTab, setActiveTab] = useState<TabValue>(
+    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "reading"
+  );
+
+  // Sync URL
+  useEffect(() => {
+    setSearchParams({ type: activeTab }, { replace: true });
+  }, [activeTab, setSearchParams]);
+
+  const handleTabChange = (value: string) => {
+    if (VALID_TABS.includes(value as TabValue)) {
+      setActiveTab(value as TabValue);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -972,40 +1010,38 @@ const CreateContent: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab Creator */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="reading" className="gap-2">
-              <BookOpen className="h-4 w-4" /> Reading
-            </TabsTrigger>
-            <TabsTrigger value="listening" className="gap-2">
-              <Headphones className="h-4 w-4" /> Listening
-            </TabsTrigger>
-            <TabsTrigger value="writing" className="gap-2">
-              <PenTool className="h-4 w-4" /> Writing
-            </TabsTrigger>
-          </TabsList>
+        {/* Tab Navigation (standalone, not wrapping content) */}
+        <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+          {VALID_TABS.map((tab) => {
+            const Icon = tab === "reading" ? BookOpen : tab === "listening" ? Headphones : PenTool;
+            return (
+              <button
+                key={tab}
+                onClick={() => handleTabChange(tab)}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-all capitalize",
+                  activeTab === tab
+                    ? "bg-background text-foreground shadow-sm"
+                    : "hover:bg-background/50 hover:text-foreground"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {tab}
+              </button>
+            );
+          })}
+        </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-            >
-              <TabsContent value="reading" className="mt-6">
-                <ReadingCreator />
-              </TabsContent>
-              <TabsContent value="listening" className="mt-6">
-                <ListeningCreator />
-              </TabsContent>
-              <TabsContent value="writing" className="mt-6">
-                <WritingCreator />
-              </TabsContent>
-            </motion.div>
-          </AnimatePresence>
-        </Tabs>
+        {/* Eagerly mounted tab panels — no unmount/remount, preserves form state */}
+        <TabPanel active={activeTab === "reading"}>
+          <ReadingCreator />
+        </TabPanel>
+        <TabPanel active={activeTab === "listening"}>
+          <ListeningCreator />
+        </TabPanel>
+        <TabPanel active={activeTab === "writing"}>
+          <WritingCreator />
+        </TabPanel>
 
         {/* Floating Action Bar */}
         <div className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-border -mx-6 md:-mx-8 px-6 md:px-8 py-4">
