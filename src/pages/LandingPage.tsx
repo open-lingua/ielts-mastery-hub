@@ -71,6 +71,9 @@ const LandingPage: React.FC = () => {
               Go Premium <ChevronRight className="h-4 w-4" />
             </a>
           </div>
+          <Link to="/dashboard" className="mt-4 inline-block text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Try for free — no login required →
+          </Link>
         </div>
       </section>
 

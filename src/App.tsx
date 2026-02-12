@@ -29,10 +29,10 @@ const App = () => (
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/writing" element={<ProtectedRoute><WritingSimulator /></ProtectedRoute>} />
-              <Route path="/reading" element={<ProtectedRoute><ReadingModule /></ProtectedRoute>} />
-              <Route path="/listening" element={<ProtectedRoute><ListeningModule /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/writing" element={<WritingSimulator />} />
+              <Route path="/reading" element={<ReadingModule />} />
+              <Route path="/listening" element={<ListeningModule />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
