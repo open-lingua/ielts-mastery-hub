@@ -14,6 +14,9 @@ import ListeningModule from "./pages/ListeningModule";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TestLibrary from "./pages/TestLibrary";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ContentLibrary from "./pages/admin/ContentLibrary";
+import CreateContent from "./pages/admin/CreateContent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +38,9 @@ const App = () => (
               <Route path="/reading" element={<ReadingModule />} />
               <Route path="/listening" element={<ListeningModule />} />
               <Route path="/tests" element={<TestLibrary />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/content" element={<ContentLibrary />} />
+              <Route path="/admin/create" element={<CreateContent />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
