@@ -1,9 +1,9 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, X } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -14,8 +14,19 @@ const navItems = [
 
 export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -99,8 +110,15 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             >
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
+            <button
+              onClick={handleLogout}
+              className="rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
+              aria-label="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-              SC
+              {initials}
             </div>
           </div>
         </header>

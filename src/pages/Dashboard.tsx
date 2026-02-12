@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { PenTool, BookOpen, Headphones, TrendingUp, Flame, Clock } from "lucide-react";
 import { mockUser } from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DashboardLayout } from "@/components/DashboardLayout";
 
@@ -33,6 +34,8 @@ const quickActions = [
 ];
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const displayName = user?.name?.split(" ")[0] || mockUser.name.split(" ")[0];
   return (
     <DashboardLayout>
       <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-8">
@@ -41,7 +44,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold md:text-3xl">
-                Welcome back, {mockUser.name.split(" ")[0]}! 👋
+                Welcome back, {displayName}! 👋
               </h1>
               <p className="mt-1 text-muted-foreground">Keep up the great work on your IELTS journey.</p>
             </div>
