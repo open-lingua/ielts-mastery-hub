@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  CheckCircle,
-  PlayCircle,
-  Clock,
-  ArrowRight,
   BookOpen,
   PenTool,
   Headphones,
-  Sparkles,
+  CheckCircle2,
+  PlayCircle,
+  Clock,
+  ArrowRight,
+  BarChart3,
+  MoreHorizontal,
+  Timer,
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -30,20 +31,19 @@ interface MockTest {
   score?: number;
   date?: string;
   progress?: number;
-  duration?: string;
+  duration: string;
   difficulty: "Easy" | "Medium" | "Hard";
 }
 
 const mockTests: MockTest[] = [
-  { id: 1, title: "Academic Reading Test 1", module: "Reading", status: "completed", score: 7.5, date: "2023-10-15", difficulty: "Hard" },
-  { id: 2, title: "General Training Writing Task 1", module: "Writing", status: "in-progress", progress: 60, difficulty: "Medium" },
-  { id: 3, title: "Listening Section 4: Lecture", module: "Listening", status: "new", duration: "30 mins", difficulty: "Hard" },
-  { id: 4, title: "Academic Reading Test 2", module: "Reading", status: "in-progress", progress: 25, difficulty: "Medium" },
-  { id: 5, title: "Writing Task 2: Essay", module: "Writing", status: "completed", score: 6.5, date: "2023-10-12", difficulty: "Hard" },
-  { id: 6, title: "Listening Section 1: Conversation", module: "Listening", status: "completed", score: 8.0, date: "2023-10-10", difficulty: "Easy" },
-  { id: 7, title: "Academic Reading Test 3", module: "Reading", status: "new", duration: "60 mins", difficulty: "Hard" },
-  { id: 8, title: "Writing Task 1: Graph Description", module: "Writing", status: "new", duration: "20 mins", difficulty: "Medium" },
-  { id: 9, title: "Listening Section 3: Discussion", module: "Listening", status: "in-progress", progress: 45, difficulty: "Medium" },
+  { id: 1, title: "Academic Reading: The History of Glass", module: "Reading", status: "completed", score: 8.5, date: "2023-10-15", difficulty: "Hard", duration: "60 mins" },
+  { id: 2, title: "General Writing Task 1: Letter to Council", module: "Writing", status: "in-progress", progress: 65, difficulty: "Medium", duration: "20 mins" },
+  { id: 3, title: "Listening Section 4: Marine Biology", module: "Listening", status: "new", duration: "30 mins", difficulty: "Hard" },
+  { id: 4, title: "Academic Reading: Urban Planning", module: "Reading", status: "in-progress", progress: 25, difficulty: "Medium", duration: "60 mins" },
+  { id: 5, title: "Writing Task 2: Essay on Technology", module: "Writing", status: "new", duration: "40 mins", difficulty: "Easy" },
+  { id: 6, title: "Listening Section 1: Hotel Reservation", module: "Listening", status: "completed", score: 9.0, date: "2023-10-18", difficulty: "Easy", duration: "30 mins" },
+  { id: 7, title: "Academic Reading: Cognitive Science", module: "Reading", status: "new", duration: "60 mins", difficulty: "Hard" },
+  { id: 8, title: "General Writing Task 2: Public Transport", module: "Writing", status: "completed", score: 6.5, date: "2023-10-20", difficulty: "Medium", duration: "40 mins" },
 ];
 
 const moduleIcons: Record<TestModule, React.ElementType> = {
@@ -52,172 +52,198 @@ const moduleIcons: Record<TestModule, React.ElementType> = {
   Listening: Headphones,
 };
 
-const moduleColors: Record<TestModule, string> = {
-  Reading: "text-emerald-600 dark:text-emerald-400",
-  Writing: "text-primary",
-  Listening: "text-amber-600 dark:text-amber-400",
+const moduleIconColors: Record<TestModule, string> = {
+  Reading: "text-blue-500",
+  Writing: "text-amber-500",
+  Listening: "text-rose-500",
 };
 
-const moduleIconBg: Record<TestModule, string> = {
-  Reading: "bg-emerald-100 dark:bg-emerald-900/40",
-  Writing: "bg-primary/10",
-  Listening: "bg-amber-100 dark:bg-amber-900/40",
+const difficultyVariant: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+  Easy: "secondary",
+  Medium: "outline",
+  Hard: "destructive",
 };
 
-const difficultyColors: Record<string, string> = {
-  Easy: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
-  Medium: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
-  Hard: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300",
+const dotColors: Record<TestStatus, string> = {
+  completed: "bg-emerald-500",
+  "in-progress": "bg-blue-500",
+  new: "bg-slate-300 dark:bg-slate-600",
+};
+
+const cardBorderColors: Record<TestStatus, string> = {
+  completed: "border-emerald-200 dark:border-emerald-900",
+  "in-progress": "border-blue-200 dark:border-blue-900",
+  new: "border-border",
 };
 
 const TestCard: React.FC<{ test: MockTest }> = ({ test }) => {
   const Icon = moduleIcons[test.module];
+  const isCompleted = test.status === "completed";
+  const isInProgress = test.status === "in-progress";
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.25 }}
-    >
-      <Card
-        className={cn(
-          "group relative overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5",
-          test.status === "completed" && "opacity-80",
-          test.status === "in-progress" && "ring-1 ring-sky-400/40 dark:ring-sky-500/30"
-        )}
-      >
-        {test.status === "completed" && (
-          <div className="absolute top-0 left-0 w-full h-0.5 bg-emerald-500" />
-        )}
-        {test.status === "in-progress" && (
-          <div className="absolute top-0 left-0 w-full h-0.5 bg-sky-500" />
-        )}
+    <Card className={cn("flex flex-col md:flex-row overflow-hidden hover:shadow-md transition-shadow", cardBorderColors[test.status])}>
+      {/* Info Section */}
+      <div className="p-5 md:w-1/3 space-y-3 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
+        <div className="flex justify-between items-start">
+          <div className={cn("flex items-center gap-2 text-sm font-medium text-muted-foreground")}>
+            <Icon className={cn("h-4 w-4", moduleIconColors[test.module])} />
+            <span>{test.module}</span>
+          </div>
+          <Badge variant={difficultyVariant[test.difficulty]} className="text-[10px]">
+            {test.difficulty}
+          </Badge>
+        </div>
+        <h3 className="font-semibold leading-tight text-lg text-foreground">{test.title}</h3>
+      </div>
 
-        <CardContent className="p-5 space-y-4">
-          {/* Header row */}
-          <div className="flex items-start justify-between gap-3">
-            <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", moduleIconBg[test.module])}>
-              <Icon className={cn("h-5 w-5", moduleColors[test.module])} />
+      {/* Status Section */}
+      <div className="px-5 py-4 md:py-5 md:w-1/3 flex flex-col justify-center space-y-3 border-b md:border-b-0 md:border-r border-border">
+        {isCompleted ? (
+          <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium uppercase tracking-wider">Score Achieved</span>
+              <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">Band {test.score}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className={cn("text-[10px] font-semibold", difficultyColors[test.difficulty])}>
-                {test.difficulty}
+            <BarChart3 className="h-8 w-8 text-emerald-300 dark:text-emerald-700 opacity-50" />
+          </div>
+        ) : isInProgress ? (
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs font-medium text-muted-foreground">
+              <span>Progress</span>
+              <span>{test.progress}%</span>
+            </div>
+            <Progress value={test.progress} className="h-2" />
+            <p className="text-xs text-muted-foreground pt-1">Last active 2 hours ago</p>
+          </div>
+        ) : (
+          <div className="flex items-center text-muted-foreground text-sm gap-2">
+            <Clock className="h-4 w-4" />
+            <span>Est. Duration: {test.duration}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Action Section */}
+      <div className="p-5 md:w-1/3 flex flex-col justify-center">
+        <div className="flex items-center justify-between md:justify-end md:gap-4">
+          <div className="md:hidden">
+            {isCompleted && (
+              <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Completed
               </Badge>
-              {test.status === "completed" && (
-                <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 border-0 gap-1">
-                  <CheckCircle className="h-3 w-3" /> Done
-                </Badge>
-              )}
-              {test.status === "in-progress" && (
-                <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300 border-0 gap-1">
-                  <PlayCircle className="h-3 w-3" /> Resumable
-                </Badge>
-              )}
-              {test.status === "new" && (
-                <Badge className="bg-secondary text-secondary-foreground border-0 gap-1">
-                  <Sparkles className="h-3 w-3" /> New
-                </Badge>
-              )}
-            </div>
+            )}
+            {isInProgress && (
+              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800 gap-1">
+                <PlayCircle className="h-3 w-3" /> Resumable
+              </Badge>
+            )}
+            {test.status === "new" && (
+              <Badge variant="secondary">New</Badge>
+            )}
           </div>
-
-          {/* Title & module */}
-          <div>
-            <h3 className="text-sm font-bold text-foreground leading-tight">{test.title}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{test.module} Module</p>
-          </div>
-
-          {/* Status-specific content */}
-          {test.status === "completed" && (
-            <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2">
-              <span className="text-xs text-muted-foreground">Band Score</span>
-              <span className="text-lg font-bold text-emerald-700 dark:text-emerald-300">{test.score}</span>
-            </div>
-          )}
-
-          {test.status === "in-progress" && (
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Progress</span>
-                <span className="font-semibold text-foreground">{test.progress}%</span>
-              </div>
-              <Progress value={test.progress} className="h-2" />
-            </div>
-          )}
-
-          {test.status === "new" && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Clock className="h-3.5 w-3.5" />
-              <span>Estimated: {test.duration}</span>
-            </div>
-          )}
-
-          {/* Action button */}
           <Button
-            variant={test.status === "completed" ? "outline" : test.status === "in-progress" ? "secondary" : "default"}
-            className="w-full gap-2 text-sm"
+            variant={isCompleted ? "secondary" : "default"}
+            size="sm"
+            className={cn("gap-2 w-full md:w-auto", isInProgress && "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white")}
             asChild
           >
             <Link to={`/${test.module.toLowerCase()}`}>
-              {test.status === "completed" && "Review Results"}
-              {test.status === "in-progress" && "Continue Test"}
-              {test.status === "new" && "Start Practice"}
-              <ArrowRight className="h-4 w-4" />
+              {isCompleted ? "Review" : isInProgress ? "Continue" : "Start"}
+              {isCompleted || isInProgress ? <ArrowRight className="h-3 w-3" /> : <PlayCircle className="h-3 w-3" />}
             </Link>
           </Button>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+      </div>
+    </Card>
   );
 };
 
 const TestLibrary: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("All");
+  const tabs = ["All", "Reading", "Writing", "Listening"];
 
-  const filteredTests =
-    activeTab === "all"
-      ? mockTests
-      : mockTests.filter((t) => t.module.toLowerCase() === activeTab);
-
-  const counts = {
-    all: mockTests.length,
-    reading: mockTests.filter((t) => t.module === "Reading").length,
-    writing: mockTests.filter((t) => t.module === "Writing").length,
-    listening: mockTests.filter((t) => t.module === "Listening").length,
-  };
+  const filteredTests = mockTests.filter(
+    (test) => activeTab === "All" || test.module === activeTab
+  );
 
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+      <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold md:text-3xl">Practice Library</h1>
-          <p className="mt-1 text-muted-foreground">
-            Choose a module to improve your band score.
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold md:text-3xl">Practice Library</h1>
+            <p className="text-muted-foreground">
+              Select a module to improve your band score. Track your progress in real-time.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="gap-2">
+              <Timer className="h-4 w-4" /> History
+            </Button>
+            <Button>Random Test</Button>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="all">All ({counts.all})</TabsTrigger>
-            <TabsTrigger value="reading">Reading ({counts.reading})</TabsTrigger>
-            <TabsTrigger value="writing">Writing ({counts.writing})</TabsTrigger>
-            <TabsTrigger value="listening">Listening ({counts.listening})</TabsTrigger>
-          </TabsList>
+        {/* Pill Tabs */}
+        <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-5 py-1.5 text-sm font-medium transition-all",
+                activeTab === tab
+                  ? "bg-background text-foreground shadow-sm"
+                  : "hover:bg-accent hover:text-accent-foreground"
+              )}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-          <TabsContent value={activeTab} className="mt-6">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <AnimatePresence mode="popLayout">
-                {filteredTests.map((test) => (
-                  <TestCard key={test.id} test={test} />
-                ))}
-              </AnimatePresence>
+        {/* Timeline */}
+        <div className="relative ml-4 md:ml-6 border-l-2 border-border space-y-8 pb-10">
+          <AnimatePresence mode="popLayout">
+            {filteredTests.map((test) => (
+              <motion.div
+                key={test.id}
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="relative pl-8 md:pl-10"
+              >
+                {/* Timeline Dot */}
+                <div
+                  className={cn(
+                    "absolute -left-[9px] top-8 h-4 w-4 rounded-full border-2 border-background shadow-sm z-10",
+                    dotColors[test.status]
+                  )}
+                />
+                <TestCard test={test} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {filteredTests.length === 0 && (
+            <div className="relative pl-8 md:pl-10">
+              <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-border rounded-xl bg-muted/50">
+                <div className="bg-muted p-4 rounded-full mb-4">
+                  <MoreHorizontal className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold">No tests found</h3>
+                <p className="text-muted-foreground max-w-sm mt-1 mb-4">
+                  We couldn't find any tests for this category.
+                </p>
+                <Button onClick={() => setActiveTab("All")}>View All Tests</Button>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
