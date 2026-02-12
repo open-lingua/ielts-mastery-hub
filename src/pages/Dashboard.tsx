@@ -5,6 +5,7 @@ import { mockUser } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
 
 const quickActions = [
   {
@@ -132,6 +133,9 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Study Heatmap */}
+        <StudyHeatmap />
       </div>
     </DashboardLayout>
   );
