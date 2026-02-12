@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { BookOpen, CheckCircle2, RotateCcw, Clock, Timer, Trophy, Eye, EyeOff, ChevronRight } from "lucide-react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
+import { BookOpen, CheckCircle2, RotateCcw, Trophy, Eye, EyeOff, ChevronRight } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { QuestionRenderer, type Answers } from "@/components/reading/QuestionRenderer";
 import { multiPassageReadingTest, calculateReadingBandScore, p2YnngQuestions, p3McQuestions } from "@/data/readingTestData";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -17,32 +18,16 @@ const ReadingModule: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
   const [visitedPassages, setVisitedPassages] = useState<boolean[]>([true, false, false]);
-  const [timeLeft, setTimeLeft] = useState(test.timer);
-  const [timerRunning, setTimerRunning] = useState(true);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
   const passagePaneRef = useRef<HTMLDivElement>(null);
   const questionPaneRef = useRef<HTMLDivElement>(null);
 
-  // Timer
-  useEffect(() => {
-    if (!timerRunning || submitted) return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setSubmitted(true);
-          setTimerRunning(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [timerRunning, submitted]);
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
+  const handleTimeUp = useCallback(() => {
+    if (submitted) return;
+    setAutoSubmitted(true);
+    setSubmitted(true);
+  }, [submitted]);
 
   const handleAnswer = useCallback((key: string, value: string) => {
     if (submitted) return;
@@ -66,22 +51,19 @@ const ReadingModule: React.FC = () => {
     setReviewMode(false);
     setActivePassage(0);
     setVisitedPassages([true, false, false]);
-    setTimeLeft(test.timer);
-    setTimerRunning(true);
+    setAutoSubmitted(false);
+    setTimerKey((k) => k + 1);
   };
 
-  // Count all answered questions
   const answeredCount = Object.values(answers).filter((v) => v && (typeof v === "string" ? v.trim() : true)).length;
   const totalQuestions = 40;
 
-  // Passage question ranges
   const passageQuestionRanges = [
     { start: 1, end: 13 },
     { start: 14, end: 27 },
     { start: 28, end: 40 },
   ];
 
-  // Navigation grid: map question numbers to passage indices
   const getQuestionPassage = (qNum: number) => {
     for (let i = 0; i < passageQuestionRanges.length; i++) {
       if (qNum >= passageQuestionRanges[i].start && qNum <= passageQuestionRanges[i].end) return i;
@@ -89,26 +71,23 @@ const ReadingModule: React.FC = () => {
     return 0;
   };
 
-  // Score calculation
-  const scoreData = useMemo(() => {
-    if (!submitted) return null;
-    let correct = 0;
-    // This is simplified - actual scoring would iterate all question data
-    // For now count based on answer matching patterns
-    return { correct: answeredCount, total: totalQuestions }; // Placeholder
-  }, [submitted, answeredCount]);
-
   const currentPassage = test.passages[activePassage];
-  const isTimerLow = timeLeft < 300 && timeLeft > 0;
 
   return (
     <DashboardLayout>
       <TooltipProvider>
         <div className="flex flex-col h-[calc(100vh-4rem)]">
-          {/* Sticky Header: Passage Stepper + Timer */}
+          {/* Unified Timer */}
+          <UnifiedTimer
+            key={timerKey}
+            totalSeconds={3600}
+            onTimeUp={handleTimeUp}
+            testFinished={submitted}
+          />
+
+          {/* Sticky Header: Passage Stepper */}
           <div className="shrink-0 border-b border-border bg-card px-4 py-2.5 md:px-6">
             <div className="flex items-center justify-between gap-4">
-              {/* Passage Tabs */}
               <div className="flex items-center gap-1 rounded-lg bg-muted p-1 flex-1 max-w-md">
                 {test.passages.map((p, idx) => (
                   <button
@@ -121,40 +100,21 @@ const ReadingModule: React.FC = () => {
                         : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
                     )}
                   >
-                    <span
-                      className={cn(
-                        "h-2 w-2 rounded-full shrink-0",
-                        visitedPassages[idx] && activePassage !== idx ? "bg-success" : activePassage === idx ? "bg-primary" : "bg-border"
-                      )}
-                    />
+                    <span className={cn(
+                      "h-2 w-2 rounded-full shrink-0",
+                      visitedPassages[idx] && activePassage !== idx ? "bg-success" : activePassage === idx ? "bg-primary" : "bg-border"
+                    )} />
                     <span className="hidden sm:inline">Passage</span> {idx + 1}
                   </button>
                 ))}
               </div>
 
-              {/* Timer + Progress */}
-              <div className="flex items-center gap-3">
-                <Badge variant="secondary" className="text-xs gap-1 hidden md:flex">
-                  <BookOpen className="h-3 w-3" />
-                  {answeredCount}/{totalQuestions}
-                </Badge>
-                <div
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-mono font-bold transition-colors",
-                    submitted
-                      ? "border-success/30 bg-success/10 text-success"
-                      : isTimerLow
-                      ? "border-destructive/30 bg-destructive/10 text-destructive animate-pulse"
-                      : "border-border text-foreground"
-                  )}
-                >
-                  <Timer className="h-3.5 w-3.5" />
-                  {submitted ? "Done" : formatTime(timeLeft)}
-                </div>
-              </div>
+              <Badge variant="secondary" className="text-xs gap-1 hidden md:flex">
+                <BookOpen className="h-3 w-3" />
+                {answeredCount}/{totalQuestions}
+              </Badge>
             </div>
 
-            {/* Global Progress Bar */}
             <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">
               <motion.div
                 className="h-full bg-primary rounded-full"
@@ -165,7 +125,7 @@ const ReadingModule: React.FC = () => {
             </div>
           </div>
 
-          {/* Results Banner (when submitted) */}
+          {/* Results Banner */}
           {submitted && !reviewMode && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
@@ -215,7 +175,6 @@ const ReadingModule: React.FC = () => {
 
           {/* Main Split Content */}
           <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-            {/* Passage Pane */}
             <div ref={passagePaneRef} className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -232,33 +191,24 @@ const ReadingModule: React.FC = () => {
                       Passage {activePassage + 1} — {test.format}
                     </Badge>
                   </div>
-                  <h2 className="text-2xl font-serif font-bold text-foreground mb-6">
-                    {currentPassage.title}
-                  </h2>
+                  <h2 className="text-2xl font-serif font-bold text-foreground mb-6">{currentPassage.title}</h2>
                   {currentPassage.passage.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">
-                      {para}
-                    </p>
+                    <p key={i} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">{para}</p>
                   ))}
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Questions Pane */}
             <div className="w-full md:w-[460px] lg:w-[520px] flex flex-col shrink-0 bg-background">
-              {/* Questions Header */}
               <div className="sticky top-0 z-10 bg-background border-b border-border px-5 py-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-bold text-foreground">
                     Questions {passageQuestionRanges[activePassage].start}–{passageQuestionRanges[activePassage].end}
                   </h2>
-                  <Badge variant="outline" className="text-[10px]">
-                    Passage {activePassage + 1} of 3
-                  </Badge>
+                  <Badge variant="outline" className="text-[10px]">Passage {activePassage + 1} of 3</Badge>
                 </div>
               </div>
 
-              {/* Scrollable Questions */}
               <div ref={questionPaneRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -286,16 +236,12 @@ const ReadingModule: React.FC = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Navigation Grid + Actions */}
               <div className="shrink-0 border-t border-border bg-background px-5 py-3 space-y-3">
-                {/* Question Navigation Grid */}
                 <div className="flex flex-wrap gap-1">
                   {Array.from({ length: totalQuestions }, (_, i) => {
                     const qNum = i + 1;
                     const passageIdx = getQuestionPassage(qNum);
                     const isCurrentPassage = passageIdx === activePassage;
-                    // Very rough "answered" check by question number
-                    const isAnswered = Object.keys(answers).length > 0; // simplified
                     return (
                       <Tooltip key={qNum}>
                         <TooltipTrigger asChild>
@@ -314,31 +260,23 @@ const ReadingModule: React.FC = () => {
                             {qNum}
                           </button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="text-[10px]">
-                          Passage {passageIdx + 1}, Q{qNum}
-                        </TooltipContent>
+                        <TooltipContent side="top" className="text-[10px]">Passage {passageIdx + 1}, Q{qNum}</TooltipContent>
                       </Tooltip>
                     );
                   })}
                 </div>
 
-                {/* Action Buttons */}
                 {!submitted ? (
                   <div className="flex gap-2">
                     {activePassage < 2 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-1.5 text-xs"
-                        onClick={() => handlePassageChange(activePassage + 1)}
-                      >
+                      <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => handlePassageChange(activePassage + 1)}>
                         Next Passage <ChevronRight className="h-3.5 w-3.5" />
                       </Button>
                     )}
                     <Button
                       size="sm"
                       className="flex-1 gap-1.5 text-xs shadow-lg shadow-primary/20"
-                      onClick={() => { setSubmitted(true); setTimerRunning(false); }}
+                      onClick={() => setSubmitted(true)}
                       disabled={answeredCount === 0}
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
@@ -346,12 +284,7 @@ const ReadingModule: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full gap-1.5 text-xs"
-                    onClick={handleReset}
-                  >
+                  <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs" onClick={handleReset}>
                     <RotateCcw className="h-3.5 w-3.5" /> Try Again
                   </Button>
                 )}
@@ -359,6 +292,8 @@ const ReadingModule: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <TimeUpOverlay show={autoSubmitted} onDismiss={() => setAutoSubmitted(false)} />
       </TooltipProvider>
     </DashboardLayout>
   );
