@@ -13,8 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -30,6 +28,7 @@ import {
   FileText,
   ImageIcon,
   AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -121,10 +120,16 @@ export interface PreviewProps {
 
 type DeviceType = "desktop" | "tablet" | "mobile";
 
-const deviceWidths: Record<DeviceType, string> = {
-  desktop: "w-full",
-  tablet: "max-w-[768px]",
-  mobile: "max-w-[375px]",
+interface DeviceConfig {
+  width: number | null; // null = full width
+  label: string;
+  splitLayout: boolean; // whether to use side-by-side layout
+}
+
+const deviceConfigs: Record<DeviceType, DeviceConfig> = {
+  desktop: { width: null, label: "Desktop", splitLayout: true },
+  tablet: { width: 768, label: "Tablet (768px)", splitLayout: true },
+  mobile: { width: 375, label: "Mobile (375px)", splitLayout: false },
 };
 
 // ─── Question Type Config ───────────────────────
@@ -149,7 +154,7 @@ const typeLabels: Record<string, { label: string; badgeClass: string }> = {
 // ─── Empty State ────────────────────────────────
 
 const EmptyPreview: React.FC<{ message?: string }> = ({ message }) => (
-  <div className="flex flex-col items-center justify-center py-20 text-center">
+  <div className="flex flex-col items-center justify-center py-20 text-center px-4">
     <div className="rounded-full bg-muted p-4 mb-4">
       <AlertCircle className="h-8 w-8 text-muted-foreground" />
     </div>
@@ -162,7 +167,7 @@ const EmptyPreview: React.FC<{ message?: string }> = ({ message }) => (
 
 // ─── Student-Style Question Preview ─────────────
 
-const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = ({ group, groupIndex }) => {
+const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; compact?: boolean }> = ({ group, groupIndex, compact }) => {
   const meta = typeLabels[group.type] || { label: group.type, badgeClass: "bg-muted text-muted-foreground" };
   const isIdentification = group.type === "tfng" || group.type === "ynng";
   const isMatching = group.type.startsWith("matching");
@@ -172,7 +177,7 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border", meta.badgeClass)}>
           {meta.label}
         </span>
@@ -185,7 +190,6 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
         <Badge variant="outline" className="text-[10px]">📏 {group.wordLimit}</Badge>
       )}
 
-      {/* Word bank */}
       {group.hasWordBank && group.wordBank.length > 0 && (
         <div className="flex flex-wrap gap-1 p-2 rounded-lg border border-border bg-secondary/50">
           {group.wordBank.map((w, i) => (
@@ -196,10 +200,9 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
       <div className="space-y-2">
         {group.questions.map((q, qIdx) => (
-          <div key={q.id} className="rounded-lg border border-border bg-card p-3 space-y-2">
-            {/* Question text */}
+          <div key={q.id} className={cn("rounded-lg border border-border bg-card space-y-2", compact ? "p-2" : "p-3")}>
             {q.text && (
-              <p className="text-sm font-medium text-foreground">
+              <p className={cn("font-medium text-foreground", compact ? "text-xs" : "text-sm")}>
                 <span className="font-bold text-primary mr-1">{groupIndex + qIdx + 1}.</span>
                 {q.text}
               </p>
@@ -207,11 +210,14 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
             {/* MC options */}
             {group.type === "multiple-choice" && q.options.length > 0 && (
-              <div className="space-y-1.5 ml-4">
+              <div className={cn("space-y-1.5", compact ? "ml-2" : "ml-4")}>
                 {q.options.map((opt, oIdx) => (
-                  <div key={opt.id} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-secondary transition-colors">
-                    <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 shrink-0" />
-                    <span>{String.fromCharCode(65 + oIdx)}. {opt.text || "(empty option)"}</span>
+                  <div key={opt.id} className={cn(
+                    "flex items-center gap-2 rounded-lg border border-border text-muted-foreground hover:bg-secondary transition-colors",
+                    compact ? "px-2 py-1.5 text-xs" : "px-3 py-2 text-sm"
+                  )}>
+                    <div className="h-3.5 w-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+                    <span className="break-words min-w-0">{String.fromCharCode(65 + oIdx)}. {opt.text || "(empty)"}</span>
                   </div>
                 ))}
               </div>
@@ -219,9 +225,12 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
             {/* TFNG / YNNG pills */}
             {isIdentification && (
-              <div className="flex gap-2 ml-4">
+              <div className={cn("flex flex-wrap gap-1.5", compact ? "ml-2" : "ml-4")}>
                 {tfngOptions.map((opt) => (
-                  <button key={opt} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary transition-colors">
+                  <button key={opt} className={cn(
+                    "rounded-lg border border-border font-medium text-muted-foreground hover:bg-secondary transition-colors",
+                    compact ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
+                  )}>
                     {opt}
                   </button>
                 ))}
@@ -230,12 +239,12 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
             {/* Matching pairs */}
             {isMatching && q.matchingPairs.length > 0 && (
-              <div className="space-y-1.5 ml-4">
+              <div className={cn("space-y-1.5", compact ? "ml-2" : "ml-4")}>
                 {q.matchingPairs.map((pair) => (
-                  <div key={pair.id} className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-foreground flex-1">{pair.left || "—"}</span>
+                  <div key={pair.id} className="flex items-center gap-2 text-sm flex-wrap">
+                    <span className="font-medium text-foreground flex-1 min-w-0 break-words text-xs">{pair.left || "—"}</span>
                     <Select disabled>
-                      <SelectTrigger className="w-32 h-7 text-xs">
+                      <SelectTrigger className={cn("h-7 text-xs shrink-0", compact ? "w-24" : "w-28")}>
                         <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                     </Select>
@@ -246,16 +255,14 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
             {/* Completion gaps */}
             {(isCompletion || group.type === "diagram-labeling") && q.completionGaps.length > 0 && (
-              <div className="space-y-1.5 ml-4">
+              <div className={cn("space-y-1.5", compact ? "ml-2" : "ml-4")}>
                 {q.completionGaps.map((gap, gIdx) => (
-                  <div key={gap.id} className="flex items-center gap-2 text-sm">
-                    <span className="text-xs text-muted-foreground w-4">{gIdx + 1}.</span>
-                    <span className="text-foreground flex-1">
-                      {gap.gapText
-                        ? gap.gapText.replace(/\{\{gap\}\}/g, "______")
-                        : "(empty)"}
+                  <div key={gap.id} className="flex items-start gap-2 text-xs flex-wrap">
+                    <span className="text-muted-foreground w-4 shrink-0 pt-1">{gIdx + 1}.</span>
+                    <span className="text-foreground flex-1 min-w-0 break-words">
+                      {gap.gapText ? gap.gapText.replace(/\{\{gap\}\}/g, "______") : "(empty)"}
                     </span>
-                    <Input disabled placeholder="Type answer..." className="w-32 h-7 text-xs" />
+                    <Input disabled placeholder="..." className={cn("h-7 text-xs shrink-0", compact ? "w-20" : "w-28")} />
                   </div>
                 ))}
               </div>
@@ -263,8 +270,8 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
 
             {/* Short answer */}
             {group.type === "short-answer" && (
-              <div className="ml-4">
-                <Input disabled placeholder="Type answer..." className="h-8 text-sm" />
+              <div className={compact ? "ml-2" : "ml-4"}>
+                <Input disabled placeholder="Type answer..." className="h-7 text-xs w-full" />
               </div>
             )}
           </div>
@@ -274,180 +281,279 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number }> = 
   );
 };
 
+// ─── Questions Panel (reused across modules) ────
+
+const QuestionsPanel: React.FC<{ groups: QuestionGroup[]; compact?: boolean; className?: string }> = ({ groups, compact, className }) => (
+  <div className={cn("bg-background overflow-y-auto", className)}>
+    <h3 className={cn("font-bold text-foreground mb-4", compact ? "text-xs" : "text-sm")}>Questions</h3>
+    <div className="space-y-5">
+      {groups.map((group, gIdx) => {
+        const startQ = groups.slice(0, gIdx).reduce((a, g) => a + g.questions.length, 0);
+        return (
+          <React.Fragment key={group.id}>
+            {gIdx > 0 && <Separator />}
+            <QuestionPreview group={group} groupIndex={startQ} compact={compact} />
+          </React.Fragment>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// ─── Mobile Pane Toggle ─────────────────────────
+
+const PaneToggle: React.FC<{
+  activePane: "content" | "questions";
+  onToggle: (pane: "content" | "questions") => void;
+  contentLabel: string;
+  questionCount: number;
+}> = ({ activePane, onToggle, contentLabel, questionCount }) => (
+  <div className="flex bg-muted rounded-lg p-0.5 mb-3">
+    <button
+      onClick={() => onToggle("content")}
+      className={cn(
+        "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
+        activePane === "content"
+          ? "bg-background text-foreground shadow-sm"
+          : "text-muted-foreground"
+      )}
+    >
+      {contentLabel}
+    </button>
+    <button
+      onClick={() => onToggle("questions")}
+      className={cn(
+        "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
+        activePane === "questions"
+          ? "bg-background text-foreground shadow-sm"
+          : "text-muted-foreground"
+      )}
+    >
+      Questions ({questionCount})
+    </button>
+  </div>
+);
+
 // ─── Reading Preview ────────────────────────────
 
-const ReadingPreviewContent: React.FC<{ data: PreviewReadingState }> = ({ data }) => {
+const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolean }> = ({ data, split }) => {
+  const [activePane, setActivePane] = useState<"content" | "questions">("content");
   const hasContent = data.title.trim() || data.passage.trim();
   const hasQuestions = data.questionGroups.some((g) => g.questions.length > 0 && (g.questions[0].text || g.questions[0].options.some((o) => o.text) || g.questions[0].matchingPairs.length > 0 || g.questions[0].completionGaps.length > 0));
+  const totalQs = data.questionGroups.reduce((a, g) => a + g.questions.length, 0);
 
   if (!hasContent && !hasQuestions) {
     return <EmptyPreview message="Add a title and passage in the Reading editor to see the student view." />;
   }
 
-  return (
-    <div className="flex flex-col md:flex-row h-full min-h-[600px]">
-      {/* Passage */}
-      <div className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-6">
-        <div className="max-w-xl mx-auto">
-          <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Reading Passage</span>
-          </div>
-          {data.title && (
-            <h2 className="text-xl font-serif font-bold text-foreground mb-4">{data.title}</h2>
-          )}
-          {data.passage ? (
-            data.passage.split("\n\n").map((para, i) => (
-              <p key={i} className="text-sm font-serif leading-[1.8] text-foreground/90 mb-3">{para}</p>
-            ))
-          ) : (
-            <p className="text-sm text-muted-foreground italic">Passage content will appear here...</p>
-          )}
-        </div>
+  const passageContent = (
+    <div className={cn(split ? "p-5" : "p-4")}>
+      <div className="flex items-center gap-2 mb-4">
+        <BookOpen className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Reading Passage</span>
       </div>
+      {data.title && (
+        <h2 className={cn("font-serif font-bold text-foreground mb-4", split ? "text-xl" : "text-lg")}>{data.title}</h2>
+      )}
+      {data.passage ? (
+        data.passage.split("\n\n").map((para, i) => (
+          <p key={i} className={cn("font-serif text-foreground/90 mb-3", split ? "text-sm leading-[1.8]" : "text-xs leading-[1.7]")}>{para}</p>
+        ))
+      ) : (
+        <p className="text-sm text-muted-foreground italic">Passage content will appear here...</p>
+      )}
+    </div>
+  );
 
-      {/* Questions */}
-      <div className="w-full md:w-[380px] lg:w-[420px] overflow-y-auto bg-background p-5 shrink-0">
-        <h3 className="text-sm font-bold text-foreground mb-4">Questions</h3>
-        <div className="space-y-6">
-          {data.questionGroups.map((group, gIdx) => {
-            const startQ = data.questionGroups.slice(0, gIdx).reduce((a, g) => a + g.questions.length, 0);
-            return (
-              <React.Fragment key={group.id}>
-                {gIdx > 0 && <Separator />}
-                <QuestionPreview group={group} groupIndex={startQ} />
-              </React.Fragment>
-            );
-          })}
+  // Split layout (Desktop / Tablet)
+  if (split) {
+    return (
+      <div className="flex flex-row h-full min-h-[500px]">
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
+          {passageContent}
         </div>
+        <QuestionsPanel groups={data.questionGroups} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
       </div>
+    );
+  }
+
+  // Stacked layout (Mobile)
+  return (
+    <div className="p-3">
+      <PaneToggle activePane={activePane} onToggle={setActivePane} contentLabel="Passage" questionCount={totalQs} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activePane}
+          initial={{ opacity: 0, x: activePane === "content" ? -10 : 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="max-h-[70vh] overflow-y-auto rounded-lg border border-border bg-card"
+        >
+          {activePane === "content" ? (
+            passageContent
+          ) : (
+            <QuestionsPanel groups={data.questionGroups} compact className="p-3" />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
 
 // ─── Listening Preview ──────────────────────────
 
-const ListeningPreviewContent: React.FC<{ data: PreviewListeningState }> = ({ data }) => {
+const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: boolean }> = ({ data, split }) => {
+  const [activePane, setActivePane] = useState<"content" | "questions">("content");
   const hasContent = data.sectionTitle.trim() || data.transcript.trim();
   const hasQuestions = data.questionGroups.some((g) => g.questions.length > 0);
+  const totalQs = data.questionGroups.reduce((a, g) => a + g.questions.length, 0);
 
   if (!hasContent && !hasQuestions) {
     return <EmptyPreview message="Add a section title and questions in the Listening editor to see the student view." />;
   }
 
-  return (
-    <div className="flex flex-col md:flex-row h-full min-h-[600px]">
-      {/* Audio & Transcript */}
-      <div className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-6">
-        <div className="max-w-xl mx-auto space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Headphones className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Listening Section</span>
+  const audioContent = (
+    <div className={cn(split ? "p-5" : "p-4", "space-y-4")}>
+      <div className="flex items-center gap-2">
+        <Headphones className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Listening Section</span>
+      </div>
+      {data.sectionTitle && (
+        <h2 className={cn("font-bold text-foreground", split ? "text-xl" : "text-lg")}>{data.sectionTitle}</h2>
+      )}
+      {/* Audio player */}
+      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <Headphones className="h-4 w-4 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="h-2 bg-border rounded-full overflow-hidden">
+            <div className="h-full w-0 bg-primary rounded-full" />
           </div>
-          {data.sectionTitle && (
-            <h2 className="text-xl font-bold text-foreground">{data.sectionTitle}</h2>
-          )}
-          {/* Mock audio player */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Headphones className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="h-2 bg-border rounded-full overflow-hidden">
-                <div className="h-full w-0 bg-primary rounded-full" />
-              </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground">
-                <span>00:00</span>
-                <span>{data.duration || "—"}</span>
-              </div>
-            </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>00:00</span>
+            <span>{data.duration || "—"}</span>
           </div>
-          {data.transcript && (
-            <div className="space-y-1">
-              <p className="text-xs font-semibold text-muted-foreground">Transcript</p>
-              <div className="rounded-lg border border-border bg-background p-4">
-                {data.transcript.split("\n\n").map((para, i) => (
-                  <p key={i} className="text-sm text-foreground/90 mb-2">{para}</p>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
+      {data.transcript && (
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-muted-foreground">Transcript</p>
+          <div className="rounded-lg border border-border bg-background p-3">
+            {data.transcript.split("\n\n").map((para, i) => (
+              <p key={i} className="text-xs text-foreground/90 mb-2">{para}</p>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
-      {/* Questions */}
-      <div className="w-full md:w-[380px] lg:w-[420px] overflow-y-auto bg-background p-5 shrink-0">
-        <h3 className="text-sm font-bold text-foreground mb-4">Questions</h3>
-        <div className="space-y-6">
-          {data.questionGroups.map((group, gIdx) => {
-            const startQ = data.questionGroups.slice(0, gIdx).reduce((a, g) => a + g.questions.length, 0);
-            return (
-              <React.Fragment key={group.id}>
-                {gIdx > 0 && <Separator />}
-                <QuestionPreview group={group} groupIndex={startQ} />
-              </React.Fragment>
-            );
-          })}
+  if (split) {
+    return (
+      <div className="flex flex-row h-full min-h-[500px]">
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
+          {audioContent}
         </div>
+        <QuestionsPanel groups={data.questionGroups} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
       </div>
+    );
+  }
+
+  return (
+    <div className="p-3">
+      <PaneToggle activePane={activePane} onToggle={setActivePane} contentLabel="Audio" questionCount={totalQs} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activePane}
+          initial={{ opacity: 0, x: activePane === "content" ? -10 : 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="max-h-[70vh] overflow-y-auto rounded-lg border border-border bg-card"
+        >
+          {activePane === "content" ? (
+            audioContent
+          ) : (
+            <QuestionsPanel groups={data.questionGroups} compact className="p-3" />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
 
 // ─── Writing Preview ────────────────────────────
 
-const WritingPreviewContent: React.FC<{ data: PreviewWritingState }> = ({ data }) => {
+const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolean }> = ({ data, split }) => {
   const hasContent = data.title.trim() || data.prompt.trim();
 
   if (!hasContent) {
     return <EmptyPreview message="Add a title and prompt in the Writing editor to see the student view." />;
   }
 
-  return (
-    <div className="flex flex-col md:flex-row h-full min-h-[600px]">
-      {/* Prompt */}
-      <div className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-6">
-        <div className="max-w-xl mx-auto space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <PenTool className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">
-              Writing {data.taskType === "task1" ? "Task 1" : "Task 2"}
-            </span>
-          </div>
-          {data.title && (
-            <h2 className="text-xl font-bold text-foreground">{data.title}</h2>
-          )}
-          {data.taskType === "task1" && (
-            <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-muted/30">
-              <ImageIcon className="h-6 w-6 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">Chart / Graph will appear here</p>
-            </div>
-          )}
-          {data.prompt && (
-            <div className="rounded-lg border border-border bg-background p-4">
-              {data.prompt.split("\n").map((line, i) => (
-                <p key={i} className="text-sm text-foreground/90 mb-1">{line || <br />}</p>
-              ))}
-            </div>
-          )}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><FileText className="h-3 w-3" /> Min: {data.minWords} words</span>
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {data.suggestedTime}</span>
+  const promptContent = (
+    <div className={cn(split ? "p-5" : "p-4", "space-y-4")}>
+      <div className="flex items-center gap-2">
+        <PenTool className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">
+          Writing {data.taskType === "task1" ? "Task 1" : "Task 2"}
+        </span>
+      </div>
+      {data.title && (
+        <h2 className={cn("font-bold text-foreground", split ? "text-xl" : "text-lg")}>{data.title}</h2>
+      )}
+      {data.taskType === "task1" && (
+        <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 bg-muted/30 overflow-hidden">
+          <ImageIcon className="h-6 w-6 text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">Chart / Graph will appear here</p>
+        </div>
+      )}
+      {data.prompt && (
+        <div className="rounded-lg border border-border bg-background p-3 overflow-hidden">
+          {data.prompt.split("\n").map((line, i) => (
+            <p key={i} className="text-xs text-foreground/90 mb-1 break-words">{line || <br />}</p>
+          ))}
+        </div>
+      )}
+      <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+        <span className="flex items-center gap-1"><FileText className="h-3 w-3" /> Min: {data.minWords} words</span>
+        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {data.suggestedTime}</span>
+      </div>
+    </div>
+  );
+
+  if (split) {
+    return (
+      <div className="flex flex-row h-full min-h-[500px]">
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
+          {promptContent}
+        </div>
+        <div className="w-[45%] shrink-0 overflow-y-auto bg-background p-5">
+          <h3 className="text-sm font-bold text-foreground mb-3">Your Response</h3>
+          <Textarea disabled placeholder="Students will write their response here..." className="min-h-[300px] text-sm font-serif w-full" />
+          <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground">
+            <span>Word count: 0 / {data.minWords}+</span>
+            <Badge variant="outline" className="text-[10px]">Practice Mode</Badge>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Writing area */}
-      <div className="w-full md:w-[420px] lg:w-[480px] overflow-y-auto bg-background p-5 shrink-0">
-        <h3 className="text-sm font-bold text-foreground mb-3">Your Response</h3>
-        <Textarea
-          disabled
-          placeholder="Students will write their response here..."
-          className="min-h-[400px] text-sm font-serif"
-        />
-        <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground">
-          <span>Word count: 0 / {data.minWords}+</span>
-          <Badge variant="outline" className="text-[10px]">Practice Mode</Badge>
+  // Stacked (mobile)
+  return (
+    <div className="overflow-hidden">
+      <div className="bg-card border-b border-border">
+        {promptContent}
+      </div>
+      <div className="p-3 bg-background">
+        <h3 className="text-xs font-bold text-foreground mb-2">Your Response</h3>
+        <Textarea disabled placeholder="Students will write here..." className="min-h-[200px] text-xs font-serif w-full" />
+        <div className="flex justify-between items-center mt-2 text-[10px] text-muted-foreground">
+          <span>0 / {data.minWords}+ words</span>
+          <Badge variant="outline" className="text-[10px]">Practice</Badge>
         </div>
       </div>
     </div>
@@ -465,44 +571,75 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
   writing,
 }) => {
   const [device, setDevice] = useState<DeviceType>("desktop");
+  const [landscape, setLandscape] = useState(false);
 
-  const moduleIcon = activeModule === "reading" ? BookOpen : activeModule === "listening" ? Headphones : PenTool;
-  const ModuleIcon = moduleIcon;
+  const config = deviceConfigs[device];
+  const useSplit = config.splitLayout;
+
+  // Calculate container dimensions
+  const containerStyle: React.CSSProperties = {};
+  if (config.width) {
+    if (landscape && device !== "desktop") {
+      // Landscape: swap dimensions conceptually — wider container
+      containerStyle.width = device === "mobile" ? 667 : 1024;
+      containerStyle.maxWidth = "100%";
+    } else {
+      containerStyle.width = config.width;
+      containerStyle.maxWidth = "100%";
+    }
+  }
+
+  const ModuleIcon = activeModule === "reading" ? BookOpen : activeModule === "listening" ? Headphones : PenTool;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50 shrink-0">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50 shrink-0 flex-wrap gap-2">
           <div className="flex items-center gap-3">
             <DialogTitle className="text-sm font-semibold flex items-center gap-2">
               <ModuleIcon className="h-4 w-4 text-primary" />
-              Student Preview — <span className="capitalize">{activeModule}</span>
+              Preview — <span className="capitalize">{activeModule}</span>
             </DialogTitle>
             <Badge variant="outline" className="text-[10px]">Read-only</Badge>
           </div>
 
-          {/* Device Toggle */}
-          <div className="flex items-center gap-1 bg-background rounded-lg p-0.5 border border-border">
-            {([
-              { type: "desktop" as DeviceType, icon: Monitor, label: "Desktop" },
-              { type: "tablet" as DeviceType, icon: Tablet, label: "Tablet" },
-              { type: "mobile" as DeviceType, icon: Smartphone, label: "Mobile" },
-            ]).map(({ type, icon: Icon, label }) => (
+          <div className="flex items-center gap-2">
+            {/* Device Toggle */}
+            <div className="flex items-center gap-0.5 bg-background rounded-lg p-0.5 border border-border">
+              {(["desktop", "tablet", "mobile"] as DeviceType[]).map((type) => {
+                const Icon = type === "desktop" ? Monitor : type === "tablet" ? Tablet : Smartphone;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => { setDevice(type); setLandscape(false); }}
+                    title={deviceConfigs[type].label}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all",
+                      device === type
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Rotate (tablet/mobile only) */}
+            {device !== "desktop" && (
               <button
-                key={type}
-                onClick={() => setDevice(type)}
-                title={label}
+                onClick={() => setLandscape((p) => !p)}
+                title={landscape ? "Portrait" : "Landscape"}
                 className={cn(
-                  "p-1.5 rounded-md transition-all",
-                  device === type
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                  "p-1.5 rounded-md border border-border transition-all",
+                  landscape ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground bg-background"
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" />
               </button>
-            ))}
+            )}
           </div>
 
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onOpenChange(false)}>
@@ -511,30 +648,33 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 overflow-hidden bg-muted/30 flex justify-center p-4">
+        <div className="flex-1 overflow-hidden bg-muted/30 flex justify-center items-start p-4 overflow-x-hidden">
           <motion.div
             layout
             transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={containerStyle}
             className={cn(
-              "bg-background rounded-xl border border-border shadow-xl overflow-hidden h-full",
-              deviceWidths[device],
-              device !== "desktop" && "mx-auto"
+              "bg-background rounded-xl border border-border shadow-xl overflow-hidden",
+              device === "desktop" ? "w-full h-full" : "mx-auto",
+              device !== "desktop" && "shadow-2xl"
             )}
           >
-            <ScrollArea className="h-full">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeModule}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {activeModule === "reading" && <ReadingPreviewContent data={reading} />}
-                  {activeModule === "listening" && <ListeningPreviewContent data={listening} />}
-                  {activeModule === "writing" && <WritingPreviewContent data={writing} />}
-                </motion.div>
-              </AnimatePresence>
+            <ScrollArea className={cn(device === "desktop" ? "h-full" : "max-h-[80vh]")}>
+              <div className="overflow-x-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`${activeModule}-${device}-${landscape}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    {activeModule === "reading" && <ReadingPreviewContent data={reading} split={useSplit || (landscape && device !== "desktop")} />}
+                    {activeModule === "listening" && <ListeningPreviewContent data={listening} split={useSplit || (landscape && device !== "desktop")} />}
+                    {activeModule === "writing" && <WritingPreviewContent data={writing} split={useSplit || (landscape && device !== "desktop")} />}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </ScrollArea>
           </motion.div>
         </div>
