@@ -99,7 +99,8 @@ const ListeningModule: React.FC = () => {
   const currentSection = test.sections[activeSection];
   const sectionQuestions = currentSection.questions;
   const answeredCount = sectionQuestions.filter((q) => answers[q.id]?.trim()).length;
-  const canSubmit = audioEnded[activeSection] || answeredCount === sectionQuestions.length;
+  const hasAtLeastOne = answeredCount > 0;
+  const canSubmit = hasAtLeastOne;
   // Global question numbering offset
   const globalOffset = test.sections
     .slice(0, activeSection)
@@ -266,25 +267,30 @@ const ListeningModule: React.FC = () => {
                     </div>
 
                     {/* Submit */}
-                    <Button
-                      onClick={handleSubmitSection}
-                      disabled={!canSubmit}
-                      className="w-full gap-2 rounded-xl py-3 text-sm font-semibold shadow-lg shadow-primary/20"
-                      size="lg"
+                    <motion.div
+                      animate={canSubmit ? { scale: [1, 1.02, 1] } : {}}
+                      transition={{ duration: 0.4 }}
                     >
-                      {activeSection < totalSections - 1 ? (
-                        <>
-                          Submit & Continue to Section {activeSection + 2}
-                          <ChevronRight className="h-4 w-4" />
-                        </>
-                      ) : (
-                        "Submit & View Results"
-                      )}
-                    </Button>
+                      <Button
+                        onClick={handleSubmitSection}
+                        disabled={!canSubmit}
+                        className="w-full gap-2 rounded-xl py-3 text-sm font-semibold shadow-lg shadow-primary/20"
+                        size="lg"
+                      >
+                        {activeSection < totalSections - 1 ? (
+                          <>
+                            Submit & Continue to Section {activeSection + 2}
+                            <ChevronRight className="h-4 w-4" />
+                          </>
+                        ) : (
+                          "Submit & View Results"
+                        )}
+                      </Button>
+                    </motion.div>
 
                     {!canSubmit && (
                       <p className="text-center text-xs text-muted-foreground">
-                        Listen to the full audio or answer all questions to proceed.
+                        Answer at least one question to proceed.
                       </p>
                     )}
                   </motion.div>
