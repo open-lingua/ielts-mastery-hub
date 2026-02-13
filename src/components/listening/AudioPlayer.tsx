@@ -4,40 +4,53 @@ import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
   sectionIndex: number;
+  audioUrl?: string;
   onEnded: () => void;
   disabled?: boolean;
 }
 
-// Simulated audio durations per section (seconds)
-const SECTION_DURATIONS = [180, 210, 240, 300];
-
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, onEnded, disabled }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnded, disabled }) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const duration = SECTION_DURATIONS[sectionIndex] || 180;
+  const [useSimulated, setUseSimulated] = useState(!audioUrl);
 
-  // Reset on section change
+  // Simulated fallback
+  const SIMULATED_DURATIONS = [180, 210, 240, 300];
+  const simulatedDuration = SIMULATED_DURATIONS[sectionIndex] || 180;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Reset on section change or audioUrl change
   useEffect(() => {
     setIsPlaying(false);
     setCurrentTime(0);
     setHasEnded(false);
+    setDuration(0);
+    setUseSimulated(!audioUrl);
     if (intervalRef.current) clearInterval(intervalRef.current);
-  }, [sectionIndex]);
 
+    if (audioUrl && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [sectionIndex, audioUrl]);
+
+  // Simulated playback
   useEffect(() => {
+    if (!useSimulated) return;
     if (isPlaying && !hasEnded) {
       intervalRef.current = setInterval(() => {
         setCurrentTime((prev) => {
           const next = prev + 1;
-          if (next >= duration) {
+          if (next >= simulatedDuration) {
             setIsPlaying(false);
             setHasEnded(true);
             if (intervalRef.current) clearInterval(intervalRef.current);
             onEnded();
-            return duration;
+            return simulatedDuration;
           }
           return next;
         });
@@ -48,26 +61,65 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, onEnded, disabl
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPlaying, hasEnded, duration, onEnded]);
+  }, [useSimulated, isPlaying, hasEnded, simulatedDuration, onEnded]);
+
+  // Real audio event handlers
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
+    setHasEnded(true);
+    onEnded();
+  };
 
   const togglePlay = useCallback(() => {
     if (disabled || hasEnded) return;
-    setIsPlaying((p) => !p);
-  }, [disabled, hasEnded]);
+    if (useSimulated) {
+      setIsPlaying((p) => !p);
+    } else if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying((p) => !p);
+    }
+  }, [disabled, hasEnded, useSimulated, isPlaying]);
 
   const restart = useCallback(() => {
     setCurrentTime(0);
     setHasEnded(false);
     setIsPlaying(true);
-  }, []);
+    if (!useSimulated && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+  }, [useSimulated]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = muted;
+    }
+  }, [muted]);
+
+  const effectiveDuration = useSimulated ? simulatedDuration : duration;
+  const progress = effectiveDuration > 0 ? (currentTime / effectiveDuration) * 100 : 0;
 
   const fmt = (s: number) => {
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
     return `${m}:${sec.toString().padStart(2, "0")}`;
   };
-
-  const progress = (currentTime / duration) * 100;
 
   return (
     <div
@@ -76,6 +128,18 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, onEnded, disabl
         disabled && "opacity-50 pointer-events-none"
       )}
     >
+      {/* Hidden audio element for real playback */}
+      {audioUrl && (
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          preload="metadata"
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleAudioEnded}
+        />
+      )}
+
       <button
         onClick={hasEnded ? restart : togglePlay}
         className={cn(
@@ -106,7 +170,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, onEnded, disabl
         </div>
         <div className="flex justify-between mt-1 text-[10px] text-muted-foreground font-mono">
           <span>{fmt(currentTime)}</span>
-          <span>{fmt(duration)}</span>
+          <span>{effectiveDuration > 0 ? fmt(effectiveDuration) : "--:--"}</span>
         </div>
       </div>
 

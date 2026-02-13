@@ -1,28 +1,96 @@
-import React, { useState, useCallback, useRef } from "react";
-import { Headphones, ChevronRight, Lock, Info } from "lucide-react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Headphones, ChevronRight, Lock, Info, AlertTriangle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import SectionStepper from "@/components/listening/SectionStepper";
 import AudioPlayer from "@/components/listening/AudioPlayer";
 import QuestionCard from "@/components/listening/QuestionCard";
 import ResultsCard from "@/components/listening/ResultsCard";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
-import { mockListeningTest } from "@/data/listeningTestData";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { startTestSession } from "@/services/practiceLibraryService";
+import { fetchListeningTestForPractice } from "@/services/listeningPracticeService";
+import type { ListeningTest } from "@/data/listeningTestData";
+
+const ListeningLoadingSkeleton = () => (
+  <DashboardLayout>
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="shrink-0 border-b border-border bg-card px-4 py-3 md:px-8 space-y-3">
+        <div className="max-w-4xl mx-auto space-y-3">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-5 rounded" />
+            <Skeleton className="h-6 w-64" />
+          </div>
+          <div className="flex items-center gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-10 w-10 rounded-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 p-4 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-7 w-80" />
+            <Skeleton className="h-4 w-48" />
+            <Separator />
+            <Skeleton className="h-14 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-40" />
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </DashboardLayout>
+);
+
+const ListeningErrorState = ({ onBack }: { onBack: () => void }) => (
+  <DashboardLayout>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <Alert variant="destructive" className="max-w-md">
+        <AlertTriangle className="h-5 w-5" />
+        <AlertTitle>Test Not Found</AlertTitle>
+        <AlertDescription className="mt-2">
+          This listening test could not be loaded. It may have been removed or you don't have access.
+          <Button variant="outline" size="sm" className="mt-4 w-full" onClick={onBack}>
+            Return to Practice Library
+          </Button>
+        </AlertDescription>
+      </Alert>
+    </div>
+  </DashboardLayout>
+);
 
 const ListeningModule: React.FC = () => {
-  const test = mockListeningTest;
-  const totalSections = test.sections.length;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const testId = searchParams.get("id");
+
+  const [test, setTest] = useState<ListeningTest | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   const [activeSection, setActiveSection] = useState(0);
-  const [unlockedSections, setUnlockedSections] = useState<boolean[]>([true, false, false, false]);
-  const [completedSections, setCompletedSections] = useState<boolean[]>([false, false, false, false]);
-  const [audioEnded, setAudioEnded] = useState<boolean[]>([false, false, false, false]);
+  const [unlockedSections, setUnlockedSections] = useState<boolean[]>([]);
+  const [completedSections, setCompletedSections] = useState<boolean[]>([]);
+  const [audioEnded, setAudioEnded] = useState<boolean[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [testFinished, setTestFinished] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
@@ -31,6 +99,35 @@ const ListeningModule: React.FC = () => {
   const [isStarted, setIsStarted] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Redirect if no ID
+  useEffect(() => {
+    if (!testId) {
+      navigate("/tests", { replace: true });
+    }
+  }, [testId, navigate]);
+
+  // Fetch test data
+  useEffect(() => {
+    if (!testId) return;
+    setIsLoading(true);
+    setHasError(false);
+
+    fetchListeningTestForPractice(testId)
+      .then((data) => {
+        setTest(data);
+        const count = data.sections.length;
+        setUnlockedSections([true, ...Array(count - 1).fill(false)]);
+        setCompletedSections(Array(count).fill(false));
+        setAudioEnded(Array(count).fill(false));
+      })
+      .catch((err) => {
+        console.error("Failed to load listening test:", err);
+        toast.error("Failed to load listening test");
+        setHasError(true);
+      })
+      .finally(() => setIsLoading(false));
+  }, [testId]);
 
   const scrollToTop = () => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -50,6 +147,8 @@ const ListeningModule: React.FC = () => {
   };
 
   const handleSubmitSection = () => {
+    if (!test) return;
+    const totalSections = test.sections.length;
     const nextIndex = activeSection + 1;
     setCompletedSections((prev) => {
       const next = [...prev];
@@ -71,17 +170,19 @@ const ListeningModule: React.FC = () => {
   };
 
   const handleTimeUp = useCallback(() => {
-    if (testFinished) return;
+    if (testFinished || !test) return;
     setAutoSubmitted(true);
-    setCompletedSections([true, true, true, true]);
+    setCompletedSections(Array(test.sections.length).fill(true));
     setTestFinished(true);
-  }, [testFinished]);
+  }, [testFinished, test]);
 
   const handleRetry = () => {
+    if (!test) return;
+    const count = test.sections.length;
     setActiveSection(0);
-    setUnlockedSections([true, false, false, false]);
-    setCompletedSections([false, false, false, false]);
-    setAudioEnded([false, false, false, false]);
+    setUnlockedSections([true, ...Array(count - 1).fill(false)]);
+    setCompletedSections(Array(count).fill(false));
+    setAudioEnded(Array(count).fill(false));
     setAnswers({});
     setTestFinished(false);
     setReviewMode(false);
@@ -91,11 +192,26 @@ const ListeningModule: React.FC = () => {
     scrollToTop();
   };
 
+  const handleStart = async () => {
+    setIsStarted(true);
+    if (user && testId) {
+      try {
+        await startTestSession(user.id, testId, "listening");
+      } catch (err) {
+        console.error("Failed to start session:", err);
+      }
+    }
+  };
+
+  if (!testId) return null;
+  if (isLoading) return <ListeningLoadingSkeleton />;
+  if (hasError || !test) return <ListeningErrorState onBack={() => navigate("/tests")} />;
+
+  const totalSections = test.sections.length;
   const currentSection = test.sections[activeSection];
   const sectionQuestions = currentSection.questions;
   const answeredCount = sectionQuestions.filter((q) => answers[q.id]?.trim()).length;
-  const hasAtLeastOne = answeredCount > 0;
-  const canSubmit = hasAtLeastOne;
+  const canSubmit = answeredCount > 0;
   const globalOffset = test.sections
     .slice(0, activeSection)
     .reduce((acc, s) => acc + s.questions.length, 0);
@@ -104,10 +220,9 @@ const ListeningModule: React.FC = () => {
     <DashboardLayout>
       <TooltipProvider>
         <div className="flex flex-col h-[calc(100vh-4rem)]">
-          {/* Unified Timer — paused until started */}
           <UnifiedTimer
             key={timerKey}
-            totalSeconds={1800}
+            totalSeconds={test.totalTime}
             onTimeUp={handleTimeUp}
             isPaused={!isStarted}
             testFinished={testFinished}
@@ -115,12 +230,12 @@ const ListeningModule: React.FC = () => {
 
           <TestStartOverlay
             isStarted={isStarted}
-            onStart={() => setIsStarted(true)}
-            title="IELTS Listening Test"
+            onStart={handleStart}
+            title={test.title}
             module="listening"
-            sections="4 Sections"
-            questions="40 Questions"
-            durationMinutes={30}
+            sections={`${totalSections} Sections`}
+            questions={`${test.sections.reduce((acc, s) => acc + s.questions.length, 0)} Questions`}
+            durationMinutes={Math.round(test.totalTime / 60)}
           >
             {/* Sticky Header */}
             <div className="shrink-0 border-b border-border bg-card px-4 py-3 md:px-8 space-y-3">
@@ -224,6 +339,7 @@ const ListeningModule: React.FC = () => {
                         <Separator className="my-4" />
                         <AudioPlayer
                           sectionIndex={activeSection}
+                          audioUrl={currentSection.audioUrl}
                           onEnded={() => handleAudioEnded(activeSection)}
                           disabled={completedSections[activeSection]}
                         />
