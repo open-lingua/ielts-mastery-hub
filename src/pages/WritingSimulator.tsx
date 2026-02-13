@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
+import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { academicWritingTest, generalWritingTest, type WritingTest, type WritingTask } from "@/data/writingTestData";
 import writingChartImage from "@/assets/writing-task1-chart.png";
 
@@ -100,6 +101,7 @@ const WritingSimulator: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
+  const [isStarted, setIsStarted] = useState(false);
   const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -134,6 +136,7 @@ const WritingSimulator: React.FC = () => {
     setShowResults(false);
     setAutoSubmitted(false);
     setTimerKey((k) => k + 1);
+    setIsStarted(false);
     localStorage.removeItem("ielts_writing_drafts");
   }, [testType]);
 
@@ -160,7 +163,6 @@ const WritingSimulator: React.FC = () => {
     if (showResults) return;
     setAutoSubmitted(true);
     setIsActive(false);
-    // Auto-submit with scores
     const totalWords = drafts[0].wordCount + drafts[1].wordCount;
     const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
     const rand = () => Math.random() * 1.0 - 0.5;
@@ -203,6 +205,7 @@ const WritingSimulator: React.FC = () => {
     setActiveTask(0);
     setIsActive(false);
     setTimerKey((k) => k + 1);
+    setIsStarted(false);
     localStorage.removeItem("ielts_writing_drafts");
   };
 
@@ -211,221 +214,232 @@ const WritingSimulator: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Unified Timer */}
+        {/* Unified Timer — paused until started */}
         <UnifiedTimer
           key={timerKey}
           totalSeconds={test.totalTime}
           onTimeUp={handleTimeUp}
+          isPaused={!isStarted}
           testFinished={showResults}
         />
 
-        {/* ─── Header ─── */}
-        <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
-          {/* Test type toggle */}
-          <div className="flex items-center gap-2">
-            <div className="flex rounded-lg border border-border overflow-hidden">
-              {(["Academic", "General"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTestType(t)}
-                  className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    testType === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
+        <TestStartOverlay
+          isStarted={isStarted}
+          onStart={() => setIsStarted(true)}
+          title={`IELTS ${testType} Writing`}
+          module="writing"
+          sections="2 Tasks"
+          questions="2 Essays"
+          durationMinutes={60}
+        >
+          {/* ─── Header ─── */}
+          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
+            {/* Test type toggle */}
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-lg border border-border overflow-hidden">
+                {(["Academic", "General"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTestType(t)}
+                    className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      testType === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Task switcher */}
+            <div className="flex items-center gap-1">
+              {test.tasks.map((task, idx) => {
+                const draft = drafts[idx];
+                const isActiveTask = activeTask === idx;
+                const statusColor = draft.wordCount >= task.minWords
+                  ? "bg-success/10 border-success/30 text-success"
+                  : draft.wordCount > 0
+                  ? "bg-warning/10 border-warning/30 text-warning"
+                  : "";
+                return (
+                  <button
+                    key={task.id}
+                    onClick={() => setActiveTask(idx)}
+                    className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border ${
+                      isActiveTask
+                        ? "bg-primary/10 border-primary/30 text-primary shadow-sm"
+                        : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <PenTool className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Task {idx + 1}</span>
+                    <span className="sm:hidden">T{idx + 1}</span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] px-1.5 py-0 ${statusColor}`}
+                    >
+                      {draft.wordCount}/{task.minWords}+
+                    </Badge>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Task switcher */}
-          <div className="flex items-center gap-1">
-            {test.tasks.map((task, idx) => {
-              const draft = drafts[idx];
-              const isActiveTask = activeTask === idx;
-              const statusColor = draft.wordCount >= task.minWords
-                ? "bg-success/10 border-success/30 text-success"
-                : draft.wordCount > 0
-                ? "bg-warning/10 border-warning/30 text-warning"
-                : "";
-              return (
-                <button
-                  key={task.id}
-                  onClick={() => setActiveTask(idx)}
-                  className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border ${
-                    isActiveTask
-                      ? "bg-primary/10 border-primary/30 text-primary shadow-sm"
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  <PenTool className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Task {idx + 1}</span>
-                  <span className="sm:hidden">T{idx + 1}</span>
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] px-1.5 py-0 ${statusColor}`}
-                  >
-                    {draft.wordCount}/{task.minWords}+
-                  </Badge>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ─── Split Layout ─── */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* Left: Prompt & Reference */}
-          <div className="w-full md:w-[420px] lg:w-[480px] border-b md:border-b-0 md:border-r border-border bg-background overflow-hidden shrink-0 flex flex-col">
-            <ScrollArea className="flex-1">
-              <div className="p-6">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`prompt-${activeTask}`}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {/* Task badge */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
-                        {currentTask.title}
-                      </Badge>
-                      <Badge variant="outline" className="text-muted-foreground">
-                        {testType} · {currentTask.suggestedTime}
-                      </Badge>
-                    </div>
-
-                    {/* Academic T1 chart image */}
-                    {activeTask === 0 && testType === "Academic" && (
-                      <div className="mb-5">
-                        <ImageViewer src={writingChartImage} alt="IELTS Task 1 Chart" />
+          {/* ─── Split Layout ─── */}
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+            {/* Left: Prompt & Reference */}
+            <div className="w-full md:w-[420px] lg:w-[480px] border-b md:border-b-0 md:border-r border-border bg-background overflow-hidden shrink-0 flex flex-col">
+              <ScrollArea className="flex-1">
+                <div className="p-6">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`prompt-${activeTask}`}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {/* Task badge */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
+                          {currentTask.title}
+                        </Badge>
+                        <Badge variant="outline" className="text-muted-foreground">
+                          {testType} · {currentTask.suggestedTime}
+                        </Badge>
                       </div>
-                    )}
 
-                    {/* Prompt card */}
-                    <div className="rounded-2xl border border-border bg-card p-5 mb-5">
-                      <h2 className="text-base font-serif font-bold text-foreground leading-relaxed whitespace-pre-line">
-                        {currentTask.prompt}
-                      </h2>
-                      <Separator className="my-4" />
-                      <p className="text-sm text-muted-foreground italic leading-relaxed">
-                        {currentTask.context}
-                      </p>
-                    </div>
-
-                    {/* Tips */}
-                    <div className="space-y-3">
-                      <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Info className="h-3.5 w-3.5 text-primary" />
-                        Writing Tips
-                      </h3>
-                      {activeTask === 0 ? (
-                        <>
-                          <TipRow icon={<FileText className="h-4 w-4" />} title="Paraphrase the prompt" desc="Rewrite the question in your own words in the introduction." color="success" />
-                          <TipRow icon={<AlignLeft className="h-4 w-4" />} title={testType === "Academic" ? "Report key trends" : "Match the tone"} desc={testType === "Academic" ? "Identify and describe the main patterns in the data." : "Use appropriate formality: formal, semi-formal, or informal."} color="primary" />
-                        </>
-                      ) : (
-                        <>
-                          <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Plan your structure" desc="Introduction → Body 1 → Body 2 → Conclusion." color="success" />
-                          <TipRow icon={<Clock className="h-4 w-4" />} title="Budget your time" desc="~5 min planning, ~30 min writing, ~5 min reviewing." color="warning" />
-                        </>
+                      {/* Academic T1 chart image */}
+                      {activeTask === 0 && testType === "Academic" && (
+                        <div className="mb-5">
+                          <ImageViewer src={writingChartImage} alt="IELTS Task 1 Chart" />
+                        </div>
                       )}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </ScrollArea>
-          </div>
 
-          {/* Right: Editor */}
-          <div className="flex-1 flex flex-col bg-card">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`editor-${activeTask}`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1 flex flex-col"
-              >
-                <div className="flex-1 p-6 md:p-10 overflow-y-auto">
-                  <textarea
-                    ref={textareaRef}
-                    value={currentDraft.text}
-                    onChange={handleTextChange}
-                    placeholder={
-                      activeTask === 0
-                        ? testType === "Academic"
-                          ? "Begin your report here..."
-                          : "Dear Sir or Madam,\n\nI am writing to..."
-                        : "Start typing your essay here..."
-                    }
-                    className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
-                    spellCheck={false}
-                  />
-                </div>
+                      {/* Prompt card */}
+                      <div className="rounded-2xl border border-border bg-card p-5 mb-5">
+                        <h2 className="text-base font-serif font-bold text-foreground leading-relaxed whitespace-pre-line">
+                          {currentTask.prompt}
+                        </h2>
+                        <Separator className="my-4" />
+                        <p className="text-sm text-muted-foreground italic leading-relaxed">
+                          {currentTask.context}
+                        </p>
+                      </div>
 
-                {/* Footer */}
-                <div className="border-t border-border bg-card px-4 py-3 md:px-6 flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">Words</span>
-                      <span className={`text-lg font-bold ${getWordCountColor(currentDraft.wordCount, currentTask.minWords)}`}>
-                        {currentDraft.wordCount}
-                        <span className="text-xs font-normal text-muted-foreground"> / {currentTask.minWords}+</span>
-                      </span>
-                    </div>
-                    <div className="hidden md:flex items-center text-xs text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-                      {isActive ? (
-                        <span className="flex items-center text-primary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...</span>
-                      ) : (
-                        <span className="flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {activeTask === 0 ? (
-                      <button
-                        onClick={() => setActiveTask(1)}
-                        className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
-                      >
-                        Go to Task 2 →
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setActiveTask(0)}
-                        className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
-                      >
-                        ← Back to Task 1
-                      </button>
-                    )}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={handleSubmit}
-                            disabled={!bothAttempted}
-                            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
-                          >
-                            Submit Test <CheckCircle className="h-4 w-4" />
-                          </button>
-                        </TooltipTrigger>
-                        {!bothAttempted && (
-                          <TooltipContent>
-                            <p>Both tasks must be attempted before submitting</p>
-                          </TooltipContent>
+                      {/* Tips */}
+                      <div className="space-y-3">
+                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
+                          <Info className="h-3.5 w-3.5 text-primary" />
+                          Writing Tips
+                        </h3>
+                        {activeTask === 0 ? (
+                          <>
+                            <TipRow icon={<FileText className="h-4 w-4" />} title="Paraphrase the prompt" desc="Rewrite the question in your own words in the introduction." color="success" />
+                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title={testType === "Academic" ? "Report key trends" : "Match the tone"} desc={testType === "Academic" ? "Identify and describe the main patterns in the data." : "Use appropriate formality: formal, semi-formal, or informal."} color="primary" />
+                          </>
+                        ) : (
+                          <>
+                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Plan your structure" desc="Introduction → Body 1 → Body 2 → Conclusion." color="success" />
+                            <TipRow icon={<Clock className="h-4 w-4" />} title="Budget your time" desc="~5 min planning, ~30 min writing, ~5 min reviewing." color="warning" />
+                          </>
                         )}
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
-              </motion.div>
-            </AnimatePresence>
+              </ScrollArea>
+            </div>
+
+            {/* Right: Editor */}
+            <div className="flex-1 flex flex-col bg-card">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`editor-${activeTask}`}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex-1 flex flex-col"
+                >
+                  <div className="flex-1 p-6 md:p-10 overflow-y-auto">
+                    <textarea
+                      ref={textareaRef}
+                      value={currentDraft.text}
+                      onChange={handleTextChange}
+                      placeholder={
+                        activeTask === 0
+                          ? testType === "Academic"
+                            ? "Begin your report here..."
+                            : "Dear Sir or Madam,\n\nI am writing to..."
+                          : "Start typing your essay here..."
+                      }
+                      className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
+                      spellCheck={false}
+                    />
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t border-border bg-card px-4 py-3 md:px-6 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">Words</span>
+                        <span className={`text-lg font-bold ${getWordCountColor(currentDraft.wordCount, currentTask.minWords)}`}>
+                          {currentDraft.wordCount}
+                          <span className="text-xs font-normal text-muted-foreground"> / {currentTask.minWords}+</span>
+                        </span>
+                      </div>
+                      <div className="hidden md:flex items-center text-xs text-muted-foreground bg-secondary px-3 py-1 rounded-full">
+                        {isActive ? (
+                          <span className="flex items-center text-primary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...</span>
+                        ) : (
+                          <span className="flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {activeTask === 0 ? (
+                        <button
+                          onClick={() => setActiveTask(1)}
+                          className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                        >
+                          Go to Task 2 →
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setActiveTask(0)}
+                          className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                        >
+                          ← Back to Task 1
+                        </button>
+                      )}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={handleSubmit}
+                              disabled={!bothAttempted}
+                              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+                            >
+                              Submit Test <CheckCircle className="h-4 w-4" />
+                            </button>
+                          </TooltipTrigger>
+                          {!bothAttempted && (
+                            <TooltipContent>
+                              <p>Both tasks must be attempted before submitting</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
+        </TestStartOverlay>
       </div>
 
       {/* ─── Results Modal ─── */}
@@ -442,7 +456,6 @@ const WritingSimulator: React.FC = () => {
               </button>
             </div>
             <div className="p-6 md:p-8">
-              {/* Word count summary */}
               <div className="flex gap-3 mb-6">
                 {test.tasks.map((task, idx) => (
                   <div key={task.id} className="flex-1 rounded-xl border border-border bg-secondary/50 p-4">
@@ -454,7 +467,6 @@ const WritingSimulator: React.FC = () => {
                 ))}
               </div>
 
-              {/* Band score */}
               <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
                 <div className="relative h-28 w-28 shrink-0">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
