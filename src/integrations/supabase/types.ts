@@ -14,6 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
+      listening_question_groups: {
+        Row: {
+          created_at: string
+          group_order: number
+          has_word_bank: boolean
+          id: string
+          instructions: string
+          multiple_selection: boolean
+          question_type: string
+          section_id: string
+          select_count: number
+          sequential_order: boolean
+          word_bank: Json | null
+          word_limit: string | null
+        }
+        Insert: {
+          created_at?: string
+          group_order?: number
+          has_word_bank?: boolean
+          id?: string
+          instructions?: string
+          multiple_selection?: boolean
+          question_type?: string
+          section_id: string
+          select_count?: number
+          sequential_order?: boolean
+          word_bank?: Json | null
+          word_limit?: string | null
+        }
+        Update: {
+          created_at?: string
+          group_order?: number
+          has_word_bank?: boolean
+          id?: string
+          instructions?: string
+          multiple_selection?: boolean
+          question_type?: string
+          section_id?: string
+          select_count?: number
+          sequential_order?: boolean
+          word_bank?: Json | null
+          word_limit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listening_question_groups_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "listening_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listening_questions: {
+        Row: {
+          accepted_answers: Json | null
+          answer: string | null
+          completion_gaps: Json | null
+          created_at: string
+          group_id: string
+          id: string
+          matching_pairs: Json | null
+          options: Json | null
+          question_order: number
+          text: string
+          timestamp: string | null
+        }
+        Insert: {
+          accepted_answers?: Json | null
+          answer?: string | null
+          completion_gaps?: Json | null
+          created_at?: string
+          group_id: string
+          id?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          question_order?: number
+          text?: string
+          timestamp?: string | null
+        }
+        Update: {
+          accepted_answers?: Json | null
+          answer?: string | null
+          completion_gaps?: Json | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          question_order?: number
+          text?: string
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listening_questions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "listening_question_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listening_sections: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          section_number: number
+          test_id: string
+          title: string
+          transcript: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          section_number?: number
+          test_id: string
+          title?: string
+          transcript?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          section_number?: number
+          test_id?: string
+          title?: string
+          transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listening_sections_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "listening_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listening_tests: {
+        Row: {
+          created_at: string
+          created_by: string
+          difficulty: string
+          duration: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          difficulty?: string
+          duration?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          difficulty?: string
+          duration?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
