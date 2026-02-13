@@ -2,7 +2,7 @@ import React from "react";
 import { Trophy, BarChart3, RotateCcw, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { calculateBandScore } from "@/data/listeningTestData";
+import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 import type { ListeningTest } from "@/data/listeningTestData";
 
 interface ResultsCardProps {
@@ -22,13 +22,13 @@ const ResultsCard: React.FC<ResultsCardProps> = ({
 }) => {
   const allQuestions = test.sections.flatMap((s) => s.questions);
   const totalCorrect = allQuestions.filter(
-    (q) => answers[q.id]?.toLowerCase().trim() === q.answer.toLowerCase().trim()
+    (q) => isAnswerCorrect(answers[q.id], q.answer)
   ).length;
-  const bandScore = calculateBandScore(totalCorrect, allQuestions.length);
+  const bandScore = calculateListeningBandScore(totalCorrect);
 
   const sectionResults = test.sections.map((section) => {
     const correct = section.questions.filter(
-      (q) => answers[q.id]?.toLowerCase().trim() === q.answer.toLowerCase().trim()
+      (q) => isAnswerCorrect(answers[q.id], q.answer)
     ).length;
     return { title: `S${section.id}`, correct, total: section.questions.length };
   });
