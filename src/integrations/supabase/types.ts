@@ -212,6 +212,92 @@ export type Database = {
         }
         Relationships: []
       }
+      writing_tasks: {
+        Row: {
+          created_at: string
+          difficulty: string
+          id: string
+          image_url: string | null
+          include_model_answer: boolean
+          max_words: string | null
+          min_words: number
+          model_answer: string | null
+          prompt: string
+          suggested_time: string
+          task_number: number
+          task_type: string
+          test_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string
+          id?: string
+          image_url?: string | null
+          include_model_answer?: boolean
+          max_words?: string | null
+          min_words?: number
+          model_answer?: string | null
+          prompt?: string
+          suggested_time?: string
+          task_number?: number
+          task_type?: string
+          test_id: string
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string
+          id?: string
+          image_url?: string | null
+          include_model_answer?: boolean
+          max_words?: string | null
+          min_words?: number
+          model_answer?: string | null
+          prompt?: string
+          suggested_time?: string
+          task_number?: number
+          task_type?: string
+          test_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "writing_tasks_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "writing_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      writing_tests: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
