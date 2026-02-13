@@ -1,4 +1,6 @@
+import { supabase } from "@/integrations/supabase/client";
 import { fetchReadingTest } from "./readingTestService";
+import { calculateReadingBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 import type {
   ReadingPassage,
   ReadingSection,
@@ -479,4 +481,130 @@ function extractParagraphLabelsFromContent(content: string): string[] | undefine
   const matches = content.match(/\(([A-Z])\)/g);
   if (!matches || matches.length < 2) return undefined;
   return matches.map((m) => m.replace(/[()]/g, ""));
+}
+
+/**
+ * Extract all correct answers from a ReadingTestPracticePayload for grading.
+ * Returns a flat array of { key, answer, acceptedAnswers } for each question.
+ */
+export function extractCorrectAnswers(
+  payload: ReadingTestPracticePayload
+): { key: string; answer: string; acceptedAnswers?: string[] }[] {
+  const results: { key: string; answer: string; acceptedAnswers?: string[] }[] = [];
+
+  for (const override of payload.passageOverrides) {
+    if (override.tfng) {
+      for (const q of override.tfng) {
+        results.push({ key: q.id, answer: q.answer });
+      }
+    }
+    if (override.ynng) {
+      for (const q of override.ynng) {
+        results.push({ key: q.id, answer: q.answer });
+      }
+    }
+    if (override.mc) {
+      for (const q of override.mc) {
+        results.push({ key: q.id, answer: q.answer });
+      }
+    }
+  }
+
+  for (const passage of payload.passages) {
+    for (const section of passage.sections) {
+      const d = section.data;
+      if ("answers" in d && typeof d.answers === "object") {
+        // Matching types: answers is Record<string, string>
+        for (const [key, answer] of Object.entries(d.answers as Record<string, string>)) {
+          if (!results.some((r) => r.key === key)) {
+            results.push({ key, answer });
+          }
+        }
+      }
+      if ("sentences" in d && Array.isArray((d as any).sentences)) {
+        for (const s of (d as any).sentences) {
+          if (s.gap && s.answer) {
+            results.push({ key: s.gap, answer: s.answer });
+          }
+        }
+      }
+      if ("gaps" in d && Array.isArray((d as any).gaps)) {
+        for (const g of (d as any).gaps) {
+          if (g.id && g.answer) {
+            results.push({ key: g.id, answer: g.answer });
+          }
+        }
+      }
+      if ("notes" in d && Array.isArray((d as any).notes)) {
+        for (const n of (d as any).notes) {
+          if (n.gap && n.answer) {
+            results.push({ key: n.gap, answer: n.answer });
+          }
+        }
+      }
+      if ("steps" in d && Array.isArray((d as any).steps)) {
+        for (const s of (d as any).steps) {
+          if (s.gap && s.answer) {
+            results.push({ key: s.gap, answer: s.answer });
+          }
+        }
+      }
+      if ("questions" in d && Array.isArray((d as any).questions)) {
+        for (const q of (d as any).questions) {
+          if (q.label && q.answer) {
+            results.push({ key: q.label, answer: q.answer, acceptedAnswers: q.acceptedAnswers });
+          }
+        }
+      }
+      // Table completion
+      if ("rows" in d && Array.isArray((d as any).rows)) {
+        for (const row of (d as any).rows) {
+          if (row.cells) {
+            for (const cell of row.cells) {
+              if (typeof cell === "object" && cell.gap && cell.answer) {
+                results.push({ key: cell.gap, answer: cell.answer });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Grade and persist a completed reading test.
+ */
+export async function submitReadingTest(
+  userId: string,
+  testId: string,
+  payload: ReadingTestPracticePayload,
+  userAnswers: Record<string, string>
+): Promise<{ rawScore: number; bandScore: number }> {
+  const correctAnswers = extractCorrectAnswers(payload);
+  const rawScore = correctAnswers.filter((q) =>
+    isAnswerCorrect(userAnswers[q.key], q.answer, q.acceptedAnswers)
+  ).length;
+  const bandScore = calculateReadingBandScore(rawScore);
+
+  const { error } = await supabase
+    .from("user_test_sessions")
+    .upsert(
+      {
+        user_id: userId,
+        test_id: testId,
+        test_type: "reading",
+        status: "completed",
+        progress_percent: 100,
+        score_band: bandScore,
+        completed_at: new Date().toISOString(),
+        last_active_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,test_id,test_type" }
+    );
+
+  if (error) throw error;
+  return { rawScore, bandScore };
 }
