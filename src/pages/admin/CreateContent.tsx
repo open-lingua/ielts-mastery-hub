@@ -54,7 +54,7 @@ import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveReadingTest, updateReadingTest, fetchReadingTest } from "@/services/readingTestService";
-import { saveWritingTest } from "@/services/writingService";
+import { saveWritingTest, updateWritingTest, fetchWritingTest } from "@/services/writingService";
 import { saveListeningTest } from "@/services/listeningService";
 import { toast } from "@/hooks/use-toast";
 
@@ -1499,27 +1499,53 @@ const CreateContent: React.FC = () => {
 
   // ── Load existing test for edit mode ──
   useEffect(() => {
-    if (!editId || activeTab !== "reading") return;
-    setIsLoadingEdit(true);
-    fetchReadingTest(editId)
-      .then((data) => {
-        setReadingTestTitle(data.title);
-        setReadingTestType(data.testType);
-        setReadingDifficulty(data.difficulty);
-        setReadingDuration(data.duration);
-        // Cast passage question group types to match component's QuestionType union
-        setReadingPassages(data.passages.map((p) => ({
-          ...p,
-          questionGroups: p.questionGroups.map((g) => ({
-            ...g,
-            type: g.type as QuestionType,
-          })),
-        })));
-      })
-      .catch((err) => {
-        toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
-      })
-      .finally(() => setIsLoadingEdit(false));
+    if (!editId) return;
+
+    if (activeTab === "reading") {
+      setIsLoadingEdit(true);
+      fetchReadingTest(editId)
+        .then((data) => {
+          setReadingTestTitle(data.title);
+          setReadingTestType(data.testType);
+          setReadingDifficulty(data.difficulty);
+          setReadingDuration(data.duration);
+          setReadingPassages(data.passages.map((p) => ({
+            ...p,
+            questionGroups: p.questionGroups.map((g) => ({
+              ...g,
+              type: g.type as QuestionType,
+            })),
+          })));
+        })
+        .catch((err) => {
+          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+        })
+        .finally(() => setIsLoadingEdit(false));
+    }
+
+    if (activeTab === "writing") {
+      setIsLoadingEdit(true);
+      fetchWritingTest(editId)
+        .then((data) => {
+          const task = data.tasks[0];
+          if (task) {
+            setWritingTaskType(task.taskType);
+            setWritingTitle(task.title);
+            setWritingDifficulty(task.difficulty);
+            setWritingSuggestedTime(task.suggestedTime);
+            setWritingPrompt(task.prompt);
+            setWritingMinWords(task.minWords);
+            setWritingMaxWords(task.maxWords);
+            if (task.imageUrl) {
+              setWritingImagePreview(task.imageUrl);
+            }
+          }
+        })
+        .catch((err) => {
+          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+        })
+        .finally(() => setIsLoadingEdit(false));
+    }
   }, [editId, activeTab]);
 
   // Sync URL
@@ -1589,27 +1615,40 @@ const CreateContent: React.FC = () => {
       return;
     }
     setIsSaving(true);
+    const taskPayload: Parameters<typeof saveWritingTest>[0]["tasks"] = [{
+      taskType: writingTaskType,
+      title: writingTitle,
+      difficulty: writingDifficulty,
+      suggestedTime: writingSuggestedTime,
+      prompt: writingPrompt,
+      minWords: writingMinWords,
+      maxWords: writingMaxWords,
+      imageFile: writingTaskType === "task1" ? writingImageFile : null,
+      imageUrl: writingTaskType === "task1" ? writingImagePreview : undefined,
+    }];
     try {
-      await saveWritingTest({
-        userId: user.id,
-        title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
-        status,
-        tasks: [{
-          taskType: writingTaskType,
-          title: writingTitle,
-          difficulty: writingDifficulty,
-          suggestedTime: writingSuggestedTime,
-          prompt: writingPrompt,
-          minWords: writingMinWords,
-          maxWords: writingMaxWords,
-          imageFile: writingTaskType === "task1" ? writingImageFile : null,
-        }],
-      });
+      if (editId) {
+        await updateWritingTest({
+          testId: editId,
+          title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
+          status,
+          tasks: taskPayload,
+        });
+      } else {
+        await saveWritingTest({
+          userId: user.id,
+          title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
+          status,
+          tasks: taskPayload,
+        });
+      }
       toast({
-        title: status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${writingTitle || "Untitled"}" has been ${status === "published" ? "published" : "saved"} successfully.`,
+        title: editId
+          ? "Test Updated!"
+          : status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${writingTitle || "Untitled"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
-      if (status === "published") {
+      if (status === "published" || editId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1735,17 +1774,24 @@ const CreateContent: React.FC = () => {
           />
         </TabPanel>
         <TabPanel active={activeTab === "writing"}>
-          <WritingCreator
-            taskType={writingTaskType} onTaskTypeChange={setWritingTaskType}
-            title={writingTitle} onTitleChange={setWritingTitle}
-            difficulty={writingDifficulty} onDifficultyChange={setWritingDifficulty}
-            suggestedTime={writingSuggestedTime} onSuggestedTimeChange={setWritingSuggestedTime}
-            prompt={writingPrompt} onPromptChange={setWritingPrompt}
-            minWords={writingMinWords} onMinWordsChange={setWritingMinWords}
-            maxWords={writingMaxWords} onMaxWordsChange={setWritingMaxWords}
-            imageFile={writingImageFile} onImageFileChange={setWritingImageFile}
-            imagePreview={writingImagePreview} onImagePreviewChange={setWritingImagePreview}
-          />
+          {isLoadingEdit ? (
+            <div className="flex items-center justify-center py-20 gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-muted-foreground">Loading test data...</span>
+            </div>
+          ) : (
+            <WritingCreator
+              taskType={writingTaskType} onTaskTypeChange={setWritingTaskType}
+              title={writingTitle} onTitleChange={setWritingTitle}
+              difficulty={writingDifficulty} onDifficultyChange={setWritingDifficulty}
+              suggestedTime={writingSuggestedTime} onSuggestedTimeChange={setWritingSuggestedTime}
+              prompt={writingPrompt} onPromptChange={setWritingPrompt}
+              minWords={writingMinWords} onMinWordsChange={setWritingMinWords}
+              maxWords={writingMaxWords} onMaxWordsChange={setWritingMaxWords}
+              imageFile={writingImageFile} onImageFileChange={setWritingImageFile}
+              imagePreview={writingImagePreview} onImagePreviewChange={setWritingImagePreview}
+            />
+          )}
         </TabPanel>
 
         {/* Floating Action Bar */}
