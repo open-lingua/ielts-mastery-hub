@@ -37,7 +37,7 @@ interface QuestionItem {
 
 interface QuestionGroup {
   id: string;
-  type: string;
+  type: string; // kept as string for DB compatibility
   instructions: string;
   wordLimit: string;
   hasWordBank: boolean;
@@ -64,6 +64,113 @@ interface SaveReadingTestParams {
   duration: string;
   status: "draft" | "published";
   passages: ReadingPassageState[];
+}
+
+export async function fetchReadingTest(testId: string): Promise<{
+  title: string;
+  testType: string;
+  difficulty: string;
+  duration: string;
+  status: string;
+  passages: ReadingPassageState[];
+}> {
+  const { data: test, error: testError } = await supabase
+    .from("reading_tests")
+    .select("*")
+    .eq("id", testId)
+    .single();
+
+  if (testError || !test) throw new Error(testError?.message || "Test not found");
+
+  const { data: passages, error: pError } = await supabase
+    .from("reading_passages")
+    .select("*")
+    .eq("test_id", testId)
+    .order("passage_number");
+
+  if (pError) throw new Error(pError.message);
+
+  const passageIds = (passages || []).map((p) => p.id);
+
+  const { data: groups, error: gError } = await supabase
+    .from("reading_question_groups")
+    .select("*")
+    .in("passage_id", passageIds.length ? passageIds : ["__none__"])
+    .order("group_order");
+
+  if (gError) throw new Error(gError.message);
+
+  const groupIds = (groups || []).map((g) => g.id);
+
+  const { data: questions, error: qError } = await supabase
+    .from("reading_questions")
+    .select("*")
+    .in("group_id", groupIds.length ? groupIds : ["__none__"])
+    .order("question_order");
+
+  if (qError) throw new Error(qError.message);
+
+  // Build nested structure
+  const questionsByGroup = new Map<string, QuestionItem[]>();
+  for (const q of questions || []) {
+    const items = questionsByGroup.get(q.group_id) || [];
+    items.push({
+      id: q.id,
+      text: q.text,
+      answer: q.answer || "",
+      options: (q.options as unknown as MCOption[]) || [],
+      matchingPairs: (q.matching_pairs as unknown as MatchingPair[]) || [],
+      completionGaps: (q.completion_gaps as unknown as CompletionGap[]) || [],
+      acceptedAnswers: (q.accepted_answers as unknown as AcceptedAnswer[]) || [],
+    });
+    questionsByGroup.set(q.group_id, items);
+  }
+
+  const groupsByPassage = new Map<string, QuestionGroup[]>();
+  for (const g of groups || []) {
+    const items = groupsByPassage.get(g.passage_id) || [];
+    items.push({
+      id: g.id,
+      type: g.question_type as string,
+      instructions: g.instructions,
+      wordLimit: g.word_limit || "",
+      hasWordBank: g.has_word_bank,
+      wordBank: (g.word_bank as string[]) || [],
+      sequentialOrder: g.sequential_order,
+      multipleSelection: g.multiple_selection,
+      selectCount: g.select_count,
+      questions: questionsByGroup.get(g.id) || [],
+    });
+    groupsByPassage.set(g.passage_id, items);
+  }
+
+  const mappedPassages: ReadingPassageState[] = (passages || []).map((p) => ({
+    id: p.passage_number,
+    title: p.title,
+    content: p.content,
+    notes: p.notes || "",
+    questionGroups: groupsByPassage.get(p.id) || [],
+  }));
+
+  // Ensure 3 passages exist
+  while (mappedPassages.length < 3) {
+    mappedPassages.push({
+      id: mappedPassages.length + 1,
+      title: "",
+      content: "",
+      notes: "",
+      questionGroups: [],
+    });
+  }
+
+  return {
+    title: test.title,
+    testType: test.test_type,
+    difficulty: test.difficulty,
+    duration: test.duration,
+    status: test.status,
+    passages: mappedPassages,
+  };
 }
 
 export async function saveReadingTest(params: SaveReadingTestParams): Promise<{ testId: string }> {
