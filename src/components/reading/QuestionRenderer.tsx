@@ -233,7 +233,7 @@ const MatchingInformationRenderer: React.FC<SectionProps> = ({ data, answers, on
                 <SelectValue placeholder="Paragraph" />
               </SelectTrigger>
               <SelectContent>
-                {d.paragraphs.map((p) => (
+                {d.paragraphs.filter((p) => p !== "").map((p) => (
                   <SelectItem key={p} value={p}>Paragraph {p}</SelectItem>
                 ))}
               </SelectContent>
@@ -287,9 +287,10 @@ const MatchingHeadingsRenderer: React.FC<SectionProps> = ({ data, answers, onAns
               </SelectTrigger>
               <SelectContent>
                 {d.headings.map((h) => {
-                  const numeral = h.split(".")[0];
+                  const numeral = h.split(".")[0]?.trim() || h;
+                  const safeValue = numeral || `heading_${h}`;
                   return (
-                    <SelectItem key={numeral} value={numeral}>{numeral}</SelectItem>
+                    <SelectItem key={safeValue} value={safeValue}>{numeral || h}</SelectItem>
                   );
                 })}
               </SelectContent>
@@ -339,7 +340,7 @@ const MatchingFeaturesRenderer: React.FC<SectionProps> = ({ data, answers, onAns
                 <SelectValue placeholder="Select researcher" />
               </SelectTrigger>
               <SelectContent>
-                {d.entities.map((e) => (
+                {d.entities.filter((e) => e !== "").map((e) => (
                   <SelectItem key={e} value={e}>{e}</SelectItem>
                 ))}
               </SelectContent>
@@ -391,7 +392,7 @@ const MatchingSentenceEndingsRenderer: React.FC<SectionProps> = ({ data, answers
                 <SelectValue placeholder="Ending" />
               </SelectTrigger>
               <SelectContent>
-                {d.endings.map((e) => (
+                {d.endings.filter((e) => e.label !== "").map((e) => (
                   <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>
                 ))}
               </SelectContent>
@@ -491,7 +492,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
-                {d.wordBank!.map((w) => (
+                {d.wordBank!.filter((w) => w !== "").map((w) => (
                   <SelectItem key={w} value={w}>{w}</SelectItem>
                 ))}
               </SelectContent>
