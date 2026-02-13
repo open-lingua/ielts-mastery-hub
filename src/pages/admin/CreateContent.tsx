@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveReadingTest, updateReadingTest, fetchReadingTest } from "@/services/readingTestService";
 import { saveWritingTest, updateWritingTest, fetchWritingTest } from "@/services/writingService";
-import { saveListeningTest } from "@/services/listeningService";
+import { saveListeningTest, updateListeningTest, fetchListeningTest } from "@/services/listeningService";
 import { toast } from "@/hooks/use-toast";
 
 // ─── Types ────────────────────────────────────
@@ -1607,6 +1607,49 @@ const CreateContent: React.FC = () => {
         })
         .finally(() => setIsLoadingEdit(false));
     }
+
+    if (activeTab === "listening") {
+      setIsLoadingEdit(true);
+      fetchListeningTest(editId)
+        .then((data) => {
+          setListeningTestTitle(data.title);
+          setListeningDifficulty(data.difficulty);
+          setListeningDuration(data.duration);
+          // Map sections into the 4-slot state
+          const newSections = emptySections();
+          data.sections.forEach((s) => {
+            const idx = s.id - 1; // section id is 1-based
+            if (idx >= 0 && idx < 4) {
+              newSections[idx] = {
+                id: s.id,
+                title: s.title,
+                transcript: s.transcript,
+                audioFileName: s.audioUrl ? s.audioUrl.split("/").pop() || "Audio" : "",
+                audioFile: null,
+                audioPreviewUrl: s.audioUrl || "",
+                questionGroups: s.questionGroups.length > 0
+                  ? s.questionGroups.map((g) => ({
+                      ...g,
+                      type: g.type as QuestionType,
+                      questions: g.questions.map((q) => ({
+                        ...q,
+                        options: (q.options || []) as unknown as MCOption[],
+                        matchingPairs: (q.matchingPairs || []) as unknown as MatchingPair[],
+                        completionGaps: (q.completionGaps || []) as unknown as CompletionGap[],
+                        acceptedAnswers: (q.acceptedAnswers || []) as unknown as AcceptedAnswer[],
+                      })),
+                    }))
+                  : [emptyGroup()],
+              };
+            }
+          });
+          setListeningSections(newSections);
+        })
+        .catch((err) => {
+          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+        })
+        .finally(() => setIsLoadingEdit(false));
+    }
   }, [editId, activeTab]);
 
   // Sync URL
@@ -1734,26 +1777,41 @@ const CreateContent: React.FC = () => {
       return;
     }
     setIsSaving(true);
+    const sectionPayload = listeningSections.map((s) => ({
+      id: s.id,
+      title: s.title,
+      transcript: s.transcript,
+      audioFile: s.audioFile || null,
+      audioUrl: s.audioPreviewUrl || "",
+      questionGroups: s.questionGroups,
+    }));
     try {
-      await saveListeningTest({
-        userId: user.id,
-        title: listeningTestTitle,
-        difficulty: listeningDifficulty,
-        duration: listeningDuration,
-        status,
-        sections: listeningSections.map((s) => ({
-          id: s.id,
-          title: s.title,
-          transcript: s.transcript,
-          audioFile: s.audioFile || null,
-          questionGroups: s.questionGroups,
-        })),
-      });
+      if (editId) {
+        await updateListeningTest({
+          testId: editId,
+          title: listeningTestTitle,
+          difficulty: listeningDifficulty,
+          duration: listeningDuration,
+          status,
+          sections: sectionPayload,
+        });
+      } else {
+        await saveListeningTest({
+          userId: user.id,
+          title: listeningTestTitle,
+          difficulty: listeningDifficulty,
+          duration: listeningDuration,
+          status,
+          sections: sectionPayload,
+        });
+      }
       toast({
-        title: status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${listeningTestTitle || "Untitled"}" has been ${status === "published" ? "published" : "saved"} successfully.`,
+        title: editId
+          ? "Test Updated!"
+          : status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${listeningTestTitle || "Untitled"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
-      if (status === "published") {
+      if (status === "published" || editId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1832,12 +1890,19 @@ const CreateContent: React.FC = () => {
           )}
         </TabPanel>
         <TabPanel active={activeTab === "listening"}>
-          <ListeningCreator
-            testTitle={listeningTestTitle} onTestTitleChange={setListeningTestTitle}
-            difficulty={listeningDifficulty} onDifficultyChange={setListeningDifficulty}
-            duration={listeningDuration} onDurationChange={setListeningDuration}
-            sections={listeningSections} onSectionsChange={setListeningSections}
-          />
+          {isLoadingEdit ? (
+            <div className="flex items-center justify-center py-20 gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-muted-foreground">Loading test data...</span>
+            </div>
+          ) : (
+            <ListeningCreator
+              testTitle={listeningTestTitle} onTestTitleChange={setListeningTestTitle}
+              difficulty={listeningDifficulty} onDifficultyChange={setListeningDifficulty}
+              duration={listeningDuration} onDurationChange={setListeningDuration}
+              sections={listeningSections} onSectionsChange={setListeningSections}
+            />
+          )}
         </TabPanel>
         <TabPanel active={activeTab === "writing"}>
           {isLoadingEdit ? (
