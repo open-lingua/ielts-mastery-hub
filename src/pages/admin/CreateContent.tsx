@@ -54,6 +54,7 @@ import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveReadingTest } from "@/services/readingTestService";
+import { saveWritingTest } from "@/services/writingService";
 import { toast } from "@/hooks/use-toast";
 
 // ─── Types ────────────────────────────────────
@@ -1265,7 +1266,25 @@ const WritingCreator: React.FC<{
   prompt: string; onPromptChange: (v: string) => void;
   minWords: number; onMinWordsChange: (v: number) => void;
   maxWords: string; onMaxWordsChange: (v: string) => void;
-}> = ({ taskType, onTaskTypeChange, title, onTitleChange, difficulty, onDifficultyChange, suggestedTime, onSuggestedTimeChange, prompt, onPromptChange, minWords, onMinWordsChange, maxWords, onMaxWordsChange }) => {
+  imageFile: File | null; onImageFileChange: (f: File | null) => void;
+  imagePreview: string; onImagePreviewChange: (v: string) => void;
+}> = ({ taskType, onTaskTypeChange, title, onTitleChange, difficulty, onDifficultyChange, suggestedTime, onSuggestedTimeChange, prompt, onPromptChange, minWords, onMinWordsChange, maxWords, onMaxWordsChange, imageFile, onImageFileChange, imagePreview, onImagePreviewChange }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onImageFileChange(file);
+      const url = URL.createObjectURL(file);
+      onImagePreviewChange(url);
+    }
+  };
+
+  const clearImage = () => {
+    onImageFileChange(null);
+    onImagePreviewChange("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
   return (
     <div className="space-y-6">
       {/* Task Selector */}
@@ -1322,11 +1341,35 @@ const WritingCreator: React.FC<{
           {taskType === "task1" && (
             <div className="space-y-2">
               <Label>Chart / Graph Image</Label>
-              <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Upload chart, graph, or diagram</p>
-                <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
-              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              {imagePreview ? (
+                <div className="relative rounded-xl border border-border overflow-hidden">
+                  <img src={imagePreview} alt="Chart preview" className="w-full max-h-48 object-contain bg-muted/30" />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={clearImage}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Upload chart, graph, or diagram</p>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1421,6 +1464,8 @@ const CreateContent: React.FC = () => {
   const [writingPrompt, setWritingPrompt] = useState("");
   const [writingMinWords, setWritingMinWords] = useState(150);
   const [writingMaxWords, setWritingMaxWords] = useState("");
+  const [writingImageFile, setWritingImageFile] = useState<File | null>(null);
+  const [writingImagePreview, setWritingImagePreview] = useState<string>("");
 
   // Sync URL
   useEffect(() => {
@@ -1464,6 +1509,56 @@ const CreateContent: React.FC = () => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveWritingTest = async (status: "draft" | "published") => {
+    if (!user) {
+      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveWritingTest({
+        userId: user.id,
+        title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
+        status,
+        tasks: [{
+          taskType: writingTaskType,
+          title: writingTitle,
+          difficulty: writingDifficulty,
+          suggestedTime: writingSuggestedTime,
+          prompt: writingPrompt,
+          minWords: writingMinWords,
+          maxWords: writingMaxWords,
+          imageFile: writingTaskType === "task1" ? writingImageFile : null,
+        }],
+      });
+      toast({
+        title: status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${writingTitle || "Untitled"}" has been ${status === "published" ? "published" : "saved"} successfully.`,
+      });
+      if (status === "published") {
+        navigate("/admin/content");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Failed to save writing test",
+        description: err?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSave = async (status: "draft" | "published") => {
+    if (activeTab === "reading") {
+      await handleSaveReadingTest(status);
+    } else if (activeTab === "writing") {
+      await handleSaveWritingTest(status);
+    } else {
+      toast({ title: "Not yet supported", description: "Listening persistence coming soon.", variant: "destructive" });
     }
   };
 
@@ -1527,6 +1622,8 @@ const CreateContent: React.FC = () => {
             prompt={writingPrompt} onPromptChange={setWritingPrompt}
             minWords={writingMinWords} onMinWordsChange={setWritingMinWords}
             maxWords={writingMaxWords} onMaxWordsChange={setWritingMaxWords}
+            imageFile={writingImageFile} onImageFileChange={setWritingImageFile}
+            imagePreview={writingImagePreview} onImagePreviewChange={setWritingImagePreview}
           />
         </TabPanel>
 
@@ -1538,8 +1635,8 @@ const CreateContent: React.FC = () => {
               <Button
                 variant="outline"
                 className="gap-2"
-                disabled={isSaving || activeTab !== "reading"}
-                onClick={() => handleSaveReadingTest("draft")}
+                disabled={isSaving || activeTab === "listening"}
+                onClick={() => handleSave("draft")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Save Draft
@@ -1549,8 +1646,8 @@ const CreateContent: React.FC = () => {
               </Button>
               <Button
                 className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
-                disabled={isSaving || activeTab !== "reading"}
-                onClick={() => handleSaveReadingTest("published")}
+                disabled={isSaving || activeTab === "listening"}
+                onClick={() => handleSave("published")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Publish
