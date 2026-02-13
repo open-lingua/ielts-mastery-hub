@@ -27,7 +27,7 @@ import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { fetchWritingTestForPractice, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
+import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
 import { startTestSession } from "@/services/practiceLibraryService";
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -242,6 +242,22 @@ const WritingSimulator: React.FC = () => {
   const getWordCountColor = (wc: number, min: number) =>
     wc >= min ? "text-success" : wc > 0 ? "text-warning" : "text-muted-foreground";
 
+  const persistSubmission = useCallback(async () => {
+    if (!user || !testId) return;
+    try {
+      await submitWritingTest(user.id, testId, {
+        task1: drafts[0].text,
+        task2: drafts[1].text,
+        task1WordCount: drafts[0].wordCount,
+        task2WordCount: drafts[1].wordCount,
+      });
+      toast.success("Your writing test has been submitted successfully.");
+    } catch (err) {
+      console.error("Failed to persist writing submission:", err);
+      toast.error("Failed to save your submission. Your work is saved locally.");
+    }
+  }, [user, testId, drafts]);
+
   const handleTimeUp = useCallback(() => {
     if (showResults) return;
     setAutoSubmitted(true);
@@ -259,7 +275,8 @@ const WritingSimulator: React.FC = () => {
     });
     setShowResults(true);
     localStorage.removeItem(`ielts_writing_drafts_${testId}`);
-  }, [showResults, drafts, testId]);
+    persistSubmission();
+  }, [showResults, drafts, testId, persistSubmission]);
 
   const handleSubmit = () => {
     if (!currentTask) return;
@@ -282,6 +299,7 @@ const WritingSimulator: React.FC = () => {
     });
     setShowResults(true);
     localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+    persistSubmission();
   };
 
   const handleReset = () => {
