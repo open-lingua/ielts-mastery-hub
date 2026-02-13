@@ -1285,34 +1285,62 @@ const ListeningCreator: React.FC<{
   );
 };
 
+// ─── Writing Task State ───────────────────────
+interface WritingTaskState {
+  taskType: "task1" | "task2";
+  title: string;
+  difficulty: string;
+  suggestedTime: string;
+  prompt: string;
+  minWords: number;
+  maxWords: string;
+  imageFile: File | null;
+  imagePreview: string;
+  includeModelAnswer: boolean;
+  modelAnswer: string;
+}
+
+const emptyWritingTask = (type: "task1" | "task2"): WritingTaskState => ({
+  taskType: type,
+  title: "",
+  difficulty: "7",
+  suggestedTime: type === "task1" ? "20 mins" : "40 mins",
+  prompt: "",
+  minWords: type === "task1" ? 150 : 250,
+  maxWords: "",
+  imageFile: null,
+  imagePreview: "",
+  includeModelAnswer: false,
+  modelAnswer: "",
+});
+
 // ─── Writing Creator ──────────────────────────
 const WritingCreator: React.FC<{
-  taskType: "task1" | "task2"; onTaskTypeChange: (v: "task1" | "task2") => void;
-  title: string; onTitleChange: (v: string) => void;
-  difficulty: string; onDifficultyChange: (v: string) => void;
-  suggestedTime: string; onSuggestedTimeChange: (v: string) => void;
-  prompt: string; onPromptChange: (v: string) => void;
-  minWords: number; onMinWordsChange: (v: number) => void;
-  maxWords: string; onMaxWordsChange: (v: string) => void;
-  imageFile: File | null; onImageFileChange: (f: File | null) => void;
-  imagePreview: string; onImagePreviewChange: (v: string) => void;
-}> = ({ taskType, onTaskTypeChange, title, onTitleChange, difficulty, onDifficultyChange, suggestedTime, onSuggestedTimeChange, prompt, onPromptChange, minWords, onMinWordsChange, maxWords, onMaxWordsChange, imageFile, onImageFileChange, imagePreview, onImagePreviewChange }) => {
+  tasks: [WritingTaskState, WritingTaskState];
+  onTasksChange: (tasks: [WritingTaskState, WritingTaskState]) => void;
+}> = ({ tasks, onTasksChange }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const task = tasks[activeIndex];
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const updateTask = (patch: Partial<WritingTaskState>) => {
+    const next = [...tasks] as [WritingTaskState, WritingTaskState];
+    next[activeIndex] = { ...next[activeIndex], ...patch };
+    onTasksChange(next);
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      onImageFileChange(file);
-      const url = URL.createObjectURL(file);
-      onImagePreviewChange(url);
+      updateTask({ imageFile: file, imagePreview: URL.createObjectURL(file) });
     }
   };
 
   const clearImage = () => {
-    onImageFileChange(null);
-    onImagePreviewChange("");
+    updateTask({ imageFile: null, imagePreview: "" });
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
   return (
     <div className="space-y-6">
       {/* Task Selector */}
@@ -1320,19 +1348,19 @@ const WritingCreator: React.FC<{
         <Label className="text-sm font-semibold">Task Type</Label>
         <div className="inline-flex items-center rounded-lg bg-muted p-1">
           <button
-            onClick={() => onTaskTypeChange("task1")}
+            onClick={() => setActiveIndex(0)}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
-              taskType === "task1" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              activeIndex === 0 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             )}
           >
             Task 1 – Visual
           </button>
           <button
-            onClick={() => onTaskTypeChange("task2")}
+            onClick={() => setActiveIndex(1)}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
-              taskType === "task2" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              activeIndex === 1 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             )}
           >
             Task 2 – Essay
@@ -1340,99 +1368,128 @@ const WritingCreator: React.FC<{
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Title</Label>
-            <Input placeholder={taskType === "task1" ? "e.g. Bar Chart – International Tourism" : "e.g. Essay on Technology in Education"} value={title} onChange={(e) => onTitleChange(e.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Difficulty</Label>
-              <Select value={difficulty} onValueChange={onDifficultyChange}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
-                    <SelectItem key={b} value={b}>Band {b}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Suggested Time</Label>
-              <Input placeholder="e.g. 20 mins" value={suggestedTime} onChange={(e) => onSuggestedTimeChange(e.target.value)} />
-            </div>
-          </div>
-
-          {/* Task 1 – Image Upload */}
-          {taskType === "task1" && (
-            <div className="space-y-2">
-              <Label>Chart / Graph Image</Label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-              {imagePreview ? (
-                <div className="relative rounded-xl border border-border overflow-hidden">
-                  <img src={imagePreview} alt="Chart preview" className="w-full max-h-48 object-contain bg-muted/30" />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-7 w-7"
-                    onClick={clearImage}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIndex}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input
+                  placeholder={task.taskType === "task1" ? "e.g. Bar Chart – International Tourism" : "e.g. Essay on Technology in Education"}
+                  value={task.title}
+                  onChange={(e) => updateTask({ title: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Difficulty</Label>
+                  <Select value={task.difficulty} onValueChange={(v) => updateTask({ difficulty: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
+                        <SelectItem key={b} value={b}>Band {b}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              ) : (
-                <div
-                  className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Upload chart, graph, or diagram</p>
-                  <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
+                <div className="space-y-2">
+                  <Label>Suggested Time</Label>
+                  <Input placeholder="e.g. 20 mins" value={task.suggestedTime} onChange={(e) => updateTask({ suggestedTime: e.target.value })} />
+                </div>
+              </div>
+
+              {/* Task 1 – Image Upload */}
+              {task.taskType === "task1" && (
+                <div className="space-y-2">
+                  <Label>Chart / Graph Image</Label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+                  {task.imagePreview ? (
+                    <div className="relative rounded-xl border border-border overflow-hidden">
+                      <img src={task.imagePreview} alt="Chart preview" className="w-full max-h-48 object-contain bg-muted/30" />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={clearImage}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div
+                      className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Upload chart, graph, or diagram</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* Right */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Question Prompt</Label>
-            <Textarea
-              placeholder={
-                taskType === "task1"
-                  ? "Summarise the information by selecting and reporting the main features, and make comparisons where relevant..."
-                  : "Write about the following topic:\n\nSome people believe that...\n\nDiscuss both views and give your own opinion."
-              }
-              className="min-h-[200px] text-sm"
-              value={prompt}
-              onChange={(e) => onPromptChange(e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Min. Words</Label>
-              <Input type="number" value={minWords} onChange={(e) => onMinWordsChange(parseInt(e.target.value) || 0)} />
+            {/* Right */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Question Prompt</Label>
+                <Textarea
+                  placeholder={
+                    task.taskType === "task1"
+                      ? "Summarise the information by selecting and reporting the main features, and make comparisons where relevant..."
+                      : "Write about the following topic:\n\nSome people believe that...\n\nDiscuss both views and give your own opinion."
+                  }
+                  className="min-h-[200px] text-sm"
+                  value={task.prompt}
+                  onChange={(e) => updateTask({ prompt: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Min. Words</Label>
+                  <Input type="number" value={task.minWords} onChange={(e) => updateTask({ minWords: parseInt(e.target.value) || 0 })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Max. Words (optional)</Label>
+                  <Input type="number" placeholder="No limit" value={task.maxWords} onChange={(e) => updateTask({ maxWords: e.target.value })} />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Switch
+                  id={`model-answer-${activeIndex}`}
+                  checked={task.includeModelAnswer}
+                  onCheckedChange={(v) => updateTask({ includeModelAnswer: v })}
+                />
+                <Label htmlFor={`model-answer-${activeIndex}`} className="text-sm cursor-pointer">Include Model Answer</Label>
+              </div>
+              {task.includeModelAnswer && (
+                <div className="space-y-2">
+                  <Label>Model Answer</Label>
+                  <Textarea
+                    placeholder="Enter the model answer..."
+                    className="min-h-[120px] text-sm"
+                    value={task.modelAnswer}
+                    onChange={(e) => updateTask({ modelAnswer: e.target.value })}
+                  />
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>Max. Words (optional)</Label>
-              <Input type="number" placeholder="No limit" value={maxWords} onChange={(e) => onMaxWordsChange(e.target.value)} />
-            </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-            <Switch id="model-answer" />
-            <Label htmlFor="model-answer" className="text-sm cursor-pointer">Include Model Answer</Label>
-          </div>
-        </div>
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
@@ -1486,16 +1543,11 @@ const CreateContent: React.FC = () => {
   const [listeningDuration, setListeningDuration] = useState("40 mins");
   const [listeningSections, setListeningSections] = useState<ListeningSectionState[]>(emptySections());
 
-  // ── Lifted Writing State ──
-  const [writingTaskType, setWritingTaskType] = useState<"task1" | "task2">("task1");
-  const [writingTitle, setWritingTitle] = useState("");
-  const [writingDifficulty, setWritingDifficulty] = useState("7");
-  const [writingSuggestedTime, setWritingSuggestedTime] = useState("20 mins");
-  const [writingPrompt, setWritingPrompt] = useState("");
-  const [writingMinWords, setWritingMinWords] = useState(150);
-  const [writingMaxWords, setWritingMaxWords] = useState("");
-  const [writingImageFile, setWritingImageFile] = useState<File | null>(null);
-  const [writingImagePreview, setWritingImagePreview] = useState<string>("");
+  // ── Lifted Writing State (2 independent tasks) ──
+  const [writingTasks, setWritingTasks] = useState<[WritingTaskState, WritingTaskState]>([
+    emptyWritingTask("task1"),
+    emptyWritingTask("task2"),
+  ]);
 
   // ── Load existing test for edit mode ──
   useEffect(() => {
@@ -1527,19 +1579,28 @@ const CreateContent: React.FC = () => {
       setIsLoadingEdit(true);
       fetchWritingTest(editId)
         .then((data) => {
-          const task = data.tasks[0];
-          if (task) {
-            setWritingTaskType(task.taskType);
-            setWritingTitle(task.title);
-            setWritingDifficulty(task.difficulty);
-            setWritingSuggestedTime(task.suggestedTime);
-            setWritingPrompt(task.prompt);
-            setWritingMinWords(task.minWords);
-            setWritingMaxWords(task.maxWords);
-            if (task.imageUrl) {
-              setWritingImagePreview(task.imageUrl);
+          const newTasks: [WritingTaskState, WritingTaskState] = [
+            emptyWritingTask("task1"),
+            emptyWritingTask("task2"),
+          ];
+          data.tasks.forEach((t, i) => {
+            if (i < 2) {
+              newTasks[i] = {
+                taskType: t.taskType,
+                title: t.title,
+                difficulty: t.difficulty,
+                suggestedTime: t.suggestedTime,
+                prompt: t.prompt,
+                minWords: t.minWords,
+                maxWords: t.maxWords,
+                imageFile: null,
+                imagePreview: t.imageUrl || "",
+                includeModelAnswer: t.includeModelAnswer || false,
+                modelAnswer: t.modelAnswer || "",
+              };
             }
-          }
+          });
+          setWritingTasks(newTasks);
         })
         .catch((err) => {
           toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
@@ -1615,29 +1676,34 @@ const CreateContent: React.FC = () => {
       return;
     }
     setIsSaving(true);
-    const taskPayload: Parameters<typeof saveWritingTest>[0]["tasks"] = [{
-      taskType: writingTaskType,
-      title: writingTitle,
-      difficulty: writingDifficulty,
-      suggestedTime: writingSuggestedTime,
-      prompt: writingPrompt,
-      minWords: writingMinWords,
-      maxWords: writingMaxWords,
-      imageFile: writingTaskType === "task1" ? writingImageFile : null,
-      imageUrl: writingTaskType === "task1" ? writingImagePreview : undefined,
-    }];
+    const taskPayload: Parameters<typeof saveWritingTest>[0]["tasks"] = writingTasks
+      .filter((t) => t.title.trim() || t.prompt.trim())
+      .map((t) => ({
+        taskType: t.taskType,
+        title: t.title,
+        difficulty: t.difficulty,
+        suggestedTime: t.suggestedTime,
+        prompt: t.prompt,
+        minWords: t.minWords,
+        maxWords: t.maxWords,
+        imageFile: t.taskType === "task1" ? t.imageFile : null,
+        imageUrl: t.taskType === "task1" ? t.imagePreview : undefined,
+        includeModelAnswer: t.includeModelAnswer,
+        modelAnswer: t.modelAnswer,
+      }));
+    const testTitle = writingTasks[0].title || writingTasks[1].title || "Writing Test";
     try {
       if (editId) {
         await updateWritingTest({
           testId: editId,
-          title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
+          title: testTitle,
           status,
           tasks: taskPayload,
         });
       } else {
         await saveWritingTest({
           userId: user.id,
-          title: writingTitle || `Writing ${writingTaskType === "task1" ? "Task 1" : "Task 2"}`,
+          title: testTitle,
           status,
           tasks: taskPayload,
         });
@@ -1646,7 +1712,7 @@ const CreateContent: React.FC = () => {
         title: editId
           ? "Test Updated!"
           : status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${writingTitle || "Untitled"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
+        description: `"${testTitle}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
       if (status === "published" || editId) {
         navigate("/admin/content");
@@ -1781,15 +1847,8 @@ const CreateContent: React.FC = () => {
             </div>
           ) : (
             <WritingCreator
-              taskType={writingTaskType} onTaskTypeChange={setWritingTaskType}
-              title={writingTitle} onTitleChange={setWritingTitle}
-              difficulty={writingDifficulty} onDifficultyChange={setWritingDifficulty}
-              suggestedTime={writingSuggestedTime} onSuggestedTimeChange={setWritingSuggestedTime}
-              prompt={writingPrompt} onPromptChange={setWritingPrompt}
-              minWords={writingMinWords} onMinWordsChange={setWritingMinWords}
-              maxWords={writingMaxWords} onMaxWordsChange={setWritingMaxWords}
-              imageFile={writingImageFile} onImageFileChange={setWritingImageFile}
-              imagePreview={writingImagePreview} onImagePreviewChange={setWritingImagePreview}
+              tasks={writingTasks}
+              onTasksChange={setWritingTasks}
             />
           )}
         </TabPanel>
@@ -1848,13 +1907,13 @@ const CreateContent: React.FC = () => {
           sections: listeningSections,
         }}
         writing={{
-          taskType: writingTaskType,
-          title: writingTitle,
-          difficulty: writingDifficulty,
-          suggestedTime: writingSuggestedTime,
-          prompt: writingPrompt,
-          minWords: writingMinWords,
-          maxWords: writingMaxWords,
+          taskType: writingTasks[0].taskType,
+          title: writingTasks[0].title,
+          difficulty: writingTasks[0].difficulty,
+          suggestedTime: writingTasks[0].suggestedTime,
+          prompt: writingTasks[0].prompt,
+          minWords: writingTasks[0].minWords,
+          maxWords: writingTasks[0].maxWords,
         }}
       />
     </AdminLayout>
