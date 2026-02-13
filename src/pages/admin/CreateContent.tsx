@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -26,6 +26,7 @@ import {
   GitBranch,
   MapPin,
   Type,
+  Loader2,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +52,9 @@ import {
 import { AdminLayout } from "@/components/AdminLayout";
 import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveReadingTest } from "@/services/readingTestService";
+import { toast } from "@/hooks/use-toast";
 
 // ─── Types ────────────────────────────────────
 const QUESTION_TYPES = [
@@ -1387,11 +1391,14 @@ type TabValue = (typeof VALID_TABS)[number];
 
 const CreateContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const tabParam = searchParams.get("type") as TabValue | null;
   const [activeTab, setActiveTab] = useState<TabValue>(
     tabParam && VALID_TABS.includes(tabParam) ? tabParam : "reading"
   );
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // ── Lifted Reading State (3-passage) ──
   const [readingTestTitle, setReadingTestTitle] = useState("");
@@ -1423,6 +1430,40 @@ const CreateContent: React.FC = () => {
   const handleTabChange = (value: string) => {
     if (VALID_TABS.includes(value as TabValue)) {
       setActiveTab(value as TabValue);
+    }
+  };
+
+  const handleSaveReadingTest = async (status: "draft" | "published") => {
+    if (!user) {
+      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveReadingTest({
+        userId: user.id,
+        title: readingTestTitle,
+        testType: readingTestType,
+        difficulty: readingDifficulty,
+        duration: readingDuration,
+        status,
+        passages: readingPassages,
+      });
+      toast({
+        title: status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${readingTestTitle || "Untitled Test"}" has been ${status === "published" ? "published" : "saved as draft"} successfully.`,
+      });
+      if (status === "published") {
+        navigate("/admin/content");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Failed to save test",
+        description: err?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1494,14 +1535,25 @@ const CreateContent: React.FC = () => {
           <div className="flex items-center justify-between max-w-6xl mx-auto">
             <p className="text-xs text-muted-foreground">Auto-saved as draft</p>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="gap-2">
-                <Save className="h-4 w-4" /> Save Draft
+              <Button
+                variant="outline"
+                className="gap-2"
+                disabled={isSaving || activeTab !== "reading"}
+                onClick={() => handleSaveReadingTest("draft")}
+              >
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Save Draft
               </Button>
               <Button variant="outline" className="gap-2" onClick={() => setPreviewOpen(true)}>
                 <Eye className="h-4 w-4" /> Preview
               </Button>
-              <Button className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
-                <Send className="h-4 w-4" /> Publish
+              <Button
+                className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+                disabled={isSaving || activeTab !== "reading"}
+                onClick={() => handleSaveReadingTest("published")}
+              >
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Publish
               </Button>
             </div>
           </div>
