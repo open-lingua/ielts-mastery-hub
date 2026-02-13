@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   CheckCircle,
   AlertCircle,
@@ -11,6 +12,8 @@ import {
   ZoomIn,
   ZoomOut,
   Clock,
+  Loader2,
+  AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -18,10 +21,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
-import { academicWritingTest, generalWritingTest, type WritingTest, type WritingTask } from "@/data/writingTestData";
-import writingChartImage from "@/assets/writing-task1-chart.png";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { fetchWritingTestForPractice, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
+import { startTestSession } from "@/services/practiceLibraryService";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -86,12 +93,71 @@ const ImageViewer: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
   );
 };
 
+// ─── Loading Skeleton ────────────────────────────────────────────────
+
+const WritingLoadingSkeleton: React.FC = () => (
+  <DashboardLayout>
+    <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0">
+        <Skeleton className="h-8 w-32" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-9 w-24 rounded-lg" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        </div>
+      </div>
+      {/* Split pane skeleton */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <div className="w-full md:w-[420px] lg:w-[480px] border-b md:border-b-0 md:border-r border-border bg-background p-6 space-y-4">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-16 w-full rounded-xl" />
+        </div>
+        <div className="flex-1 bg-card p-6 md:p-10 space-y-4">
+          <Skeleton className="h-6 w-60" />
+          <Skeleton className="h-[300px] w-full rounded-xl" />
+          <div className="flex justify-between items-center pt-4">
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-10 w-28 rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </DashboardLayout>
+);
+
+// ─── Error State ─────────────────────────────────────────────────────
+
+const WritingErrorState: React.FC<{ message: string; onBack: () => void }> = ({ message, onBack }) => (
+  <DashboardLayout>
+    <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+      <div className="text-center space-y-4 max-w-md">
+        <div className="bg-destructive/10 p-4 rounded-full inline-flex">
+          <AlertTriangle className="h-8 w-8 text-destructive" />
+        </div>
+        <h2 className="text-xl font-bold text-foreground">Test Not Found</h2>
+        <p className="text-muted-foreground">{message}</p>
+        <Button onClick={onBack} variant="default">Return to Library</Button>
+      </div>
+    </div>
+  </DashboardLayout>
+);
+
 // ─── Main Component ──────────────────────────────────────────────────
 
 const WritingSimulator: React.FC = () => {
-  const [testType, setTestType] = useState<"Academic" | "General">("Academic");
-  const test: WritingTest = testType === "Academic" ? academicWritingTest : generalWritingTest;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const testId = searchParams.get("id");
 
+  // Data fetching state
+  const [testData, setTestData] = useState<WritingTestPayload | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Test engine state
   const [activeTask, setActiveTask] = useState(0);
   const [drafts, setDrafts] = useState<[TaskDraft, TaskDraft]>([
     { text: "", wordCount: 0 },
@@ -107,38 +173,55 @@ const WritingSimulator: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const currentTask = test.tasks[activeTask];
+  // ── Fetch test data ──
+  useEffect(() => {
+    if (!testId) {
+      navigate("/tests", { replace: true });
+      return;
+    }
+
+    setIsLoading(true);
+    setFetchError(null);
+
+    fetchWritingTestForPractice(testId)
+      .then((data) => {
+        if (!data.tasks || data.tasks.length === 0) {
+          setFetchError("This test has no tasks configured.");
+          return;
+        }
+        setTestData(data);
+      })
+      .catch((err) => {
+        setFetchError(err.message || "Failed to load writing test");
+        toast.error("Failed to load writing test");
+      })
+      .finally(() => setIsLoading(false));
+  }, [testId, navigate]);
+
+  // Derived from fetched data
+  const tasks = testData?.tasks || [];
+  const currentTask: WritingTaskPayload | undefined = tasks[activeTask];
   const currentDraft = drafts[activeTask];
+  const totalSeconds = 3600; // 60 minutes standard
 
   // ── Auto-save every 30s ──
   useEffect(() => {
     autoSaveRef.current = setInterval(() => {
       if (drafts[0].text || drafts[1].text) {
-        localStorage.setItem("ielts_writing_drafts", JSON.stringify(drafts));
+        localStorage.setItem(`ielts_writing_drafts_${testId}`, JSON.stringify(drafts));
       }
     }, 30000);
     return () => { if (autoSaveRef.current) clearInterval(autoSaveRef.current); };
-  }, [drafts]);
+  }, [drafts, testId]);
 
   // ── Load saved drafts ──
   useEffect(() => {
-    const saved = localStorage.getItem("ielts_writing_drafts");
+    if (!testId) return;
+    const saved = localStorage.getItem(`ielts_writing_drafts_${testId}`);
     if (saved) {
       try { setDrafts(JSON.parse(saved)); } catch {}
     }
-  }, []);
-
-  // ── Reset on test type change ──
-  useEffect(() => {
-    setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
-    setActiveTask(0);
-    setIsActive(false);
-    setShowResults(false);
-    setAutoSubmitted(false);
-    setTimerKey((k) => k + 1);
-    setIsStarted(false);
-    localStorage.removeItem("ielts_writing_drafts");
-  }, [testType]);
+  }, [testId]);
 
   const countWords = (text: string) => text.trim().split(/\s+/).filter((w) => w.length > 0).length;
 
@@ -175,14 +258,17 @@ const WritingSimulator: React.FC = () => {
       feedback: "Time expired. Your essays have been automatically submitted for evaluation.",
     });
     setShowResults(true);
-    localStorage.removeItem("ielts_writing_drafts");
-  }, [showResults, drafts]);
+    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+  }, [showResults, drafts, testId]);
 
   const handleSubmit = () => {
+    if (!currentTask) return;
     setIsActive(false);
     const totalWords = drafts[0].wordCount + drafts[1].wordCount;
     const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
     const rand = () => Math.random() * 1.0 - 0.5;
+    const t1Min = tasks[0]?.minWords ?? 150;
+    const t2Min = tasks[1]?.minWords ?? 250;
     setScores({
       overall: (base + 0.5).toFixed(1),
       task: (base + rand()).toFixed(1),
@@ -190,12 +276,12 @@ const WritingSimulator: React.FC = () => {
       lexical: (base + 1.0 + rand()).toFixed(1),
       grammar: (base + rand()).toFixed(1),
       feedback:
-        drafts[0].wordCount < test.tasks[0].minWords || drafts[1].wordCount < test.tasks[1].minWords
+        drafts[0].wordCount < t1Min || drafts[1].wordCount < t2Min
           ? "One or both tasks are under the minimum word count. Task Achievement may be affected. Focus on developing your ideas more fully."
           : "Good job meeting the word requirements for both tasks. To improve, focus on varied sentence structures and precise vocabulary.",
     });
     setShowResults(true);
-    localStorage.removeItem("ielts_writing_drafts");
+    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
   };
 
   const handleReset = () => {
@@ -206,10 +292,32 @@ const WritingSimulator: React.FC = () => {
     setIsActive(false);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
-    localStorage.removeItem("ielts_writing_drafts");
+    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+  };
+
+  const handleStart = async () => {
+    setIsStarted(true);
+    // Create/update session
+    if (user && testId) {
+      try {
+        await startTestSession(user.id, testId, "writing");
+      } catch {
+        // Non-blocking — session tracking is best-effort
+      }
+    }
   };
 
   const bothAttempted = drafts[0].wordCount > 0 && drafts[1].wordCount > 0;
+
+  // ── Loading ──
+  if (isLoading) return <WritingLoadingSkeleton />;
+
+  // ── Error ──
+  if (fetchError || !testData || !currentTask) {
+    return <WritingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />;
+  }
+
+  const isTask1 = currentTask.taskType === "task1";
 
   return (
     <DashboardLayout>
@@ -217,7 +325,7 @@ const WritingSimulator: React.FC = () => {
         {/* Unified Timer — paused until started */}
         <UnifiedTimer
           key={timerKey}
-          totalSeconds={test.totalTime}
+          totalSeconds={totalSeconds}
           onTimeUp={handleTimeUp}
           isPaused={!isStarted}
           testFinished={showResults}
@@ -225,8 +333,8 @@ const WritingSimulator: React.FC = () => {
 
         <TestStartOverlay
           isStarted={isStarted}
-          onStart={() => setIsStarted(true)}
-          title={`IELTS ${testType} Writing`}
+          onStart={handleStart}
+          title={testData.title}
           module="writing"
           sections="2 Tasks"
           questions="2 Essays"
@@ -234,26 +342,15 @@ const WritingSimulator: React.FC = () => {
         >
           {/* ─── Header ─── */}
           <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
-            {/* Test type toggle */}
             <div className="flex items-center gap-2">
-              <div className="flex rounded-lg border border-border overflow-hidden">
-                {(["Academic", "General"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTestType(t)}
-                    className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      testType === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10 text-xs">
+                {testData.title}
+              </Badge>
             </div>
 
             {/* Task switcher */}
             <div className="flex items-center gap-1">
-              {test.tasks.map((task, idx) => {
+              {tasks.map((task, idx) => {
                 const draft = drafts[idx];
                 const isActiveTask = activeTask === idx;
                 const statusColor = draft.wordCount >= task.minWords
@@ -306,14 +403,14 @@ const WritingSimulator: React.FC = () => {
                           {currentTask.title}
                         </Badge>
                         <Badge variant="outline" className="text-muted-foreground">
-                          {testType} · {currentTask.suggestedTime}
+                          {currentTask.suggestedTime}
                         </Badge>
                       </div>
 
-                      {/* Academic T1 chart image */}
-                      {activeTask === 0 && testType === "Academic" && (
+                      {/* Task 1 image */}
+                      {isTask1 && currentTask.imageUrl && (
                         <div className="mb-5">
-                          <ImageViewer src={writingChartImage} alt="IELTS Task 1 Chart" />
+                          <ImageViewer src={currentTask.imageUrl} alt="IELTS Task 1 Reference" />
                         </div>
                       )}
 
@@ -324,7 +421,7 @@ const WritingSimulator: React.FC = () => {
                         </h2>
                         <Separator className="my-4" />
                         <p className="text-sm text-muted-foreground italic leading-relaxed">
-                          {currentTask.context}
+                          Write at least {currentTask.minWords} words. You should spend about {currentTask.suggestedTime} on this task.
                         </p>
                       </div>
 
@@ -334,10 +431,10 @@ const WritingSimulator: React.FC = () => {
                           <Info className="h-3.5 w-3.5 text-primary" />
                           Writing Tips
                         </h3>
-                        {activeTask === 0 ? (
+                        {isTask1 ? (
                           <>
                             <TipRow icon={<FileText className="h-4 w-4" />} title="Paraphrase the prompt" desc="Rewrite the question in your own words in the introduction." color="success" />
-                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title={testType === "Academic" ? "Report key trends" : "Match the tone"} desc={testType === "Academic" ? "Identify and describe the main patterns in the data." : "Use appropriate formality: formal, semi-formal, or informal."} color="primary" />
+                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Report key trends" desc="Identify and describe the main patterns in the data or situation." color="primary" />
                           </>
                         ) : (
                           <>
@@ -369,10 +466,8 @@ const WritingSimulator: React.FC = () => {
                       value={currentDraft.text}
                       onChange={handleTextChange}
                       placeholder={
-                        activeTask === 0
-                          ? testType === "Academic"
-                            ? "Begin your report here..."
-                            : "Dear Sir or Madam,\n\nI am writing to..."
+                        isTask1
+                          ? "Begin your response here..."
                           : "Start typing your essay here..."
                       }
                       className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
@@ -449,7 +544,7 @@ const WritingSimulator: React.FC = () => {
             <div className="bg-primary p-6 flex justify-between items-start text-primary-foreground">
               <div>
                 <h2 className="text-2xl font-bold">Writing Summary</h2>
-                <p className="text-primary-foreground/70 text-sm mt-1">{testType} Writing Test · AI Assessment</p>
+                <p className="text-primary-foreground/70 text-sm mt-1">{testData.title} · AI Assessment</p>
               </div>
               <button onClick={() => setShowResults(false)} className="rounded-full bg-primary-foreground/10 p-2 hover:bg-primary-foreground/20 transition-colors">
                 <X className="h-5 w-5" />
@@ -457,7 +552,7 @@ const WritingSimulator: React.FC = () => {
             </div>
             <div className="p-6 md:p-8">
               <div className="flex gap-3 mb-6">
-                {test.tasks.map((task, idx) => (
+                {tasks.map((task, idx) => (
                   <div key={task.id} className="flex-1 rounded-xl border border-border bg-secondary/50 p-4">
                     <span className="text-xs font-semibold text-muted-foreground uppercase">Task {idx + 1}</span>
                     <div className={`text-2xl font-bold mt-1 ${getWordCountColor(drafts[idx].wordCount, task.minWords)}`}>
