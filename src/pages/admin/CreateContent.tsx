@@ -53,7 +53,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveReadingTest } from "@/services/readingTestService";
+import { saveReadingTest, fetchReadingTest } from "@/services/readingTestService";
 import { saveWritingTest } from "@/services/writingService";
 import { saveListeningTest } from "@/services/listeningService";
 import { toast } from "@/hooks/use-toast";
@@ -1465,11 +1465,13 @@ const CreateContent: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const tabParam = searchParams.get("type") as TabValue | null;
+  const editId = searchParams.get("id");
   const [activeTab, setActiveTab] = useState<TabValue>(
     tabParam && VALID_TABS.includes(tabParam) ? tabParam : "reading"
   );
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
   // ── Lifted Reading State (3-passage) ──
   const [readingTestTitle, setReadingTestTitle] = useState("");
@@ -1495,10 +1497,37 @@ const CreateContent: React.FC = () => {
   const [writingImageFile, setWritingImageFile] = useState<File | null>(null);
   const [writingImagePreview, setWritingImagePreview] = useState<string>("");
 
+  // ── Load existing test for edit mode ──
+  useEffect(() => {
+    if (!editId || activeTab !== "reading") return;
+    setIsLoadingEdit(true);
+    fetchReadingTest(editId)
+      .then((data) => {
+        setReadingTestTitle(data.title);
+        setReadingTestType(data.testType);
+        setReadingDifficulty(data.difficulty);
+        setReadingDuration(data.duration);
+        // Cast passage question group types to match component's QuestionType union
+        setReadingPassages(data.passages.map((p) => ({
+          ...p,
+          questionGroups: p.questionGroups.map((g) => ({
+            ...g,
+            type: g.type as QuestionType,
+          })),
+        })));
+      })
+      .catch((err) => {
+        toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+      })
+      .finally(() => setIsLoadingEdit(false));
+  }, [editId, activeTab]);
+
   // Sync URL
   useEffect(() => {
-    setSearchParams({ type: activeTab }, { replace: true });
-  }, [activeTab, setSearchParams]);
+    const params: Record<string, string> = { type: activeTab };
+    if (editId) params.id = editId;
+    setSearchParams(params, { replace: true });
+  }, [activeTab, setSearchParams, editId]);
 
   const handleTabChange = (value: string) => {
     if (VALID_TABS.includes(value as TabValue)) {
@@ -1635,8 +1664,12 @@ const CreateContent: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold md:text-3xl">Test Creator Studio</h1>
-            <p className="text-muted-foreground mt-1">Build IELTS practice tests for your students.</p>
+            <h1 className="text-2xl font-bold md:text-3xl">
+              {editId ? "Edit Test" : "Test Creator Studio"}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {editId ? "Editing an existing test." : "Build IELTS practice tests for your students."}
+            </p>
           </div>
         </div>
 
@@ -1664,13 +1697,20 @@ const CreateContent: React.FC = () => {
 
         {/* Eagerly mounted tab panels */}
         <TabPanel active={activeTab === "reading"}>
-          <ReadingCreator
-            testTitle={readingTestTitle} onTestTitleChange={setReadingTestTitle}
-            testType={readingTestType} onTestTypeChange={setReadingTestType}
-            difficulty={readingDifficulty} onDifficultyChange={setReadingDifficulty}
-            duration={readingDuration} onDurationChange={setReadingDuration}
-            passages={readingPassages} onPassagesChange={setReadingPassages}
-          />
+          {isLoadingEdit ? (
+            <div className="flex items-center justify-center py-20 gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-muted-foreground">Loading test data...</span>
+            </div>
+          ) : (
+            <ReadingCreator
+              testTitle={readingTestTitle} onTestTitleChange={setReadingTestTitle}
+              testType={readingTestType} onTestTypeChange={setReadingTestType}
+              difficulty={readingDifficulty} onDifficultyChange={setReadingDifficulty}
+              duration={readingDuration} onDurationChange={setReadingDuration}
+              passages={readingPassages} onPassagesChange={setReadingPassages}
+            />
+          )}
         </TabPanel>
         <TabPanel active={activeTab === "listening"}>
           <ListeningCreator
