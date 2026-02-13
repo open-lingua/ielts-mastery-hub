@@ -69,12 +69,12 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
   const rules = instructions || defaultInstructions[module];
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden">
+    <div className="relative flex-1 flex flex-col overflow-hidden min-h-0">
       {/* Test content with conditional blur */}
       <div
         className={cn(
-          "flex-1 flex flex-col transition-all duration-700",
-          !isStarted && "blur-lg grayscale opacity-40 pointer-events-none select-none"
+          "flex-1 flex flex-col min-h-0 transition-all duration-700",
+          !isStarted && "blur-lg grayscale opacity-40 pointer-events-none select-none overflow-hidden"
         )}
       >
         {children}
