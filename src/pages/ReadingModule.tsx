@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { BookOpen, CheckCircle2, RotateCcw, Trophy, Eye, EyeOff, ChevronRight, AlertTriangle } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { QuestionRenderer, type Answers } from "@/components/reading/QuestionRenderer";
-import { calculateReadingBandScore } from "@/data/readingTestData";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchReadingTestForPractice, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
+import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
 import { startTestSession } from "@/services/practiceLibraryService";
 
 // ─── Loading Skeleton ────────────────────────────────
@@ -114,11 +114,30 @@ const ReadingModule: React.FC = () => {
       .finally(() => setIsLoading(false));
   }, [testId, navigate]);
 
+  const [gradingResult, setGradingResult] = useState<{ rawScore: number; bandScore: number } | null>(null);
+
+  const persistResults = useCallback(async () => {
+    if (!user || !testId || !testData) return;
+    try {
+      const flatAnswers: Record<string, string> = {};
+      for (const [k, v] of Object.entries(answers)) {
+        flatAnswers[k] = Array.isArray(v) ? v.join(", ") : v;
+      }
+      const result = await submitReadingTest(user.id, testId, testData, flatAnswers);
+      setGradingResult(result);
+      toast.success(`Reading test submitted! Band Score: ${result.bandScore} (${result.rawScore}/${testData.totalQuestions} correct)`);
+    } catch (err) {
+      console.error("Failed to persist reading submission:", err);
+      toast.error("Failed to save your submission.");
+    }
+  }, [user, testId, testData, answers]);
+
   const handleTimeUp = useCallback(() => {
     if (submitted) return;
     setAutoSubmitted(true);
     setSubmitted(true);
-  }, [submitted]);
+    persistResults();
+  }, [submitted, persistResults]);
 
   const handleAnswer = useCallback((key: string, value: string) => {
     if (submitted) return;
@@ -143,6 +162,7 @@ const ReadingModule: React.FC = () => {
     setActivePassage(0);
     setVisitedPassages(testData ? testData.passages.map((_, i) => i === 0) : [true, false, false]);
     setAutoSubmitted(false);
+    setGradingResult(null);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
   };
@@ -249,16 +269,16 @@ const ReadingModule: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <Trophy className="h-8 w-8 text-warning" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Estimated Band Score</p>
+                      <p className="text-sm text-muted-foreground">Band Score</p>
                       <p className="text-2xl font-extrabold text-foreground">
-                        {calculateReadingBandScore(answeredCount, totalQuestions)}
+                        {gradingResult ? gradingResult.bandScore : "—"}
                         <span className="text-sm text-muted-foreground font-normal ml-1">/ 9</span>
                       </p>
                     </div>
                     <Separator orientation="vertical" className="h-10 hidden md:block" />
                     <div className="hidden md:block">
                       <p className="text-sm text-muted-foreground">Correct Answers</p>
-                      <p className="text-xl font-bold text-primary">{answeredCount}/{totalQuestions}</p>
+                      <p className="text-xl font-bold text-primary">{gradingResult ? gradingResult.rawScore : answeredCount}/{totalQuestions}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -390,7 +410,7 @@ const ReadingModule: React.FC = () => {
                       <Button
                         size="sm"
                         className="flex-1 gap-1.5 text-xs shadow-lg shadow-primary/20"
-                        onClick={() => setSubmitted(true)}
+                        onClick={() => { setSubmitted(true); persistResults(); }}
                         disabled={answeredCount === 0}
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />
