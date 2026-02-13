@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   PlusCircle,
   Search,
@@ -11,8 +11,9 @@ import {
   Eye,
   Trash2,
   Edit3,
+  Loader2,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -22,27 +23,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AdminLayout } from "@/components/AdminLayout";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-interface ContentItem {
-  id: number;
-  title: string;
-  module: "Reading" | "Writing" | "Listening";
-  status: "Draft" | "Published" | "Archived";
-  questions: number;
-  lastEdited: string;
-  band: string;
-}
-
-const allContent: ContentItem[] = [
-  { id: 101, title: "The Future of AI", module: "Reading", status: "Draft", questions: 13, lastEdited: "2 mins ago", band: "7-8" },
-  { id: 102, title: "Section 2: Campus Tour", module: "Listening", status: "Published", questions: 10, lastEdited: "1 day ago", band: "6-7" },
-  { id: 103, title: "Task 2: Climate Change Essay", module: "Writing", status: "Draft", questions: 1, lastEdited: "3 hours ago", band: "7-8" },
-  { id: 104, title: "Academic Reading: Coral Reefs", module: "Reading", status: "Published", questions: 14, lastEdited: "2 days ago", band: "8-9" },
-  { id: 105, title: "Section 4: Renewable Energy Lecture", module: "Listening", status: "Archived", questions: 10, lastEdited: "1 week ago", band: "7-8" },
-  { id: 106, title: "Task 1: Bar Chart – Tourism", module: "Writing", status: "Published", questions: 1, lastEdited: "5 days ago", band: "6-7" },
-];
+import { toast } from "@/hooks/use-toast";
+import { fetchAllContent, deleteContent, type ContentItem, type ContentModule } from "@/services/contentService";
 
 const moduleIcons: Record<string, React.ElementType> = {
   Reading: BookOpen,
@@ -63,10 +58,51 @@ const statusColors: Record<string, string> = {
 };
 
 const ContentLibrary: React.FC = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterModule, setFilterModule] = useState<string>("All");
+  const [content, setContent] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const filtered = allContent.filter((c) => {
+  useEffect(() => {
+    loadContent();
+  }, []);
+
+  const loadContent = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAllContent();
+      setContent(data);
+    } catch {
+      toast({ title: "Failed to load content", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteContent(deleteTarget.id, deleteTarget.module);
+      setContent((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      toast({ title: "Content deleted successfully" });
+    } catch {
+      toast({ title: "Failed to delete content", variant: "destructive" });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleEdit = (item: ContentItem) => {
+    const type = item.module.toLowerCase();
+    navigate(`/admin/create?type=${type}&id=${item.id}`);
+  };
+
+  const filtered = content.filter((c) => {
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase());
     const matchModule = filterModule === "All" || c.module === filterModule;
     return matchSearch && matchModule;
@@ -129,49 +165,95 @@ const ContentLibrary: React.FC = () => {
                 <div className="col-span-2">Edited</div>
                 <div className="col-span-1"></div>
               </div>
-              {filtered.map((item) => {
-                const ModIcon = moduleIcons[item.module];
-                return (
-                  <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors">
+
+              {loading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
                     <div className="col-span-5 flex items-center gap-3">
-                      <ModIcon className={cn("h-4 w-4 shrink-0", moduleColors[item.module])} />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{item.title}</p>
-                        <p className="text-xs text-muted-foreground">{item.module}</p>
+                      <Skeleton className="h-4 w-4 rounded" />
+                      <div className="space-y-1.5 flex-1">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-16" />
                       </div>
                     </div>
-                    <div className="col-span-2">
-                      <Badge variant="secondary" className={cn("text-[10px]", statusColors[item.status])}>{item.status}</Badge>
-                    </div>
-                    <div className="col-span-1 text-center text-sm text-muted-foreground">{item.questions}</div>
-                    <div className="col-span-1 text-sm text-muted-foreground">{item.band}</div>
-                    <div className="col-span-2 text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {item.lastEdited}
-                    </div>
-                    <div className="col-span-1 flex justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2"><Edit3 className="h-3.5 w-3.5" /> Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2"><Eye className="h-3.5 w-3.5" /> Preview</DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-destructive"><Trash2 className="h-3.5 w-3.5" /> Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <div className="col-span-2"><Skeleton className="h-5 w-16 rounded-full" /></div>
+                    <div className="col-span-1 text-center"><Skeleton className="h-4 w-6 mx-auto" /></div>
+                    <div className="col-span-1"><Skeleton className="h-4 w-8" /></div>
+                    <div className="col-span-2"><Skeleton className="h-4 w-20" /></div>
+                    <div className="col-span-1"><Skeleton className="h-8 w-8 ml-auto rounded" /></div>
                   </div>
-                );
-              })}
-              {filtered.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground">No content found.</div>
+                ))
+              ) : filtered.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground">
+                  {content.length === 0 ? "No content yet. Create your first test!" : "No content found."}
+                </div>
+              ) : (
+                filtered.map((item) => {
+                  const ModIcon = moduleIcons[item.module];
+                  return (
+                    <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors">
+                      <div className="col-span-5 flex items-center gap-3">
+                        <ModIcon className={cn("h-4 w-4 shrink-0", moduleColors[item.module])} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate">{item.title}</p>
+                          <p className="text-xs text-muted-foreground">{item.module}</p>
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        <Badge variant="secondary" className={cn("text-[10px]", statusColors[item.status])}>{item.status}</Badge>
+                      </div>
+                      <div className="col-span-1 text-center text-sm text-muted-foreground">{item.questions}</div>
+                      <div className="col-span-1 text-sm text-muted-foreground">{item.band}</div>
+                      <div className="col-span-2 text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {item.lastEdited}
+                      </div>
+                      <div className="col-span-1 flex justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem className="gap-2" onClick={() => handleEdit(item)}>
+                              <Edit3 className="h-3.5 w-3.5" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-destructive" onClick={() => setDeleteTarget(item)}>
+                              <Trash2 className="h-3.5 w-3.5" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{deleteTarget?.title}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this {deleteTarget?.module.toLowerCase()} test and all its associated content. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Deleting...</> : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
