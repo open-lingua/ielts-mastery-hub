@@ -55,6 +55,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveReadingTest } from "@/services/readingTestService";
 import { saveWritingTest } from "@/services/writingService";
+import { saveListeningTest } from "@/services/listeningService";
 import { toast } from "@/hooks/use-toast";
 
 // ─── Types ────────────────────────────────────
@@ -1026,6 +1027,8 @@ interface ListeningSectionState {
   title: string;
   transcript: string;
   audioFileName: string;
+  audioFile?: File | null;
+  audioPreviewUrl?: string;
   questionGroups: QuestionGroup[];
 }
 
@@ -1052,6 +1055,19 @@ const ListeningSectionEditor: React.FC<{
   onChange: (patch: Partial<ListeningSectionState>) => void;
 }> = ({ section, meta, onChange }) => {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const audioInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAudioSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onChange({ audioFile: file, audioFileName: file.name, audioPreviewUrl: URL.createObjectURL(file) });
+    }
+  };
+
+  const clearAudio = () => {
+    onChange({ audioFile: null, audioFileName: "", audioPreviewUrl: "" });
+    if (audioInputRef.current) audioInputRef.current.value = "";
+  };
 
   return (
     <div className="space-y-5">
@@ -1069,26 +1085,38 @@ const ListeningSectionEditor: React.FC<{
       <Card>
         <CardContent className="p-5 space-y-3">
           <Label className="text-sm font-semibold">Audio Source</Label>
-          <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
-            <Upload className="h-6 w-6 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground text-center">Drag & drop audio or click to browse</p>
-            <p className="text-[10px] text-muted-foreground">MP3, WAV up to 50MB</p>
-          </div>
-          {/* Mock player */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-            <div className="h-9 w-9 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
-              <Headphones className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="h-1.5 bg-border rounded-full overflow-hidden">
-                <div className="h-full w-1/3 bg-violet-500 rounded-full" />
+          <input
+            ref={audioInputRef}
+            type="file"
+            accept="audio/mpeg,audio/wav,audio/mp3,audio/x-wav"
+            className="hidden"
+            onChange={handleAudioSelect}
+          />
+          {section.audioPreviewUrl ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                <div className="h-9 w-9 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                  <Headphones className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{section.audioFileName}</p>
+                  <audio src={section.audioPreviewUrl} controls className="w-full mt-1 h-8" />
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={clearAudio}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
               </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground">
-                <span>00:00</span>
-                <span>--:--</span>
-              </div>
             </div>
-          </div>
+          ) : (
+            <div
+              className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+              onClick={() => audioInputRef.current?.click()}
+            >
+              <Upload className="h-6 w-6 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground text-center">Drag & drop audio or click to browse</p>
+              <p className="text-[10px] text-muted-foreground">MP3, WAV up to 50MB</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -1552,13 +1580,52 @@ const CreateContent: React.FC = () => {
     }
   };
 
+  const handleSaveListeningTest = async (status: "draft" | "published") => {
+    if (!user) {
+      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveListeningTest({
+        userId: user.id,
+        title: listeningTestTitle,
+        difficulty: listeningDifficulty,
+        duration: listeningDuration,
+        status,
+        sections: listeningSections.map((s) => ({
+          id: s.id,
+          title: s.title,
+          transcript: s.transcript,
+          audioFile: s.audioFile || null,
+          questionGroups: s.questionGroups,
+        })),
+      });
+      toast({
+        title: status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${listeningTestTitle || "Untitled"}" has been ${status === "published" ? "published" : "saved"} successfully.`,
+      });
+      if (status === "published") {
+        navigate("/admin/content");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Failed to save listening test",
+        description: err?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSave = async (status: "draft" | "published") => {
     if (activeTab === "reading") {
       await handleSaveReadingTest(status);
     } else if (activeTab === "writing") {
       await handleSaveWritingTest(status);
-    } else {
-      toast({ title: "Not yet supported", description: "Listening persistence coming soon.", variant: "destructive" });
+    } else if (activeTab === "listening") {
+      await handleSaveListeningTest(status);
     }
   };
 
@@ -1635,7 +1702,7 @@ const CreateContent: React.FC = () => {
               <Button
                 variant="outline"
                 className="gap-2"
-                disabled={isSaving || activeTab === "listening"}
+                disabled={isSaving}
                 onClick={() => handleSave("draft")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
@@ -1646,7 +1713,7 @@ const CreateContent: React.FC = () => {
               </Button>
               <Button
                 className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
-                disabled={isSaving || activeTab === "listening"}
+                disabled={isSaving}
                 onClick={() => handleSave("published")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
