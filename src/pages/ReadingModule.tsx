@@ -1,19 +1,82 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
-import { BookOpen, CheckCircle2, RotateCcw, Trophy, Eye, EyeOff, ChevronRight } from "lucide-react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { BookOpen, CheckCircle2, RotateCcw, Trophy, Eye, EyeOff, ChevronRight, AlertTriangle } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { QuestionRenderer, type Answers } from "@/components/reading/QuestionRenderer";
-import { multiPassageReadingTest, calculateReadingBandScore, p2YnngQuestions, p3McQuestions } from "@/data/readingTestData";
+import { calculateReadingBandScore } from "@/data/readingTestData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchReadingTestForPractice, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
+import { startTestSession } from "@/services/practiceLibraryService";
+
+// ─── Loading Skeleton ────────────────────────────────
+const ReadingLoadingSkeleton: React.FC = () => (
+  <DashboardLayout>
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="shrink-0 border-b border-border bg-card px-4 py-2.5 md:px-6">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-28 rounded-md" />
+          <Skeleton className="h-8 w-28 rounded-md" />
+          <Skeleton className="h-8 w-28 rounded-md" />
+        </div>
+        <Skeleton className="mt-2 h-1 w-full rounded-full" />
+      </div>
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+        <div className="flex-1 p-6 md:p-10 space-y-4">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+        <div className="w-full md:w-[460px] lg:w-[520px] border-l border-border p-5 space-y-4">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+        </div>
+      </div>
+    </div>
+  </DashboardLayout>
+);
+
+// ─── Error State ─────────────────────────────────────
+const ReadingErrorState: React.FC<{ message: string; onBack: () => void }> = ({ message, onBack }) => (
+  <DashboardLayout>
+    <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+      <div className="text-center space-y-4 max-w-md">
+        <div className="bg-destructive/10 p-4 rounded-full inline-flex">
+          <AlertTriangle className="h-8 w-8 text-destructive" />
+        </div>
+        <h2 className="text-xl font-bold text-foreground">Test Not Found</h2>
+        <p className="text-muted-foreground">{message}</p>
+        <Button onClick={onBack} variant="default">Return to Library</Button>
+      </div>
+    </div>
+  </DashboardLayout>
+);
 
 const ReadingModule: React.FC = () => {
-  const test = multiPassageReadingTest;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const testId = searchParams.get("id");
+
+  // Data fetching
+  const [testData, setTestData] = useState<ReadingTestPracticePayload | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Test engine state
   const [activePassage, setActivePassage] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [submitted, setSubmitted] = useState(false);
@@ -24,6 +87,32 @@ const ReadingModule: React.FC = () => {
   const [isStarted, setIsStarted] = useState(false);
   const passagePaneRef = useRef<HTMLDivElement>(null);
   const questionPaneRef = useRef<HTMLDivElement>(null);
+
+  // Fetch test data
+  useEffect(() => {
+    if (!testId) {
+      navigate("/tests", { replace: true });
+      return;
+    }
+
+    setIsLoading(true);
+    setFetchError(null);
+
+    fetchReadingTestForPractice(testId)
+      .then((data) => {
+        if (!data.passages || data.passages.length === 0) {
+          setFetchError("This test has no passages configured.");
+          return;
+        }
+        setTestData(data);
+        setVisitedPassages(data.passages.map((_, i) => i === 0));
+      })
+      .catch((err) => {
+        setFetchError(err.message || "Failed to load reading test");
+        toast.error("Failed to load reading test");
+      })
+      .finally(() => setIsLoading(false));
+  }, [testId, navigate]);
 
   const handleTimeUp = useCallback(() => {
     if (submitted) return;
@@ -52,20 +141,34 @@ const ReadingModule: React.FC = () => {
     setSubmitted(false);
     setReviewMode(false);
     setActivePassage(0);
-    setVisitedPassages([true, false, false]);
+    setVisitedPassages(testData ? testData.passages.map((_, i) => i === 0) : [true, false, false]);
     setAutoSubmitted(false);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
   };
 
-  const answeredCount = Object.values(answers).filter((v) => v && (typeof v === "string" ? v.trim() : true)).length;
-  const totalQuestions = 40;
+  const handleStart = async () => {
+    setIsStarted(true);
+    if (user && testId) {
+      try {
+        await startTestSession(user.id, testId, "reading");
+      } catch {
+        // Non-blocking
+      }
+    }
+  };
 
-  const passageQuestionRanges = [
-    { start: 1, end: 13 },
-    { start: 14, end: 27 },
-    { start: 28, end: 40 },
-  ];
+  // Loading
+  if (isLoading) return <ReadingLoadingSkeleton />;
+
+  // Error
+  if (fetchError || !testData) {
+    return <ReadingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />;
+  }
+
+  const { passages, totalQuestions, passageQuestionRanges, passageOverrides } = testData;
+  const currentPassage = passages[activePassage];
+  const answeredCount = Object.values(answers).filter((v) => v && (typeof v === "string" ? v.trim() : true)).length;
 
   const getQuestionPassage = (qNum: number) => {
     for (let i = 0; i < passageQuestionRanges.length; i++) {
@@ -74,13 +177,10 @@ const ReadingModule: React.FC = () => {
     return 0;
   };
 
-  const currentPassage = test.passages[activePassage];
-
   return (
     <DashboardLayout>
       <TooltipProvider>
         <div className="flex flex-col h-[calc(100vh-4rem)]">
-          {/* Unified Timer — paused until started */}
           <UnifiedTimer
             key={timerKey}
             totalSeconds={3600}
@@ -91,18 +191,18 @@ const ReadingModule: React.FC = () => {
 
           <TestStartOverlay
             isStarted={isStarted}
-            onStart={() => setIsStarted(true)}
-            title="IELTS Academic Reading"
+            onStart={handleStart}
+            title={testData.title}
             module="reading"
-            sections="3 Passages"
-            questions="40 Questions"
+            sections={`${passages.length} Passages`}
+            questions={`${totalQuestions} Questions`}
             durationMinutes={60}
           >
             {/* Sticky Header: Passage Stepper */}
             <div className="shrink-0 border-b border-border bg-card px-4 py-2.5 md:px-6">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-1 rounded-lg bg-muted p-1 flex-1 max-w-md">
-                  {test.passages.map((p, idx) => (
+                  {passages.map((p, idx) => (
                     <button
                       key={p.id}
                       onClick={() => handlePassageChange(idx)}
@@ -201,7 +301,7 @@ const ReadingModule: React.FC = () => {
                     <div className="flex items-center gap-2 mb-4">
                       <BookOpen className="h-5 w-5 text-primary" />
                       <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
-                        Passage {activePassage + 1} — {test.format}
+                        Passage {activePassage + 1} — {testData.testType}
                       </Badge>
                     </div>
                     <h2 className="text-2xl font-serif font-bold text-foreground mb-6">{currentPassage.title}</h2>
@@ -216,9 +316,9 @@ const ReadingModule: React.FC = () => {
                 <div className="sticky top-0 z-10 bg-background border-b border-border px-5 py-3">
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-bold text-foreground">
-                      Questions {passageQuestionRanges[activePassage].start}–{passageQuestionRanges[activePassage].end}
+                      Questions {passageQuestionRanges[activePassage]?.start}–{passageQuestionRanges[activePassage]?.end}
                     </h2>
-                    <Badge variant="outline" className="text-[10px]">Passage {activePassage + 1} of 3</Badge>
+                    <Badge variant="outline" className="text-[10px]">Passage {activePassage + 1} of {passages.length}</Badge>
                   </div>
                 </div>
 
@@ -240,8 +340,9 @@ const ReadingModule: React.FC = () => {
                             answers={answers}
                             onAnswer={handleAnswer}
                             submitted={submitted}
-                            ynngOverride={activePassage === 1 ? p2YnngQuestions : undefined}
-                            mcOverride={activePassage === 2 ? p3McQuestions : undefined}
+                            tfngOverride={passageOverrides[activePassage]?.tfng}
+                            ynngOverride={passageOverrides[activePassage]?.ynng}
+                            mcOverride={passageOverrides[activePassage]?.mc as any}
                           />
                         </React.Fragment>
                       ))}
@@ -281,7 +382,7 @@ const ReadingModule: React.FC = () => {
 
                   {!submitted ? (
                     <div className="flex gap-2">
-                      {activePassage < 2 && (
+                      {activePassage < passages.length - 1 && (
                         <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => handlePassageChange(activePassage + 1)}>
                           Next Passage <ChevronRight className="h-3.5 w-3.5" />
                         </Button>
