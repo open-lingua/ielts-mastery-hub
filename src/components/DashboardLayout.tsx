@@ -22,19 +22,23 @@ const navItems = [
 
 export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, profile, isAuthenticated, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  const isGuest = !user;
-  const initials = user?.name
-    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : "G";
+  const isGuest = !isAuthenticated;
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Guest";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/login");
   };
 
@@ -106,7 +110,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           </nav>
         </TooltipProvider>
 
-        {/* Premium CTA - hide when collapsed */}
+        {/* Premium CTA */}
         {!collapsed && (
           <div className="border-t border-border p-4">
             <div className="rounded-xl bg-primary/10 p-4">
@@ -136,7 +140,6 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Top bar */}
         <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -186,7 +189,6 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           </div>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
