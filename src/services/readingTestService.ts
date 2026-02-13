@@ -195,7 +195,67 @@ export async function saveReadingTest(params: SaveReadingTestParams): Promise<{ 
   }
 
   const testId = testData.id;
+  await insertPassagesAndQuestions(testId, passages);
+  return { testId };
+}
 
+interface UpdateReadingTestParams {
+  testId: string;
+  title: string;
+  testType: string;
+  difficulty: string;
+  duration: string;
+  status: "draft" | "published";
+  passages: ReadingPassageState[];
+}
+
+export async function updateReadingTest(params: UpdateReadingTestParams): Promise<void> {
+  const { testId, title, testType, difficulty, duration, status, passages } = params;
+
+  // 1. Update the parent test record
+  const { error: testError } = await supabase
+    .from("reading_tests")
+    .update({
+      title,
+      test_type: testType,
+      difficulty,
+      duration,
+      status,
+    })
+    .eq("id", testId);
+
+  if (testError) throw new Error(testError.message || "Failed to update reading test");
+
+  // 2. Delete old children (cascade: passages → groups → questions handled by FK)
+  // First delete questions, then groups, then passages to respect FK order
+  const { data: oldPassages } = await supabase
+    .from("reading_passages")
+    .select("id")
+    .eq("test_id", testId);
+
+  if (oldPassages && oldPassages.length > 0) {
+    const oldPassageIds = oldPassages.map((p) => p.id);
+
+    const { data: oldGroups } = await supabase
+      .from("reading_question_groups")
+      .select("id")
+      .in("passage_id", oldPassageIds);
+
+    if (oldGroups && oldGroups.length > 0) {
+      const oldGroupIds = oldGroups.map((g) => g.id);
+      await supabase.from("reading_questions").delete().in("group_id", oldGroupIds);
+      await supabase.from("reading_question_groups").delete().in("passage_id", oldPassageIds);
+    }
+
+    await supabase.from("reading_passages").delete().eq("test_id", testId);
+  }
+
+  // 3. Re-insert all passages, groups, and questions
+  await insertPassagesAndQuestions(testId, passages);
+}
+
+/** Shared helper: insert passages → groups → questions for a given testId */
+async function insertPassagesAndQuestions(testId: string, passages: ReadingPassageState[]): Promise<void> {
   // 2. Insert passages
   const passageInserts = passages.map((p, idx) => ({
     test_id: testId,
@@ -211,8 +271,6 @@ export async function saveReadingTest(params: SaveReadingTestParams): Promise<{ 
     .select("id, passage_number");
 
   if (passageError || !passageData) {
-    // Attempt cleanup
-    await supabase.from("reading_tests").delete().eq("id", testId);
     throw new Error(passageError?.message || "Failed to create passages");
   }
 
@@ -261,13 +319,14 @@ export async function saveReadingTest(params: SaveReadingTestParams): Promise<{ 
   // Strip internal tracking fields before insert
   const cleanGroupInserts = groupInserts.map(({ _passageIdx, _groupIdx, ...rest }) => rest);
 
+  if (cleanGroupInserts.length === 0) return;
+
   const { data: groupData, error: groupError } = await supabase
     .from("reading_question_groups")
     .insert(cleanGroupInserts)
     .select("id");
 
   if (groupError || !groupData) {
-    await supabase.from("reading_tests").delete().eq("id", testId);
     throw new Error(groupError?.message || "Failed to create question groups");
   }
 
@@ -311,10 +370,7 @@ export async function saveReadingTest(params: SaveReadingTestParams): Promise<{ 
       .insert(questionInserts);
 
     if (qError) {
-      await supabase.from("reading_tests").delete().eq("id", testId);
       throw new Error(qError.message || "Failed to create questions");
     }
   }
-
-  return { testId };
 }

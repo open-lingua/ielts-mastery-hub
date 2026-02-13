@@ -53,7 +53,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveReadingTest, fetchReadingTest } from "@/services/readingTestService";
+import { saveReadingTest, updateReadingTest, fetchReadingTest } from "@/services/readingTestService";
 import { saveWritingTest } from "@/services/writingService";
 import { saveListeningTest } from "@/services/listeningService";
 import { toast } from "@/hooks/use-toast";
@@ -1542,20 +1542,34 @@ const CreateContent: React.FC = () => {
     }
     setIsSaving(true);
     try {
-      await saveReadingTest({
-        userId: user.id,
-        title: readingTestTitle,
-        testType: readingTestType,
-        difficulty: readingDifficulty,
-        duration: readingDuration,
-        status,
-        passages: readingPassages,
-      });
+      if (editId) {
+        await updateReadingTest({
+          testId: editId,
+          title: readingTestTitle,
+          testType: readingTestType,
+          difficulty: readingDifficulty,
+          duration: readingDuration,
+          status,
+          passages: readingPassages,
+        });
+      } else {
+        await saveReadingTest({
+          userId: user.id,
+          title: readingTestTitle,
+          testType: readingTestType,
+          difficulty: readingDifficulty,
+          duration: readingDuration,
+          status,
+          passages: readingPassages,
+        });
+      }
       toast({
-        title: status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${readingTestTitle || "Untitled Test"}" has been ${status === "published" ? "published" : "saved as draft"} successfully.`,
+        title: editId
+          ? "Test Updated!"
+          : status === "published" ? "Test Published!" : "Draft Saved!",
+        description: `"${readingTestTitle || "Untitled Test"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved as draft"} successfully.`,
       });
-      if (status === "published") {
+      if (status === "published" || editId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1746,7 +1760,7 @@ const CreateContent: React.FC = () => {
                 onClick={() => handleSave("draft")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Save Draft
+                {editId ? "Update Draft" : "Save Draft"}
               </Button>
               <Button variant="outline" className="gap-2" onClick={() => setPreviewOpen(true)}>
                 <Eye className="h-4 w-4" /> Preview
@@ -1757,7 +1771,7 @@ const CreateContent: React.FC = () => {
                 onClick={() => handleSave("published")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Publish
+                {editId ? "Update & Publish" : "Publish"}
               </Button>
             </div>
           </div>
