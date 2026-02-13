@@ -38,6 +38,180 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_passages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          notes: string | null
+          passage_number: number
+          test_id: string
+          title: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          passage_number?: number
+          test_id: string
+          title?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          passage_number?: number
+          test_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_passages_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "reading_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_question_groups: {
+        Row: {
+          created_at: string
+          group_order: number
+          has_word_bank: boolean
+          id: string
+          instructions: string
+          multiple_selection: boolean
+          passage_id: string
+          question_type: string
+          select_count: number
+          sequential_order: boolean
+          word_bank: Json | null
+          word_limit: string | null
+        }
+        Insert: {
+          created_at?: string
+          group_order?: number
+          has_word_bank?: boolean
+          id?: string
+          instructions?: string
+          multiple_selection?: boolean
+          passage_id: string
+          question_type?: string
+          select_count?: number
+          sequential_order?: boolean
+          word_bank?: Json | null
+          word_limit?: string | null
+        }
+        Update: {
+          created_at?: string
+          group_order?: number
+          has_word_bank?: boolean
+          id?: string
+          instructions?: string
+          multiple_selection?: boolean
+          passage_id?: string
+          question_type?: string
+          select_count?: number
+          sequential_order?: boolean
+          word_bank?: Json | null
+          word_limit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_question_groups_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "reading_passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_questions: {
+        Row: {
+          accepted_answers: Json | null
+          answer: string | null
+          completion_gaps: Json | null
+          created_at: string
+          group_id: string
+          id: string
+          matching_pairs: Json | null
+          options: Json | null
+          question_order: number
+          text: string
+        }
+        Insert: {
+          accepted_answers?: Json | null
+          answer?: string | null
+          completion_gaps?: Json | null
+          created_at?: string
+          group_id: string
+          id?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          question_order?: number
+          text?: string
+        }
+        Update: {
+          accepted_answers?: Json | null
+          answer?: string | null
+          completion_gaps?: Json | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          question_order?: number
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_questions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "reading_question_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_tests: {
+        Row: {
+          created_at: string
+          created_by: string
+          difficulty: string
+          duration: string
+          id: string
+          status: string
+          test_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          difficulty?: string
+          duration?: string
+          id?: string
+          status?: string
+          test_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          difficulty?: string
+          duration?: string
+          id?: string
+          status?: string
+          test_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
