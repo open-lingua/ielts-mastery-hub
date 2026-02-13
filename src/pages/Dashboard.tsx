@@ -35,9 +35,9 @@ const quickActions = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
-  const displayName = user?.name?.split(" ")[0] || "Future Achiever";
-  const streak = user ? mockUser.streak : 0;
+  const { user, profile, isAuthenticated } = useAuth();
+  const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Future Achiever";
+  const streak = isAuthenticated ? mockUser.streak : 0;
   return (
     <DashboardLayout>
       <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-8">
@@ -46,10 +46,10 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold md:text-3xl">
-                Welcome{user ? " back" : ""}, {displayName}! 👋
+                Welcome{isAuthenticated ? " back" : ""}, {displayName}! 👋
               </h1>
               <p className="mt-1 text-muted-foreground">
-                {user ? "Keep up the great work on your IELTS journey." : "Explore freely — sign up anytime to save your progress."}
+                {isAuthenticated ? "Keep up the great work on your IELTS journey." : "Explore freely — sign up anytime to save your progress."}
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-warning/10 px-4 py-2.5 text-warning">

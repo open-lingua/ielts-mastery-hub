@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Chrome } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDecorativePanel } from "@/components/AuthDecorativePanel";
 import { useToast } from "@/hooks/use-toast";
@@ -10,9 +10,8 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,17 +28,13 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    login({ name: email.split("@")[0], email });
+    const { error } = await signIn(email, password);
+    setLoading(false);
+    if (error) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+      return;
+    }
     toast({ title: "Welcome back! 👋", description: "You've successfully signed in." });
-    navigate("/dashboard");
-  };
-
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    login({ name: "Demo Student", email: "student@example.com" });
-    toast({ title: "Welcome back! 👋", description: "Signed in with Google." });
     navigate("/dashboard");
   };
 
@@ -47,10 +42,8 @@ const LoginPage: React.FC = () => {
     <div className="flex min-h-screen bg-background">
       <AuthDecorativePanel />
 
-      {/* Form Side */}
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-16 xl:px-24">
         <div className="mx-auto w-full max-w-md animate-fade-in">
-          {/* Mobile branding */}
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Mail className="h-4 w-4" />
@@ -62,30 +55,13 @@ const LoginPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
           <p className="mt-2 text-muted-foreground">Enter your details to access your prep dashboard.</p>
 
-          {/* Google */}
-          <button
-            onClick={handleGoogle}
-            disabled={googleLoading || loading}
-            className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card py-3 text-sm font-medium text-foreground transition-all hover:bg-secondary disabled:opacity-60"
-          >
-            {googleLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : (
-              <>
-                <Chrome className="h-5 w-5" />
-                Continue with Google
-              </>
-            )}
-          </button>
-
           {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
+          <div className="my-8 flex items-center gap-4">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Or continue with email</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sign in with email</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
@@ -107,7 +83,6 @@ const LoginPage: React.FC = () => {
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <label className="text-sm font-medium text-foreground">Password</label>
-                <button type="button" className="text-xs text-primary hover:underline">Forgot password?</button>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -133,7 +108,7 @@ const LoginPage: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading || googleLoading}
+              disabled={loading}
               className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:hover:scale-100"
             >
               {loading ? (
