@@ -386,6 +386,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_test_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_active_at: string
+          progress_percent: number
+          score_band: number | null
+          started_at: string
+          status: string
+          test_id: string
+          test_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_active_at?: string
+          progress_percent?: number
+          score_band?: number | null
+          started_at?: string
+          status?: string
+          test_id: string
+          test_type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_active_at?: string
+          progress_percent?: number
+          score_band?: number | null
+          started_at?: string
+          status?: string
+          test_id?: string
+          test_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       writing_tasks: {
         Row: {
           created_at: string
