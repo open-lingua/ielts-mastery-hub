@@ -19,8 +19,9 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { startTestSession } from "@/services/practiceLibraryService";
-import { fetchListeningTestForPractice } from "@/services/listeningPracticeService";
+import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
 import type { ListeningTest } from "@/data/listeningTestData";
+import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
 const ListeningLoadingSkeleton = () => (
   <DashboardLayout>
@@ -146,7 +147,18 @@ const ListeningModule: React.FC = () => {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
   };
 
-  const handleSubmitSection = () => {
+  const persistResults = useCallback(async () => {
+    if (!user || !testId || !test) return;
+    try {
+      const result = await submitListeningTest(user.id, testId, test, answers);
+      toast.success(`Test submitted! Band Score: ${result.bandScore}`);
+    } catch (err) {
+      console.error("Failed to save results:", err);
+      toast.error("Could not save your results. Please try again.");
+    }
+  }, [user, testId, test, answers]);
+
+  const handleSubmitSection = async () => {
     if (!test) return;
     const totalSections = test.sections.length;
     const nextIndex = activeSection + 1;
@@ -166,15 +178,24 @@ const ListeningModule: React.FC = () => {
     } else {
       setTestFinished(true);
       scrollToTop();
+      await persistResults();
     }
   };
 
-  const handleTimeUp = useCallback(() => {
+  const handleTimeUp = useCallback(async () => {
     if (testFinished || !test) return;
     setAutoSubmitted(true);
     setCompletedSections(Array(test.sections.length).fill(true));
     setTestFinished(true);
-  }, [testFinished, test]);
+    // Persist on time-up too
+    if (user && testId) {
+      try {
+        await submitListeningTest(user.id, testId, test, answers);
+      } catch (err) {
+        console.error("Failed to save results on time-up:", err);
+      }
+    }
+  }, [testFinished, test, user, testId, answers]);
 
   const handleRetry = () => {
     if (!test) return;
