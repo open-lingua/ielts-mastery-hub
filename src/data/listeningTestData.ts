@@ -16,6 +16,7 @@ export interface ListeningSection {
   subtitle: string;
   context: string;
   instructions: string;
+  audioUrl?: string;
   questions: ListeningQuestion[];
 }
 
