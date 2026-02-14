@@ -36,7 +36,12 @@ export async function submitWritingTest(
   answers: WritingAnswers
 ): Promise<void> {
   const { completeSession } = await import("./practiceLibraryService");
-  await completeSession(sessionId, null);
+  await completeSession(sessionId, null, {
+    task1: answers.task1,
+    task2: answers.task2,
+    task1WordCount: answers.task1WordCount,
+    task2WordCount: answers.task2WordCount,
+  });
 }
 
 /**

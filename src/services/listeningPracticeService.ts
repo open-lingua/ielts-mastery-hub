@@ -17,7 +17,7 @@ export async function submitListeningTest(
   ).length;
   const bandScore = calculateListeningBandScore(rawScore);
 
-  await completeSession(sessionId, bandScore);
+  await completeSession(sessionId, bandScore, { userAnswers: answers });
   return { rawScore, bandScore };
 }
 
