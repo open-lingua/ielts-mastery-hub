@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -35,49 +37,30 @@ interface DayData {
   level: number;
 }
 
-function generateCalendarData(year: number): DayData[] {
-  const startDate = new Date(year, 0, 1);
-  const endDate = new Date(year, 11, 31);
+function countToLevel(count: number): number {
+  if (count === 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function buildCalendar(year: number, countMap: Record<string, number>): DayData[] {
   const days: DayData[] = [];
-  const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-  const getWeightedLevel = () => {
-    const rand = Math.random();
-    if (rand < 0.4) return 0;
-    if (rand < 0.65) return 1;
-    if (rand < 0.85) return 2;
-    if (rand < 0.95) return 3;
-    return 4;
-  };
+  const start = new Date(year, 0, 1);
+  const end = new Date(year, 11, 31);
+  const cursor = new Date(start);
 
-  const streaks = Array.from({ length: 10 }, () => ({
-    start: getRandomInt(0, 365),
-    length: getRandomInt(3, 14),
-    intensity: getRandomInt(2, 4),
-  }));
-
-  const currentLoopDate = new Date(startDate);
-  let dayIndex = 0;
-
-  while (currentLoopDate <= endDate) {
-    let level = getWeightedLevel();
-    let count = level === 0 ? 0 : getRandomInt(1, level * 5 + 3);
-
-    streaks.forEach((streak) => {
-      if (dayIndex >= streak.start && dayIndex < streak.start + streak.length) {
-        level = Math.max(level, streak.intensity);
-        count = Math.max(count, getRandomInt(5, 20));
-      }
-    });
-
+  while (cursor <= end) {
+    const dateString = cursor.toISOString().split("T")[0];
+    const count = countMap[dateString] || 0;
     days.push({
-      date: new Date(currentLoopDate),
-      dateString: currentLoopDate.toISOString().split("T")[0],
+      date: new Date(cursor),
+      dateString,
       count,
-      level,
+      level: countToLevel(count),
     });
-
-    currentLoopDate.setDate(currentLoopDate.getDate() + 1);
-    dayIndex++;
+    cursor.setDate(cursor.getDate() + 1);
   }
 
   return days;
@@ -119,23 +102,86 @@ function calculateLongestStreak(days: DayData[]): number {
 
 const StudyHeatmap: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { user } = useAuth();
   const [selectedYear, setSelectedYear] = useState(String(currentYear));
   const [loading, setLoading] = useState(true);
   const [rawDays, setRawDays] = useState<DayData[]>([]);
   const [weeks, setWeeks] = useState<(DayData | null)[][]>([]);
   const [total, setTotal] = useState(0);
+  const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
 
+  // Fetch available years from user sessions
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      const data = generateCalendarData(Number(selectedYear));
-      setRawDays(data);
-      setWeeks(groupDaysIntoWeeks(data));
-      setTotal(data.reduce((acc, d) => acc + d.count, 0));
+    if (!user) {
+      setAvailableYears([currentYear]);
+      return;
+    }
+
+    const fetchYears = async () => {
+      const { data } = await supabase
+        .from("user_test_sessions")
+        .select("started_at")
+        .eq("user_id", user.id)
+        .order("started_at", { ascending: true });
+
+      if (data && data.length > 0) {
+        const yearSet = new Set<number>();
+        data.forEach((row) => {
+          yearSet.add(new Date(row.started_at).getFullYear());
+        });
+        // Always include current year
+        yearSet.add(currentYear);
+        const sorted = Array.from(yearSet).sort((a, b) => b - a);
+        setAvailableYears(sorted);
+      } else {
+        setAvailableYears([currentYear]);
+      }
+    };
+
+    fetchYears();
+  }, [user, currentYear]);
+
+  // Fetch session counts for selected year
+  useEffect(() => {
+    if (!user) {
+      const emptyDays = buildCalendar(Number(selectedYear), {});
+      setRawDays(emptyDays);
+      setWeeks(groupDaysIntoWeeks(emptyDays));
+      setTotal(0);
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [selectedYear]);
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      const yearNum = Number(selectedYear);
+      const startDate = `${yearNum}-01-01T00:00:00.000Z`;
+      const endDate = `${yearNum}-12-31T23:59:59.999Z`;
+
+      const { data } = await supabase
+        .from("user_test_sessions")
+        .select("started_at")
+        .eq("user_id", user.id)
+        .gte("started_at", startDate)
+        .lte("started_at", endDate);
+
+      const countMap: Record<string, number> = {};
+      if (data) {
+        data.forEach((row) => {
+          const dateKey = new Date(row.started_at).toISOString().split("T")[0];
+          countMap[dateKey] = (countMap[dateKey] || 0) + 1;
+        });
+      }
+
+      const days = buildCalendar(yearNum, countMap);
+      setRawDays(days);
+      setWeeks(groupDaysIntoWeeks(days));
+      setTotal(days.reduce((acc, d) => acc + d.count, 0));
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [user, selectedYear]);
 
   const longestStreak = useMemo(() => calculateLongestStreak(rawDays), [rawDays]);
 
@@ -155,8 +201,6 @@ const StudyHeatmap: React.FC = () => {
     return labels;
   }, [weeks]);
 
-  const years = [currentYear, currentYear - 1, currentYear - 2];
-
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -169,7 +213,7 @@ const StudyHeatmap: React.FC = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {years.map((y) => (
+            {availableYears.map((y) => (
               <SelectItem key={y} value={String(y)}>
                 {y}
               </SelectItem>
