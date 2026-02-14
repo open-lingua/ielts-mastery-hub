@@ -72,11 +72,20 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
   return [...reading, ...writing, ...listening];
 }
 
+export interface TestSessionInfo {
+  id: string;
+  started_at: string;
+  status: string;
+  progress_percent: number;
+  score_band: number | null;
+}
+
 export async function startTestSession(
   userId: string,
   testId: string,
   testType: TestModule
-): Promise<string> {
+): Promise<TestSessionInfo> {
+  const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("user_test_sessions")
     .upsert(
@@ -86,13 +95,31 @@ export async function startTestSession(
         test_type: testType,
         status: "in_progress",
         progress_percent: 0,
-        last_active_at: new Date().toISOString(),
+        started_at: now,
+        last_active_at: now,
       },
       { onConflict: "user_id,test_id,test_type" }
     )
-    .select("id")
+    .select("id, started_at, status, progress_percent, score_band")
     .single();
 
   if (error) throw error;
-  return data.id;
+  return data as TestSessionInfo;
+}
+
+export async function fetchExistingSession(
+  userId: string,
+  testId: string,
+  testType: TestModule
+): Promise<TestSessionInfo | null> {
+  const { data, error } = await supabase
+    .from("user_test_sessions")
+    .select("id, started_at, status, progress_percent, score_band")
+    .eq("user_id", userId)
+    .eq("test_id", testId)
+    .eq("test_type", testType)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as TestSessionInfo | null;
 }
