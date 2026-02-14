@@ -26,11 +26,15 @@ import { toast } from "sonner";
 import {
   fetchLibraryData,
   startTestSession,
+  fetchActiveSession,
+  fetchTestTitle,
   type PracticeTestCard,
   type TestModule,
   type SessionStatus,
+  type ActiveSessionInfo,
 } from "@/services/practiceLibraryService";
 import { formatDistanceToNow } from "date-fns";
+import ActiveSessionBanner from "@/components/shared/ActiveSessionBanner";
 
 const moduleIcons: Record<TestModule, React.ElementType> = {
   reading: BookOpen,
@@ -215,6 +219,7 @@ const TestLibrary: React.FC = () => {
   const [tests, setTests] = useState<PracticeTestCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [starting, setStarting] = useState<string | null>(null);
+  const [activeSessionInfo, setActiveSessionInfo] = useState<{ session: ActiveSessionInfo; title: string } | null>(null);
 
   const tabs = ["All", "Reading", "Writing", "Listening"];
 
@@ -224,10 +229,28 @@ const TestLibrary: React.FC = () => {
       return;
     }
     setIsLoading(true);
-    fetchLibraryData(user.id)
-      .then(setTests)
-      .catch(() => toast.error("Failed to load tests"))
-      .finally(() => setIsLoading(false));
+
+    const load = async () => {
+      try {
+        const [testsData, active] = await Promise.all([
+          fetchLibraryData(user.id),
+          fetchActiveSession(user.id),
+        ]);
+        setTests(testsData);
+
+        if (active) {
+          const title = await fetchTestTitle(active.test_id, active.test_type as TestModule);
+          setActiveSessionInfo({ session: active, title });
+        } else {
+          setActiveSessionInfo(null);
+        }
+      } catch {
+        toast.error("Failed to load tests");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    load();
   }, [user]);
 
   const filteredTests = tests.filter(
@@ -236,6 +259,13 @@ const TestLibrary: React.FC = () => {
 
   const handleStart = async (test: PracticeTestCard) => {
     if (!user) return;
+
+    // Block if another test is already in progress
+    if (activeSessionInfo && activeSessionInfo.session.test_id !== test.id) {
+      toast.error("You already have a test in progress. Please resume or submit it first.");
+      return;
+    }
+
     setStarting(test.id);
     try {
       await startTestSession(user.id, test.id, test.module);
@@ -250,6 +280,15 @@ const TestLibrary: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
+        {/* Active Session Banner */}
+        {activeSessionInfo && (
+          <ActiveSessionBanner
+            testTitle={activeSessionInfo.title}
+            testType={activeSessionInfo.session.test_type as TestModule}
+            testId={activeSessionInfo.session.test_id}
+          />
+        )}
+
         {/* Header */}
         <div className="space-y-1">
           <h1 className="text-2xl font-bold md:text-3xl">Practice Library</h1>

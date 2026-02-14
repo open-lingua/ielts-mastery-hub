@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
-import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 
 // ─── Loading Skeleton ────────────────────────────────
@@ -200,10 +200,15 @@ const ReadingModule: React.FC = () => {
   const handleStart = async () => {
     if (user && testId) {
       try {
+        // Check for active session on a different test
+        const active = await fetchActiveSession(user.id);
+        if (active && active.test_id !== testId) {
+          toast.error("You already have a test in progress. Please resume or submit it first.");
+          return;
+        }
         const session = await startTestSession(user.id, testId, "reading");
         setStartedAt(session.started_at);
       } catch {
-        // Fallback to local-only timer
         setStartedAt(new Date().toISOString());
       }
     } else {
