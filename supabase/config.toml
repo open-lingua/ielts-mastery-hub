@@ -1,1 +1,4 @@
 project_id = "rbpypwhbtptkqkdfwpic"
+
+[functions.grade-writing]
+verify_jwt = false
