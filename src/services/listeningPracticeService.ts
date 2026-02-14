@@ -56,13 +56,13 @@ function mapDBQuestionToListening(q: DBQuestion, group: DBQuestionGroup): Listen
       type: "mcq",
       text: q.text,
       answer: q.answer,
-      options: q.options.map((o) => o.text),
+      options: q.options.map((o) => (typeof o === "string" ? o : o.text)),
     };
   }
 
   if (dbType === "matching" || dbType === "matching-features" || dbType === "matching-information") {
-    const leftParts = q.matchingPairs.map((p) => p.left).join(", ");
-    const rightOptions = q.matchingPairs.map((p) => p.right);
+    const leftParts = q.matchingPairs.map((p) => (typeof p === "string" ? p : p.left)).join(", ");
+    const rightOptions = q.matchingPairs.map((p) => (typeof p === "string" ? p : p.right));
     return {
       id: q.id,
       type: "matching",
@@ -70,7 +70,7 @@ function mapDBQuestionToListening(q: DBQuestion, group: DBQuestionGroup): Listen
       answer: q.answer,
       matchOptions: {
         left: leftParts || q.text,
-        right: rightOptions.length > 0 ? rightOptions : q.options.map((o) => o.text),
+        right: rightOptions.length > 0 ? rightOptions : q.options.map((o) => (typeof o === "string" ? o : o.text)),
       },
     };
   }
