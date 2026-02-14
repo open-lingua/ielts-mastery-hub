@@ -644,6 +644,9 @@ const WritingSimulator: React.FC = () => {
               </div>
             </div>
             <div className="border-t border-border bg-secondary/50 p-4 flex justify-end gap-3">
+              <button onClick={() => navigate("/tests")} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                ← Practice Library
+              </button>
               <button onClick={() => setShowResults(false)} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Review Essays
               </button>
