@@ -25,7 +25,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   fetchLibraryData,
-  startTestSession,
   fetchActiveSession,
   fetchTestTitle,
   type PracticeTestCard,
@@ -84,12 +83,10 @@ const TestCardSkeleton = () => (
 const TestCard: React.FC<{
   test: PracticeTestCard;
   onStart: (test: PracticeTestCard) => void;
-  starting: string | null;
-}> = ({ test, onStart, starting }) => {
+}> = ({ test, onStart }) => {
   const Icon = moduleIcons[test.module];
   const isCompleted = test.status === "completed";
   const isInProgress = test.status === "in_progress";
-  const isStarting = starting === test.id;
 
   const targetRoute = `/${test.module}?id=${test.id}`;
 
@@ -186,13 +183,12 @@ const TestCard: React.FC<{
               "gap-2 w-full md:w-auto",
               isInProgress && "bg-primary hover:bg-primary/90 text-primary-foreground"
             )}
-            disabled={isStarting}
             onClick={handleAction}
-            asChild={!isStarting && test.status !== "not_started"}
+            asChild={test.status !== "not_started"}
           >
             {test.status === "not_started" ? (
               <span>
-                {isStarting ? "Starting…" : "Start"}
+                Start
                 <PlayCircle className="h-3 w-3" />
               </span>
             ) : (
@@ -218,7 +214,6 @@ const TestLibrary: React.FC = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [tests, setTests] = useState<PracticeTestCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [starting, setStarting] = useState<string | null>(null);
   const [activeSessionInfo, setActiveSessionInfo] = useState<{ session: ActiveSessionInfo; title: string } | null>(null);
 
   const tabs = ["All", "Reading", "Writing", "Listening"];
@@ -257,7 +252,7 @@ const TestLibrary: React.FC = () => {
     (t) => activeTab === "All" || moduleLabels[t.module] === activeTab
   );
 
-  const handleStart = async (test: PracticeTestCard) => {
+  const handleStart = (test: PracticeTestCard) => {
     if (!user) return;
 
     // Block if another test is already in progress
@@ -266,15 +261,8 @@ const TestLibrary: React.FC = () => {
       return;
     }
 
-    setStarting(test.id);
-    try {
-      await startTestSession(user.id, test.id, test.module);
-      navigate(`/${test.module}?id=${test.id}`);
-    } catch {
-      toast.error("Failed to start test session");
-    } finally {
-      setStarting(null);
-    }
+    // Navigate to the module — the Test Guard overlay will handle session creation
+    navigate(`/${test.module}?id=${test.id}`);
   };
 
   return (
@@ -345,7 +333,6 @@ const TestLibrary: React.FC = () => {
                   <TestCard
                     test={test}
                     onStart={handleStart}
-                    starting={starting}
                   />
                 </motion.div>
               ))}
