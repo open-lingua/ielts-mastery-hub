@@ -388,6 +388,7 @@ export type Database = {
       }
       user_test_sessions: {
         Row: {
+          attempt_number: number
           completed_at: string | null
           created_at: string
           id: string
@@ -401,6 +402,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attempt_number?: number
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -414,6 +416,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attempt_number?: number
           completed_at?: string | null
           created_at?: string
           id?: string

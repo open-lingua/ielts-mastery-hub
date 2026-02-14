@@ -6,34 +6,18 @@ import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGradi
  * Grade a completed listening test and persist the result to user_test_sessions.
  */
 export async function submitListeningTest(
-  userId: string,
-  testId: string,
+  sessionId: string,
   test: ListeningTest,
   answers: Record<string, string>
 ): Promise<{ rawScore: number; bandScore: number }> {
+  const { completeSession } = await import("./practiceLibraryService");
   const allQuestions = test.sections.flatMap((s) => s.questions);
   const rawScore = allQuestions.filter((q) =>
     isAnswerCorrect(answers[q.id], q.answer)
   ).length;
   const bandScore = calculateListeningBandScore(rawScore);
 
-  const { error } = await supabase
-    .from("user_test_sessions")
-    .upsert(
-      {
-        user_id: userId,
-        test_id: testId,
-        test_type: "listening",
-        status: "completed",
-        progress_percent: 100,
-        score_band: bandScore,
-        completed_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,test_id,test_type" }
-    );
-
-  if (error) throw error;
+  await completeSession(sessionId, bandScore);
   return { rawScore, bandScore };
 }
 

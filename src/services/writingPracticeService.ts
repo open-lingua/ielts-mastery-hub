@@ -32,27 +32,11 @@ export interface WritingAnswers {
  * Writing is subjectively graded, so score_band is null (pending review).
  */
 export async function submitWritingTest(
-  userId: string,
-  testId: string,
+  sessionId: string,
   answers: WritingAnswers
 ): Promise<void> {
-  const { error } = await supabase
-    .from("user_test_sessions")
-    .upsert(
-      {
-        user_id: userId,
-        test_id: testId,
-        test_type: "writing",
-        status: "completed",
-        progress_percent: 100,
-        score_band: null,
-        completed_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,test_id,test_type" }
-    );
-
-  if (error) throw error;
+  const { completeSession } = await import("./practiceLibraryService");
+  await completeSession(sessionId, null);
 }
 
 /**
