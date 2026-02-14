@@ -467,7 +467,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
   const renderSummary = () => {
     const parts = d.summaryText.split(/(\{\{[^}]+\}\})/);
     return parts.map((part, i) => {
-      const match = part.match(/\{\{(\w+)\}\}/);
+      const match = part.match(/\{\{([^}]+)\}\}/);
       if (match) {
         const gapId = match[1];
         const gap = d.gaps.find((g) => g.id === gapId);
