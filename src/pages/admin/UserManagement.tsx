@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -9,6 +9,8 @@ import {
   MoreHorizontal,
   AlertTriangle,
   ShieldAlert,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Input } from "@/components/ui/input";
@@ -48,102 +50,193 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
-// ── Mock Data ──────────────────────────────────────────────
-const names = ["Andrés Rodríguez", "Sarah Jenkins", "Liam Chen", "Elena Rossi"];
-const loginTimes = ["2 hours ago", "5 minutes ago", "1 day ago", "3 hours ago", "Just now"];
+// ── Types ──────────────────────────────────────────────────
+interface UserRow {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  avatar_url: string | null;
+  plan_type: string | null;
+  is_banned: boolean;
+  ban_reason: string | null;
+  banned_until: string | null;
+  updated_at: string | null;
+  role: string;
+}
 
-const mockUsers = Array.from({ length: 25 }).map((_, i) => ({
-  id: `u-${i + 1}`,
-  name: names[i % names.length],
-  email: `user${i + 1}@example.com`,
-  plan: (i % 3 === 0 ? "Premium" : "Free") as "Premium" | "Free",
-  status: (i === 5 ? "Banned" : "Active") as "Active" | "Banned",
-  lastLogin: loginTimes[i % loginTimes.length],
-  joinedDate: "2023-11-01",
-}));
-
-type MockUser = (typeof mockUsers)[0];
 type ModalType = "edit" | "delete" | "ban" | null;
 
 const ROWS_PER_PAGE = 10;
 
 // ── Status / Plan Badges ───────────────────────────────────
-const StatusBadge: React.FC<{ status: MockUser["status"] }> = ({ status }) => (
+const StatusBadge: React.FC<{ isBanned: boolean }> = ({ isBanned }) => (
   <Badge
     variant="outline"
     className={
-      status === "Active"
+      !isBanned
         ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
         : "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400"
     }
   >
-    {status}
+    {isBanned ? "Banned" : "Active"}
   </Badge>
 );
 
-const PlanBadge: React.FC<{ plan: MockUser["plan"] }> = ({ plan }) => (
+const PlanBadge: React.FC<{ plan: string }> = ({ plan }) => {
+  const isPremium = plan?.toLowerCase() === "premium";
+  return (
+    <Badge
+      variant="outline"
+      className={
+        isPremium
+          ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+          : "border-border bg-muted text-muted-foreground"
+      }
+    >
+      {isPremium ? "Premium" : "Free"}
+    </Badge>
+  );
+};
+
+const RoleBadge: React.FC<{ role: string }> = ({ role }) => (
   <Badge
     variant="outline"
     className={
-      plan === "Premium"
-        ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+      role === "super_admin"
+        ? "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400"
         : "border-border bg-muted text-muted-foreground"
     }
   >
-    {plan}
+    {role === "super_admin" ? "Admin" : "Student"}
   </Badge>
+);
+
+const TableSkeleton = () => (
+  <>
+    {Array.from({ length: ROWS_PER_PAGE }).map((_, i) => (
+      <TableRow key={i}>
+        <TableCell>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-3.5 w-28" />
+              <Skeleton className="h-3 w-36" />
+            </div>
+          </div>
+        </TableCell>
+        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
+        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
+        <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
+        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+      </TableRow>
+    ))}
+  </>
 );
 
 // ── Page Component ─────────────────────────────────────────
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<MockUser[]>(mockUsers);
+  const [users, setUsers] = useState<UserRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isMutating, setIsMutating] = useState(false);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [selectedUser, setSelectedUser] = useState<MockUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
 
   // Edit form state
   const [editName, setEditName] = useState("");
-  const [editEmail, setEditEmail] = useState("");
-  const [editPlan, setEditPlan] = useState<"Free" | "Premium">("Free");
+  const [editPlan, setEditPlan] = useState("free");
+  const [editRole, setEditRole] = useState("student");
 
   // Ban form state
   const [banReason, setBanReason] = useState("");
   const [banDuration, setBanDuration] = useState<"temporary" | "permanent">("temporary");
 
-  // Filtered + paginated
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.id.toLowerCase().includes(q)
-    );
-  }, [users, search]);
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
-  const paginated = filtered.slice(
-    (currentPage - 1) * ROWS_PER_PAGE,
-    currentPage * ROWS_PER_PAGE
-  );
+  // Fetch users with server-side pagination + search
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const from = (currentPage - 1) * ROWS_PER_PAGE;
+      const to = from + ROWS_PER_PAGE - 1;
 
-  // Reset page on search
-  const handleSearch = (val: string) => {
-    setSearch(val);
-    setCurrentPage(1);
-  };
+      let query = supabase
+        .from("profiles")
+        .select("id, full_name, email, avatar_url, plan_type, is_banned, ban_reason, banned_until, updated_at", { count: "exact" });
+
+      if (debouncedSearch) {
+        query = query.or(`full_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
+      }
+
+      const { data: profiles, count, error } = await query
+        .order("updated_at", { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      // Fetch roles for these user IDs
+      const userIds = (profiles ?? []).map((p) => p.id);
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("user_id, role")
+        .in("user_id", userIds.length > 0 ? userIds : ["__none__"]);
+
+      const roleMap = new Map<string, string>();
+      (roles ?? []).forEach((r) => roleMap.set(r.user_id, r.role));
+
+      const merged: UserRow[] = (profiles ?? []).map((p) => ({
+        id: p.id,
+        full_name: p.full_name,
+        email: p.email,
+        avatar_url: p.avatar_url,
+        plan_type: p.plan_type,
+        is_banned: p.is_banned ?? false,
+        ban_reason: p.ban_reason,
+        banned_until: p.banned_until,
+        updated_at: p.updated_at,
+        role: roleMap.get(p.id) ?? "student",
+      }));
+
+      setUsers(merged);
+      setTotalCount(count ?? 0);
+    } catch (err) {
+      toast.error("Failed to load users");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, debouncedSearch]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / ROWS_PER_PAGE));
 
   // Open modals
-  const openModal = (type: ModalType, user: MockUser) => {
+  const openModal = (type: ModalType, user: UserRow) => {
     setSelectedUser(user);
     setActiveModal(type);
     if (type === "edit") {
-      setEditName(user.name);
-      setEditEmail(user.email);
-      setEditPlan(user.plan);
+      setEditName(user.full_name ?? "");
+      setEditPlan(user.plan_type ?? "free");
+      setEditRole(user.role);
     }
     if (type === "ban") {
       setBanReason("");
@@ -156,33 +249,88 @@ const UserManagement: React.FC = () => {
     setSelectedUser(null);
   };
 
-  // Actions
-  const handleEdit = () => {
+  // ── Actions ──────────────────────────────────────────────
+  const handleEdit = async () => {
     if (!selectedUser) return;
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === selectedUser.id
-          ? { ...u, name: editName, email: editEmail, plan: editPlan }
-          : u
-      )
-    );
-    closeModal();
+    setIsMutating(true);
+    try {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ full_name: editName.trim(), plan_type: editPlan })
+        .eq("id", selectedUser.id);
+      if (profileError) throw profileError;
+
+      // Update role if changed
+      if (editRole !== selectedUser.role) {
+        // Delete old role and insert new one
+        await supabase.from("user_roles").delete().eq("user_id", selectedUser.id);
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: selectedUser.id, role: editRole as "student" | "super_admin" });
+        if (roleError) throw roleError;
+      }
+
+      toast.success("User updated successfully");
+      closeModal();
+      fetchUsers();
+    } catch (err) {
+      toast.error("Failed to update user");
+      console.error(err);
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedUser) return;
-    setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
-    closeModal();
+    setIsMutating(true);
+    try {
+      // Delete profile (cascade will handle related data)
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", selectedUser.id);
+      if (error) throw error;
+
+      toast.success("User deleted");
+      closeModal();
+      fetchUsers();
+    } catch (err) {
+      toast.error("Failed to delete user");
+      console.error(err);
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handleBan = () => {
-    if (!selectedUser) return;
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === selectedUser.id ? { ...u, status: "Banned" as const } : u
-      )
-    );
-    closeModal();
+  const handleBan = async () => {
+    if (!selectedUser || !banReason.trim()) return;
+    setIsMutating(true);
+    try {
+      const bannedUntil =
+        banDuration === "permanent"
+          ? null
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          is_banned: true,
+          ban_reason: banReason.trim(),
+          banned_until: bannedUntil,
+        })
+        .eq("id", selectedUser.id);
+      if (error) throw error;
+
+      toast.success(`${selectedUser.full_name ?? "User"} has been banned`);
+      closeModal();
+      fetchUsers();
+    } catch (err) {
+      toast.error("Failed to ban user");
+      console.error(err);
+    } finally {
+      setIsMutating(false);
+    }
   };
 
   // Page numbers
@@ -197,7 +345,7 @@ const UserManagement: React.FC = () => {
   }, [currentPage, totalPages]);
 
   const rangeStart = (currentPage - 1) * ROWS_PER_PAGE + 1;
-  const rangeEnd = Math.min(currentPage * ROWS_PER_PAGE, filtered.length);
+  const rangeEnd = Math.min(currentPage * ROWS_PER_PAGE, totalCount);
 
   return (
     <AdminLayout>
@@ -208,17 +356,22 @@ const UserManagement: React.FC = () => {
             <h1 className="text-2xl font-bold text-foreground">User Management</h1>
             <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
               <Users className="h-4 w-4" />
-              Total Students: {users.length.toLocaleString()}
+              Total Students: {totalCount.toLocaleString()}
             </p>
           </div>
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name, email, or ID…"
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-9"
-            />
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={fetchUsers} disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            </Button>
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or email…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
           </div>
         </div>
 
@@ -228,78 +381,93 @@ const UserManagement: React.FC = () => {
             <TableHeader>
               <TableRow className="bg-muted/40">
                 <TableHead className="min-w-[220px]">User</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Plan</TableHead>
-                <TableHead className="hidden md:table-cell">Last Login</TableHead>
+                <TableHead className="hidden md:table-cell">Last Updated</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <AnimatePresence mode="popLayout">
-                {paginated.map((user) => (
-                  <motion.tr
-                    key={user.id}
-                    layout
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.15 }}
-                    className="border-b border-border transition-colors hover:bg-muted/30"
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 text-xs font-medium">
-                            {user.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              {isLoading ? (
+                <TableSkeleton />
+              ) : (
+                <AnimatePresence mode="popLayout">
+                  {users.map((user) => (
+                    <motion.tr
+                      key={user.id}
+                      layout
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                      className="border-b border-border transition-colors hover:bg-muted/30"
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 text-xs font-medium">
+                              {(user.full_name ?? "U")
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">
+                              {user.full_name ?? "Unknown"}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <PlanBadge plan={user.plan} />
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                      {user.lastLogin}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={user.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => openModal("edit", user)}>
-                            <Edit2 className="h-4 w-4 mr-2 text-blue-500" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => openModal("ban", user)}>
-                            <Ban className="h-4 w-4 mr-2 text-amber-500" /> Ban
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openModal("delete", user)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </AnimatePresence>
-              {paginated.length === 0 && (
+                      </TableCell>
+                      <TableCell>
+                        <RoleBadge role={user.role} />
+                      </TableCell>
+                      <TableCell>
+                        <PlanBadge plan={user.plan_type ?? "free"} />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                        {user.updated_at
+                          ? formatDistanceToNow(new Date(user.updated_at), { addSuffix: true })
+                          : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge isBanned={user.is_banned} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem onClick={() => openModal("edit", user)}>
+                              <Edit2 className="h-4 w-4 mr-2 text-blue-500" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openModal("ban", user)}>
+                              <Ban className="h-4 w-4 mr-2 text-amber-500" />
+                              {user.is_banned ? "Update Ban" : "Ban"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => openModal("delete", user)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              )}
+              {!isLoading && users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                     No users found.
                   </TableCell>
                 </TableRow>
@@ -311,7 +479,7 @@ const UserManagement: React.FC = () => {
         {/* Pagination Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
           <p className="text-muted-foreground">
-            Showing {filtered.length > 0 ? rangeStart : 0}–{rangeEnd} of {filtered.length} users
+            Showing {totalCount > 0 ? rangeStart : 0}–{rangeEnd} of {totalCount} users
           </p>
           <div className="flex items-center gap-1">
             <Button
@@ -350,7 +518,7 @@ const UserManagement: React.FC = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update details for {selectedUser?.name}.</DialogDescription>
+            <DialogDescription>Update details for {selectedUser?.full_name ?? "this user"}.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
@@ -358,18 +526,26 @@ const UserManagement: React.FC = () => {
               <Input id="edit-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
-              <Input id="edit-email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
-            </div>
-            <div className="space-y-2">
               <Label>Plan</Label>
-              <Select value={editPlan} onValueChange={(v) => setEditPlan(v as "Free" | "Premium")}>
+              <Select value={editPlan} onValueChange={setEditPlan}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Free">Free</SelectItem>
-                  <SelectItem value="Premium">Premium</SelectItem>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Role</Label>
+              <Select value={editRole} onValueChange={setEditRole}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -378,7 +554,10 @@ const UserManagement: React.FC = () => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleEdit}>Save Changes</Button>
+            <Button onClick={handleEdit} disabled={isMutating}>
+              {isMutating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -391,7 +570,7 @@ const UserManagement: React.FC = () => {
               <AlertTriangle className="h-5 w-5" /> Delete User
             </DialogTitle>
             <DialogDescription>
-              You are about to permanently delete <strong>{selectedUser?.name}</strong>. This action
+              You are about to permanently delete <strong>{selectedUser?.full_name ?? "this user"}</strong>. This action
               cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -400,7 +579,8 @@ const UserManagement: React.FC = () => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDelete} disabled={isMutating}>
+              {isMutating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Delete Permanently
             </Button>
           </DialogFooter>
@@ -415,7 +595,7 @@ const UserManagement: React.FC = () => {
               <ShieldAlert className="h-5 w-5 text-amber-500" /> Ban User
             </DialogTitle>
             <DialogDescription>
-              Banning <strong>{selectedUser?.name}</strong> will restrict their access.
+              Banning <strong>{selectedUser?.full_name ?? "this user"}</strong> will restrict their access.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -451,8 +631,9 @@ const UserManagement: React.FC = () => {
             <Button
               variant="destructive"
               onClick={handleBan}
-              disabled={!banReason.trim()}
+              disabled={!banReason.trim() || isMutating}
             >
+              {isMutating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Confirm Ban
             </Button>
           </DialogFooter>
