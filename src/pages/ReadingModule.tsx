@@ -325,6 +325,9 @@ const ReadingModule: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate("/tests")}>
+                      ← Practice Library
+                    </Button>
                     <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setReviewMode(true)}>
                       <Eye className="h-3.5 w-3.5" /> Review Answers
                     </Button>
