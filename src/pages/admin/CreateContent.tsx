@@ -1549,13 +1549,17 @@ const CreateContent: React.FC = () => {
     emptyWritingTask("task2"),
   ]);
 
+  // The editId from the URL is only valid for the tab type that was originally navigated to.
+  const editTabRef = React.useRef<TabValue | null>(tabParam && VALID_TABS.includes(tabParam) ? tabParam : null);
+  const effectiveEditId = (editTabRef.current === activeTab) ? editId : null;
+
   // ── Load existing test for edit mode ──
   useEffect(() => {
-    if (!editId) return;
+    if (!effectiveEditId) return;
 
     if (activeTab === "reading") {
       setIsLoadingEdit(true);
-      fetchReadingTest(editId)
+      fetchReadingTest(effectiveEditId)
         .then((data) => {
           setReadingTestTitle(data.title);
           setReadingTestType(data.testType);
@@ -1577,7 +1581,7 @@ const CreateContent: React.FC = () => {
 
     if (activeTab === "writing") {
       setIsLoadingEdit(true);
-      fetchWritingTest(editId)
+      fetchWritingTest(effectiveEditId)
         .then((data) => {
           const newTasks: [WritingTaskState, WritingTaskState] = [
             emptyWritingTask("task1"),
@@ -1610,7 +1614,7 @@ const CreateContent: React.FC = () => {
 
     if (activeTab === "listening") {
       setIsLoadingEdit(true);
-      fetchListeningTest(editId)
+      fetchListeningTest(effectiveEditId)
         .then((data) => {
           setListeningTestTitle(data.title);
           setListeningDifficulty(data.difficulty);
@@ -1650,7 +1654,7 @@ const CreateContent: React.FC = () => {
         })
         .finally(() => setIsLoadingEdit(false));
     }
-  }, [editId, activeTab]);
+  }, [effectiveEditId, activeTab]);
 
   // Sync URL
   useEffect(() => {
@@ -1672,9 +1676,9 @@ const CreateContent: React.FC = () => {
     }
     setIsSaving(true);
     try {
-      if (editId) {
+      if (effectiveEditId) {
         await updateReadingTest({
-          testId: editId,
+          testId: effectiveEditId,
           title: readingTestTitle,
           testType: readingTestType,
           difficulty: readingDifficulty,
@@ -1694,12 +1698,12 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: editId
+        title: effectiveEditId
           ? "Test Updated!"
           : status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${readingTestTitle || "Untitled Test"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved as draft"} successfully.`,
+        description: `"${readingTestTitle || "Untitled Test"}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved as draft"} successfully.`,
       });
-      if (status === "published" || editId) {
+      if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1736,9 +1740,9 @@ const CreateContent: React.FC = () => {
       }));
     const testTitle = writingTasks[0].title || writingTasks[1].title || "Writing Test";
     try {
-      if (editId) {
+      if (effectiveEditId) {
         await updateWritingTest({
-          testId: editId,
+          testId: effectiveEditId,
           title: testTitle,
           status,
           tasks: taskPayload,
@@ -1752,12 +1756,12 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: editId
+        title: effectiveEditId
           ? "Test Updated!"
           : status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${testTitle}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
+        description: `"${testTitle}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
-      if (status === "published" || editId) {
+      if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1786,9 +1790,9 @@ const CreateContent: React.FC = () => {
       questionGroups: s.questionGroups,
     }));
     try {
-      if (editId) {
+      if (effectiveEditId) {
         await updateListeningTest({
-          testId: editId,
+          testId: effectiveEditId,
           title: listeningTestTitle,
           difficulty: listeningDifficulty,
           duration: listeningDuration,
@@ -1806,12 +1810,12 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: editId
+        title: effectiveEditId
           ? "Test Updated!"
           : status === "published" ? "Test Published!" : "Draft Saved!",
-        description: `"${listeningTestTitle || "Untitled"}" has been ${editId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
+        description: `"${listeningTestTitle || "Untitled"}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
-      if (status === "published" || editId) {
+      if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
     } catch (err: any) {
@@ -1842,10 +1846,10 @@ const CreateContent: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold md:text-3xl">
-              {editId ? "Edit Test" : "Test Creator Studio"}
+              {effectiveEditId ? "Edit Test" : "Test Creator Studio"}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {editId ? "Editing an existing test." : "Build IELTS practice tests for your students."}
+              {effectiveEditId ? "Editing an existing test." : "Build IELTS practice tests for your students."}
             </p>
           </div>
         </div>
@@ -1930,7 +1934,7 @@ const CreateContent: React.FC = () => {
                 onClick={() => handleSave("draft")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {editId ? "Update Draft" : "Save Draft"}
+                {effectiveEditId ? "Update Draft" : "Save Draft"}
               </Button>
               <Button variant="outline" className="gap-2" onClick={() => setPreviewOpen(true)}>
                 <Eye className="h-4 w-4" /> Preview
@@ -1941,7 +1945,7 @@ const CreateContent: React.FC = () => {
                 onClick={() => handleSave("published")}
               >
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {editId ? "Update & Publish" : "Publish"}
+                {effectiveEditId ? "Update & Publish" : "Publish"}
               </Button>
             </div>
           </div>
