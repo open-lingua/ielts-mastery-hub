@@ -11,6 +11,7 @@ interface ResultsCardProps {
   reviewMode: boolean;
   onToggleReview: () => void;
   onRetry: () => void;
+  onBackToLibrary?: () => void;
 }
 
 const ResultsCard: React.FC<ResultsCardProps> = ({
@@ -19,6 +20,7 @@ const ResultsCard: React.FC<ResultsCardProps> = ({
   reviewMode,
   onToggleReview,
   onRetry,
+  onBackToLibrary,
 }) => {
   const allQuestions = test.sections.flatMap((s) => s.questions);
   const totalCorrect = allQuestions.filter(
@@ -69,15 +71,22 @@ const ResultsCard: React.FC<ResultsCardProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3">
-        <Button variant="outline" className="flex-1 gap-2" onClick={onToggleReview}>
-          {reviewMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          {reviewMode ? "Hide Answers" : "Review Answers"}
-        </Button>
-        <Button variant="default" className="flex-1 gap-2" onClick={onRetry}>
-          <RotateCcw className="h-4 w-4" />
-          Try Again
-        </Button>
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex-1 gap-2" onClick={onToggleReview}>
+            {reviewMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {reviewMode ? "Hide Answers" : "Review Answers"}
+          </Button>
+          <Button variant="default" className="flex-1 gap-2" onClick={onRetry}>
+            <RotateCcw className="h-4 w-4" />
+            Try Again
+          </Button>
+        </div>
+        {onBackToLibrary && (
+          <Button variant="outline" className="w-full gap-2" onClick={onBackToLibrary}>
+            ← Return to Practice Library
+          </Button>
+        )}
       </div>
     </div>
   );
