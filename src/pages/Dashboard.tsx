@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PenTool, BookOpen, Headphones, Flame, Clock } from "lucide-react";
-import { mockUser } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import BandScoreChart from "@/components/dashboard/BandScoreChart";
+import { supabase } from "@/integrations/supabase/client";
 
 const quickActions = [
   {
@@ -35,10 +35,61 @@ const quickActions = [
   },
 ];
 
+function calculateStreak(dates: string[]): number {
+  if (dates.length === 0) return 0;
+
+  // Get unique local dates sorted descending
+  const uniqueDays = new Set<string>();
+  dates.forEach((d) => {
+    const local = new Date(d);
+    uniqueDays.add(`${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, "0")}-${String(local.getDate()).padStart(2, "0")}`);
+  });
+
+  const sorted = Array.from(uniqueDays).sort().reverse();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+
+  // Streak must start from today or yesterday (grace period)
+  if (sorted[0] !== todayStr && sorted[0] !== yesterdayStr) return 0;
+
+  let streak = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1]);
+    const curr = new Date(sorted[i]);
+    const diff = (prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24);
+    if (Math.round(diff) === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
 const Dashboard: React.FC = () => {
   const { user, profile, isAuthenticated } = useAuth();
   const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Future Achiever";
-  const streak = isAuthenticated ? mockUser.streak : 0;
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchStreak = async () => {
+      const { data } = await supabase
+        .from("user_test_sessions")
+        .select("started_at")
+        .eq("user_id", user.id)
+        .order("started_at", { ascending: false });
+      if (data) {
+        setStreak(calculateStreak(data.map((r) => r.started_at)));
+      }
+    };
+    fetchStreak();
+  }, [user]);
+
   return (
     <DashboardLayout>
       <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-8">
