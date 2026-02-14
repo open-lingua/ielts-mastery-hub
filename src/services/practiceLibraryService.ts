@@ -14,6 +14,7 @@ export interface PracticeTestCard {
   score_band: number | null;
   last_active_at: string | null;
   session_id: string | null;
+  created_at: string;
 }
 
 interface RawTest {
@@ -21,13 +22,14 @@ interface RawTest {
   title: string;
   difficulty: string;
   duration: string;
+  created_at: string;
 }
 
 export async function fetchLibraryData(userId: string): Promise<PracticeTestCard[]> {
   const [readingRes, writingRes, listeningRes, sessionsRes] = await Promise.all([
-    supabase.from("reading_tests").select("id, title, difficulty, duration").eq("status", "published"),
-    supabase.from("writing_tests").select("id, title").eq("status", "published"),
-    supabase.from("listening_tests").select("id, title, difficulty, duration").eq("status", "published"),
+    supabase.from("reading_tests").select("id, title, difficulty, duration, created_at").eq("status", "published"),
+    supabase.from("writing_tests").select("id, title, created_at").eq("status", "published"),
+    supabase.from("listening_tests").select("id, title, difficulty, duration, created_at").eq("status", "published"),
     supabase.from("user_test_sessions").select("*").eq("user_id", userId),
   ]);
 
@@ -57,6 +59,7 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
         score_band: session?.score_band ? Number(session.score_band) : null,
         last_active_at: session?.last_active_at ?? null,
         session_id: session?.id ?? null,
+        created_at: t.created_at,
       };
     });
 
@@ -65,7 +68,7 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
     "reading"
   );
   const writing = merge(
-    ((writingRes.data ?? []) as { id: string; title: string }[]).map((w) => ({
+    ((writingRes.data ?? []) as { id: string; title: string; created_at: string }[]).map((w) => ({
       ...w,
       difficulty: "7",
       duration: "60 mins",
