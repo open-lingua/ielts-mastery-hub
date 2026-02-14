@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight, Library, Shield, CreditCard } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -24,6 +25,7 @@ const navItems = [
 export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, profile, isAuthenticated, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -75,7 +77,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
         {/* Nav */}
         <TooltipProvider delayDuration={0}>
           <nav className={cn("flex-1 space-y-1 p-4 transition-all duration-300", collapsed && "px-2")}>
-            {navItems.map((item) => {
+            {navItems.filter((item) => item.path !== "/admin" || isAdmin).map((item) => {
               const isActive = location.pathname === item.path;
               const linkContent = (
                 <Link
