@@ -348,6 +348,7 @@ const ListeningModule: React.FC = () => {
                         reviewMode={reviewMode}
                         onToggleReview={() => setReviewMode((r) => !r)}
                         onRetry={handleRetry}
+                        onBackToLibrary={() => navigate("/tests")}
                       />
                       {reviewMode && (
                         <div className="space-y-6">
