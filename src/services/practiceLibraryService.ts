@@ -24,7 +24,6 @@ interface RawTest {
 }
 
 export async function fetchLibraryData(userId: string): Promise<PracticeTestCard[]> {
-  // Fetch all published tests and user sessions in parallel
   const [readingRes, writingRes, listeningRes, sessionsRes] = await Promise.all([
     supabase.from("reading_tests").select("id, title, difficulty, duration").eq("status", "published"),
     supabase.from("writing_tests").select("id, title").eq("status", "published"),
@@ -33,11 +32,20 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
   ]);
 
   const sessions = sessionsRes.data ?? [];
-  const sessionMap = new Map(sessions.map((s) => [`${s.test_type}_${s.test_id}`, s]));
+
+  // Group sessions by test_type + test_id and pick the latest attempt
+  const latestSessionMap = new Map<string, (typeof sessions)[0]>();
+  for (const s of sessions) {
+    const key = `${s.test_type}_${s.test_id}`;
+    const existing = latestSessionMap.get(key);
+    if (!existing || (s.attempt_number ?? 1) > (existing.attempt_number ?? 1)) {
+      latestSessionMap.set(key, s);
+    }
+  }
 
   const merge = (tests: RawTest[], module: TestModule): PracticeTestCard[] =>
     tests.map((t) => {
-      const session = sessionMap.get(`${module}_${t.id}`);
+      const session = latestSessionMap.get(`${module}_${t.id}`);
       return {
         id: t.id,
         title: t.title,
@@ -78,35 +86,54 @@ export interface TestSessionInfo {
   status: string;
   progress_percent: number;
   score_band: number | null;
+  attempt_number: number;
 }
 
+/**
+ * Start a NEW test session (new attempt). No upsert — always inserts.
+ */
 export async function startTestSession(
   userId: string,
   testId: string,
   testType: TestModule
 ): Promise<TestSessionInfo> {
+  // Determine next attempt number
+  const { data: prev } = await supabase
+    .from("user_test_sessions")
+    .select("attempt_number")
+    .eq("user_id", userId)
+    .eq("test_id", testId)
+    .eq("test_type", testType)
+    .order("attempt_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextAttempt = (prev?.attempt_number ?? 0) + 1;
   const now = new Date().toISOString();
+
   const { data, error } = await supabase
     .from("user_test_sessions")
-    .upsert(
-      {
-        user_id: userId,
-        test_id: testId,
-        test_type: testType,
-        status: "in_progress",
-        progress_percent: 0,
-        started_at: now,
-        last_active_at: now,
-      },
-      { onConflict: "user_id,test_id,test_type" }
-    )
-    .select("id, started_at, status, progress_percent, score_band")
+    .insert({
+      user_id: userId,
+      test_id: testId,
+      test_type: testType,
+      status: "in_progress",
+      progress_percent: 0,
+      started_at: now,
+      last_active_at: now,
+      attempt_number: nextAttempt,
+    })
+    .select("id, started_at, status, progress_percent, score_band, attempt_number")
     .single();
 
   if (error) throw error;
   return data as TestSessionInfo;
 }
 
+/**
+ * Fetch the most recent session for a given user + test + type.
+ * Returns the latest attempt regardless of status.
+ */
 export async function fetchExistingSession(
   userId: string,
   testId: string,
@@ -114,10 +141,12 @@ export async function fetchExistingSession(
 ): Promise<TestSessionInfo | null> {
   const { data, error } = await supabase
     .from("user_test_sessions")
-    .select("id, started_at, status, progress_percent, score_band")
+    .select("id, started_at, status, progress_percent, score_band, attempt_number")
     .eq("user_id", userId)
     .eq("test_id", testId)
     .eq("test_type", testType)
+    .order("attempt_number", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) throw error;
@@ -173,4 +202,25 @@ export async function fetchTestTitle(
     .maybeSingle();
 
   return data?.title || `${testType.charAt(0).toUpperCase() + testType.slice(1)} Test`;
+}
+
+/**
+ * Complete a session by its ID (used by submit functions).
+ */
+export async function completeSession(
+  sessionId: string,
+  scoreBand: number | null
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_test_sessions")
+    .update({
+      status: "completed",
+      progress_percent: 100,
+      score_band: scoreBand,
+      completed_at: new Date().toISOString(),
+      last_active_at: new Date().toISOString(),
+    })
+    .eq("id", sessionId);
+
+  if (error) throw error;
 }
