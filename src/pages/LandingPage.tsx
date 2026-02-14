@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, Mic, ArrowRight, CheckCircle, Star, Moon, Sun, ChevronRight } from "lucide-react";
+import { BookOpen, PenTool, Headphones, Mic, ArrowRight, CheckCircle2, Star, Moon, Sun, ChevronRight, Sparkles, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { fetchPlans, type Plan } from "@/services/pricingService";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ieltsModules } from "@/data/mockData";
 
@@ -9,6 +13,89 @@ const iconMap: Record<string, React.FC<{ className?: string }>> = {
   BookOpen,
   PenTool,
   Mic,
+};
+
+const LandingPricing: React.FC = () => {
+  const [isYearly, setIsYearly] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPlans().then(setPlans).catch(console.error).finally(() => setLoading(false));
+  }, []);
+
+  const displayed = plans.filter(p => p.billing_period === (isYearly ? "yearly" : "monthly"));
+
+  return (
+    <section id="pricing" className="py-20">
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold md:text-4xl">Simple, Transparent Pricing</h2>
+          <p className="mt-3 text-muted-foreground">Start free. Upgrade when you're ready.</p>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <span className={`text-sm font-medium ${!isYearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
+            <Switch checked={isYearly} onCheckedChange={setIsYearly} />
+            <span className={`text-sm font-medium ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>Yearly</span>
+            {isYearly && (
+              <Badge variant="secondary" className="ml-1 bg-success/15 text-success border-success/30 text-xs">Save ~20%</Badge>
+            )}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+        ) : (
+          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
+            <AnimatePresence mode="wait">
+              {displayed.map((plan) => (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.25 }}
+                  className={`relative rounded-2xl border bg-card p-8 flex flex-col ${
+                    plan.is_popular
+                      ? "border-2 border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/20"
+                      : "border-border"
+                  }`}
+                >
+                  {plan.is_popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <Badge className="bg-primary text-primary-foreground gap-1"><Sparkles className="h-3 w-3" /> Most Popular</Badge>
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold">{plan.name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                  <div className="mt-5">
+                    <span className="text-4xl font-extrabold">${plan.price.toFixed(2)}</span>
+                    <span className="text-muted-foreground ml-1">/{isYearly ? "year" : "month"}</span>
+                  </div>
+                  <ul className="mt-6 space-y-3 text-sm flex-1">
+                    {plan.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-success" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => { window.location.href = plan.checkout_url; }}
+                    className={`mt-8 w-full rounded-xl py-3 text-sm font-bold transition-transform hover:scale-105 ${
+                      plan.is_popular
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                        : "border border-border text-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    Subscribe
+                  </button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 };
 
 const LandingPage: React.FC = () => {
@@ -127,69 +214,7 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">Simple, Transparent Pricing</h2>
-            <p className="mt-3 text-muted-foreground">Start free. Upgrade when you're ready.</p>
-          </div>
-          <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
-            {/* Free */}
-            <div className="rounded-2xl border border-border bg-card p-8">
-              <h3 className="text-xl font-bold">Free</h3>
-              <div className="mt-4">
-                <span className="text-4xl font-extrabold">$0</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <ul className="mt-6 space-y-3 text-sm">
-                {["1 practice test per day", "Basic score tracking", "Writing word count tools", "Community tips & resources"].map(
-                  (f) => (
-                    <li key={f} className="flex items-center gap-2 text-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-success" /> {f}
-                    </li>
-                  )
-                )}
-              </ul>
-              <Link
-                to="/dashboard"
-                className="mt-8 block rounded-xl border border-border py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-              >
-                Get Started Free
-              </Link>
-            </div>
-
-            {/* Premium */}
-            <div className="relative rounded-2xl border-2 border-warning bg-card p-8 shadow-lg shadow-warning/10">
-              <div className="absolute -top-3 left-6 rounded-full bg-warning px-3 py-1 text-xs font-bold text-warning-foreground">
-                MOST POPULAR
-              </div>
-              <h3 className="text-xl font-bold">Premium</h3>
-              <div className="mt-4">
-                <span className="text-4xl font-extrabold">$12</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <ul className="mt-6 space-y-3 text-sm">
-                {[
-                  "Unlimited practice tests",
-                  "AI-powered writing feedback",
-                  "Full mock exams",
-                  "Advanced analytics & progress",
-                  "Dark mode analytics dashboard",
-                  "Priority support",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 text-warning" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <button className="mt-8 w-full rounded-xl bg-warning py-3 text-sm font-bold text-warning-foreground transition-transform hover:scale-105">
-                Upgrade to Premium
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <LandingPricing />
 
       {/* Footer */}
       <footer className="border-t border-border bg-card py-12">
