@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight, Library, Shield } from "lucide-react";
+import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, LogOut, UserPlus, ChevronLeft, ChevronRight, Library, Shield, CreditCard } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ const navItems = [
   { label: "Writing", path: "/writing", icon: PenTool },
   { label: "Reading", path: "/reading", icon: BookOpen },
   { label: "Listening", path: "/listening", icon: Headphones },
+  { label: "Billing", path: "/dashboard/billing", icon: CreditCard },
   { label: "Admin Portal", path: "/admin", icon: Shield },
 ];
 
