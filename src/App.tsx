@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import WritingSimulator from "./pages/WritingSimulator";
@@ -41,10 +42,10 @@ const App = () => (
               <Route path="/reading" element={<ReadingModule />} />
               <Route path="/listening" element={<ListeningModule />} />
               <Route path="/tests" element={<TestLibrary />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/content" element={<ContentLibrary />} />
-              <Route path="/admin/create" element={<CreateContent />} />
-              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/content" element={<AdminRoute><ContentLibrary /></AdminRoute>} />
+              <Route path="/admin/create" element={<AdminRoute><CreateContent /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/dashboard/billing" element={<BillingPage />} />
               <Route path="*" element={<NotFound />} />
