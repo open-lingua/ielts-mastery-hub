@@ -31,7 +31,7 @@ export default function PricingPage() {
       <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-30">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <button onClick={() => navigate("/")} className="text-xl font-bold text-primary tracking-tight">
-            SkillUp IELTS
+            IELTS Mastery Hub
           </button>
           <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
             Sign In
