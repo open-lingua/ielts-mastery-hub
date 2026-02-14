@@ -9,6 +9,7 @@ import {
   PlayCircle,
   Clock,
   ArrowRight,
+  ArrowUpDown,
   BarChart3,
   MoreHorizontal,
   Trophy,
@@ -20,6 +21,13 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -212,6 +220,7 @@ const TestLibrary: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("All");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [tests, setTests] = useState<PracticeTestCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSessionInfo, setActiveSessionInfo] = useState<{ session: ActiveSessionInfo; title: string } | null>(null);
@@ -248,9 +257,12 @@ const TestLibrary: React.FC = () => {
     load();
   }, [user]);
 
-  const filteredTests = tests.filter(
-    (t) => activeTab === "All" || moduleLabels[t.module] === activeTab
-  );
+  const filteredTests = tests
+    .filter((t) => activeTab === "All" || moduleLabels[t.module] === activeTab)
+    .sort((a, b) => {
+      const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return sortOrder === "newest" ? diff : -diff;
+    });
 
   const handleStart = (test: PracticeTestCard) => {
     if (!user) return;
@@ -285,22 +297,37 @@ const TestLibrary: React.FC = () => {
           </p>
         </div>
 
-        {/* Pill Tabs */}
-        <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-5 py-1.5 text-sm font-medium transition-all",
-                activeTab === tab
-                  ? "bg-background text-foreground shadow-sm"
-                  : "hover:bg-accent/20 hover:text-accent-foreground"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
+        {/* Filters Row */}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Pill Tabs */}
+          <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-5 py-1.5 text-sm font-medium transition-all",
+                  activeTab === tab
+                    ? "bg-background text-foreground shadow-sm"
+                    : "hover:bg-accent/20 hover:text-accent-foreground"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort Dropdown */}
+          <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as "newest" | "oldest")}>
+            <SelectTrigger className="w-[160px] h-10">
+              <ArrowUpDown className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Timeline */}
