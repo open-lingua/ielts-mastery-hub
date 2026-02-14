@@ -16,7 +16,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
-import { startTestSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 
 // ─── Loading Skeleton ────────────────────────────────
 const ReadingLoadingSkeleton: React.FC = () => (
@@ -85,10 +86,12 @@ const ReadingModule: React.FC = () => {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
   const passagePaneRef = useRef<HTMLDivElement>(null);
   const questionPaneRef = useRef<HTMLDivElement>(null);
 
-  // Fetch test data
+  // Fetch test data + existing session
   useEffect(() => {
     if (!testId) {
       navigate("/tests", { replace: true });
@@ -97,22 +100,40 @@ const ReadingModule: React.FC = () => {
 
     setIsLoading(true);
     setFetchError(null);
+    setSessionLoading(true);
 
-    fetchReadingTestForPractice(testId)
-      .then((data) => {
+    const loadData = async () => {
+      try {
+        const data = await fetchReadingTestForPractice(testId);
         if (!data.passages || data.passages.length === 0) {
           setFetchError("This test has no passages configured.");
           return;
         }
         setTestData(data);
         setVisitedPassages(data.passages.map((_, i) => i === 0));
-      })
-      .catch((err) => {
+
+        // Hydrate existing session
+        if (user) {
+          const session = await fetchExistingSession(user.id, testId, "reading");
+          if (session && session.status === "in_progress" && session.started_at) {
+            const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000);
+            const remaining = 3600 - elapsed;
+            if (remaining > 0) {
+              setStartedAt(session.started_at);
+              setIsStarted(true); // bypass overlay
+            }
+          }
+        }
+      } catch (err: any) {
         setFetchError(err.message || "Failed to load reading test");
         toast.error("Failed to load reading test");
-      })
-      .finally(() => setIsLoading(false));
-  }, [testId, navigate]);
+      } finally {
+        setIsLoading(false);
+        setSessionLoading(false);
+      }
+    };
+    loadData();
+  }, [testId, navigate, user]);
 
   const [gradingResult, setGradingResult] = useState<{ rawScore: number; bandScore: number } | null>(null);
 
@@ -138,6 +159,14 @@ const ReadingModule: React.FC = () => {
     setSubmitted(true);
     persistResults();
   }, [submitted, persistResults]);
+
+  // Persisted timer
+  const { remainingSeconds } = usePersistedTimer({
+    totalSeconds: 3600,
+    startedAt,
+    onTimeUp: handleTimeUp,
+    isFinished: submitted,
+  });
 
   const handleAnswer = useCallback((key: string, value: string) => {
     if (submitted) return;
@@ -165,17 +194,22 @@ const ReadingModule: React.FC = () => {
     setGradingResult(null);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
+    setStartedAt(null);
   };
 
   const handleStart = async () => {
-    setIsStarted(true);
     if (user && testId) {
       try {
-        await startTestSession(user.id, testId, "reading");
+        const session = await startTestSession(user.id, testId, "reading");
+        setStartedAt(session.started_at);
       } catch {
-        // Non-blocking
+        // Fallback to local-only timer
+        setStartedAt(new Date().toISOString());
       }
+    } else {
+      setStartedAt(new Date().toISOString());
     }
+    setIsStarted(true);
   };
 
   // Loading
@@ -203,7 +237,7 @@ const ReadingModule: React.FC = () => {
         <div className="flex flex-col h-[calc(100vh-4rem)]">
           <UnifiedTimer
             key={timerKey}
-            totalSeconds={3600}
+            totalSeconds={startedAt ? remainingSeconds : 3600}
             onTimeUp={handleTimeUp}
             isPaused={!isStarted}
             testFinished={submitted}
