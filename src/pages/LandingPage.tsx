@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { fetchPlans, type Plan } from "@/services/pricingService";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ieltsModules } from "@/data/mockData";
 
 const iconMap: Record<string, React.FC<{ className?: string }>> = {
@@ -19,6 +20,7 @@ const LandingPricing: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchPlans().then(setPlans).catch(console.error).finally(() => setLoading(false));
@@ -79,7 +81,14 @@ const LandingPricing: React.FC = () => {
                     ))}
                   </ul>
                   <button
-                    onClick={() => { window.location.href = plan.checkout_url; }}
+                    onClick={() => {
+                      const url = new URL(plan.checkout_url);
+                      if (user?.email) {
+                        url.searchParams.set("checkout[custom][user_email]", user.email);
+                        url.searchParams.set("checkout[email]", user.email);
+                      }
+                      window.location.href = url.toString();
+                    }}
                     className={`mt-8 w-full rounded-xl py-3 text-sm font-bold transition-transform hover:scale-105 ${
                       plan.is_popular
                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
