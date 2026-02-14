@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { PenTool, BookOpen, Headphones, TrendingUp, Flame, Clock } from "lucide-react";
+import { PenTool, BookOpen, Headphones, Flame, Clock } from "lucide-react";
 import { mockUser } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
 import RecentActivity from "@/components/dashboard/RecentActivity";
+import BandScoreChart from "@/components/dashboard/BandScoreChart";
 
 const quickActions = [
   {
@@ -82,35 +82,7 @@ const Dashboard: React.FC = () => {
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Progress Chart */}
           <div className="rounded-2xl border border-border bg-card p-6 lg:col-span-3">
-            <div className="mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-bold">Band Score Progress</h2>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockUser.recentScores}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis domain={[4, 9]} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.75rem",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={3}
-                    dot={{ r: 5, fill: "hsl(var(--primary))" }}
-                    activeDot={{ r: 7 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <BandScoreChart />
           </div>
 
           {/* Recent Activity */}
