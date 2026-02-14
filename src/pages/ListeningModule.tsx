@@ -352,9 +352,9 @@ const ListeningModule: React.FC = () => {
                       />
                       {reviewMode && (
                         <div className="space-y-6">
-                          {test.sections.map((section) => {
+                        {test.sections.map((section, sectionIdx) => {
                             const offset = test.sections
-                              .slice(0, section.id - 1)
+                              .slice(0, sectionIdx)
                               .reduce((acc, s) => acc + s.questions.length, 0);
                             return (
                               <div key={section.id} className="rounded-2xl border border-border bg-card p-6 space-y-4">
