@@ -87,6 +87,7 @@ const ReadingModule: React.FC = () => {
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
   const passagePaneRef = useRef<HTMLDivElement>(null);
   const questionPaneRef = useRef<HTMLDivElement>(null);
@@ -120,7 +121,8 @@ const ReadingModule: React.FC = () => {
             const remaining = 3600 - elapsed;
             if (remaining > 0) {
               setStartedAt(session.started_at);
-              setIsStarted(true); // bypass overlay
+              setSessionId(session.id);
+              setIsStarted(true);
             }
           }
         }
@@ -138,20 +140,20 @@ const ReadingModule: React.FC = () => {
   const [gradingResult, setGradingResult] = useState<{ rawScore: number; bandScore: number } | null>(null);
 
   const persistResults = useCallback(async () => {
-    if (!user || !testId || !testData) return;
+    if (!sessionId || !testData) return;
     try {
       const flatAnswers: Record<string, string> = {};
       for (const [k, v] of Object.entries(answers)) {
         flatAnswers[k] = Array.isArray(v) ? v.join(", ") : v;
       }
-      const result = await submitReadingTest(user.id, testId, testData, flatAnswers);
+      const result = await submitReadingTest(sessionId, testData, flatAnswers);
       setGradingResult(result);
       toast.success(`Reading test submitted! Band Score: ${result.bandScore} (${result.rawScore}/${testData.totalQuestions} correct)`);
     } catch (err) {
       console.error("Failed to persist reading submission:", err);
       toast.error("Failed to save your submission.");
     }
-  }, [user, testId, testData, answers]);
+  }, [sessionId, testData, answers]);
 
   const handleTimeUp = useCallback(() => {
     if (submitted) return;
@@ -195,6 +197,7 @@ const ReadingModule: React.FC = () => {
     setTimerKey((k) => k + 1);
     setIsStarted(false);
     setStartedAt(null);
+    setSessionId(null);
   };
 
   const handleStart = async () => {
@@ -208,6 +211,7 @@ const ReadingModule: React.FC = () => {
         }
         const session = await startTestSession(user.id, testId, "reading");
         setStartedAt(session.started_at);
+        setSessionId(session.id);
       } catch {
         setStartedAt(new Date().toISOString());
       }

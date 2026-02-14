@@ -170,6 +170,7 @@ const WritingSimulator: React.FC = () => {
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -202,6 +203,7 @@ const WritingSimulator: React.FC = () => {
             const remaining = 3600 - elapsed;
             if (remaining > 0) {
               setStartedAt(session.started_at);
+              setSessionId(session.id);
               setIsStarted(true);
             }
           }
@@ -261,9 +263,9 @@ const WritingSimulator: React.FC = () => {
     wc >= min ? "text-success" : wc > 0 ? "text-warning" : "text-muted-foreground";
 
   const persistSubmission = useCallback(async () => {
-    if (!user || !testId) return;
+    if (!sessionId) return;
     try {
-      await submitWritingTest(user.id, testId, {
+      await submitWritingTest(sessionId, {
         task1: drafts[0].text,
         task2: drafts[1].text,
         task1WordCount: drafts[0].wordCount,
@@ -274,7 +276,7 @@ const WritingSimulator: React.FC = () => {
       console.error("Failed to persist writing submission:", err);
       toast.error("Failed to save your submission. Your work is saved locally.");
     }
-  }, [user, testId, drafts]);
+  }, [sessionId, drafts]);
 
   const handleTimeUp = useCallback(() => {
     if (showResults) return;
@@ -329,6 +331,7 @@ const WritingSimulator: React.FC = () => {
     setTimerKey((k) => k + 1);
     setIsStarted(false);
     setStartedAt(null);
+    setSessionId(null);
     localStorage.removeItem(`ielts_writing_drafts_${testId}`);
   };
 
@@ -342,6 +345,7 @@ const WritingSimulator: React.FC = () => {
         }
         const session = await startTestSession(user.id, testId, "writing");
         setStartedAt(session.started_at);
+        setSessionId(session.id);
       } catch {
         setStartedAt(new Date().toISOString());
       }

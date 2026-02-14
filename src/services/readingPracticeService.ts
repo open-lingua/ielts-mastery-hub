@@ -578,33 +578,17 @@ export function extractCorrectAnswers(
  * Grade and persist a completed reading test.
  */
 export async function submitReadingTest(
-  userId: string,
-  testId: string,
+  sessionId: string,
   payload: ReadingTestPracticePayload,
   userAnswers: Record<string, string>
 ): Promise<{ rawScore: number; bandScore: number }> {
+  const { completeSession } = await import("./practiceLibraryService");
   const correctAnswers = extractCorrectAnswers(payload);
   const rawScore = correctAnswers.filter((q) =>
     isAnswerCorrect(userAnswers[q.key], q.answer, q.acceptedAnswers)
   ).length;
   const bandScore = calculateReadingBandScore(rawScore);
 
-  const { error } = await supabase
-    .from("user_test_sessions")
-    .upsert(
-      {
-        user_id: userId,
-        test_id: testId,
-        test_type: "reading",
-        status: "completed",
-        progress_percent: 100,
-        score_band: bandScore,
-        completed_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,test_id,test_type" }
-    );
-
-  if (error) throw error;
+  await completeSession(sessionId, bandScore);
   return { rawScore, bandScore };
 }
