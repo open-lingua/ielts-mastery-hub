@@ -28,7 +28,7 @@ const navItems = [
   { label: "Content Library", icon: Library, path: "/admin/content" },
   { label: "Create New", icon: PlusCircle, path: "/admin/create" },
   { label: "Students", icon: Users, path: "/admin/users" },
-  { label: "Settings", icon: Settings, path: "/admin/settings" },
+ //  { label: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
