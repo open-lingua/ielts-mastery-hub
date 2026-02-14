@@ -18,8 +18,9 @@ import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { startTestSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
 import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import type { ListeningTest } from "@/data/listeningTestData";
 import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
@@ -98,6 +99,7 @@ const ListeningModule: React.FC = () => {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -108,27 +110,43 @@ const ListeningModule: React.FC = () => {
     }
   }, [testId, navigate]);
 
-  // Fetch test data
+  // Fetch test data + existing session
   useEffect(() => {
     if (!testId) return;
     setIsLoading(true);
     setHasError(false);
 
-    fetchListeningTestForPractice(testId)
-      .then((data) => {
+    const loadData = async () => {
+      try {
+        const data = await fetchListeningTestForPractice(testId);
         setTest(data);
         const count = data.sections.length;
         setUnlockedSections([true, ...Array(count - 1).fill(false)]);
         setCompletedSections(Array(count).fill(false));
         setAudioEnded(Array(count).fill(false));
-      })
-      .catch((err) => {
+
+        // Hydrate existing session
+        if (user) {
+          const session = await fetchExistingSession(user.id, testId, "listening");
+          if (session && session.status === "in_progress" && session.started_at) {
+            const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000);
+            const remaining = data.totalTime - elapsed;
+            if (remaining > 0) {
+              setStartedAt(session.started_at);
+              setIsStarted(true);
+            }
+          }
+        }
+      } catch (err) {
         console.error("Failed to load listening test:", err);
         toast.error("Failed to load listening test");
         setHasError(true);
-      })
-      .finally(() => setIsLoading(false));
-  }, [testId]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [testId, user]);
 
   const scrollToTop = () => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -210,19 +228,32 @@ const ListeningModule: React.FC = () => {
     setAutoSubmitted(false);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
+    setStartedAt(null);
     scrollToTop();
   };
 
   const handleStart = async () => {
-    setIsStarted(true);
     if (user && testId) {
       try {
-        await startTestSession(user.id, testId, "listening");
+        const session = await startTestSession(user.id, testId, "listening");
+        setStartedAt(session.started_at);
       } catch (err) {
         console.error("Failed to start session:", err);
+        setStartedAt(new Date().toISOString());
       }
+    } else {
+      setStartedAt(new Date().toISOString());
     }
+    setIsStarted(true);
   };
+
+  const totalTime = test?.totalTime ?? 1800;
+  const { remainingSeconds } = usePersistedTimer({
+    totalSeconds: totalTime,
+    startedAt,
+    onTimeUp: handleTimeUp,
+    isFinished: testFinished,
+  });
 
   if (!testId) return null;
   if (isLoading) return <ListeningLoadingSkeleton />;
@@ -243,7 +274,7 @@ const ListeningModule: React.FC = () => {
         <div className="flex flex-col h-[calc(100vh-4rem)]">
           <UnifiedTimer
             key={timerKey}
-            totalSeconds={test.totalTime}
+            totalSeconds={startedAt ? remainingSeconds : totalTime}
             onTimeUp={handleTimeUp}
             isPaused={!isStarted}
             testFinished={testFinished}
