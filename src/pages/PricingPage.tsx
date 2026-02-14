@@ -7,12 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { fetchPlans, type Plan } from "@/services/pricingService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchPlans()
@@ -128,7 +130,12 @@ export default function PricingPage() {
                         className="w-full"
                         variant={plan.is_popular ? "default" : "outline"}
                         onClick={() => {
-                          window.location.href = plan.checkout_url;
+                          const url = new URL(plan.checkout_url);
+                          if (user?.email) {
+                            url.searchParams.set("checkout[custom][user_email]", user.email);
+                            url.searchParams.set("checkout[email]", user.email);
+                          }
+                          window.location.href = url.toString();
                         }}
                       >
                         Subscribe
