@@ -100,6 +100,7 @@ const ListeningModule: React.FC = () => {
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -133,6 +134,7 @@ const ListeningModule: React.FC = () => {
             const remaining = data.totalTime - elapsed;
             if (remaining > 0) {
               setStartedAt(session.started_at);
+              setSessionId(session.id);
               setIsStarted(true);
             }
           }
@@ -166,15 +168,15 @@ const ListeningModule: React.FC = () => {
   };
 
   const persistResults = useCallback(async () => {
-    if (!user || !testId || !test) return;
+    if (!sessionId || !test) return;
     try {
-      const result = await submitListeningTest(user.id, testId, test, answers);
+      const result = await submitListeningTest(sessionId, test, answers);
       toast.success(`Test submitted! Band Score: ${result.bandScore}`);
     } catch (err) {
       console.error("Failed to save results:", err);
       toast.error("Could not save your results. Please try again.");
     }
-  }, [user, testId, test, answers]);
+  }, [sessionId, test, answers]);
 
   const handleSubmitSection = async () => {
     if (!test) return;
@@ -208,12 +210,12 @@ const ListeningModule: React.FC = () => {
     // Persist on time-up too
     if (user && testId) {
       try {
-        await submitListeningTest(user.id, testId, test, answers);
+        await submitListeningTest(sessionId!, test, answers);
       } catch (err) {
         console.error("Failed to save results on time-up:", err);
       }
     }
-  }, [testFinished, test, user, testId, answers]);
+  }, [testFinished, test, user, testId, sessionId, answers]);
 
   const handleRetry = () => {
     if (!test) return;
@@ -229,6 +231,7 @@ const ListeningModule: React.FC = () => {
     setTimerKey((k) => k + 1);
     setIsStarted(false);
     setStartedAt(null);
+    setSessionId(null);
     scrollToTop();
   };
 
@@ -242,6 +245,7 @@ const ListeningModule: React.FC = () => {
         }
         const session = await startTestSession(user.id, testId, "listening");
         setStartedAt(session.started_at);
+        setSessionId(session.id);
       } catch (err) {
         console.error("Failed to start session:", err);
         setStartedAt(new Date().toISOString());
