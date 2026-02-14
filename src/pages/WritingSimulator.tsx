@@ -28,7 +28,7 @@ import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
-import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -335,6 +335,11 @@ const WritingSimulator: React.FC = () => {
   const handleStart = async () => {
     if (user && testId) {
       try {
+        const active = await fetchActiveSession(user.id);
+        if (active && active.test_id !== testId) {
+          toast.error("You already have a test in progress. Please resume or submit it first.");
+          return;
+        }
         const session = await startTestSession(user.id, testId, "writing");
         setStartedAt(session.started_at);
       } catch {

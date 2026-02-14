@@ -123,3 +123,54 @@ export async function fetchExistingSession(
   if (error) throw error;
   return data as TestSessionInfo | null;
 }
+
+export interface ActiveSessionInfo {
+  id: string;
+  test_id: string;
+  test_type: TestModule;
+  started_at: string;
+  status: string;
+}
+
+/**
+ * Fetch any in-progress session for the user, regardless of test.
+ * Returns null if no active session exists.
+ */
+export async function fetchActiveSession(
+  userId: string
+): Promise<ActiveSessionInfo | null> {
+  const { data, error } = await supabase
+    .from("user_test_sessions")
+    .select("id, test_id, test_type, started_at, status")
+    .eq("user_id", userId)
+    .eq("status", "in_progress")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as ActiveSessionInfo | null;
+}
+
+/**
+ * Look up the test title for an active session by querying the appropriate table.
+ */
+export async function fetchTestTitle(
+  testId: string,
+  testType: TestModule
+): Promise<string> {
+  const table =
+    testType === "reading"
+      ? "reading_tests"
+      : testType === "writing"
+      ? "writing_tests"
+      : "listening_tests";
+
+  const { data } = await supabase
+    .from(table)
+    .select("title")
+    .eq("id", testId)
+    .maybeSingle();
+
+  return data?.title || `${testType.charAt(0).toUpperCase() + testType.slice(1)} Test`;
+}
