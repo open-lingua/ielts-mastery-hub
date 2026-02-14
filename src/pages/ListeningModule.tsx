@@ -18,7 +18,7 @@ import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import type { ListeningTest } from "@/data/listeningTestData";
@@ -235,6 +235,11 @@ const ListeningModule: React.FC = () => {
   const handleStart = async () => {
     if (user && testId) {
       try {
+        const active = await fetchActiveSession(user.id);
+        if (active && active.test_id !== testId) {
+          toast.error("You already have a test in progress. Please resume or submit it first.");
+          return;
+        }
         const session = await startTestSession(user.id, testId, "listening");
         setStartedAt(session.started_at);
       } catch (err) {
