@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
+import RecentActivity from "@/components/dashboard/RecentActivity";
 
 const quickActions = [
   {
@@ -118,19 +119,7 @@ const Dashboard: React.FC = () => {
               <Clock className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-bold">Recent Activity</h2>
             </div>
-            <div className="space-y-4">
-              {mockUser.recentActivity.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-xl bg-secondary/50 p-4">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">{item.type} · {item.date}</p>
-                  </div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-1 text-sm font-bold text-primary">
-                    {item.score}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <RecentActivity />
           </div>
         </div>
 
