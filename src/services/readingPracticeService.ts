@@ -168,7 +168,7 @@ function buildQuestionSection(
       const paragraphs = qs.map((q) => q.text);
       const headings = group.wordBank.length > 0
         ? group.wordBank
-        : qs.flatMap((q) => q.options.map((o) => o.text));
+        : qs.flatMap((q) => q.options.map((o) => (typeof o === "string" ? o : o.text)));
       const answers: Record<string, string> = {};
       qs.forEach((q) => { answers[q.text] = q.answer; });
       return {
@@ -401,7 +401,7 @@ function buildFlatOverrides(
         id: q.id,
         label: String(startNum + i),
         text: q.text,
-        options: q.options.map((o) => o.text),
+        options: q.options.map((o) => (typeof o === "string" ? o : o.text)),
         answer: q.answer,
         multiSelect: group.multipleSelection || false,
       })),
