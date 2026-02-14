@@ -589,6 +589,6 @@ export async function submitReadingTest(
   ).length;
   const bandScore = calculateReadingBandScore(rawScore);
 
-  await completeSession(sessionId, bandScore);
+  await completeSession(sessionId, bandScore, { userAnswers });
   return { rawScore, bandScore };
 }

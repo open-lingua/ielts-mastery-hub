@@ -209,17 +209,22 @@ export async function fetchTestTitle(
  */
 export async function completeSession(
   sessionId: string,
-  scoreBand: number | null
+  scoreBand: number | null,
+  answers?: Record<string, unknown> | null
 ): Promise<void> {
+  const payload: Record<string, unknown> = {
+    status: "completed",
+    progress_percent: 100,
+    score_band: scoreBand,
+    completed_at: new Date().toISOString(),
+    last_active_at: new Date().toISOString(),
+  };
+  if (answers !== undefined && answers !== null) {
+    payload.answers = answers;
+  }
   const { error } = await supabase
     .from("user_test_sessions")
-    .update({
-      status: "completed",
-      progress_percent: 100,
-      score_band: scoreBand,
-      completed_at: new Date().toISOString(),
-      last_active_at: new Date().toISOString(),
-    })
+    .update(payload)
     .eq("id", sessionId);
 
   if (error) throw error;
