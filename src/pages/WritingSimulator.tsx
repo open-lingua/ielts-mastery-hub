@@ -28,7 +28,8 @@ import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
-import { startTestSession } from "@/services/practiceLibraryService";
+import { startTestSession, fetchExistingSession } from "@/services/practiceLibraryService";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -168,12 +169,13 @@ const WritingSimulator: React.FC = () => {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
   const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Fetch test data ──
+  // ── Fetch test data + existing session ──
   useEffect(() => {
     if (!testId) {
       navigate("/tests", { replace: true });
@@ -183,20 +185,36 @@ const WritingSimulator: React.FC = () => {
     setIsLoading(true);
     setFetchError(null);
 
-    fetchWritingTestForPractice(testId)
-      .then((data) => {
+    const loadData = async () => {
+      try {
+        const data = await fetchWritingTestForPractice(testId);
         if (!data.tasks || data.tasks.length === 0) {
           setFetchError("This test has no tasks configured.");
           return;
         }
         setTestData(data);
-      })
-      .catch((err) => {
+
+        // Hydrate existing session
+        if (user) {
+          const session = await fetchExistingSession(user.id, testId, "writing");
+          if (session && session.status === "in_progress" && session.started_at) {
+            const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000);
+            const remaining = 3600 - elapsed;
+            if (remaining > 0) {
+              setStartedAt(session.started_at);
+              setIsStarted(true);
+            }
+          }
+        }
+      } catch (err: any) {
         setFetchError(err.message || "Failed to load writing test");
         toast.error("Failed to load writing test");
-      })
-      .finally(() => setIsLoading(false));
-  }, [testId, navigate]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [testId, navigate, user]);
 
   // Derived from fetched data
   const tasks = testData?.tasks || [];
@@ -310,20 +328,30 @@ const WritingSimulator: React.FC = () => {
     setIsActive(false);
     setTimerKey((k) => k + 1);
     setIsStarted(false);
+    setStartedAt(null);
     localStorage.removeItem(`ielts_writing_drafts_${testId}`);
   };
 
   const handleStart = async () => {
-    setIsStarted(true);
-    // Create/update session
     if (user && testId) {
       try {
-        await startTestSession(user.id, testId, "writing");
+        const session = await startTestSession(user.id, testId, "writing");
+        setStartedAt(session.started_at);
       } catch {
-        // Non-blocking — session tracking is best-effort
+        setStartedAt(new Date().toISOString());
       }
+    } else {
+      setStartedAt(new Date().toISOString());
     }
+    setIsStarted(true);
   };
+
+  const { remainingSeconds } = usePersistedTimer({
+    totalSeconds: totalSeconds,
+    startedAt,
+    onTimeUp: handleTimeUp,
+    isFinished: showResults,
+  });
 
   const bothAttempted = drafts[0].wordCount > 0 && drafts[1].wordCount > 0;
 
@@ -343,7 +371,7 @@ const WritingSimulator: React.FC = () => {
         {/* Unified Timer — paused until started */}
         <UnifiedTimer
           key={timerKey}
-          totalSeconds={totalSeconds}
+          totalSeconds={startedAt ? remainingSeconds : totalSeconds}
           onTimeUp={handleTimeUp}
           isPaused={!isStarted}
           testFinished={showResults}
