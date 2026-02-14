@@ -118,7 +118,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
               <p className="text-sm font-semibold text-foreground">Go Premium ✨</p>
               <p className="mt-1 text-xs text-muted-foreground">Unlock unlimited practice & AI feedback</p>
               <Link
-                to="/#pricing"
+                to="/pricing"
                 className="mt-3 block rounded-lg bg-warning px-3 py-2 text-center text-xs font-bold text-warning-foreground transition-transform hover:scale-105"
               >
                 Upgrade Now
