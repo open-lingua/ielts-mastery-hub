@@ -188,6 +188,120 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          lemon_squeezy_order_id: string | null
+          lemon_squeezy_payment_id: string | null
+          payment_method: string | null
+          plan_id: string | null
+          receipt_url: string | null
+          refunded_at: string | null
+          status: string
+          subscription_id: string | null
+          updated_at: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          lemon_squeezy_order_id?: string | null
+          lemon_squeezy_payment_id?: string | null
+          payment_method?: string | null
+          plan_id?: string | null
+          receipt_url?: string | null
+          refunded_at?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          lemon_squeezy_order_id?: string | null
+          lemon_squeezy_payment_id?: string | null
+          payment_method?: string | null
+          plan_id?: string | null
+          receipt_url?: string | null
+          refunded_at?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          billing_period: string
+          checkout_url: string
+          created_at: string
+          description: string | null
+          features: Json
+          id: string
+          is_popular: boolean | null
+          lemon_squeezy_variant_id: string | null
+          name: string
+          price: number
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          billing_period: string
+          checkout_url: string
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_popular?: boolean | null
+          lemon_squeezy_variant_id?: string | null
+          name: string
+          price: number
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          billing_period?: string
+          checkout_url?: string
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_popular?: boolean | null
+          lemon_squeezy_variant_id?: string | null
+          name?: string
+          price?: number
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -385,6 +499,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          lemon_squeezy_customer_id: string | null
+          lemon_squeezy_order_id: string | null
+          lemon_squeezy_subscription_id: string | null
+          plan_id: string | null
+          status: string
+          updated_at: string
+          user_email: string
+          user_id: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          lemon_squeezy_customer_id?: string | null
+          lemon_squeezy_order_id?: string | null
+          lemon_squeezy_subscription_id?: string | null
+          plan_id?: string | null
+          status?: string
+          updated_at?: string
+          user_email: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          lemon_squeezy_customer_id?: string | null
+          lemon_squeezy_order_id?: string | null
+          lemon_squeezy_subscription_id?: string | null
+          plan_id?: string | null
+          status?: string
+          updated_at?: string
+          user_email?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_test_sessions: {
         Row: {
