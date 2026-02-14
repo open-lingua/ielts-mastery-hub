@@ -392,6 +392,7 @@ export type Database = {
           attempt_number: number
           completed_at: string | null
           created_at: string
+          feedback_data: Json | null
           id: string
           last_active_at: string
           progress_percent: number
@@ -407,6 +408,7 @@ export type Database = {
           attempt_number?: number
           completed_at?: string | null
           created_at?: string
+          feedback_data?: Json | null
           id?: string
           last_active_at?: string
           progress_percent?: number
@@ -422,6 +424,7 @@ export type Database = {
           attempt_number?: number
           completed_at?: string | null
           created_at?: string
+          feedback_data?: Json | null
           id?: string
           last_active_at?: string
           progress_percent?: number

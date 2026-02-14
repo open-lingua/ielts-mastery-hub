@@ -25,10 +25,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
+import WritingGradingLoader from "@/components/writing/WritingGradingLoader";
+import WritingResultsDashboard from "@/components/writing/WritingResultsDashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
+import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -38,27 +41,16 @@ interface TaskDraft {
   wordCount: number;
 }
 
-interface Scores {
-  overall: string;
-  task: string;
-  coherence: string;
-  lexical: string;
-  grammar: string;
-  feedback: string;
+// AI grading results
+interface GradingResults {
+  task1: WritingGradingResult;
+  task2: WritingGradingResult;
+  overallBand: number;
 }
 
 // ─── Score Card ──────────────────────────────────────────────────────
 
-const ScoreCard: React.FC<{ label: string; score: string; colorClass: string; bgClass: string }> = ({
-  label, score, colorClass, bgClass,
-}) => (
-  <div className={`rounded-xl p-3 ${bgClass} border border-border transition-all hover:shadow-sm`}>
-    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-tight">{label}</span>
-    <div className={`mt-1 text-xl font-bold ${colorClass}`}>{score}</div>
-  </div>
-);
-
-// ─── Image Viewer ────────────────────────────────────────────────────
+// (ScoreCard removed — replaced by WritingResultsDashboard)
 
 const ImageViewer: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
   const [zoomed, setZoomed] = useState(false);
@@ -171,7 +163,8 @@ const WritingSimulator: React.FC = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [scores, setScores] = useState<Scores>({ overall: "0", task: "0", coherence: "0", lexical: "0", grammar: "0", feedback: "" });
+  const [isGrading, setIsGrading] = useState(false);
+  const [gradingResults, setGradingResults] = useState<GradingResults | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -262,69 +255,61 @@ const WritingSimulator: React.FC = () => {
   const getWordCountColor = (wc: number, min: number) =>
     wc >= min ? "text-success" : wc > 0 ? "text-warning" : "text-muted-foreground";
 
-  const persistSubmission = useCallback(async () => {
-    if (!sessionId) return;
+  const runAIGrading = useCallback(async () => {
+    if (!sessionId || !tasks[0] || !tasks[1]) return;
+    setIsGrading(true);
     try {
+      // Persist raw answers first
       await submitWritingTest(sessionId, {
         task1: drafts[0].text,
         task2: drafts[1].text,
         task1WordCount: drafts[0].wordCount,
         task2WordCount: drafts[1].wordCount,
       });
-      toast.success("Your writing test has been submitted successfully.");
+
+      // Call AI grading
+      const results = await gradeWritingTest([
+        { taskType: "task1", prompt: tasks[0].prompt, userResponse: drafts[0].text },
+        { taskType: "task2", prompt: tasks[1].prompt, userResponse: drafts[1].text },
+      ]);
+
+      setGradingResults(results);
+
+      // Persist feedback
+      await persistFeedback(sessionId, results.overallBand, {
+        task1: results.task1,
+        task2: results.task2,
+        overallBand: results.overallBand,
+      });
+
+      toast.success("Your writing has been graded by AI.");
     } catch (err) {
-      console.error("Failed to persist writing submission:", err);
-      toast.error("Failed to save your submission. Your work is saved locally.");
+      console.error("AI grading failed:", err);
+      toast.error("AI grading failed. Your work has been saved.");
+    } finally {
+      setIsGrading(false);
+      setShowResults(true);
+      localStorage.removeItem(`ielts_writing_drafts_${testId}`);
     }
-  }, [sessionId, drafts]);
+  }, [sessionId, drafts, tasks, testId]);
 
   const handleTimeUp = useCallback(() => {
-    if (showResults) return;
+    if (showResults || isGrading) return;
     setAutoSubmitted(true);
     setIsActive(false);
-    const totalWords = drafts[0].wordCount + drafts[1].wordCount;
-    const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
-    const rand = () => Math.random() * 1.0 - 0.5;
-    setScores({
-      overall: (base + 0.5).toFixed(1),
-      task: (base + rand()).toFixed(1),
-      coherence: (base + 0.5 + rand()).toFixed(1),
-      lexical: (base + 1.0 + rand()).toFixed(1),
-      grammar: (base + rand()).toFixed(1),
-      feedback: "Time expired. Your essays have been automatically submitted for evaluation.",
-    });
-    setShowResults(true);
-    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
-    persistSubmission();
-  }, [showResults, drafts, testId, persistSubmission]);
+    runAIGrading();
+  }, [showResults, isGrading, runAIGrading]);
 
   const handleSubmit = () => {
     if (!currentTask) return;
     setIsActive(false);
-    const totalWords = drafts[0].wordCount + drafts[1].wordCount;
-    const base = totalWords > 400 ? 7.0 : totalWords > 200 ? 6.0 : 5.0;
-    const rand = () => Math.random() * 1.0 - 0.5;
-    const t1Min = tasks[0]?.minWords ?? 150;
-    const t2Min = tasks[1]?.minWords ?? 250;
-    setScores({
-      overall: (base + 0.5).toFixed(1),
-      task: (base + rand()).toFixed(1),
-      coherence: (base + 0.5 + rand()).toFixed(1),
-      lexical: (base + 1.0 + rand()).toFixed(1),
-      grammar: (base + rand()).toFixed(1),
-      feedback:
-        drafts[0].wordCount < t1Min || drafts[1].wordCount < t2Min
-          ? "One or both tasks are under the minimum word count. Task Achievement may be affected. Focus on developing your ideas more fully."
-          : "Good job meeting the word requirements for both tasks. To improve, focus on varied sentence structures and precise vocabulary.",
-    });
-    setShowResults(true);
-    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
-    persistSubmission();
+    runAIGrading();
   };
 
   const handleReset = () => {
     setShowResults(false);
     setAutoSubmitted(false);
+    setGradingResults(null);
     setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
     setActiveTask(0);
     setIsActive(false);
@@ -592,58 +577,36 @@ const WritingSimulator: React.FC = () => {
         </TestStartOverlay>
       </div>
 
-      {/* ─── Results Modal ─── */}
-      {showResults && (
+      {/* ─── AI Grading Loader ─── */}
+      {isGrading && <WritingGradingLoader />}
+
+      {/* ─── AI Results Dashboard ─── */}
+      {showResults && gradingResults && (
+        <WritingResultsDashboard
+          task1={gradingResults.task1}
+          task2={gradingResults.task2}
+          overallBand={gradingResults.overallBand}
+          task1WordCount={drafts[0].wordCount}
+          task2WordCount={drafts[1].wordCount}
+          task1MinWords={tasks[0]?.minWords ?? 150}
+          task2MinWords={tasks[1]?.minWords ?? 250}
+          testTitle={testData.title}
+          onClose={() => setShowResults(false)}
+          onBackToLibrary={() => navigate("/tests")}
+          onReset={handleReset}
+        />
+      )}
+
+      {/* Fallback results (no AI result) */}
+      {showResults && !gradingResults && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-2xl bg-card shadow-2xl overflow-hidden border border-border">
-            <div className="bg-primary p-6 flex justify-between items-start text-primary-foreground">
-              <div>
-                <h2 className="text-2xl font-bold">Writing Summary</h2>
-                <p className="text-primary-foreground/70 text-sm mt-1">{testData.title} · AI Assessment</p>
-              </div>
-              <button onClick={() => setShowResults(false)} className="rounded-full bg-primary-foreground/10 p-2 hover:bg-primary-foreground/20 transition-colors">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-6 md:p-8">
-              <div className="flex gap-3 mb-6">
-                {tasks.map((task, idx) => (
-                  <div key={task.id} className="flex-1 rounded-xl border border-border bg-secondary/50 p-4">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase">Task {idx + 1}</span>
-                    <div className={`text-2xl font-bold mt-1 ${getWordCountColor(drafts[idx].wordCount, task.minWords)}`}>
-                      {drafts[idx].wordCount} <span className="text-sm font-normal text-muted-foreground">/ {task.minWords}+ words</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
-                <div className="relative h-28 w-28 shrink-0">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray={`${(parseFloat(scores.overall) / 9) * 100}, 100`} />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-3xl font-bold text-foreground">{scores.overall}</span>
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Band</span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 w-full">
-                  <ScoreCard label="Task Achievement" score={scores.task} colorClass="text-success" bgClass="bg-success/5" />
-                  <ScoreCard label="Coherence & Cohesion" score={scores.coherence} colorClass="text-primary" bgClass="bg-primary/5" />
-                  <ScoreCard label="Lexical Resource" score={scores.lexical} colorClass="text-foreground" bgClass="bg-secondary" />
-                  <ScoreCard label="Grammatical Range" score={scores.grammar} colorClass="text-warning" bgClass="bg-warning/5" />
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-secondary p-5 border border-border">
-                <h3 className="flex items-center text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
-                  <AlertCircle className="h-4 w-4 mr-2 text-primary" /> AI Feedback
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{scores.feedback}</p>
-              </div>
-            </div>
-            <div className="border-t border-border bg-secondary/50 p-4 flex justify-end gap-3">
+          <div className="w-full max-w-md rounded-2xl bg-card shadow-2xl overflow-hidden border border-border p-8 text-center space-y-4">
+            <AlertTriangle className="h-10 w-10 text-warning mx-auto" />
+            <h2 className="text-xl font-bold text-foreground">Test Submitted</h2>
+            <p className="text-sm text-muted-foreground">
+              Your answers have been saved but AI grading was unavailable. You can review your essays or return to the library.
+            </p>
+            <div className="flex justify-center gap-3 pt-2">
               <button onClick={() => navigate("/tests")} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 ← Practice Library
               </button>
