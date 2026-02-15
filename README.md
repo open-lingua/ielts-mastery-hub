@@ -12,6 +12,8 @@
 
 ---
 
+> **DISCLAIMER:** This platform is intended strictly for educational purposes. It provides students with a simulated environment to practice and improve their performance in the IELTS exam.
+
 ## 🧬 MISSION ABSTRACT
 
 **PROJECT DESIGNATION:** IELTS-MH (IELTS Mastery Hub)  
