@@ -13,6 +13,7 @@ import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import ExamSandbox from "@/components/shared/ExamSandbox";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
@@ -366,7 +367,8 @@ const ReadingModule: React.FC = () => {
 
             {/* Main Split Content */}
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-              <div ref={passagePaneRef} className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card">
+              <ExamSandbox enabled={isStarted && !submitted} className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card">
+              <div ref={passagePaneRef} className="h-full overflow-y-auto">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activePassage}
@@ -389,6 +391,7 @@ const ReadingModule: React.FC = () => {
                   </motion.div>
                 </AnimatePresence>
               </div>
+              </ExamSandbox>
 
               <div className="w-full md:w-[460px] lg:w-[520px] flex flex-col shrink-0 bg-background">
                 <div className="sticky top-0 z-10 bg-background border-b border-border px-5 py-3">
