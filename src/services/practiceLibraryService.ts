@@ -141,10 +141,10 @@ export async function fetchExistingSession(
   userId: string,
   testId: string,
   testType: TestModule
-): Promise<TestSessionInfo | null> {
+): Promise<(TestSessionInfo & { answers?: Record<string, unknown> | null }) | null> {
   const { data, error } = await supabase
     .from("user_test_sessions")
-    .select("id, started_at, status, progress_percent, score_band, attempt_number")
+    .select("id, started_at, status, progress_percent, score_band, attempt_number, answers")
     .eq("user_id", userId)
     .eq("test_id", testId)
     .eq("test_type", testType)
@@ -153,7 +153,7 @@ export async function fetchExistingSession(
     .maybeSingle();
 
   if (error) throw error;
-  return data as TestSessionInfo | null;
+  return data as (TestSessionInfo & { answers?: Record<string, unknown> | null }) | null;
 }
 
 export interface ActiveSessionInfo {
