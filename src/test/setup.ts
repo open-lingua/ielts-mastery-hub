@@ -13,3 +13,12 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => {},
   }),
 });
+
+// Radix UI primitives need ResizeObserver and scrollIntoView in jsdom
+window.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
+Element.prototype.scrollIntoView = () => {};
