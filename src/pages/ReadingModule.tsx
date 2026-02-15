@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
 
 // ─── Loading Skeleton ────────────────────────────────
 const ReadingLoadingSkeleton: React.FC = () => (
@@ -123,6 +124,10 @@ const ReadingModule: React.FC = () => {
               setStartedAt(session.started_at);
               setSessionId(session.id);
               setIsStarted(true);
+              // Restore saved answers
+              if (session.answers && typeof session.answers === "object") {
+                setAnswers(session.answers as Answers);
+              }
             }
           }
         }
@@ -168,6 +173,13 @@ const ReadingModule: React.FC = () => {
     startedAt,
     onTimeUp: handleTimeUp,
     isFinished: submitted,
+  });
+
+  // Auto-save answers to DB
+  useAutoSaveAnswers({
+    sessionId,
+    answers,
+    enabled: isStarted && !submitted,
   });
 
   const handleAnswer = useCallback((key: string, value: string) => {
