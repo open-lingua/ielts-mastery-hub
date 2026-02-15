@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
 import type { ListeningTest } from "@/data/listeningTestData";
 import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
@@ -136,6 +137,10 @@ const ListeningModule: React.FC = () => {
               setStartedAt(session.started_at);
               setSessionId(session.id);
               setIsStarted(true);
+              // Restore saved answers
+              if (session.answers && typeof session.answers === "object") {
+                setAnswers(session.answers as Record<string, string>);
+              }
             }
           }
         }
@@ -262,6 +267,13 @@ const ListeningModule: React.FC = () => {
     startedAt,
     onTimeUp: handleTimeUp,
     isFinished: testFinished,
+  });
+
+  // Auto-save answers to DB
+  useAutoSaveAnswers({
+    sessionId,
+    answers,
+    enabled: isStarted && !testFinished,
   });
 
   if (!testId) return null;
