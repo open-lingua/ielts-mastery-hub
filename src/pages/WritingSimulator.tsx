@@ -33,6 +33,7 @@ import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -198,6 +199,21 @@ const WritingSimulator: React.FC = () => {
               setStartedAt(session.started_at);
               setSessionId(session.id);
               setIsStarted(true);
+              // Restore saved drafts from DB
+              if (session.answers && typeof session.answers === "object") {
+                const saved = session.answers as Record<string, unknown>;
+                const countWords = (t: string) => t.trim().split(/\s+/).filter((w) => w.length > 0).length;
+                setDrafts([
+                  {
+                    text: (saved.task1 as string) || "",
+                    wordCount: countWords((saved.task1 as string) || ""),
+                  },
+                  {
+                    text: (saved.task2 as string) || "",
+                    wordCount: countWords((saved.task2 as string) || ""),
+                  },
+                ]);
+              }
             }
           }
         }
@@ -345,6 +361,17 @@ const WritingSimulator: React.FC = () => {
     startedAt,
     onTimeUp: handleTimeUp,
     isFinished: showResults,
+  });
+
+  // Auto-save writing drafts to DB
+  const writingAnswers = React.useMemo(
+    () => ({ task1: drafts[0].text, task2: drafts[1].text }),
+    [drafts]
+  );
+  useAutoSaveAnswers({
+    sessionId,
+    answers: writingAnswers,
+    enabled: isStarted && !showResults && !isGrading,
   });
 
   const bothAttempted = drafts[0].wordCount > 0 && drafts[1].wordCount > 0;
