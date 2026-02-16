@@ -69,6 +69,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate taskType
+    if (taskType !== "task1" && taskType !== "task2") {
+      return new Response(
+        JSON.stringify({ error: "taskType must be 'task1' or 'task2'" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate input lengths (prevent cost abuse)
+    const MAX_RESPONSE_LENGTH = 10000; // ~2000 words
+    const MAX_PROMPT_LENGTH = 5000;
+    if (typeof userResponse !== "string" || userResponse.length > MAX_RESPONSE_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `userResponse must be a string under ${MAX_RESPONSE_LENGTH} characters` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (typeof taskPrompt !== "string" || taskPrompt.length > MAX_PROMPT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `prompt must be a string under ${MAX_PROMPT_LENGTH} characters` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {

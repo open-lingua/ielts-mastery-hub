@@ -18,7 +18,12 @@ async function verifySignature(payload: string, signature: string, secret: strin
   const computedSignature = Array.from(new Uint8Array(signatureBytes))
     .map(b => b.toString(16).padStart(2, '0'))
     .join('')
-  return computedSignature === signature
+
+  // Use constant-time comparison to prevent timing attacks
+  if (computedSignature.length !== signature.length) return false
+  const a = new TextEncoder().encode(computedSignature)
+  const b = new TextEncoder().encode(signature)
+  return crypto.subtle.timingSafeEqual(a, b)
 }
 
 Deno.serve(async (req) => {
