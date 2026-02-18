@@ -15,7 +15,7 @@ TRUNCATE TABLE listening_questions, listening_question_groups, listening_section
 TRUNCATE TABLE reading_questions, reading_question_groups, reading_passages, reading_tests CASCADE;
 
 -- Placeholder author
-DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM auth.users WHERE id = '00000000-0000-0000-0000-000000000001') THEN
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM auth.users WHERE id = 'fe38ed89-f1fe-4b88-9609-8736be47f61e') THEN
   NULL;
 END IF; END $$;
 
@@ -25,7 +25,7 @@ END IF; END $$;
 -- ████████████████████████████████████████████████████████████████
 
 INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duration, status) VALUES
-('a1000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
+('c574e32b-ddec-402d-9fbf-772f4c92dce8', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
  'IELTS Academic Reading Practice Test 1', 'Academic', '7', '60 mins', 'published');
 
 
@@ -34,7 +34,7 @@ INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duratio
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 1,
+('5e4a4573-84f0-43ed-bd6b-495d8176884a', 'c574e32b-ddec-402d-9fbf-772f4c92dce8', 1,
  'The Evolution of the Bicycle',
  '(A) The bicycle is one of the most successful human-powered means of transport ever devised. Its origins can be traced to the early nineteenth century, when a German inventor named Karl von Drais created the "Laufmaschine" (running machine) in 1817. This device, also known as a draisine, consisted of two wheels connected by a wooden frame, with a handlebar for steering. The rider sat astride the frame and propelled the machine by pushing against the ground with alternating feet — there were no pedals. Despite its simplicity, the draisine proved popular among European aristocrats as a novel form of recreation.
 
@@ -51,70 +51,70 @@ INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUE
 
 -- ── Group 1: TRUE/FALSE/NOT GIVEN (Q1–3) ──────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000001', 'b1100000-0000-0000-0000-000000000001', 1,
+('85ccb4be-900f-435e-a3cb-394e4b108b3b', '5e4a4573-84f0-43ed-bd6b-495d8176884a', 1,
  'true-false-not-given', 'Do the following statements agree with the information given in the passage? Write TRUE, FALSE, or NOT GIVEN.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000001', 'c1100000-0000-0000-0000-000000000001', 1,
+('5275dbd9-5b38-4171-9821-7c6942bfa612', '85ccb4be-900f-435e-a3cb-394e4b108b3b', 1,
  'Karl von Drais''s original machine included pedals for propulsion.', 'FALSE', '["FALSE","False","false"]'::jsonb),
-('d1100000-0000-0000-0000-000000000002', 'c1100000-0000-0000-0000-000000000001', 2,
+('3fe008ba-5768-4c71-ad62-0eef504499d1', '85ccb4be-900f-435e-a3cb-394e4b108b3b', 2,
  'The penny-farthing was safer to ride than earlier bicycle designs.', 'FALSE', '["FALSE","False","false"]'::jsonb),
-('d1100000-0000-0000-0000-000000000003', 'c1100000-0000-0000-0000-000000000001', 3,
+('ab7a787b-c39a-4186-b8ea-34cdcdb0fe1e', '85ccb4be-900f-435e-a3cb-394e4b108b3b', 3,
  'John Boyd Dunlop was a colleague of John Kemp Starley.', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'::jsonb);
 
 
 -- ── Group 2: SHORT ANSWER (Q4–6) ─────────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000002', 'b1100000-0000-0000-0000-000000000001', 2,
+('1e149b5f-71fb-426c-ae37-40129c54f125', '5e4a4573-84f0-43ed-bd6b-495d8176884a', 2,
  'short-answer', 'Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.', true, '3');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000004', 'c1100000-0000-0000-0000-000000000002', 4,
+('5bf4fdb8-1340-4ef4-b1b5-5baf79a4ef74', '1e149b5f-71fb-426c-ae37-40129c54f125', 4,
  'What was the other name for the draisine?', 'running machine', '[{"id":"1","text":"running machine"},{"id":"2","text":"Laufmaschine"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000005', 'c1100000-0000-0000-0000-000000000002', 5,
+('d3b7b440-6f44-4ad2-bfb5-7047cea3a83f', '1e149b5f-71fb-426c-ae37-40129c54f125', 5,
  'In which English city was the safety bicycle developed?', 'Coventry', '[{"id":"1","text":"Coventry"},{"id":"2","text":"coventry"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000006', 'c1100000-0000-0000-0000-000000000002', 6,
+('1c7d0bdf-f4b1-49cb-9bea-de6f2b4fdb2c', '1e149b5f-71fb-426c-ae37-40129c54f125', 6,
  'How many bicycles are estimated to be in use worldwide today?', 'one billion', '[{"id":"1","text":"one billion"},{"id":"2","text":"1 billion"}]'::jsonb);
 
 
 -- ── Group 3: SENTENCE COMPLETION (Q7–8) ───────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000003', 'b1100000-0000-0000-0000-000000000001', 3,
+('78e93d83-7920-4476-9a15-04e698d8befc', '5e4a4573-84f0-43ed-bd6b-495d8176884a', 3,
  'sentence-completion', 'Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.', true, '2');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000007', 'c1100000-0000-0000-0000-000000000003', 7,
+('a62ac865-8a6b-41f7-876f-08f154a13954', '78e93d83-7920-4476-9a15-04e698d8befc', 7,
  'The velocipede was nicknamed the {{gap}} because of its uncomfortable ride.', 'boneshaker', '[{"id":"1","text":"boneshaker"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000008', 'c1100000-0000-0000-0000-000000000003', 8,
+('9113e59a-71f0-4421-9d2b-02dace46e1cf', '78e93d83-7920-4476-9a15-04e698d8befc', 8,
  'Susan B. Anthony said the bicycle helped to {{gap}} women.', 'emancipate', '[{"id":"1","text":"emancipate"}]'::jsonb);
 
 
 -- ── Group 4: TABLE COMPLETION (Q9–11) ─────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000004', 'b1100000-0000-0000-0000-000000000001', 4,
+('98ead4d1-787b-4dab-804a-ed80fd6e9aba', '5e4a4573-84f0-43ed-bd6b-495d8176884a', 4,
  'table-completion', 'Complete the table below. Choose NO MORE THAN TWO WORDS from the passage for each answer.', true, '2');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, completion_gaps) VALUES
-('d1100000-0000-0000-0000-000000000009', 'c1100000-0000-0000-0000-000000000004', 9,
+('fea07731-73c7-405f-a473-aa3ce408dc9a', '98ead4d1-787b-4dab-804a-ed80fd6e9aba', 9,
  'Row 1', '',
  '[{"id":"h1","gapText":"Era","answer":""},{"id":"h2","gapText":"Innovation","answer":""},{"id":"h3","gapText":"Key Feature","answer":""}]'::jsonb),
-('d1100000-0000-0000-0000-000000000010', 'c1100000-0000-0000-0000-000000000004', 10,
+('22ac46b6-008f-4810-86c5-889e9ee09a05', '98ead4d1-787b-4dab-804a-ed80fd6e9aba', 10,
  'Row 2', '',
  '[{"id":"c1","gapText":"1817","answer":""},{"id":"c2","gapText":"Draisine","answer":""},{"id":"c3","gapText":"","answer":"wooden frame"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000011', 'c1100000-0000-0000-0000-000000000004', 11,
+('c70d827f-f3dd-4986-959d-50c50b3f9361', '98ead4d1-787b-4dab-804a-ed80fd6e9aba', 11,
  'Row 3', '',
  '[{"id":"c4","gapText":"1860s","answer":""},{"id":"c5","gapText":"","answer":"velocipede"},{"id":"c6","gapText":"cranks and pedals","answer":""}]'::jsonb);
 
 
 -- ── Group 5: NOTE COMPLETION (Q12–13) ─────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000005', 'b1100000-0000-0000-0000-000000000001', 5,
+('3111ccb8-7fc4-419b-b2ee-60b0ec988384', '5e4a4573-84f0-43ed-bd6b-495d8176884a', 5,
  'note-completion', 'Complete the notes below. Choose NO MORE THAN TWO WORDS from the passage for each answer.', true, '2');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000012', 'c1100000-0000-0000-0000-000000000005', 12,
+('e3fe23fb-0e6a-40bd-95c2-3bad243dea4e', '3111ccb8-7fc4-419b-b2ee-60b0ec988384', 12,
  'The penny-farthing''s front wheel could be up to {{gap}} in diameter.', '1.5 metres', '[{"id":"1","text":"1.5 metres"},{"id":"2","text":"1.5 meters"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000013', 'c1100000-0000-0000-0000-000000000005', 13,
+('0ea44d62-6906-476a-b31a-4924c5872b88', '3111ccb8-7fc4-419b-b2ee-60b0ec988384', 13,
  'In the Netherlands and Denmark, bicycles account for over {{gap}} of urban trips.', '25 percent', '[{"id":"1","text":"25 percent"},{"id":"2","text":"25%"}]'::jsonb);
 
 
@@ -123,7 +123,7 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, accep
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001', 2,
+('501a1d6f-ece1-4fcc-89c6-18ae4b94ef89', 'c574e32b-ddec-402d-9fbf-772f4c92dce8', 2,
  'The Impact of Artificial Intelligence on Workspaces',
  '(A) Artificial intelligence is transforming the modern workplace at an unprecedented pace. From automated customer-service chatbots to sophisticated data-analysis platforms, AI technologies are being integrated into virtually every industry. A 2024 survey by McKinsey Global Institute found that 72 percent of companies had adopted at least one AI capability, up from 55 percent just two years earlier. This rapid adoption has sparked both enthusiasm about productivity gains and anxiety about potential job displacement.
 
@@ -140,52 +140,52 @@ INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUE
 
 -- ── Group 6: MATCHING HEADINGS (Q14–17) ───────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c1100000-0000-0000-0000-000000000006', 'b1100000-0000-0000-0000-000000000002', 1,
+('bb43b38f-b448-46c5-b0a1-ea8d0148de54', '501a1d6f-ece1-4fcc-89c6-18ae4b94ef89', 1,
  'matching-headings', 'The reading passage has six paragraphs, A–F. Choose the correct heading for paragraphs B, C, D and E from the list of headings below.', true,
  true, '["i. The automation of routine work","ii. Regulation and ethical concerns","iii. A balanced view of AI and jobs","iv. Investing in workforce adaptation","v. New roles born from technology","vi. The global spread of AI adoption"]'::jsonb);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000014', 'c1100000-0000-0000-0000-000000000006', 14, 'B', 'i'),
-('d1100000-0000-0000-0000-000000000015', 'c1100000-0000-0000-0000-000000000006', 15, 'C', 'iii'),
-('d1100000-0000-0000-0000-000000000016', 'c1100000-0000-0000-0000-000000000006', 16, 'D', 'v'),
-('d1100000-0000-0000-0000-000000000017', 'c1100000-0000-0000-0000-000000000006', 17, 'E', 'iv');
+('9bfe4d52-185f-477a-9c36-7b4551ed0657', 'bb43b38f-b448-46c5-b0a1-ea8d0148de54', 14, 'B', 'i'),
+('d46fec97-2894-4ae3-8dba-5583828f217f', 'bb43b38f-b448-46c5-b0a1-ea8d0148de54', 15, 'C', 'iii'),
+('f56c9109-f2b3-4fa2-890c-328ab9a8d6cd', 'bb43b38f-b448-46c5-b0a1-ea8d0148de54', 16, 'D', 'v'),
+('b78102bd-8f2e-4527-998a-6b760509e612', 'bb43b38f-b448-46c5-b0a1-ea8d0148de54', 17, 'E', 'iv');
 
 
 -- ── Group 7: MATCHING INFORMATION (Q18–21) ────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000007', 'b1100000-0000-0000-0000-000000000002', 2,
+('d4d9f1c2-d8c3-4f50-87b5-6c6317c1beb8', '501a1d6f-ece1-4fcc-89c6-18ae4b94ef89', 2,
  'matching-information', 'Which paragraph contains the following information? Write the correct letter, A–F.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, matching_pairs) VALUES
-('d1100000-0000-0000-0000-000000000018', 'c1100000-0000-0000-0000-000000000007', 18,
+('dba737f1-4c4e-4c1a-9b89-4bf0206e481a', 'd4d9f1c2-d8c3-4f50-87b5-6c6317c1beb8', 18,
  'A prediction about machines performing more work than humans', 'B',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000019', 'c1100000-0000-0000-0000-000000000007', 19,
+('8f939d09-5dd3-4edd-a43b-7adee781f47f', 'd4d9f1c2-d8c3-4f50-87b5-6c6317c1beb8', 19,
  'An example of how AI and humans can work together in healthcare', 'C',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000020', 'c1100000-0000-0000-0000-000000000007', 20,
+('017dc069-0dd4-4759-a0df-533143c8c00c', 'd4d9f1c2-d8c3-4f50-87b5-6c6317c1beb8', 20,
  'Reference to a specific piece of AI legislation', 'F',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000021', 'c1100000-0000-0000-0000-000000000007', 21,
+('68297aeb-57ec-45b3-a9ce-4db9b0a66f87', 'd4d9f1c2-d8c3-4f50-87b5-6c6317c1beb8', 21,
  'A historical comparison between AI and previous technological changes', 'D',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'::jsonb);
 
 
 -- ── Group 8: MULTIPLE CHOICE (Q22–24) ─────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000008', 'b1100000-0000-0000-0000-000000000002', 3,
+('ac239171-43c7-461b-a223-aaeb2bca699c', '501a1d6f-ece1-4fcc-89c6-18ae4b94ef89', 3,
  'multiple-choice', 'Choose the correct letter, A, B, C or D.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('d1100000-0000-0000-0000-000000000022', 'c1100000-0000-0000-0000-000000000008', 22,
+('8394783a-53f1-4731-8272-493fe098404e', 'ac239171-43c7-461b-a223-aaeb2bca699c', 22,
  'According to the passage, AI is LEAST effective at tasks that require',
  'B',
  '[{"id":"A","text":"A. processing large datasets","isCorrect":false},{"id":"B","text":"B. creativity and empathy","isCorrect":true},{"id":"C","text":"C. following established rules","isCorrect":false},{"id":"D","text":"D. repetitive quality checks","isCorrect":false}]'::jsonb),
-('d1100000-0000-0000-0000-000000000023', 'c1100000-0000-0000-0000-000000000008', 23,
+('c775af6b-826f-44ac-a891-d07e3537328c', 'ac239171-43c7-461b-a223-aaeb2bca699c', 23,
  'Dr. Elena Vasquez describes the ideal AI-workplace relationship as',
  'C',
  '[{"id":"A","text":"A. full automation of all tasks","isCorrect":false},{"id":"B","text":"B. a temporary transition phase","isCorrect":false},{"id":"C","text":"C. a collaboration model","isCorrect":true},{"id":"D","text":"D. a replacement strategy","isCorrect":false}]'::jsonb),
-('d1100000-0000-0000-0000-000000000024', 'c1100000-0000-0000-0000-000000000008', 24,
+('e1199203-bc9f-4788-b6a7-82490af87c5d', 'ac239171-43c7-461b-a223-aaeb2bca699c', 24,
  'The McKinsey survey found that AI adoption among companies',
  'A',
  '[{"id":"A","text":"A. increased significantly over a two-year period","isCorrect":true},{"id":"B","text":"B. remained stable since 2020","isCorrect":false},{"id":"C","text":"C. was concentrated in manufacturing only","isCorrect":false},{"id":"D","text":"D. declined due to regulatory concerns","isCorrect":false}]'::jsonb);
@@ -193,15 +193,15 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, optio
 
 -- ── Group 9: FLOWCHART COMPLETION (Q25–27) ────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000009', 'b1100000-0000-0000-0000-000000000002', 4,
+('cb704b3c-20f5-4c77-94af-273b8d9a3d27', '501a1d6f-ece1-4fcc-89c6-18ae4b94ef89', 4,
  'flowchart-completion', 'Complete the flowchart below. Choose NO MORE THAN TWO WORDS from the passage for each answer.', true, '2');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000025', 'c1100000-0000-0000-0000-000000000009', 25,
+('b4f493aa-4f30-44f1-8272-cf2b6a8a630f', 'cb704b3c-20f5-4c77-94af-273b8d9a3d27', 25,
  'AI systems handle {{gap}} tasks in manufacturing and services', 'routine'),
-('d1100000-0000-0000-0000-000000000026', 'c1100000-0000-0000-0000-000000000009', 26,
+('b458fcea-a71d-4c45-b792-d0374fdf090d', 'cb704b3c-20f5-4c77-94af-273b8d9a3d27', 26,
  'This leads to concerns about {{gap}} for affected workers', 'job displacement'),
-('d1100000-0000-0000-0000-000000000027', 'c1100000-0000-0000-0000-000000000009', 27,
+('8d154a74-4e71-4d3e-85b9-722d2eee8c58', 'cb704b3c-20f5-4c77-94af-273b8d9a3d27', 27,
  'Companies respond by investing in {{gap}} programmes', 'reskilling');
 
 
@@ -210,7 +210,7 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUE
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001', 3,
+('c9d1c541-9b45-431c-bebb-73170ef4d5aa', 'c574e32b-ddec-402d-9fbf-772f4c92dce8', 3,
  'The Psychology of Consumer Behaviour',
  '(A) Why do people buy what they buy? This seemingly simple question has occupied researchers in psychology, economics, and marketing for over a century. Consumer behaviour — the study of how individuals make decisions about what to purchase, use, and discard — sits at the intersection of multiple academic disciplines and has profound implications for businesses, policymakers, and society at large.
 
@@ -227,50 +227,50 @@ INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUE
 
 -- ── Group 10: YES/NO/NOT GIVEN (Q28–31) ───────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000010', 'b1100000-0000-0000-0000-000000000003', 1,
+('85ecae3f-c150-410b-9bed-b41364fc4bdf', 'c9d1c541-9b45-431c-bebb-73170ef4d5aa', 1,
  'yes-no-not-given', 'Do the following statements agree with the claims of the writer? Write YES, NO, or NOT GIVEN.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000028', 'c1100000-0000-0000-0000-000000000010', 28,
+('52d374a9-955d-44ff-964f-cd119458f219', '85ecae3f-c150-410b-9bed-b41364fc4bdf', 28,
  'Consumers always follow Maslow''s hierarchy when making purchases.', 'NO', '["NO","No","no"]'::jsonb),
-('d1100000-0000-0000-0000-000000000029', 'c1100000-0000-0000-0000-000000000010', 29,
+('5f6b02f7-05c0-454d-bec0-6bde8634d6af', '85ecae3f-c150-410b-9bed-b41364fc4bdf', 29,
  'Having more options available makes it easier for consumers to decide.', 'NO', '["NO","No","no"]'::jsonb),
-('d1100000-0000-0000-0000-000000000030', 'c1100000-0000-0000-0000-000000000010', 30,
+('2d98e398-a5a7-4dbc-beda-5a28679547a1', '85ecae3f-c150-410b-9bed-b41364fc4bdf', 30,
  'Social media influencer marketing has declined in effectiveness recently.', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'::jsonb),
-('d1100000-0000-0000-0000-000000000031', 'c1100000-0000-0000-0000-000000000010', 31,
+('d5cb8f89-fdae-403c-af6b-3b242cc942c6', '85ecae3f-c150-410b-9bed-b41364fc4bdf', 31,
  'Neuromarketing research has been banned in some countries.', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'::jsonb);
 
 
 -- ── Group 11: MATCHING FEATURES (Q32–34) ──────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c1100000-0000-0000-0000-000000000011', 'b1100000-0000-0000-0000-000000000003', 2,
+('5f885113-2766-45d6-84b2-1743984eb3a8', 'c9d1c541-9b45-431c-bebb-73170ef4d5aa', 2,
  'matching-features', 'Look at the following statements and the list of researchers below. Match each statement with the correct researcher, A, B or C.', true,
  true, '["A. Professor Sarah Chen","B. Dr. Robert Hartley","C. Dr. Maria Gonzalez"]'::jsonb);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000032', 'c1100000-0000-0000-0000-000000000011', 32,
+('0f077494-fb0b-4957-a2b4-77364b0ce0a1', '5f885113-2766-45d6-84b2-1743984eb3a8', 32,
  'Showed that an inferior third option can boost sales of a target product.', 'B. Dr. Robert Hartley'),
-('d1100000-0000-0000-0000-000000000033', 'c1100000-0000-0000-0000-000000000011', 33,
+('8f76a698-7bbf-4a27-9a8a-585c56d284d8', '5f885113-2766-45d6-84b2-1743984eb3a8', 33,
  'Found that consumers trust other consumers far more than brand messaging.', 'C. Dr. Maria Gonzalez'),
-('d1100000-0000-0000-0000-000000000034', 'c1100000-0000-0000-0000-000000000011', 34,
+('13ebd53e-a89e-452f-a92f-475736b6a59c', '5f885113-2766-45d6-84b2-1743984eb3a8', 34,
  'Argues that brand logos activate neural pathways related to personal identity.', 'A. Professor Sarah Chen');
 
 
 -- ── Group 12: MATCHING SENTENCE ENDINGS (Q35–37) ─────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000012', 'b1100000-0000-0000-0000-000000000003', 3,
+('17f55ea3-3a26-4540-a642-2799e169eaf7', 'c9d1c541-9b45-431c-bebb-73170ef4d5aa', 3,
  'matching-sentence-endings', 'Complete each sentence with the correct ending, A–E, from the box below.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('d1100000-0000-0000-0000-000000000035', 'c1100000-0000-0000-0000-000000000012', 35,
+('138cfaa3-9a99-4775-95a2-5c9f1cde59cc', '17f55ea3-3a26-4540-a642-2799e169eaf7', 35,
  'Herbert Simon argued that consumers do not evaluate all options but instead',
  'C',
  '[{"id":"A","text":"activate neural pathways associated with personal identity.","isCorrect":false},{"id":"B","text":"trust peer recommendations more than brand advertising.","isCorrect":false},{"id":"C","text":"settle for the first acceptable choice they find.","isCorrect":true},{"id":"D","text":"pay premium prices for emotionally appealing brands.","isCorrect":false},{"id":"E","text":"become paralysed when faced with too many options.","isCorrect":false}]'::jsonb),
-('d1100000-0000-0000-0000-000000000036', 'c1100000-0000-0000-0000-000000000012', 36,
+('0fecb879-6932-4b5a-ae91-42fa1ab15835', '17f55ea3-3a26-4540-a642-2799e169eaf7', 36,
  'According to the passage, the endowment effect explains why consumers',
  'D',
  '[{"id":"A","text":"activate neural pathways associated with personal identity.","isCorrect":false},{"id":"B","text":"trust peer recommendations more than brand advertising.","isCorrect":false},{"id":"C","text":"settle for the first acceptable choice they find.","isCorrect":false},{"id":"D","text":"value items more once they possess them.","isCorrect":true},{"id":"E","text":"become paralysed when faced with too many options.","isCorrect":false}]'::jsonb),
-('d1100000-0000-0000-0000-000000000037', 'c1100000-0000-0000-0000-000000000012', 37,
+('64f94f5f-7670-445e-982c-5d07e6c50292', '17f55ea3-3a26-4540-a642-2799e169eaf7', 37,
  'Research using brain imaging has shown that brand logos can',
  'A',
  '[{"id":"A","text":"activate neural pathways associated with personal identity.","isCorrect":true},{"id":"B","text":"trust peer recommendations more than brand advertising.","isCorrect":false},{"id":"C","text":"settle for the first acceptable choice they find.","isCorrect":false},{"id":"D","text":"value items more once they possess them.","isCorrect":false},{"id":"E","text":"become paralysed when faced with too many options.","isCorrect":false}]'::jsonb);
@@ -278,18 +278,18 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, optio
 
 -- ── Group 13: SUMMARY COMPLETION with Word Bank (Q38–40) ──
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit, has_word_bank, word_bank) VALUES
-('c1100000-0000-0000-0000-000000000013', 'b1100000-0000-0000-0000-000000000003', 4,
+('40d2a520-a742-412e-886f-d36cc3428d6f', 'c9d1c541-9b45-431c-bebb-73170ef4d5aa', 4,
  'summary-completion', 'Complete the summary below. Choose ONE WORD from the box for each answer.', true, '1',
  true, '["satisfice","anchoring","decoy","endowment","overload","bounded","manipulation"]'::jsonb);
 
 -- For SUMMARY_COMPLETION: first question text = summary template, all questions provide answers
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000038', 'c1100000-0000-0000-0000-000000000013', 38,
- 'Herbert Simon''s concept of {{gap_c1100000-0000-0000-0000-000000000013_0}} rationality explains that consumers do not fully optimise decisions. Instead, they {{gap_c1100000-0000-0000-0000-000000000013_1}} by choosing the first acceptable option. Retailers exploit the {{gap_c1100000-0000-0000-0000-000000000013_2}} effect by introducing an inferior option to steer buyers toward a target product.',
+('a2663d8a-0c07-4c46-8c2c-b35a9d9901b2', '40d2a520-a742-412e-886f-d36cc3428d6f', 38,
+ 'Herbert Simon''s concept of {{gap_40d2a520-a742-412e-886f-d36cc3428d6f_0}} rationality explains that consumers do not fully optimise decisions. Instead, they {{gap_40d2a520-a742-412e-886f-d36cc3428d6f_1}} by choosing the first acceptable option. Retailers exploit the {{gap_40d2a520-a742-412e-886f-d36cc3428d6f_2}} effect by introducing an inferior option to steer buyers toward a target product.',
  'bounded'),
-('d1100000-0000-0000-0000-000000000039', 'c1100000-0000-0000-0000-000000000013', 39,
+('5ca9cd91-5d12-4c6c-9352-81272e2d660a', '40d2a520-a742-412e-886f-d36cc3428d6f', 39,
  '', 'satisfice'),
-('d1100000-0000-0000-0000-000000000040', 'c1100000-0000-0000-0000-000000000013', 40,
+('65824d6e-01ef-481f-b8c6-514c9531fc16', '40d2a520-a742-412e-886f-d36cc3428d6f', 40,
  '', 'decoy');
 
 
@@ -298,12 +298,12 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUE
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO listening_tests (id, created_by, title, difficulty, duration, status) VALUES
-('a2000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
+('ac2b9026-21d2-4e09-8f7e-cac388435b16', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
  'IELTS Listening Practice Test 1', '7', '40 mins', 'published');
 
 -- ── Section 1: Hotel Booking ────────────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000001', 'a2000000-0000-0000-0000-000000000001', 1,
+('de9f3a2b-3e7c-45ae-9283-8851265aaf9e', 'ac2b9026-21d2-4e09-8f7e-cac388435b16', 1,
  'Hotel Booking Enquiry',
  'Receptionist: Good morning, Riverside Hotel. How can I help you?
 Caller: Hello, I''d like to book a room for next weekend, please.
@@ -325,63 +325,63 @@ Receptionist: Of course. The transfer service costs 45 pounds each way. Shall I 
 Caller: Just the one way for now, thanks.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000001', 'b2000000-0000-0000-0000-000000000001', 1,
+('1819acfa-9001-4fb2-bbfc-8f928a5e4931', 'de9f3a2b-3e7c-45ae-9283-8851265aaf9e', 1,
  'sentence-completion', 'Complete the booking form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d2000000-0000-0000-0000-000000000001', 'c2000000-0000-0000-0000-000000000001', 1,
+('626a5b8d-5cbe-413f-bf53-b4c29052cd1b', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 1,
  'Guest name: Margaret ________', 'Thornton', '["Thornton","thornton","THORNTON"]'::jsonb),
-('d2000000-0000-0000-0000-000000000002', 'c2000000-0000-0000-0000-000000000001', 2,
+('02c1f5a7-0ced-48f7-ba7f-724491c565c4', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 2,
  'Check-in date: ________ March', '14th', '["14th","14","14th of"]'::jsonb),
-('d2000000-0000-0000-0000-000000000003', 'c2000000-0000-0000-0000-000000000001', 3,
+('7396a667-1e19-4e06-ac0b-5826d96190c4', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 3,
  'Number of nights: ________', '3', '["3","three","Three"]'::jsonb),
-('d2000000-0000-0000-0000-000000000004', 'c2000000-0000-0000-0000-000000000001', 4,
+('1f547811-a08f-48de-9713-86c05b771821', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 4,
  'Room type: ________', 'standard', '["standard","Standard","standard room"]'::jsonb),
-('d2000000-0000-0000-0000-000000000005', 'c2000000-0000-0000-0000-000000000001', 5,
+('28bac9aa-4131-4a54-8911-c7b4f746890c', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 5,
  'Price per night: ________ pounds', '85', '["85","£85","85 pounds"]'::jsonb),
-('d2000000-0000-0000-0000-000000000006', 'c2000000-0000-0000-0000-000000000001', 6,
+('9937c8aa-5ddf-4480-a020-b068796ead65', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 6,
  'Phone number: ________', '07742 539 168', '["07742 539 168","07742539168"]'::jsonb),
-('d2000000-0000-0000-0000-000000000007', 'c2000000-0000-0000-0000-000000000001', 7,
+('17afa91d-cd70-460b-805f-e5f5cf980a9b', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 7,
  'Airport transfer from: ________', 'Heathrow', '["Heathrow","heathrow","HEATHROW"]'::jsonb),
-('d2000000-0000-0000-0000-000000000008', 'c2000000-0000-0000-0000-000000000001', 8,
+('86eb115b-bd2f-4c41-b586-967b24d01dd9', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 8,
  'Arrival time: ________', '2.30 pm', '["2.30 pm","2:30 pm","2.30","14:30"]'::jsonb),
-('d2000000-0000-0000-0000-000000000009', 'c2000000-0000-0000-0000-000000000001', 9,
+('50002e8f-701a-41bc-9751-a130966f604a', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 9,
  'Transfer cost (one way): ________ pounds', '45', '["45","£45","45 pounds"]'::jsonb),
-('d2000000-0000-0000-0000-000000000010', 'c2000000-0000-0000-0000-000000000001', 10,
+('a66bb0b3-0010-4920-93f8-cddb390166da', '1819acfa-9001-4fb2-bbfc-8f928a5e4931', 10,
  'Parking: ________', 'complimentary', '["complimentary","free","Complimentary","Free"]'::jsonb);
 
 -- ── Section 2: Museum Tour ──────────────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000002', 'a2000000-0000-0000-0000-000000000001', 2,
+('4a3cf26c-3824-48e2-b24f-e8f60263e2a8', 'ac2b9026-21d2-4e09-8f7e-cac388435b16', 2,
  'City Museum Guided Tour',
  'Guide: Welcome to the City Museum. The museum was originally built in 1856 as a private residence for the industrialist William Harding. It was converted into a public museum in 1923. The museum now houses over 15,000 artefacts across three floors.
 
 On the ground floor you''ll find the Natural History gallery and the Ancient Civilisations gallery. The first floor has the Art and Culture wing with a current exhibition of contemporary photography from South-East Asia. The second floor is dedicated to Science and Technology with an interactive Engineering Lab. The planetarium runs shows every hour — tickets are 5 pounds for adults. Photography is permitted but please do not use flash in the Art and Culture wing.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000002', 'b2000000-0000-0000-0000-000000000002', 1,
+('17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', '4a3cf26c-3824-48e2-b24f-e8f60263e2a8', 1,
  'multiple-choice', 'Choose the correct letter, A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('d2000000-0000-0000-0000-000000000011', 'c2000000-0000-0000-0000-000000000002', 11,
+('1ba46472-f43f-471f-90ba-955587ff2e57', '17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', 11,
  'The museum building was originally used as',
  '["A. a government office", "B. a private home", "C. a school"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000012', 'c2000000-0000-0000-0000-000000000002', 12,
+('bc1b8f64-7c28-4a39-9d30-4e3eaae4969c', '17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', 12,
  'How many artefacts does the museum currently contain?',
  '["A. over 5,000", "B. over 10,000", "C. over 15,000"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000013', 'c2000000-0000-0000-0000-000000000002', 13,
+('19a96acd-380b-4f8d-9f4c-ccf9e9b2fe7d', '17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', 13,
  'The current rotating exhibition features',
  '["A. paintings from Europe", "B. photography from South-East Asia", "C. sculptures from Africa"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000014', 'c2000000-0000-0000-0000-000000000002', 14,
+('25ea6827-beb1-487d-a065-2acf85d84182', '17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', 14,
  'The planetarium ticket for an adult costs',
  '["A. 3 pounds", "B. 4 pounds", "C. 5 pounds"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000015', 'c2000000-0000-0000-0000-000000000002', 15,
+('c0b40eb9-2a90-48e0-a4d3-4a11f582dae1', '17895bb7-1e5d-4cb0-90a5-5f4d9320cc7d', 15,
  'Flash photography is not allowed in',
  '["A. the Natural History gallery", "B. the Art and Culture wing", "C. the Science and Technology floor"]'::jsonb, 'B');
 
 -- ── Section 3: Student-Tutor Discussion ─────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000003', 'a2000000-0000-0000-0000-000000000001', 3,
+('ee6d108d-4c0d-4c49-84cd-fc7b68eb0e2a', 'ac2b9026-21d2-4e09-8f7e-cac388435b16', 3,
  'Research Project Discussion',
  'Tutor: So, James, how is your research project on renewable energy coming along?
 James: I''ve finished the literature review and started collecting data, but the survey response rate has been low — only 43 responses from 200 households.
@@ -392,82 +392,82 @@ James: When is the submission deadline?
 Tutor: The 28th of November. Have a first draft ready by the 14th. Include survey data and interview transcripts in the appendix, and address ethical considerations — your ethics approval was approved last week.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000003', 'b2000000-0000-0000-0000-000000000003', 1,
+('36886de8-f1d7-4ab6-96ac-55bd67b8044b', 'ee6d108d-4c0d-4c49-84cd-fc7b68eb0e2a', 1,
  'sentence-completion', 'Complete the notes below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d2000000-0000-0000-0000-000000000016', 'c2000000-0000-0000-0000-000000000003', 16,
+('d6094042-4217-43f1-b56d-e448b1d31016', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 16,
  'Research topic: ________ energy', 'renewable', '["renewable","Renewable"]'::jsonb),
-('d2000000-0000-0000-0000-000000000017', 'c2000000-0000-0000-0000-000000000003', 17,
+('3b2d1370-17aa-4c07-9df0-98319ba22f51', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 17,
  'Number of survey responses received so far: ________', '43', '["43","forty-three"]'::jsonb),
-('d2000000-0000-0000-0000-000000000018', 'c2000000-0000-0000-0000-000000000003', 18,
+('c27ef1a0-c3d3-4674-a74c-47353f4d6d6a', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 18,
  'Mei suggests interviewing ________ households in depth.', '15 to 20', '["15 to 20","15-20","fifteen to twenty"]'::jsonb),
-('d2000000-0000-0000-0000-000000000019', 'c2000000-0000-0000-0000-000000000003', 19,
+('b6f3ab4f-8b2b-4cd3-bc97-40d3a54b665f', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 19,
  'Focus interviews on households that have installed ________.', 'solar panels', '["solar panels","Solar panels"]'::jsonb),
-('d2000000-0000-0000-0000-000000000020', 'c2000000-0000-0000-0000-000000000003', 20,
+('d5b2fcb2-6c3e-4d40-b4b1-bb69b62f559b', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 20,
  'James is not confident with ________ modelling.', 'regression', '["regression","Regression"]'::jsonb),
-('d2000000-0000-0000-0000-000000000021', 'c2000000-0000-0000-0000-000000000003', 21,
+('a80a7195-a83d-4c31-9a74-d4b6ec340fc2', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 21,
  'Statistics workshop leader: Dr ________', 'Patel', '["Patel","patel","PATEL"]'::jsonb),
-('d2000000-0000-0000-0000-000000000022', 'c2000000-0000-0000-0000-000000000003', 22,
+('3672d5c3-fc8f-4ed3-b6c8-5dc6392121e7', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 22,
  'Report submission deadline: ________ November', '28th', '["28th","28","28th of"]'::jsonb),
-('d2000000-0000-0000-0000-000000000023', 'c2000000-0000-0000-0000-000000000003', 23,
+('7cd08ab1-2d7c-47b2-bd77-2f1618a815df', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 23,
  'First draft should be ready by the ________ of November.', '14th', '["14th","14"]'::jsonb),
-('d2000000-0000-0000-0000-000000000024', 'c2000000-0000-0000-0000-000000000003', 24,
+('f1931de7-b9cc-433b-8bd2-48f8c6eb5e57', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 24,
  'James has already received approval for the ________ form.', 'ethics', '["ethics","ethics approval","Ethics"]'::jsonb),
-('d2000000-0000-0000-0000-000000000025', 'c2000000-0000-0000-0000-000000000003', 25,
+('a629813c-ccbb-49e0-a7d5-d72111d51a65', '36886de8-f1d7-4ab6-96ac-55bd67b8044b', 25,
  'Appendix should include survey data and interview ________.', 'transcripts', '["transcripts","Transcripts"]'::jsonb);
 
 -- ── Section 4: Coral Reef Lecture ───────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000004', 'a2000000-0000-0000-0000-000000000001', 4,
+('2a94ffd4-0c79-4015-81f6-ad0f80a90daa', 'ac2b9026-21d2-4e09-8f7e-cac388435b16', 4,
  'Lecture: Coral Reef Ecosystems',
  'Professor: Today we look at coral reefs — the rainforests of the sea. They cover less than one percent of the ocean floor yet host about 25 percent of all marine species. Corals are colonial animals (phylum Cnidaria) whose polyps secrete calcium carbonate skeletons. They live in symbiosis with zooxanthellae algae that provide up to 90 percent of their energy. Elevated water temperatures cause coral bleaching. The Great Barrier Reef''s 2016-2017 bleaching affected two-thirds of the reef. Since 2009, roughly 14 percent of global reefs have been lost. Conservation includes marine protected areas, heat-resistant breeding, genetic modification, and transplanting laboratory-grown fragments.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000004', 'b2000000-0000-0000-0000-000000000004', 1,
+('4abbe729-4a46-4e0a-9802-74538f909a02', '2a94ffd4-0c79-4015-81f6-ad0f80a90daa', 1,
  'multiple-choice', 'Choose the correct letter, A, B, C or D.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('d2000000-0000-0000-0000-000000000026', 'c2000000-0000-0000-0000-000000000004', 26,
+('f4228965-c949-43a0-be16-8db79927cfc1', '4abbe729-4a46-4e0a-9802-74538f909a02', 26,
  'What percentage of the ocean floor do coral reefs cover?',
  '["A. less than 1%", "B. about 5%", "C. approximately 10%", "D. around 25%"]'::jsonb, 'A'),
-('d2000000-0000-0000-0000-000000000027', 'c2000000-0000-0000-0000-000000000004', 27,
+('c82ab1f5-e461-460b-857f-5a6399bd6fc2', '4abbe729-4a46-4e0a-9802-74538f909a02', 27,
  'Zooxanthellae provide corals with',
  '["A. calcium carbonate", "B. protection from predators", "C. energy through photosynthesis", "D. reproductive cells"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000028', 'c2000000-0000-0000-0000-000000000004', 28,
+('de6a11e0-eaf9-4780-87ef-3bc2d61d152c', '4abbe729-4a46-4e0a-9802-74538f909a02', 28,
  'Coral bleaching is caused by',
  '["A. predation by fish", "B. lack of sunlight", "C. elevated water temperatures", "D. chemical pollution"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000029', 'c2000000-0000-0000-0000-000000000004', 29,
+('3a7f6f1c-7705-4f36-9b57-dfef716c680f', '4abbe729-4a46-4e0a-9802-74538f909a02', 29,
  'The 2016-2017 bleaching affected approximately what proportion of the Great Barrier Reef?',
  '["A. one quarter", "B. one third", "C. one half", "D. two thirds"]'::jsonb, 'D'),
-('d2000000-0000-0000-0000-000000000030', 'c2000000-0000-0000-0000-000000000004', 30,
+('794e5a96-a36c-48c9-9bb5-0f6ef53713f0', '4abbe729-4a46-4e0a-9802-74538f909a02', 30,
  'Since 2009, the world has lost roughly what percentage of its coral reefs?',
  '["A. 5%", "B. 14%", "C. 25%", "D. 50%"]'::jsonb, 'B');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000005', 'b2000000-0000-0000-0000-000000000004', 2,
+('118482ad-701b-47e6-bd17-3bf0aae0b45c', '2a94ffd4-0c79-4015-81f6-ad0f80a90daa', 2,
  'sentence-completion', 'Complete the sentences below. Write NO MORE THAN TWO WORDS for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d2000000-0000-0000-0000-000000000031', 'c2000000-0000-0000-0000-000000000005', 31,
+('c5e4b2d6-fb9a-4c28-98e9-d9229f5f0a44', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 31,
  'Coral reefs are often called the ________ of the sea.', 'rainforests', '["rainforests","Rainforests"]'::jsonb),
-('d2000000-0000-0000-0000-000000000032', 'c2000000-0000-0000-0000-000000000005', 32,
+('eb663d27-99e7-4940-b88a-d7ab0e722881', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 32,
  'Individual coral animals are called ________.', 'polyps', '["polyps","Polyps","polyp"]'::jsonb),
-('d2000000-0000-0000-0000-000000000033', 'c2000000-0000-0000-0000-000000000005', 33,
+('1f126f5d-6b57-41a4-9e32-a50d2bc4a8cd', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 33,
  'Coral skeletons are made of ________.', 'calcium carbonate', '["calcium carbonate","Calcium carbonate"]'::jsonb),
-('d2000000-0000-0000-0000-000000000034', 'c2000000-0000-0000-0000-000000000005', 34,
+('80d22c95-364e-4f39-b9d9-bb4d2b2cd283', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 34,
  'At current rates, most reef systems could reach functional extinction by ________.', '2050', '["2050"]'::jsonb),
-('d2000000-0000-0000-0000-000000000035', 'c2000000-0000-0000-0000-000000000005', 35,
+('4a25af0d-45db-4ef0-bd70-a8dcf84a5be6', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 35,
  'Heat-resistant corals are being developed through selective breeding and ________.', 'genetic modification', '["genetic modification","Genetic modification"]'::jsonb),
-('d2000000-0000-0000-0000-000000000036', 'c2000000-0000-0000-0000-000000000005', 36,
+('71df4cc3-2aeb-49fc-9e90-c116c21e6490', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 36,
  'Reef restoration involves transplanting ________ coral fragments.', 'laboratory-grown', '["laboratory-grown","lab-grown","laboratory grown"]'::jsonb),
-('d2000000-0000-0000-0000-000000000037', 'c2000000-0000-0000-0000-000000000005', 37,
+('d46d5106-cc55-46a2-a9b0-9e6db73afab8', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 37,
  'Corals belong to the phylum ________.', 'Cnidaria', '["Cnidaria","cnidaria"]'::jsonb),
-('d2000000-0000-0000-0000-000000000038', 'c2000000-0000-0000-0000-000000000005', 38,
+('a17f8a7c-df8b-4a6c-9a40-e0c2f82161b3', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 38,
  'A localised threat to reefs is pollution from ________ runoff.', 'agricultural', '["agricultural","Agricultural"]'::jsonb),
-('d2000000-0000-0000-0000-000000000039', 'c2000000-0000-0000-0000-000000000005', 39,
+('c408f6d2-9988-4f81-ba55-901ff21ef583', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 39,
  'Marine ________ areas are one conservation strategy.', 'protected', '["protected","Protected"]'::jsonb),
-('d2000000-0000-0000-0000-000000000040', 'c2000000-0000-0000-0000-000000000005', 40,
+('58c35a82-f470-49b8-a1e4-f3c5b8b51d5c', '118482ad-701b-47e6-bd17-3bf0aae0b45c', 40,
  'Reefs support about ________ percent of all marine species.', '25', '["25","twenty-five"]'::jsonb);
 
 
@@ -476,17 +476,17 @@ INSERT INTO listening_questions (id, group_id, question_order, text, answer, acc
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO writing_tests (id, created_by, title, status) VALUES
-('a3000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
+('b7f284e3-82a1-4de2-ba78-4f15d9a90cd6', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
  'IELTS Academic Writing Practice Test 1', 'published');
 
 INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url) VALUES
-('d3000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 1,
+('f1a3d02a-9e73-45a8-bc6f-706f9d45e4ab', 'b7f284e3-82a1-4de2-ba78-4f15d9a90cd6', 1,
  'task1', 'Writing Task 1', '7', '20 mins',
  'The chart below shows the percentage of households in owned and rented accommodation in England and Wales between 1918 and 2011.
 
 Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
  150, '', ''),
-('d3000000-0000-0000-0000-000000000002', 'a3000000-0000-0000-0000-000000000001', 2,
+('c83b10b9-d2b5-4b51-b0db-5fc5ba8623ad', 'b7f284e3-82a1-4de2-ba78-4f15d9a90cd6', 2,
  'task2', 'Writing Task 2', '7', '40 mins',
  'Some people think that the best way to reduce crime is to give longer prison sentences. Others, however, believe there are better alternative ways of reducing crime.
 
