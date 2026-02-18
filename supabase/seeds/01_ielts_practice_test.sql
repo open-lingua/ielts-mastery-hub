@@ -26,7 +26,7 @@ END IF; END $$;
 
 INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duration, status) VALUES
 ('c574e32b-ddec-402d-9fbf-772f4c92dce8', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
- 'IELTS Academic Reading Practice Test 1', 'Academic', '7', '60 mins', 'published');
+ 'IELTS Comprehensive Practice Test: Technology, Psychology & Evolution (Band 7)', 'Academic', '7', '60 mins', 'published');
 
 
 -- ══════════════════════════════════════════════════════════════
@@ -299,7 +299,7 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUE
 
 INSERT INTO listening_tests (id, created_by, title, difficulty, duration, status) VALUES
 ('ac2b9026-21d2-4e09-8f7e-cac388435b16', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
- 'IELTS Listening Practice Test 1', '7', '40 mins', 'published');
+ 'IELTS Listening: Travel, Culture & Environmental Science (Band 7)', '7', '40 mins', 'published');
 
 -- ── Section 1: Hotel Booking ────────────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
@@ -477,7 +477,7 @@ INSERT INTO listening_questions (id, group_id, question_order, text, answer, acc
 
 INSERT INTO writing_tests (id, created_by, title, status) VALUES
 ('b7f284e3-82a1-4de2-ba78-4f15d9a90cd6', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
- 'IELTS Academic Writing Practice Test 1', 'published');
+ 'IELTS Academic Writing: Housing Trends & Crime Prevention (Band 7)', 'published');
 
 INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url) VALUES
 ('f1a3d02a-9e73-45a8-bc6f-706f9d45e4ab', 'b7f284e3-82a1-4de2-ba78-4f15d9a90cd6', 1,
