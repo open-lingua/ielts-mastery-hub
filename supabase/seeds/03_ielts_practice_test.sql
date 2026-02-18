@@ -8,7 +8,7 @@
 -- ████████████████████████████████████████████████████████████████
 
 INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duration, status) VALUES
-('a1000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001',
+('6b2c9e10-4d5e-4a3b-9c8d-1e2f3a4b5c6d', '80f68d7a-1b4e-4f92-9c3a-23456789abcd',
  'IELTS Academic Reading Practice Test 3', 'Academic', '7', '60 mins', 'published');
 
 
@@ -17,43 +17,43 @@ INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duratio
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000007', 'a1000000-0000-0000-0000-000000000003', 1,
+('7f8a9b0c-d1e2-4f3a-b4c5-d6e7f8a9b0c1', '6b2c9e10-4d5e-4a3b-9c8d-1e2f3a4b5c6d', 1,
  'The Birth of the London Underground',
  '(A) In the first half of the 19th century, London''s population grew at an astonishing rate... (B) The solution was proposed by Charles Pearson... (C) On January 10, 1863... (D) The true revolution... (E) As the network expanded...');
 
 -- ── Group 23: TRUE/FALSE/NOT GIVEN (Q1–4) ──────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000023', 'b1100000-0000-0000-0000-000000000007', 1,
+('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', '7f8a9b0c-d1e2-4f3a-b4c5-d6e7f8a9b0c1', 1,
  'true-false-not-given', 'Do the following statements agree with the information given in the passage? Write TRUE, FALSE, or NOT GIVEN.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000081', 'c1100000-0000-0000-0000-000000000023', 1, 'Main-line railways in the 1850s...', 'FALSE', '["FALSE","False","false"]'::jsonb),
-('d1100000-0000-0000-0000-000000000082', 'c1100000-0000-0000-0000-000000000023', 2, 'Charles Pearson personally funded...', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'::jsonb),
-('d1100000-0000-0000-0000-000000000083', 'c1100000-0000-0000-0000-000000000023', 3, 'The first underground trains...', 'TRUE', '["TRUE","True","true"]'::jsonb),
-('d1100000-0000-0000-0000-000000000084', 'c1100000-0000-0000-0000-000000000023', 4, 'The nickname "Tube" originated...', 'TRUE', '["TRUE","True","true"]'::jsonb);
+('d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 1, 'Main-line railways in the 1850s...', 'FALSE', '["FALSE","False","false"]'::jsonb),
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 2, 'Charles Pearson personally funded...', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'::jsonb),
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 3, 'The first underground trains...', 'TRUE', '["TRUE","True","true"]'::jsonb),
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 4, 'The nickname "Tube" originated...', 'TRUE', '["TRUE","True","true"]'::jsonb);
 
 -- ── Group 24: SHORT ANSWER (Q5–8) ─────────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000024', 'b1100000-0000-0000-0000-000000000007', 2,
+('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', '7f8a9b0c-d1e2-4f3a-b4c5-d6e7f8a9b0c1', 2,
  'short-answer', 'Answer the questions below...', true, '3');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000085', 'c1100000-0000-0000-0000-000000000024', 5, 'What construction method...', 'cut-and-cover', '[{"id":"1","text":"cut-and-cover"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000086', 'c1100000-0000-0000-0000-000000000024', 6, 'How many passengers...', '38,000', '[{"id":"1","text":"38,000"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000087', 'c1100000-0000-0000-0000-000000000024', 7, 'What equipment was used...', 'tunneling shield', '[{"id":"1","text":"tunneling shield"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000088', 'c1100000-0000-0000-0000-000000000024', 8, 'What is the specific name...', 'roundel', '[{"id":"1","text":"roundel"}]'::jsonb);
+('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 5, 'What construction method...', 'cut-and-cover', '[{"id":"1","text":"cut-and-cover"}]'::jsonb),
+('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 6, 'How many passengers...', '38,000', '[{"id":"1","text":"38,000"}]'::jsonb),
+('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 7, 'What equipment was used...', 'tunneling shield', '[{"id":"1","text":"tunneling shield"}]'::jsonb),
+('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 8, 'What is the specific name...', 'roundel', '[{"id":"1","text":"roundel"}]'::jsonb);
 
 -- ── Group 25: TABLE COMPLETION (Q9–13) ─────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, word_limit) VALUES
-('c1100000-0000-0000-0000-000000000025', 'b1100000-0000-0000-0000-000000000007', 3,
+('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', '7f8a9b0c-d1e2-4f3a-b4c5-d6e7f8a9b0c1', 3,
  'table-completion', 'Complete the table below...', true, '2');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, completion_gaps) VALUES
-('d1100000-0000-0000-0000-000000000089', 'c1100000-0000-0000-0000-000000000025', 9, 'Row 1', '', '[{"id":"h1","gapText":"Year"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000090', 'c1100000-0000-0000-0000-000000000025', 10, 'Row 2', '', '[{"id":"c1","gapText":"1860"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000091', 'c1100000-0000-0000-0000-000000000025', 11, 'Row 3', '', '[{"id":"c3","gapText":"1890"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000092', 'c1100000-0000-0000-0000-000000000025', 12, 'Row 4', '', '[{"id":"c5","gapText":"1908"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000093', 'c1100000-0000-0000-0000-000000000025', 13, 'Row 5', '', '[{"id":"c7","gapText":"1933"}]'::jsonb);
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 9, 'Row 1', '', '[{"id":"h1","gapText":"Year"}]'::jsonb),
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 10, 'Row 2', '', '[{"id":"c1","gapText":"1860"}]'::jsonb),
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 11, 'Row 3', '', '[{"id":"c3","gapText":"1890"}]'::jsonb),
+('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 12, 'Row 4', '', '[{"id":"c5","gapText":"1908"}]'::jsonb),
+('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 13, 'Row 5', '', '[{"id":"c7","gapText":"1933"}]'::jsonb);
 
 
 -- ══════════════════════════════════════════════════════════════
@@ -61,43 +61,43 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, compl
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000008', 'a1000000-0000-0000-0000-000000000003', 2,
+('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', '6b2c9e10-4d5e-4a3b-9c8d-1e2f3a4b5c6d', 2,
  'Vertical Farming: The Next Agricultural Revolution?', '...');
 
 -- ── Group 26: MATCHING HEADINGS (Q14–19) ───────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c1100000-0000-0000-0000-000000000026', 'b1100000-0000-0000-0000-000000000008', 1,
+('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 1,
  'matching-headings', 'Choose the correct heading...', true, true, '["i. ...", "ii. ..."]'::jsonb);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000094', 'c1100000-0000-0000-0000-000000000026', 14, 'Paragraph A', 'v'),
-('d1100000-0000-0000-0000-000000000095', 'c1100000-0000-0000-0000-000000000026', 15, 'Paragraph B', 'ii'),
-('d1100000-0000-0000-0000-000000000096', 'c1100000-0000-0000-0000-000000000026', 16, 'Paragraph C', 'vi'),
-('d1100000-0000-0000-0000-000000000097', 'c1100000-0000-0000-0000-000000000026', 17, 'Paragraph D', 'i'),
-('d1100000-0000-0000-0000-000000000098', 'c1100000-0000-0000-0000-000000000026', 18, 'Paragraph E', 'iv'),
-('d1100000-0000-0000-0000-000000000099', 'c1100000-0000-0000-0000-000000000026', 19, 'Paragraph F', 'iii');
+('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 14, 'Paragraph A', 'v'),
+('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 15, 'Paragraph B', 'ii'),
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 16, 'Paragraph C', 'vi'),
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 17, 'Paragraph D', 'i'),
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 18, 'Paragraph E', 'iv'),
+('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 19, 'Paragraph F', 'iii');
 
 -- ── Group 27: MATCHING INFORMATION (Q20–23) ── (FIXED IDs) ──
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000027', 'b1100000-0000-0000-0000-000000000008', 2,
+('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 2,
  'matching-information', 'Which paragraph contains...', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, matching_pairs) VALUES
-('d1100000-0000-0000-0000-000000000100', 'c1100000-0000-0000-0000-000000000027', 20, 'Reference to a method...', 'B', '[{"id":"1","right":"A"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000101', 'c1100000-0000-0000-0000-000000000027', 21, 'An explanation of why...', 'E', '[{"id":"1","right":"A"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000102', 'c1100000-0000-0000-0000-000000000027', 22, 'A statistic indicating...', 'A', '[{"id":"1","right":"A"}]'::jsonb),
-('d1100000-0000-0000-0000-000000000103', 'c1100000-0000-0000-0000-000000000027', 23, 'The reason why chemical...', 'C', '[{"id":"1","right":"A"}]'::jsonb);
+('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 20, 'Reference to a method...', 'B', '[{"id":"1","right":"A"}]'::jsonb),
+('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 21, 'An explanation of why...', 'E', '[{"id":"1","right":"A"}]'::jsonb),
+('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 22, 'A statistic indicating...', 'A', '[{"id":"1","right":"A"}]'::jsonb),
+('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 23, 'The reason why chemical...', 'C', '[{"id":"1","right":"A"}]'::jsonb);
 
 -- ── Group 28: MULTIPLE CHOICE (Q24–27) ─────────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000028', 'b1100000-0000-0000-0000-000000000008', 3,
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 3,
  'multiple-choice', 'Choose the correct letter...', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('d1100000-0000-0000-0000-000000000104', 'c1100000-0000-0000-0000-000000000028', 24, 'According to Paragraph C...', 'B', '[{"id":"B","text":"..."}]'::jsonb),
-('d1100000-0000-0000-0000-000000000105', 'c1100000-0000-0000-0000-000000000028', 25, 'The writer suggests...', 'C', '[{"id":"C","text":"..."}]'::jsonb),
-('d1100000-0000-0000-0000-000000000106', 'c1100000-0000-0000-0000-000000000028', 26, 'What is currently...', 'D', '[{"id":"D","text":"..."}]'::jsonb),
-('d1100000-0000-0000-0000-000000000107', 'c1100000-0000-0000-0000-000000000028', 27, 'What does the phrase...', 'A', '[{"id":"A","text":"..."}]'::jsonb);
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 24, 'According to Paragraph C...', 'B', '[{"id":"B","text":"..."}]'::jsonb),
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 25, 'The writer suggests...', 'C', '[{"id":"C","text":"..."}]'::jsonb),
+('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 26, 'What is currently...', 'D', '[{"id":"D","text":"..."}]'::jsonb),
+('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 27, 'What does the phrase...', 'A', '[{"id":"A","text":"..."}]'::jsonb);
 
 
 -- ══════════════════════════════════════════════════════════════
@@ -105,42 +105,42 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, optio
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO reading_passages (id, test_id, passage_number, title, content) VALUES
-('b1100000-0000-0000-0000-000000000009', 'a1000000-0000-0000-0000-000000000003', 3,
+('b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e', '6b2c9e10-4d5e-4a3b-9c8d-1e2f3a4b5c6d', 3,
  'Biomimicry: Engineering Inspired by Nature', '...');
 
 -- ── Group 29: YES/NO/NOT GIVEN (Q28–32) ───────────────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000029', 'b1100000-0000-0000-0000-000000000009', 1,
+('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e', 1,
  'yes-no-not-given', 'Do the following statements...', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d1100000-0000-0000-0000-000000000108', 'c1100000-0000-0000-0000-000000000029', 28, 'Janine Benyus...', 'NO', '["NO"]'::jsonb),
-('d1100000-0000-0000-0000-000000000109', 'c1100000-0000-0000-0000-000000000029', 29, 'George de Mestral...', 'YES', '["YES"]'::jsonb),
-('d1100000-0000-0000-0000-000000000110', 'c1100000-0000-0000-0000-000000000029', 30, 'The original bullet...', 'NOT GIVEN', '["NOT GIVEN"]'::jsonb),
-('d1100000-0000-0000-0000-000000000111', 'c1100000-0000-0000-0000-000000000029', 31, 'Sharklet surfaces...', 'NO', '["NO"]'::jsonb),
-('d1100000-0000-0000-0000-000000000112', 'c1100000-0000-0000-0000-000000000029', 32, 'The Eastgate Centre...', 'NO', '["NO"]'::jsonb);
+('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 28, 'Janine Benyus...', 'NO', '["NO"]'::jsonb),
+('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 29, 'George de Mestral...', 'YES', '["YES"]'::jsonb),
+('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 30, 'The original bullet...', 'NOT GIVEN', '["NOT GIVEN"]'::jsonb),
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 31, 'Sharklet surfaces...', 'NO', '["NO"]'::jsonb),
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 32, 'The Eastgate Centre...', 'NO', '["NO"]'::jsonb);
 
 -- ── Group 30: MATCHING SENTENCE ENDINGS (Q33–35) ─────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c1100000-0000-0000-0000-000000000030', 'b1100000-0000-0000-0000-000000000009', 2,
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e', 2,
  'matching-sentence-endings', 'Complete each sentence...', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('d1100000-0000-0000-0000-000000000113', 'c1100000-0000-0000-0000-000000000030', 33, 'The Shinkansen train...', 'E', '[{"id":"E","text":"..."}]'::jsonb),
-('d1100000-0000-0000-0000-000000000114', 'c1100000-0000-0000-0000-000000000030', 34, 'The unique micro-texture...', 'B', '[{"id":"B","text":"..."}]'::jsonb),
-('d1100000-0000-0000-0000-000000000115', 'c1100000-0000-0000-0000-000000000030', 35, 'The ventilation system...', 'C', '[{"id":"C","text":"..."}]'::jsonb);
+('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 33, 'The Shinkansen train...', 'E', '[{"id":"E","text":"..."}]'::jsonb),
+('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 34, 'The unique micro-texture...', 'B', '[{"id":"B","text":"..."}]'::jsonb),
+('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 35, 'The ventilation system...', 'C', '[{"id":"C","text":"..."}]'::jsonb);
 
 -- ── Group 31: SUMMARY COMPLETION (Q36–40) ──
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c1100000-0000-0000-0000-000000000031', 'b1100000-0000-0000-0000-000000000009', 3,
+('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e', 3,
  'summary-completion', 'Complete the summary...', true, true, '["burrs","speed","kingfisher","passive","chemicals","waste","shark"]'::jsonb);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('d1100000-0000-0000-0000-000000000116', 'c1100000-0000-0000-0000-000000000031', 36, 'Biomimicry looks to nature...', 'burrs'),
-('d1100000-0000-0000-0000-000000000117', 'c1100000-0000-0000-0000-000000000031', 37, '', 'kingfisher'),
-('d1100000-0000-0000-0000-000000000118', 'c1100000-0000-0000-0000-000000000031', 38, '', 'shark'),
-('d1100000-0000-0000-0000-000000000119', 'c1100000-0000-0000-0000-000000000031', 39, '', 'chemicals'),
-('d1100000-0000-0000-0000-000000000120', 'c1100000-0000-0000-0000-000000000031', 40, '', 'passive');
+('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 36, 'Biomimicry looks to nature...', 'burrs'),
+('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 37, '', 'kingfisher'),
+('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 38, '', 'shark'),
+('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 39, '', 'chemicals'),
+('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 40, '', 'passive');
 
 
 -- ████████████████████████████████████████████████████████████
@@ -148,104 +148,104 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUE
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO listening_tests (id, created_by, title, difficulty, duration, status) VALUES
-('a2000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001',
+('b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', '80f68d7a-1b4e-4f92-9c3a-23456789abcd',
  'IELTS Listening Practice Test 3', '7', '40 mins', 'published');
 
 -- ── Section 1: Walking Tour Booking ─────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000009', 'a2000000-0000-0000-0000-000000000003', 1,
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 1,
  'Walking Tour Booking Enquiry', '...');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000012', 'b2000000-0000-0000-0000-000000000009', 1,
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 1,
  'sentence-completion', 'Complete the booking form...', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d2000000-0000-0000-0000-000000000081', 'c2000000-0000-0000-0000-000000000012', 1, 'Sarah ________', 'Mitchell', '["Mitchell"]'::jsonb),
-('d2000000-0000-0000-0000-000000000082', 'c2000000-0000-0000-0000-000000000012', 2, '14th ________', 'July', '["July"]'::jsonb),
-('d2000000-0000-0000-0000-000000000083', 'c2000000-0000-0000-0000-000000000012', 3, '________ Tour', 'Ghost', '["Ghost"]'::jsonb),
-('d2000000-0000-0000-0000-000000000084', 'c2000000-0000-0000-0000-000000000012', 4, 'Number of people: ________', '4', '["4"]'::jsonb),
-('d2000000-0000-0000-0000-000000000085', 'c2000000-0000-0000-0000-000000000012', 5, 'Price per person: ________', '15', '["15"]'::jsonb),
-('d2000000-0000-0000-0000-000000000086', 'c2000000-0000-0000-0000-000000000012', 6, 'Meeting point: ________', 'Cathedral', '["Cathedral"]'::jsonb),
-('d2000000-0000-0000-0000-000000000087', 'c2000000-0000-0000-0000-000000000012', 7, 'Departure time: ________', '8.00 pm', '["8.00 pm"]'::jsonb),
-('d2000000-0000-0000-0000-000000000088', 'c2000000-0000-0000-0000-000000000012', 8, 'Comfortable ________', 'shoes', '["shoes"]'::jsonb),
-('d2000000-0000-0000-0000-000000000089', 'c2000000-0000-0000-0000-000000000012', 9, 'Bring an ________', 'umbrella', '["umbrella"]'::jsonb),
-('d2000000-0000-0000-0000-000000000090', 'c2000000-0000-0000-0000-000000000012', 10, 'Contact: ________', '07593 821', '["07593 821"]'::jsonb);
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 1, 'Sarah ________', 'Mitchell', '["Mitchell"]'::jsonb),
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 2, '14th ________', 'July', '["July"]'::jsonb),
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 3, '________ Tour', 'Ghost', '["Ghost"]'::jsonb),
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 4, 'Number of people: ________', '4', '["4"]'::jsonb),
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 5, 'Price per person: ________', '15', '["15"]'::jsonb),
+('a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 6, 'Meeting point: ________', 'Cathedral', '["Cathedral"]'::jsonb),
+('c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 7, 'Departure time: ________', '8.00 pm', '["8.00 pm"]'::jsonb),
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 8, 'Comfortable ________', 'shoes', '["shoes"]'::jsonb),
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 9, 'Bring an ________', 'umbrella', '["umbrella"]'::jsonb),
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 10, 'Contact: ________', '07593 821', '["07593 821"]'::jsonb);
 
 -- ── Section 2: Festival Volunteering ────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000010', 'a2000000-0000-0000-0000-000000000003', 2,
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 2,
  'Music Festival Volunteer Briefing', '...');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000013', 'b2000000-0000-0000-0000-000000000010', 1,
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 1,
  'multiple-choice', 'Choose A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('d2000000-0000-0000-0000-000000000091', 'c2000000-0000-0000-0000-000000000013', 11, 'Shift length?', '["A. 4 hours"]'::jsonb, 'A'),
-('d2000000-0000-0000-0000-000000000092', 'c2000000-0000-0000-0000-000000000013', 12, 'Main duty?', '["B. Checking wristbands"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000093', 'c2000000-0000-0000-0000-000000000013', 13, 'Meal vouchers?', '["B. Two"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000094', 'c2000000-0000-0000-0000-000000000013', 14, 'Used where?', '["C. Any food vendor"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000095', 'c2000000-0000-0000-0000-000000000013', 15, 'Travel?', '["C. By shuttle bus"]'::jsonb, 'C');
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 11, 'Shift length?', '["A. 4 hours"]'::jsonb, 'A'),
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 12, 'Main duty?', '["B. Checking wristbands"]'::jsonb, 'B'),
+('a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 'a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 13, 'Meal vouchers?', '["B. Two"]'::jsonb, 'B'),
+('c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 14, 'Used where?', '["C. Any food vendor"]'::jsonb, 'C'),
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 15, 'Travel?', '["C. By shuttle bus"]'::jsonb, 'C');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c2000000-0000-0000-0000-000000000014', 'b2000000-0000-0000-0000-000000000010', 2,
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 2,
  'matching-features', 'Label the map...', true, true, '["A. Main Stage", "B. First Aid", "C. Food Stalls", "D. Toilets", "E. Volunteer Tent"]'::jsonb);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer) VALUES
-('d2000000-0000-0000-0000-000000000096', 'c2000000-0000-0000-0000-000000000014', 16, 'Bottom of map', 'E'),
-('d2000000-0000-0000-0000-000000000097', 'c2000000-0000-0000-0000-000000000014', 17, 'Centre', 'A'),
-('d2000000-0000-0000-0000-000000000098', 'c2000000-0000-0000-0000-000000000014', 18, 'To the left', 'B'),
-('d2000000-0000-0000-0000-000000000099', 'c2000000-0000-0000-0000-000000000014', 19, 'To the right', 'C'),
-('d2000000-0000-0000-0000-000000000100', 'c2000000-0000-0000-0000-000000000014', 20, 'Top right corner', 'D');
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 16, 'Bottom of map', 'E'),
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 17, 'Centre', 'A'),
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 18, 'To the left', 'B'),
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 19, 'To the right', 'C'),
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 20, 'Top right corner', 'D');
 
 -- ── Section 3: Student-Tutor Discussion ─────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000011', 'a2000000-0000-0000-0000-000000000003', 3,
+('a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 3,
  'Marketing Presentation Meeting', '...');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000015', 'b2000000-0000-0000-0000-000000000011', 1,
+('c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 'a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 1,
  'multiple-choice', 'Choose A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('d2000000-0000-0000-0000-000000000101', 'c2000000-0000-0000-0000-000000000015', 21, 'Topic?', '["B. The decoy effect"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000102', 'c2000000-0000-0000-0000-000000000015', 22, 'Decoy is...', '["C. Inferior"]'::jsonb, 'C'),
-('d2000000-0000-0000-0000-000000000103', 'c2000000-0000-0000-0000-000000000015', 23, 'Length?', '["B. 15 minutes"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000104', 'c2000000-0000-0000-0000-000000000015', 24, 'Reminded to...', '["B. A handout"]'::jsonb, 'B'),
-('d2000000-0000-0000-0000-000000000105', 'c2000000-0000-0000-0000-000000000015', 25, 'Draft due?', '["B. Tuesday"]'::jsonb, 'B');
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 21, 'Topic?', '["B. The decoy effect"]'::jsonb, 'B'),
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 22, 'Decoy is...', '["C. Inferior"]'::jsonb, 'C'),
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 23, 'Length?', '["B. 15 minutes"]'::jsonb, 'B'),
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 24, 'Reminded to...', '["B. A handout"]'::jsonb, 'B'),
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 25, 'Draft due?', '["B. Tuesday"]'::jsonb, 'B');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order, has_word_bank, word_bank) VALUES
-('c2000000-0000-0000-0000-000000000016', 'b2000000-0000-0000-0000-000000000011', 2,
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 2,
  'matching-features', 'Match tasks to person...', true, true, '["A. Sam", "B. Anna", "C. Both"]'::jsonb);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer) VALUES
-('d2000000-0000-0000-0000-000000000106', 'c2000000-0000-0000-0000-000000000016', 26, 'Researching', 'A'),
-('d2000000-0000-0000-0000-000000000107', 'c2000000-0000-0000-0000-000000000016', 27, 'Slides', 'B'),
-('d2000000-0000-0000-0000-000000000108', 'c2000000-0000-0000-0000-000000000016', 28, 'Script', 'C'),
-('d2000000-0000-0000-0000-000000000109', 'c2000000-0000-0000-0000-000000000016', 29, 'Printing', 'A'),
-('d2000000-0000-0000-0000-000000000110', 'c2000000-0000-0000-0000-000000000016', 30, 'Conclusion', 'B');
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 26, 'Researching', 'A'),
+('a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 'c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 27, 'Slides', 'B'),
+('c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 'c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 28, 'Script', 'C'),
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 29, 'Printing', 'A'),
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 30, 'Conclusion', 'B');
 
 -- ── Section 4: Antarctic Exploration ────────────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('b2000000-0000-0000-0000-000000000012', 'a2000000-0000-0000-0000-000000000003', 4,
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 4,
  'Lecture: History of Antarctic Exploration', '...');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2000000-0000-0000-0000-000000000017', 'b2000000-0000-0000-0000-000000000012', 1,
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 1,
  'sentence-completion', 'Complete notes...', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('d2000000-0000-0000-0000-000000000111', 'c2000000-0000-0000-0000-000000000017', 31, 'Ended in year ________.', '1922', '["1922"]'::jsonb),
-('d2000000-0000-0000-0000-000000000112', 'c2000000-0000-0000-0000-000000000017', 32, 'South Pole', 'South Pole', '["South Pole"]'::jsonb),
-('d2000000-0000-0000-0000-000000000113', 'c2000000-0000-0000-0000-000000000017', 33, 'Norway', 'Norway', '["Norway"]'::jsonb),
-('d2000000-0000-0000-0000-000000000114', 'c2000000-0000-0000-0000-000000000017', 34, 'Amundsen used ________', 'sled dogs', '["sled dogs"]'::jsonb),
-('d2000000-0000-0000-0000-000000000115', 'c2000000-0000-0000-0000-000000000017', 35, 'Scott used ________', 'motorised', '["motorised"]'::jsonb),
-('d2000000-0000-0000-0000-000000000116', 'c2000000-0000-0000-0000-000000000017', 36, 'Animals died from ________', 'extreme cold', '["extreme cold"]'::jsonb),
-('d2000000-0000-0000-0000-000000000117', 'c2000000-0000-0000-0000-000000000017', 37, 'Died of cold and ________', 'starvation', '["starvation"]'::jsonb),
-('d2000000-0000-0000-0000-000000000118', 'c2000000-0000-0000-0000-000000000017', 38, 'Signed in ________', '1959', '["1959"]'::jsonb),
-('d2000000-0000-0000-0000-000000000119', 'c2000000-0000-0000-0000-000000000017', 39, 'Bans ________ activity', 'military', '["military"]'::jsonb),
-('d2000000-0000-0000-0000-000000000120', 'c2000000-0000-0000-0000-000000000017', 40, 'Reserves of ________', 'freshwater', '["freshwater"]'::jsonb);
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 31, 'Ended in year ________.', '1922', '["1922"]'::jsonb),
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 32, 'South Pole', 'South Pole', '["South Pole"]'::jsonb),
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 33, 'Norway', 'Norway', '["Norway"]'::jsonb),
+('a1b2c3d4-e5f6-4a7b-c8d9-0e1f2a3b4c5d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 34, 'Amundsen used ________', 'sled dogs', '["sled dogs"]'::jsonb),
+('c2d3e4f5-a6b7-4c8d-e9f0-1a2b3c4d5e6f', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 35, 'Scott used ________', 'motorised', '["motorised"]'::jsonb),
+('e7f8a9b0-c1d2-4e3f-a4b5-6c7d8e9f0a1b', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 36, 'Animals died from ________', 'extreme cold', '["extreme cold"]'::jsonb),
+('a2b3c4d5-e6f7-4a8b-c9d0-1e2f3a4b5c6d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 37, 'Died of cold and ________', 'starvation', '["starvation"]'::jsonb),
+('c7d8e9f0-a1b2-4c3d-e4f5-6a7b8c9d0e1f', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 38, 'Signed in ________', '1959', '["1959"]'::jsonb),
+('e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 39, 'Bans ________ activity', 'military', '["military"]'::jsonb),
+('a6b7c8d9-e0f1-4a2b-c3d4-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-a8b9-0c1d2e3f4a5b', 40, 'Reserves of ________', 'freshwater', '["freshwater"]'::jsonb);
 
 
 -- ████████████████████████████████████████████████████████████
@@ -253,13 +253,13 @@ INSERT INTO listening_questions (id, group_id, question_order, text, answer, acc
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO writing_tests (id, created_by, title, status) VALUES
-('a3000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001',
+('b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', '80f68d7a-1b4e-4f92-9c3a-23456789abcd',
  'IELTS Academic Writing Practice Test 3', 'published');
 
 INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url) VALUES
-('d3000000-0000-0000-0000-000000000005', 'a3000000-0000-0000-0000-000000000003', 1,
+('c1d2e3f4-a5b6-4c7d-e8f9-0a1b2c3d4e5f', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 1,
  'task1', 'Writing Task 1', '7', '20 mins', 'The line graph below shows...', 150, '', ''),
-('d3000000-0000-0000-0000-000000000006', 'a3000000-0000-0000-0000-000000000003', 2,
+('f6a7b8c9-d0e1-4f2a-b3c4-5d6e7f8a9b0c', 'b3c4d5e6-a7b8-4c9d-e0f1-a2b3c4d5e6f7', 2,
  'task2', 'Writing Task 2', '7', '40 mins', 'The rise of convenience foods...', 250, '', '');
 
 -- ════════════════════════════════════════════════════════════
