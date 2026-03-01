@@ -11,7 +11,7 @@ You are tasked with generating a comprehensive **Supabase SQL Seed File** specif
 
 ## 1. Database Seed Strategy & Relational Integrity
 - **Do not use `TRUNCATE` in this script**, as it should append to existing seed data.
-- **Non-Deterministic UUIDs:** Generate unique **UUID v4** identifiers for all records (e.g., `'550e8400-e29b-41d4-a716-446655440000'`) to eliminate primary key collisions.
+- **Note to AI:** You must strictly use the UUIDs provided in the `UUID Inventory` section for the Primary Keys (id)
 
 ## 2. Seed: IELTS Reading Test
 - **Test Record:** Create 1 entry in `reading_tests` using the Test Title and `[TEST_TYPE]`.
