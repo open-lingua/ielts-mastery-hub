@@ -1,8 +1,9 @@
-use crate::db::Database;
-use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+use crate::db::Db;
+use crate::error::AppError;
+
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct Profile {
     pub id: String,
     pub full_name: Option<String>,
@@ -16,6 +17,14 @@ pub struct Profile {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct CreateProfile {
+    pub full_name: Option<String>,
+    pub avatar_url: Option<String>,
+    pub plan_type: Option<String>,
+    pub email: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct UpdateProfile {
     pub full_name: Option<String>,
     pub avatar_url: Option<String>,
@@ -26,89 +35,82 @@ pub struct UpdateProfile {
     pub banned_until: Option<String>,
 }
 
-pub fn find_by_id(db: &Database, id: &str) -> Result<Option<Profile>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, full_name, avatar_url, plan_type, email, is_banned, ban_reason, banned_until, updated_at \
-             FROM profiles WHERE id = ?1",
-        )
-        .map_err(|e| e.to_string())?;
-    let result: Option<Profile> = stmt
-        .query_map(params![id], map_row)
-        .map_err(|e| e.to_string())?
-        .next()
-        .transpose()
-        .map_err(|e| e.to_string())?;
+pub async fn find_by_id(pool: &Db, id: &str) -> Result<Option<Profile>, AppError> {
+    let result = sqlx::query_as!(
+        Profile,
+        r#"SELECT id, full_name, avatar_url, plan_type, email,
+           is_banned AS "is_banned: bool", ban_reason, banned_until, updated_at
+           FROM profiles WHERE id = ?"#,
+        id
+    )
+    .fetch_optional(pool)
+    .await?;
     Ok(result)
 }
 
-pub fn find_all(db: &Database) -> Result<Vec<Profile>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, full_name, avatar_url, plan_type, email, is_banned, ban_reason, banned_until, updated_at \
-             FROM profiles",
-        )
-        .map_err(|e| e.to_string())?;
-    let result: Vec<Profile> = stmt
-        .query_map([], map_row)
-        .map_err(|e| e.to_string())?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
+pub async fn find_all(pool: &Db) -> Result<Vec<Profile>, AppError> {
+    let result = sqlx::query_as!(
+        Profile,
+        r#"SELECT id, full_name, avatar_url, plan_type, email,
+           is_banned AS "is_banned: bool", ban_reason, banned_until, updated_at
+           FROM profiles"#
+    )
+    .fetch_all(pool)
+    .await?;
     Ok(result)
 }
 
-pub fn insert(db: &Database, profile: &Profile) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "INSERT INTO profiles (id, full_name, avatar_url, plan_type, email, is_banned, ban_reason, banned_until, updated_at) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
-        params![
-            profile.id, profile.full_name, profile.avatar_url, profile.plan_type, profile.email,
-            profile.is_banned as i32, profile.ban_reason, profile.banned_until, profile.updated_at,
-        ],
+pub async fn insert(pool: &Db, input: &CreateProfile) -> Result<String, AppError> {
+    let id = uuid::Uuid::new_v4().to_string();
+    let now = chrono::Utc::now().to_rfc3339();
+    let plan_type = input.plan_type.as_deref().unwrap_or("free");
+    sqlx::query!(
+        "INSERT INTO profiles (id, full_name, avatar_url, plan_type, email, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?)",
+        id,
+        input.full_name,
+        input.avatar_url,
+        plan_type,
+        input.email,
+        now
     )
-    .map_err(|e| e.to_string())?;
-    Ok(())
+    .execute(pool)
+    .await?;
+    Ok(id)
 }
 
-pub fn update(db: &Database, user_id: &str, upd: &UpdateProfile) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "UPDATE profiles SET \
-         full_name = COALESCE(?1, full_name), avatar_url = COALESCE(?2, avatar_url), \
-         plan_type = COALESCE(?3, plan_type), email = COALESCE(?4, email), \
-         is_banned = COALESCE(?5, is_banned), ban_reason = COALESCE(?6, ban_reason), \
-         banned_until = COALESCE(?7, banned_until), \
-         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') \
-         WHERE id = ?8",
-        params![
-            upd.full_name, upd.avatar_url, upd.plan_type, upd.email,
-            upd.is_banned.map(|b| b as i32), upd.ban_reason, upd.banned_until, user_id,
-        ],
+pub async fn update(pool: &Db, user_id: &str, input: &UpdateProfile) -> Result<(), AppError> {
+    let now = chrono::Utc::now().to_rfc3339();
+    let is_banned = input.is_banned.map(|b| b as i64);
+    sqlx::query!(
+        "UPDATE profiles SET
+         full_name = COALESCE(?, full_name),
+         avatar_url = COALESCE(?, avatar_url),
+         plan_type = COALESCE(?, plan_type),
+         email = COALESCE(?, email),
+         is_banned = COALESCE(?, is_banned),
+         ban_reason = COALESCE(?, ban_reason),
+         banned_until = COALESCE(?, banned_until),
+         updated_at = ?
+         WHERE id = ?",
+        input.full_name,
+        input.avatar_url,
+        input.plan_type,
+        input.email,
+        is_banned,
+        input.ban_reason,
+        input.banned_until,
+        now,
+        user_id
     )
-    .map_err(|e| e.to_string())?;
+    .execute(pool)
+    .await?;
     Ok(())
 }
 
-pub fn delete(db: &Database, user_id: &str) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute("DELETE FROM profiles WHERE id = ?1", params![user_id])
-        .map_err(|e| e.to_string())?;
+pub async fn delete(pool: &Db, user_id: &str) -> Result<(), AppError> {
+    sqlx::query!("DELETE FROM profiles WHERE id = ?", user_id)
+        .execute(pool)
+        .await?;
     Ok(())
-}
-
-fn map_row(row: &rusqlite::Row) -> rusqlite::Result<Profile> {
-    Ok(Profile {
-        id: row.get(0)?,
-        full_name: row.get(1)?,
-        avatar_url: row.get(2)?,
-        plan_type: row.get(3)?,
-        email: row.get(4)?,
-        is_banned: row.get::<_, i32>(5)? != 0,
-        ban_reason: row.get(6)?,
-        banned_until: row.get(7)?,
-        updated_at: row.get(8)?,
-    })
 }

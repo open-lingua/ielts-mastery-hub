@@ -1,8 +1,9 @@
-use crate::db::Database;
-use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+use crate::db::Db;
+use crate::error::AppError;
+
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct ReadingTest {
     pub id: String,
     pub created_by: String,
@@ -16,14 +17,12 @@ pub struct ReadingTest {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct NewReadingTest {
-    pub id: String,
-    pub created_by: String,
-    pub title: String,
-    pub test_type: String,
-    pub difficulty: String,
-    pub duration: String,
-    pub status: String,
+pub struct CreateReadingTest {
+    pub title: Option<String>,
+    pub test_type: Option<String>,
+    pub difficulty: Option<String>,
+    pub duration: Option<String>,
+    pub status: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,85 +34,89 @@ pub struct UpdateReadingTest {
     pub status: Option<String>,
 }
 
-pub fn find_by_id(db: &Database, id: &str, user_id: &str) -> Result<Option<ReadingTest>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, created_by, title, test_type, difficulty, duration, status, created_at, updated_at \
-             FROM reading_tests WHERE id = ?1 AND (created_by = ?2 OR status = 'published')",
-        )
-        .map_err(|e| e.to_string())?;
-    let result: Option<ReadingTest> = stmt
-        .query_map(params![id, user_id], map_row)
-        .map_err(|e| e.to_string())?
-        .next()
-        .transpose()
-        .map_err(|e| e.to_string())?;
+pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<ReadingTest>, AppError> {
+    let result = sqlx::query_as!(
+        ReadingTest,
+        "SELECT id, created_by, title, test_type, difficulty, duration, status, created_at, updated_at
+         FROM reading_tests WHERE id = ? AND (created_by = ? OR status = 'published')",
+        id,
+        user_id
+    )
+    .fetch_optional(pool)
+    .await?;
     Ok(result)
 }
 
-pub fn find_all(db: &Database, user_id: &str) -> Result<Vec<ReadingTest>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, created_by, title, test_type, difficulty, duration, status, created_at, updated_at \
-             FROM reading_tests WHERE created_by = ?1 OR status = 'published'",
-        )
-        .map_err(|e| e.to_string())?;
-    let result: Vec<ReadingTest> = stmt
-        .query_map(params![user_id], map_row)
-        .map_err(|e| e.to_string())?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
+pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<ReadingTest>, AppError> {
+    let result = sqlx::query_as!(
+        ReadingTest,
+        "SELECT id, created_by, title, test_type, difficulty, duration, status, created_at, updated_at
+         FROM reading_tests WHERE created_by = ? OR status = 'published'",
+        user_id
+    )
+    .fetch_all(pool)
+    .await?;
     Ok(result)
 }
 
-pub fn insert(db: &Database, t: &NewReadingTest) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duration, status) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-        params![t.id, t.created_by, t.title, t.test_type, t.difficulty, t.duration, t.status],
+pub async fn insert(pool: &Db, input: &CreateReadingTest, user_id: &str) -> Result<String, AppError> {
+    let id = uuid::Uuid::new_v4().to_string();
+    let now = chrono::Utc::now().to_rfc3339();
+    let title = input.title.as_deref().unwrap_or("");
+    let test_type = input.test_type.as_deref().unwrap_or("Academic");
+    let difficulty = input.difficulty.as_deref().unwrap_or("7");
+    let duration = input.duration.as_deref().unwrap_or("60 mins");
+    let status = input.status.as_deref().unwrap_or("draft");
+    sqlx::query!(
+        "INSERT INTO reading_tests (id, created_by, title, test_type, difficulty, duration, status, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        id,
+        user_id,
+        title,
+        test_type,
+        difficulty,
+        duration,
+        status,
+        now,
+        now
     )
-    .map_err(|e| e.to_string())?;
+    .execute(pool)
+    .await?;
+    Ok(id)
+}
+
+pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateReadingTest) -> Result<(), AppError> {
+    let now = chrono::Utc::now().to_rfc3339();
+    sqlx::query!(
+        "UPDATE reading_tests SET
+         title = COALESCE(?, title),
+         test_type = COALESCE(?, test_type),
+         difficulty = COALESCE(?, difficulty),
+         duration = COALESCE(?, duration),
+         status = COALESCE(?, status),
+         updated_at = ?
+         WHERE id = ? AND created_by = ?",
+        input.title,
+        input.test_type,
+        input.difficulty,
+        input.duration,
+        input.status,
+        now,
+        id,
+        user_id
+    )
+    .execute(pool)
+    .await?;
     Ok(())
 }
 
-pub fn update(db: &Database, id: &str, user_id: &str, u: &UpdateReadingTest) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "UPDATE reading_tests SET \
-         title = COALESCE(?1, title), test_type = COALESCE(?2, test_type), \
-         difficulty = COALESCE(?3, difficulty), duration = COALESCE(?4, duration), \
-         status = COALESCE(?5, status), \
-         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') \
-         WHERE id = ?6 AND created_by = ?7",
-        params![u.title, u.test_type, u.difficulty, u.duration, u.status, id, user_id],
+pub async fn delete(pool: &Db, id: &str, user_id: &str) -> Result<(), AppError> {
+    sqlx::query!(
+        "DELETE FROM reading_tests WHERE id = ? AND created_by = ?",
+        id,
+        user_id
     )
-    .map_err(|e| e.to_string())?;
+    .execute(pool)
+    .await?;
     Ok(())
-}
-
-pub fn delete(db: &Database, id: &str, user_id: &str) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "DELETE FROM reading_tests WHERE id = ?1 AND created_by = ?2",
-        params![id, user_id],
-    )
-    .map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-fn map_row(row: &rusqlite::Row) -> rusqlite::Result<ReadingTest> {
-    Ok(ReadingTest {
-        id: row.get(0)?,
-        created_by: row.get(1)?,
-        title: row.get(2)?,
-        test_type: row.get(3)?,
-        difficulty: row.get(4)?,
-        duration: row.get(5)?,
-        status: row.get(6)?,
-        created_at: row.get(7)?,
-        updated_at: row.get(8)?,
-    })
 }

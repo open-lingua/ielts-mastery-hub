@@ -9,9 +9,6 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
 tauri = { version = "2", features = [] }
-tauri-plugin-shell = "2"
-rusqlite = { version = "0.32", features = ["bundled"] }
-rusqlite_migration = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["v4"] }
@@ -19,6 +16,7 @@ chrono = { version = "0.4", features = ["serde"] }
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 thiserror = "1"
+sqlx = { version = "0.8", features = ["sqlite", "runtime-tokio", "macros"] }
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

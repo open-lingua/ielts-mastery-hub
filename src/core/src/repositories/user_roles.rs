@@ -1,8 +1,9 @@
-use crate::db::Database;
-use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+use crate::db::Db;
+use crate::error::AppError;
+
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct UserRole {
     pub id: String,
     pub user_id: String,
@@ -10,66 +11,74 @@ pub struct UserRole {
     pub created_at: String,
 }
 
-pub fn find_by_user(db: &Database, user_id: &str) -> Result<Vec<UserRole>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare("SELECT id, user_id, role, created_at FROM user_roles WHERE user_id = ?1")
-        .map_err(|e| e.to_string())?;
-    let result: Vec<UserRole> = stmt
-        .query_map(params![user_id], map_row)
-        .map_err(|e| e.to_string())?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
-    Ok(result)
+#[derive(Debug, Deserialize)]
+pub struct CreateUserRole {
+    pub user_id: String,
+    pub role: String,
 }
 
-pub fn find_all(db: &Database) -> Result<Vec<UserRole>, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let mut stmt = conn
-        .prepare("SELECT id, user_id, role, created_at FROM user_roles")
-        .map_err(|e| e.to_string())?;
-    let result: Vec<UserRole> = stmt
-        .query_map([], map_row)
-        .map_err(|e| e.to_string())?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
-    Ok(result)
+#[derive(Debug, Deserialize)]
+pub struct UpdateUserRole {
+    pub role: Option<String>,
 }
 
-pub fn insert(db: &Database, role: &UserRole) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute(
-        "INSERT INTO user_roles (id, user_id, role, created_at) VALUES (?1, ?2, ?3, ?4)",
-        params![role.id, role.user_id, role.role, role.created_at],
+pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<UserRole>, AppError> {
+    let result = sqlx::query_as!(
+        UserRole,
+        "SELECT id, user_id, role, created_at FROM user_roles WHERE id = ? AND user_id = ?",
+        id,
+        user_id
     )
-    .map_err(|e| e.to_string())?;
+    .fetch_optional(pool)
+    .await?;
+    Ok(result)
+}
+
+pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<UserRole>, AppError> {
+    let result = sqlx::query_as!(
+        UserRole,
+        "SELECT id, user_id, role, created_at FROM user_roles WHERE user_id = ?",
+        user_id
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(result)
+}
+
+pub async fn insert(pool: &Db, input: &CreateUserRole) -> Result<String, AppError> {
+    let id = uuid::Uuid::new_v4().to_string();
+    let now = chrono::Utc::now().to_rfc3339();
+    sqlx::query!(
+        "INSERT INTO user_roles (id, user_id, role, created_at) VALUES (?, ?, ?, ?)",
+        id,
+        input.user_id,
+        input.role,
+        now
+    )
+    .execute(pool)
+    .await?;
+    Ok(id)
+}
+
+pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateUserRole) -> Result<(), AppError> {
+    sqlx::query!(
+        "UPDATE user_roles SET role = COALESCE(?, role) WHERE id = ? AND user_id = ?",
+        input.role,
+        id,
+        user_id
+    )
+    .execute(pool)
+    .await?;
     Ok(())
 }
 
-pub fn delete(db: &Database, id: &str) -> Result<(), String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    conn.execute("DELETE FROM user_roles WHERE id = ?1", params![id])
-        .map_err(|e| e.to_string())?;
+pub async fn delete(pool: &Db, id: &str, user_id: &str) -> Result<(), AppError> {
+    sqlx::query!(
+        "DELETE FROM user_roles WHERE id = ? AND user_id = ?",
+        id,
+        user_id
+    )
+    .execute(pool)
+    .await?;
     Ok(())
-}
-
-pub fn has_role(db: &Database, user_id: &str, role: &str) -> Result<bool, String> {
-    let conn = db.conn.lock().map_err(|e| e.to_string())?;
-    let count: i64 = conn
-        .query_row(
-            "SELECT COUNT(*) FROM user_roles WHERE user_id = ?1 AND role = ?2",
-            params![user_id, role],
-            |row| row.get(0),
-        )
-        .map_err(|e| e.to_string())?;
-    Ok(count > 0)
-}
-
-fn map_row(row: &rusqlite::Row) -> rusqlite::Result<UserRole> {
-    Ok(UserRole {
-        id: row.get(0)?,
-        user_id: row.get(1)?,
-        role: row.get(2)?,
-        created_at: row.get(3)?,
-    })
 }

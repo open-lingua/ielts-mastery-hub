@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
-use crate::db::Database;
+use crate::db::Db;
 
 const MAX_RESPONSE_LEN: usize = 10_000;
 const MAX_PROMPT_LEN: usize = 5_000;
@@ -71,7 +71,7 @@ pub struct GradingResult {
 
 #[tauri::command]
 pub async fn grade_writing(
-    _db: State<'_, Database>,
+    _db: State<'_, Db>,
     input: GradeWritingInput,
 ) -> Result<GradingResult, String> {
     if input.task_type != "task1" && input.task_type != "task2" {
