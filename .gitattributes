@@ -3,6 +3,7 @@
 # Build output
 *.css linguist-generated
 *.js  linguist-generated
+src/ui/index.html linguist-generated
 
 # SQL files (PLpgSQL)
 *.sql linguist-vendored
