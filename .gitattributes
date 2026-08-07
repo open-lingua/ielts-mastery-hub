@@ -3,10 +3,10 @@
 # Build output
 *.css linguist-generated
 *.js  linguist-generated
-*.html linguist-generated
 
 # SQL files (PLpgSQL)
 *.sql linguist-vendored
+*.html linguist-vendored
 
 # Documentation
 *.md linguist-documentation
