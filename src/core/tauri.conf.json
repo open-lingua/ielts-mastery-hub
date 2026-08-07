@@ -1,0 +1,23 @@
+{
+  "productName": "ielts-mastery-hub",
+  "version": "0.1.0",
+  "identifier": "com.openlingua.ieltsmasteryhub",
+  "build": {
+    "frontendDist": "../ui/dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "IELTS Mastery Hub",
+        "width": 1280,
+        "height": 800
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/icon.png"]
+  }
+}
