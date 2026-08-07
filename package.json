@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "vitest run --silent",
-    "test:watch": "vitest"
+    "dev": "vite --config src/ui/vite.config.ts",
+    "build": "vite build --config src/ui/vite.config.ts",
+    "build:dev": "vite build --mode development --config src/ui/vite.config.ts",
+    "lint": "eslint --config src/ui/eslint.config.js src/ui",
+    "preview": "vite preview --config src/ui/vite.config.ts",
+    "test": "vitest run --silent --config src/ui/vitest.config.ts",
+    "test:watch": "vitest --config src/ui/vitest.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
