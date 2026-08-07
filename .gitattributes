@@ -1,4 +1,22 @@
 # https://github.com/github/linguist/blob/master/docs/overrides.md#using-gitattributes
+
+# Build output
 *.css linguist-generated
-*.js linguist-generated
-*.sql linguist-generated
+*.js  linguist-generated
+
+# SQL files (PLpgSQL)
+*.sql linguist-vendored
+
+# Documentation
+*.md linguist-documentation
+
+# Lock files
+*.lockb           linguist-generated
+Cargo.lock        linguist-generated
+package-lock.json linguist-generated
+
+# Build dist
+dist/**/* linguist-generated
+
+# Generated JSON schemas
+src/core/gen/**/* linguist-generated
