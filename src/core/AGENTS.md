@@ -1,0 +1,90 @@
+# src/core — Rust / Tauri 2 Layer
+
+## Tauri Version & Key Config
+
+- **Tauri**: 2.x
+- Config file: `src/core/tauri.conf.json`
+- Key features enabled:
+  - `[e.g. shell:open, fs:read-all, http:all]` — [YOUR ENABLED PLUGINS/PERMISSIONS]
+  - Plugin list: `[YOUR PLUGINS e.g. tauri-plugin-store, tauri-plugin-http]`
+
+## Command Definition Pattern
+
+All Tauri commands live in `src/core/src/commands/`.
+
+```rust
+// src/core/src/commands/example.rs
+#[tauri::command]
+pub async fn my_command(arg: String, state: tauri::State<'_, AppState>) -> Result<MyResponse, AppError> {
+    // implementation
+}
+```
+
+Commands are registered in `src/core/src/lib.rs` (or `main.rs`):
+
+```rust
+tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![
+        commands::example::my_command,
+    ])
+```
+
+- One file per domain in `commands/` (e.g., `reading.rs`, `writing.rs`, `auth.rs`).
+- All commands must return `Result<T, AppError>` — never panic or unwrap.
+
+## Error Handling
+
+Custom error type is defined in `src/core/src/error.rs`:
+
+```rust
+#[derive(Debug, thiserror::Error, serde::Serialize)]
+pub enum AppError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("[YOUR VARIANT]: {0}")]
+    [YourVariant](String),
+}
+```
+
+- Uses `thiserror` for derivation.
+- `AppError` implements `serde::Serialize` so it can be sent to the frontend as a structured JSON error.
+- Frontend receives errors in the `catch` block of `invoke(...)`.
+
+## Key Crates
+
+| Crate              | Purpose                                      |
+|--------------------|----------------------------------------------|
+| `tauri`            | Core desktop runtime and IPC                 |
+| `serde`            | Serialization for IPC payloads               |
+| `thiserror`        | Ergonomic error type derivation              |
+| `tokio`            | Async runtime                                |
+| `[YOUR CRATE]`     | [YOUR PURPOSE e.g. sqlx → SQLite DB access]  |
+| `[YOUR CRATE]`     | [YOUR PURPOSE e.g. reqwest → HTTP client]    |
+
+## Module Structure
+
+```
+src/core/src/
+├── commands/       # One file per feature domain; all #[tauri::command] fns here
+├── models/         # Rust structs mirroring DB schema or IPC payloads
+├── services/       # Business logic, called by commands
+├── state.rs        # AppState struct registered with Tauri's manage()
+├── error.rs        # AppError enum
+└── lib.rs          # Tauri builder, plugin registration, invoke_handler
+```
+
+## Rust Conventions
+
+- All commands are `async` — use `async fn` even for simple operations.
+- Shared app state uses `tauri::State<'_, T>` — state types must be `Send + Sync`.
+- Struct fields use `snake_case`; add `#[serde(rename_all = "camelCase")]` on any struct exposed to the frontend.
+- Avoid `unwrap()` / `expect()` in command handlers — propagate with `?`.
+- Business logic goes in `services/`, not directly in `commands/`.
+
+## Do NOT
+
+- Do not call `std::process::exit()` inside commands — use `AppError` instead.
+- Do not store non-`Send` types in `AppState`.
+- Do not define commands outside the `commands/` directory.
+- Do not serialize sensitive data (API keys, tokens) into command return values.
+- Do not use `#[tauri::command]` on private functions — they must be `pub`.
