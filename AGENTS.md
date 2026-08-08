@@ -57,6 +57,18 @@ pnpm tauri build
 └── [YOUR CONFIG FILE e.g. .env, turbo.json, etc.]
 ```
 
+## Layer-Specific Context Files
+
+Before modifying code in a layer, read the corresponding context file (both files are identical — pick either):
+
+- **`src/core/*`** (Rust/Tauri backend): `src/core/AGENTS.md` or `src/core/CLAUDE.md` — both files have identical content.
+- **`src/ui/*`** (React/TS frontend): `src/ui/AGENTS.md` or `src/ui/CLAUDE.md` — both files have identical content.
+
+## Project Documentation
+
+- **`docs/FRONTEND_ARCHITECTURE.md`** — frontend architecture overview; read before making structural UI changes.
+- **`docs/PRODUCT.md`** — product requirements and feature specs; read before adding or changing features.
+
 ## Environment Variables & Config
 
 - Frontend env vars: defined in `.env` / `.env.local` — must be prefixed with `VITE_` to be exposed.
