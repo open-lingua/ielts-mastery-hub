@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "identifier": "com.openlingua.ieltsmasteryhub",
   "build": {
-    "frontendDist": "../ui/dist"
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:8080",
+    "beforeDevCommand": "bun dev",
+    "beforeBuildCommand": "bun build"
   },
   "app": {
     "withGlobalTauri": false,

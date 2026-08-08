@@ -10,7 +10,9 @@
     "lint": "eslint --config src/ui/eslint.config.js src/ui",
     "preview": "vite preview --config src/ui/vite.config.ts",
     "test": "vitest run --silent --config src/ui/vitest.config.ts",
-    "test:watch": "vitest --config src/ui/vitest.config.ts"
+    "test:watch": "vitest --config src/ui/vitest.config.ts",
+    "tauri": "tauri dev --config src/core/tauri.conf.json",
+    "tauri:build": "tauri build --config src/core/tauri.conf.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -42,6 +44,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.95.3",
+    "@tauri-apps/api": "^2",
     "@tanstack/react-query": "^5.90.21",
     "@testing-library/user-event": "^14.6.1",
     "class-variance-authority": "^0.7.1",
@@ -68,6 +71,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@tauri-apps/cli": "^2",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
