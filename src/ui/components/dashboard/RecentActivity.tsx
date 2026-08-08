@@ -4,7 +4,7 @@ import { BookOpen, Headphones, PenTool, Clock, CheckCircle, ChevronRight, AlertC
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { fetchRecentActivity, type RecentActivity as ActivityItem } from "@/services/dashboardService";
 import { formatDistanceToNow } from "date-fns";
 
@@ -27,21 +27,17 @@ function getActivityLink(activity: ActivityItem): string {
 }
 
 const RecentActivity: React.FC = () => {
-  const { user } = useAuth();
+  const userId = getAnonId();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-    fetchRecentActivity(user.id)
+    fetchRecentActivity(userId)
       .then(setActivities)
       .catch((e) => setError(e.message))
       .finally(() => setIsLoading(false));
-  }, [user]);
+  }, [userId]);
 
   if (isLoading) {
     return (
@@ -69,7 +65,7 @@ const RecentActivity: React.FC = () => {
     );
   }
 
-  if (!user || activities.length === 0) {
+  if (activities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
         <Clock className="h-10 w-10 text-muted-foreground/40 mb-3" />

@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, Mic, ArrowRight, CheckCircle2, Star, Moon, Sun, ChevronRight, Sparkles, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { fetchPlans, type Plan } from "@/services/pricingService";
+import { BookOpen, PenTool, Headphones, Mic, ArrowRight, Star, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { ieltsModules } from "@/data/mockData";
 
 const iconMap: Record<string, React.FC<{ className?: string }>> = {
@@ -14,97 +9,6 @@ const iconMap: Record<string, React.FC<{ className?: string }>> = {
   BookOpen,
   PenTool,
   Mic,
-};
-
-const LandingPricing: React.FC = () => {
-  const [isYearly, setIsYearly] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    fetchPlans().then(setPlans).catch(console.error).finally(() => setLoading(false));
-  }, []);
-
-  const displayed = plans.filter(p => p.billing_period === (isYearly ? "yearly" : "monthly"));
-
-  return (
-    <section id="pricing" className="py-20">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold md:text-4xl">Simple, Transparent Pricing</h2>
-          <p className="mt-3 text-muted-foreground">Start free. Upgrade when you're ready.</p>
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <span className={`text-sm font-medium ${!isYearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
-            <Switch checked={isYearly} onCheckedChange={setIsYearly} />
-            <span className={`text-sm font-medium ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>Yearly</span>
-            {isYearly && (
-              <Badge variant="secondary" className="ml-1 bg-success/15 text-success border-success/30 text-xs">Save ~20%</Badge>
-            )}
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-        ) : (
-          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
-            <AnimatePresence mode="wait">
-              {displayed.map((plan) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -16 }}
-                  transition={{ duration: 0.25 }}
-                  className={`relative rounded-2xl border bg-card p-8 flex flex-col ${
-                    plan.is_popular
-                      ? "border-2 border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/20"
-                      : "border-border"
-                  }`}
-                >
-                  {plan.is_popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-primary text-primary-foreground gap-1"><Sparkles className="h-3 w-3" /> Most Popular</Badge>
-                    </div>
-                  )}
-                  <h3 className="text-xl font-bold">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
-                  <div className="mt-5">
-                    <span className="text-4xl font-extrabold">${plan.price.toFixed(2)}</span>
-                    <span className="text-muted-foreground ml-1">/{isYearly ? "year" : "month"}</span>
-                  </div>
-                  <ul className="mt-6 space-y-3 text-sm flex-1">
-                    {plan.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-success" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => {
-                      const url = new URL(plan.checkout_url);
-                      if (user?.email) {
-                        url.searchParams.set("checkout[custom][user_email]", user.email);
-                        url.searchParams.set("checkout[email]", user.email);
-                      }
-                      window.location.href = url.toString();
-                    }}
-                    className={`mt-8 w-full rounded-xl py-3 text-sm font-bold transition-transform hover:scale-105 ${
-                      plan.is_popular
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                        : "border border-border text-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    Subscribe
-                  </button>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
-    </section>
-  );
 };
 
 const LandingPage: React.FC = () => {
@@ -158,18 +62,9 @@ const LandingPage: React.FC = () => {
               to="/dashboard"
               className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105"
             >
-              Start Free Practice <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Start Practicing <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a
-              href="#pricing"
-              className="flex items-center gap-2 rounded-xl border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary"
-            >
-              Go Premium <ChevronRight className="h-4 w-4" />
-            </a>
           </div>
-          <Link to="/dashboard" className="mt-4 inline-block text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Try for free — no login required →
-          </Link>
         </div>
       </section>
 
@@ -222,8 +117,6 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <LandingPricing />
 
       {/* Footer */}
       <footer className="border-t border-border bg-card py-12">

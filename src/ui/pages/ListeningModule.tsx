@@ -17,7 +17,7 @@ import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
@@ -83,7 +83,7 @@ const ListeningErrorState = ({ onBack }: { onBack: () => void }) => (
 const ListeningModule: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const userId = getAnonId();
   const testId = searchParams.get("id");
 
   const [test, setTest] = useState<ListeningTest | null>(null);
@@ -128,8 +128,8 @@ const ListeningModule: React.FC = () => {
         setAudioEnded(Array(count).fill(false));
 
         // Hydrate existing session
-        if (user) {
-          const session = await fetchExistingSession(user.id, testId, "listening");
+        {
+          const session = await fetchExistingSession(userId, testId, "listening");
           if (session && session.status === "in_progress" && session.started_at) {
             const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000);
             const remaining = data.totalTime - elapsed;
@@ -153,7 +153,7 @@ const ListeningModule: React.FC = () => {
       }
     };
     loadData();
-  }, [testId, user]);
+  }, [testId, userId]);
 
   const scrollToTop = () => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -213,14 +213,14 @@ const ListeningModule: React.FC = () => {
     setCompletedSections(Array(test.sections.length).fill(true));
     setTestFinished(true);
     // Persist on time-up too
-    if (user && testId) {
+    if (testId) {
       try {
         await submitListeningTest(sessionId!, test, answers);
       } catch (err) {
         console.error("Failed to save results on time-up:", err);
       }
     }
-  }, [testFinished, test, user, testId, sessionId, answers]);
+  }, [testFinished, test, testId, sessionId, answers]);
 
   const handleRetry = () => {
     if (!test) return;
@@ -241,14 +241,14 @@ const ListeningModule: React.FC = () => {
   };
 
   const handleStart = async () => {
-    if (user && testId) {
+    if (testId) {
       try {
-        const active = await fetchActiveSession(user.id);
+        const active = await fetchActiveSession(userId);
         if (active && active.test_id !== testId) {
           toast.error("You already have a test in progress. Please resume or submit it first.");
           return;
         }
-        const session = await startTestSession(user.id, testId, "listening");
+        const session = await startTestSession(userId, testId, "listening");
         setStartedAt(session.started_at);
         setSessionId(session.id);
       } catch (err) {

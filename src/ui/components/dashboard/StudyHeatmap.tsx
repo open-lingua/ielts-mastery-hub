@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { supabase } from "@/integrations/supabase/client";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -102,7 +102,7 @@ function calculateLongestStreak(days: DayData[]): number {
 
 const StudyHeatmap: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const { user } = useAuth();
+  const userId = getAnonId();
   const [selectedYear, setSelectedYear] = useState(String(currentYear));
   const [loading, setLoading] = useState(true);
   const [rawDays, setRawDays] = useState<DayData[]>([]);
@@ -110,18 +110,12 @@ const StudyHeatmap: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
 
-  // Fetch available years from user sessions
   useEffect(() => {
-    if (!user) {
-      setAvailableYears([currentYear]);
-      return;
-    }
-
     const fetchYears = async () => {
       const { data } = await supabase
         .from("user_test_sessions")
         .select("started_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .order("started_at", { ascending: true });
 
       if (data && data.length > 0) {
@@ -129,7 +123,6 @@ const StudyHeatmap: React.FC = () => {
         data.forEach((row) => {
           yearSet.add(new Date(row.started_at).getFullYear());
         });
-        // Always include current year
         yearSet.add(currentYear);
         const sorted = Array.from(yearSet).sort((a, b) => b - a);
         setAvailableYears(sorted);
@@ -139,19 +132,9 @@ const StudyHeatmap: React.FC = () => {
     };
 
     fetchYears();
-  }, [user, currentYear]);
+  }, [userId, currentYear]);
 
-  // Fetch session counts for selected year
   useEffect(() => {
-    if (!user) {
-      const emptyDays = buildCalendar(Number(selectedYear), {});
-      setRawDays(emptyDays);
-      setWeeks(groupDaysIntoWeeks(emptyDays));
-      setTotal(0);
-      setLoading(false);
-      return;
-    }
-
     const fetchData = async () => {
       setLoading(true);
       const yearNum = Number(selectedYear);
@@ -161,7 +144,7 @@ const StudyHeatmap: React.FC = () => {
       const { data } = await supabase
         .from("user_test_sessions")
         .select("started_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .gte("started_at", startDate)
         .lte("started_at", endDate);
 
@@ -181,7 +164,7 @@ const StudyHeatmap: React.FC = () => {
     };
 
     fetchData();
-  }, [user, selectedYear]);
+  }, [userId, selectedYear]);
 
   const longestStreak = useMemo(() => calculateLongestStreak(rawDays), [rawDays]);
 

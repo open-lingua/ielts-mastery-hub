@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -217,7 +217,7 @@ const TestCard: React.FC<{
 };
 
 const TestLibrary: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const userId = getAnonId();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("All");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
@@ -228,17 +228,13 @@ const TestLibrary: React.FC = () => {
   const tabs = ["All", "Reading", "Writing", "Listening"];
 
   useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
     setIsLoading(true);
 
     const load = async () => {
       try {
         const [testsData, active] = await Promise.all([
-          fetchLibraryData(user.id),
-          fetchActiveSession(user.id),
+          fetchLibraryData(userId),
+          fetchActiveSession(userId),
         ]);
         setTests(testsData);
 
@@ -255,7 +251,7 @@ const TestLibrary: React.FC = () => {
       }
     };
     load();
-  }, [user]);
+  }, [userId]);
 
   const filteredTests = tests
     .filter((t) => activeTab === "All" || moduleLabels[t.module] === activeTab)
@@ -265,7 +261,6 @@ const TestLibrary: React.FC = () => {
     });
 
   const handleStart = (test: PracticeTestCard) => {
-    if (!user) return;
 
     // Block if another test is already in progress
     if (activeSessionInfo && activeSessionInfo.session.test_id !== test.id) {
@@ -374,20 +369,11 @@ const TestLibrary: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-semibold">No tests found</h3>
                 <p className="text-muted-foreground max-w-sm mt-1 mb-4">
-                  {isAuthenticated
-                    ? "No published tests are available in this category yet."
-                    : "Please log in to view available practice tests."}
+                  No published tests are available in this category yet.
                 </p>
-                {!isAuthenticated && (
-                  <Button asChild>
-                    <Link to="/login">Log In</Link>
-                  </Button>
-                )}
-                {isAuthenticated && (
-                  <Button onClick={() => setActiveTab("All")}>
-                    View All Tests
-                  </Button>
-                )}
+                <Button onClick={() => setActiveTab("All")}>
+                  View All Tests
+                </Button>
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PenTool, BookOpen, Headphones, Flame, Clock } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
 import RecentActivity from "@/components/dashboard/RecentActivity";
@@ -71,24 +71,22 @@ function calculateStreak(dates: string[]): number {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, profile, isAuthenticated } = useAuth();
-  const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Future Achiever";
+  const userId = getAnonId();
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
     const fetchStreak = async () => {
       const { data } = await supabase
         .from("user_test_sessions")
         .select("started_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .order("started_at", { ascending: false });
       if (data) {
         setStreak(calculateStreak(data.map((r) => r.started_at)));
       }
     };
     fetchStreak();
-  }, [user]);
+  }, [userId]);
 
   return (
     <DashboardLayout>
@@ -98,10 +96,10 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold md:text-3xl">
-                Welcome{isAuthenticated ? " back" : ""}, {displayName}! 👋
+                Welcome back! 👋
               </h1>
               <p className="mt-1 text-muted-foreground">
-                {isAuthenticated ? "Keep up the great work on your IELTS journey." : "Explore freely — sign up anytime to save your progress."}
+                Keep up the great work on your IELTS journey.
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-warning/10 px-4 py-2.5 text-warning">

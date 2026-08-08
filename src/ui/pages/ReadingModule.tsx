@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ExamSandbox from "@/components/shared/ExamSandbox";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
 import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
@@ -71,7 +71,7 @@ const ReadingErrorState: React.FC<{ message: string; onBack: () => void }> = ({ 
 const ReadingModule: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const userId = getAnonId();
   const testId = searchParams.get("id");
 
   // Data fetching
@@ -116,8 +116,8 @@ const ReadingModule: React.FC = () => {
         setVisitedPassages(data.passages.map((_, i) => i === 0));
 
         // Hydrate existing session
-        if (user) {
-          const session = await fetchExistingSession(user.id, testId, "reading");
+        {
+          const session = await fetchExistingSession(userId, testId, "reading");
           if (session && session.status === "in_progress" && session.started_at) {
             const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000);
             const remaining = 3600 - elapsed;
@@ -141,7 +141,7 @@ const ReadingModule: React.FC = () => {
       }
     };
     loadData();
-  }, [testId, navigate, user]);
+  }, [testId, navigate, userId]);
 
   const [gradingResult, setGradingResult] = useState<{ rawScore: number; bandScore: number } | null>(null);
 
@@ -214,15 +214,14 @@ const ReadingModule: React.FC = () => {
   };
 
   const handleStart = async () => {
-    if (user && testId) {
+    if (testId) {
       try {
-        // Check for active session on a different test
-        const active = await fetchActiveSession(user.id);
+        const active = await fetchActiveSession(userId);
         if (active && active.test_id !== testId) {
           toast.error("You already have a test in progress. Please resume or submit it first.");
           return;
         }
-        const session = await startTestSession(user.id, testId, "reading");
+        const session = await startTestSession(userId, testId, "reading");
         setStartedAt(session.started_at);
         setSessionId(session.id);
       } catch {

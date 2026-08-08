@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/contexts/AuthContext";
+import { getAnonId } from "@/lib/anonId";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 
@@ -26,21 +26,16 @@ const MODULE_COLORS: Record<string, string> = {
 };
 
 const BandScoreChart: React.FC = () => {
-  const { user } = useAuth();
+  const userId = getAnonId();
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
     const fetch = async () => {
       const { data } = await supabase
         .from("user_test_sessions")
         .select("test_type, score_band, completed_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("status", "completed")
         .not("score_band", "is", null)
         .not("completed_at", "is", null)
@@ -51,7 +46,7 @@ const BandScoreChart: React.FC = () => {
     };
 
     fetch();
-  }, [user]);
+  }, [userId]);
 
   const chartData = useMemo(() => {
     if (sessions.length === 0) return [];

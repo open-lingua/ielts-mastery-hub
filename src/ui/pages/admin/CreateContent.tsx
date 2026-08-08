@@ -52,7 +52,6 @@ import {
 import { AdminLayout } from "@/components/AdminLayout";
 import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
 import { saveReadingTest, updateReadingTest, fetchReadingTest } from "@/services/readingTestService";
 import { saveWritingTest, updateWritingTest, fetchWritingTest } from "@/services/writingService";
 import { saveListeningTest, updateListeningTest, fetchListeningTest } from "@/services/listeningService";
@@ -1520,7 +1519,6 @@ type TabValue = (typeof VALID_TABS)[number];
 const CreateContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const tabParam = searchParams.get("type") as TabValue | null;
   const editId = searchParams.get("id");
   const [activeTab, setActiveTab] = useState<TabValue>(
@@ -1670,10 +1668,6 @@ const CreateContent: React.FC = () => {
   };
 
   const handleSaveReadingTest = async (status: "draft" | "published") => {
-    if (!user) {
-      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
-      return;
-    }
     setIsSaving(true);
     try {
       if (effectiveEditId) {
@@ -1718,10 +1712,6 @@ const CreateContent: React.FC = () => {
   };
 
   const handleSaveWritingTest = async (status: "draft" | "published") => {
-    if (!user) {
-      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
-      return;
-    }
     setIsSaving(true);
     const taskPayload: Parameters<typeof saveWritingTest>[0]["tasks"] = writingTasks
       .filter((t) => t.title.trim() || t.prompt.trim())
@@ -1776,10 +1766,6 @@ const CreateContent: React.FC = () => {
   };
 
   const handleSaveListeningTest = async (status: "draft" | "published") => {
-    if (!user) {
-      toast({ title: "Error", description: "You must be logged in to save a test.", variant: "destructive" });
-      return;
-    }
     setIsSaving(true);
     const sectionPayload = listeningSections.map((s) => ({
       id: s.id,
