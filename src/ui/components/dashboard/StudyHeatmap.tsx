@@ -18,7 +18,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getAnonId } from "@/lib/anonId";
-import { supabase } from "@/integrations/supabase/client";
+import { listUserTestSessions } from "@/lib/tauri";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -47,29 +47,20 @@ function countToLevel(count: number): number {
 
 function buildCalendar(year: number, countMap: Record<string, number>): DayData[] {
   const days: DayData[] = [];
-  const start = new Date(year, 0, 1);
+  const cursor = new Date(year, 0, 1);
   const end = new Date(year, 11, 31);
-  const cursor = new Date(start);
-
   while (cursor <= end) {
     const dateString = cursor.toISOString().split("T")[0];
     const count = countMap[dateString] || 0;
-    days.push({
-      date: new Date(cursor),
-      dateString,
-      count,
-      level: countToLevel(count),
-    });
+    days.push({ date: new Date(cursor), dateString, count, level: countToLevel(count) });
     cursor.setDate(cursor.getDate() + 1);
   }
-
   return days;
 }
 
 function groupDaysIntoWeeks(days: DayData[]): (DayData | null)[][] {
   const weeks: (DayData | null)[][] = [];
   let currentWeek: (DayData | null)[] = new Array(7).fill(null);
-
   days.forEach((day) => {
     const dayOfWeek = day.date.getDay();
     currentWeek[dayOfWeek] = day;
@@ -78,11 +69,7 @@ function groupDaysIntoWeeks(days: DayData[]): (DayData | null)[][] {
       currentWeek = new Array(7).fill(null);
     }
   });
-
-  if (currentWeek.some((d) => d !== null)) {
-    weeks.push(currentWeek);
-  }
-
+  if (currentWeek.some((d) => d !== null)) weeks.push(currentWeek);
   return weeks;
 }
 
@@ -90,12 +77,8 @@ function calculateLongestStreak(days: DayData[]): number {
   let max = 0;
   let current = 0;
   for (const day of days) {
-    if (day.count > 0) {
-      current++;
-      max = Math.max(max, current);
-    } else {
-      current = 0;
-    }
+    if (day.count > 0) { current++; max = Math.max(max, current); }
+    else { current = 0; }
   }
   return max;
 }
@@ -109,62 +92,40 @@ const StudyHeatmap: React.FC = () => {
   const [weeks, setWeeks] = useState<(DayData | null)[][]>([]);
   const [total, setTotal] = useState(0);
   const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
+  const [allStartDates, setAllStartDates] = useState<string[]>([]);
 
+  // Load all sessions once
   useEffect(() => {
-    const fetchYears = async () => {
-      const { data } = await supabase
-        .from("user_test_sessions")
-        .select("started_at")
-        .eq("user_id", userId)
-        .order("started_at", { ascending: true });
+    listUserTestSessions(userId)
+      .then((sessions) => {
+        const dates = sessions.map((s) => s.started_at);
+        setAllStartDates(dates);
 
-      if (data && data.length > 0) {
-        const yearSet = new Set<number>();
-        data.forEach((row) => {
-          yearSet.add(new Date(row.started_at).getFullYear());
-        });
+        const yearSet = new Set<number>(dates.map((d) => new Date(d).getFullYear()));
         yearSet.add(currentYear);
-        const sorted = Array.from(yearSet).sort((a, b) => b - a);
-        setAvailableYears(sorted);
-      } else {
-        setAvailableYears([currentYear]);
-      }
-    };
-
-    fetchYears();
+        setAvailableYears(Array.from(yearSet).sort((a, b) => b - a));
+      })
+      .catch(() => {});
   }, [userId, currentYear]);
 
+  // Build calendar when year or data changes
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const yearNum = Number(selectedYear);
-      const startDate = `${yearNum}-01-01T00:00:00.000Z`;
-      const endDate = `${yearNum}-12-31T23:59:59.999Z`;
+    setLoading(true);
+    const yearNum = Number(selectedYear);
+    const countMap: Record<string, number> = {};
+    allStartDates.forEach((d) => {
+      const date = new Date(d);
+      if (date.getFullYear() !== yearNum) return;
+      const key = date.toISOString().split("T")[0];
+      countMap[key] = (countMap[key] || 0) + 1;
+    });
 
-      const { data } = await supabase
-        .from("user_test_sessions")
-        .select("started_at")
-        .eq("user_id", userId)
-        .gte("started_at", startDate)
-        .lte("started_at", endDate);
-
-      const countMap: Record<string, number> = {};
-      if (data) {
-        data.forEach((row) => {
-          const dateKey = new Date(row.started_at).toISOString().split("T")[0];
-          countMap[dateKey] = (countMap[dateKey] || 0) + 1;
-        });
-      }
-
-      const days = buildCalendar(yearNum, countMap);
-      setRawDays(days);
-      setWeeks(groupDaysIntoWeeks(days));
-      setTotal(days.reduce((acc, d) => acc + d.count, 0));
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [userId, selectedYear]);
+    const days = buildCalendar(yearNum, countMap);
+    setRawDays(days);
+    setWeeks(groupDaysIntoWeeks(days));
+    setTotal(days.reduce((acc, d) => acc + d.count, 0));
+    setLoading(false);
+  }, [selectedYear, allStartDates]);
 
   const longestStreak = useMemo(() => calculateLongestStreak(rawDays), [rawDays]);
 
@@ -197,20 +158,16 @@ const StudyHeatmap: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             {availableYears.map((y) => (
-              <SelectItem key={y} value={String(y)}>
-                {y}
-              </SelectItem>
+              <SelectItem key={y} value={String(y)}>{y}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Heatmap Grid */}
         <div className="overflow-x-auto pb-2">
           <div className="min-w-[720px]">
             <div className="flex gap-[3px] relative pt-5">
-              {/* Month Labels */}
               {monthLabels.map((month) => (
                 <span
                   key={month.name + month.index}
@@ -220,18 +177,12 @@ const StudyHeatmap: React.FC = () => {
                   {month.name}
                 </span>
               ))}
-
-              {/* Weeks */}
               <TooltipProvider delayDuration={100}>
                 {loading
                   ? Array.from({ length: 53 }).map((_, i) => (
                       <div key={i} className="flex flex-col gap-[3px]">
                         {Array.from({ length: 7 }).map((_, j) => (
-                          <Skeleton
-                            key={j}
-                            className="w-[10px] h-[10px] rounded-sm"
-                            style={{ animationDelay: `${(i * 7 + j) * 5}ms` }}
-                          />
+                          <Skeleton key={j} className="w-[10px] h-[10px] rounded-sm" style={{ animationDelay: `${(i * 7 + j) * 5}ms` }} />
                         ))}
                       </div>
                     ))
@@ -244,13 +195,7 @@ const StudyHeatmap: React.FC = () => {
                         className="flex flex-col gap-[3px]"
                       >
                         {week.map((day, dayIndex) => {
-                          if (!day)
-                            return (
-                              <div
-                                key={`empty-${dayIndex}`}
-                                className="w-[10px] h-[10px]"
-                              />
-                            );
+                          if (!day) return <div key={`empty-${dayIndex}`} className="w-[10px] h-[10px]" />;
                           return (
                             <Tooltip key={day.dateString}>
                               <TooltipTrigger asChild>
@@ -263,16 +208,9 @@ const StudyHeatmap: React.FC = () => {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="text-center">
-                                <p className="font-semibold">
-                                  {day.count === 0 ? "No" : day.count} sessions
-                                </p>
+                                <p className="font-semibold">{day.count === 0 ? "No" : day.count} sessions</p>
                                 <p className="text-muted-foreground text-xs">
-                                  {day.date.toLocaleDateString("en-US", {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })}
+                                  {day.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -285,27 +223,19 @@ const StudyHeatmap: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer: Legend + Stats */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-border pt-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <span>Less</span>
             <div className="flex gap-1">
               {[0, 1, 2, 3, 4].map((level) => (
-                <div
-                  key={level}
-                  className={cn("w-[10px] h-[10px] rounded-sm", INTENSITY_CLASSES[level])}
-                />
+                <div key={level} className={cn("w-[10px] h-[10px] rounded-sm", INTENSITY_CLASSES[level])} />
               ))}
             </div>
             <span>More</span>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <span>
-              Total: <strong className="text-foreground">{total.toLocaleString()}</strong> sessions
-            </span>
-            <span>
-              Longest Streak: <strong className="text-foreground">{longestStreak}</strong> days
-            </span>
+            <span>Total: <strong className="text-foreground">{total.toLocaleString()}</strong> sessions</span>
+            <span>Longest Streak: <strong className="text-foreground">{longestStreak}</strong> days</span>
           </div>
         </div>
       </CardContent>
