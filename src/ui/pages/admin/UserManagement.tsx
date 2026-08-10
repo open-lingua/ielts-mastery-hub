@@ -51,7 +51,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from "@/integrations/supabase/client";
+import { listProfiles, listUserRoles, updateProfile, deleteProfile, createUserRole, deleteUserRole } from "@/lib/tauri";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
@@ -169,38 +169,41 @@ const UserManagement: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch users with server-side pagination + search
+  // Fetch all profiles client-side, then paginate + search locally
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
+      const allProfiles = await listProfiles();
+
+      // Client-side search
+      const filtered = debouncedSearch
+        ? allProfiles.filter((p) => {
+            const q = debouncedSearch.toLowerCase();
+            return (
+              (p.full_name ?? "").toLowerCase().includes(q) ||
+              (p.email ?? "").toLowerCase().includes(q)
+            );
+          })
+        : allProfiles;
+
+      // Sort by updated_at descending
+      filtered.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+
+      setTotalCount(filtered.length);
+
+      // Client-side pagination
       const from = (currentPage - 1) * ROWS_PER_PAGE;
-      const to = from + ROWS_PER_PAGE - 1;
+      const page = filtered.slice(from, from + ROWS_PER_PAGE);
 
-      let query = supabase
-        .from("profiles")
-        .select("id, full_name, email, avatar_url, plan_type, is_banned, ban_reason, banned_until, updated_at", { count: "exact" });
-
-      if (debouncedSearch) {
-        query = query.or(`full_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
-      }
-
-      const { data: profiles, count, error } = await query
-        .order("updated_at", { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-
-      // Fetch roles for these user IDs
-      const userIds = (profiles ?? []).map((p) => p.id);
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id, role")
-        .in("user_id", userIds.length > 0 ? userIds : ["__none__"]);
-
+      // Fetch roles for this page of users in parallel
+      const roleResults = await Promise.all(page.map((p) => listUserRoles(p.id).catch(() => [])));
       const roleMap = new Map<string, string>();
-      (roles ?? []).forEach((r) => roleMap.set(r.user_id, r.role));
+      page.forEach((p, i) => {
+        const role = roleResults[i]?.[0]?.role ?? "student";
+        roleMap.set(p.id, role);
+      });
 
-      const merged: UserRow[] = (profiles ?? []).map((p) => ({
+      const merged: UserRow[] = page.map((p) => ({
         id: p.id,
         full_name: p.full_name,
         email: p.email,
@@ -214,7 +217,6 @@ const UserManagement: React.FC = () => {
       }));
 
       setUsers(merged);
-      setTotalCount(count ?? 0);
     } catch (err) {
       toast.error("Failed to load users");
       console.error(err);
@@ -254,20 +256,12 @@ const UserManagement: React.FC = () => {
     if (!selectedUser) return;
     setIsMutating(true);
     try {
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ full_name: editName.trim(), plan_type: editPlan })
-        .eq("id", selectedUser.id);
-      if (profileError) throw profileError;
+      await updateProfile(selectedUser.id, { full_name: editName.trim(), plan_type: editPlan });
 
-      // Update role if changed
       if (editRole !== selectedUser.role) {
-        // Delete old role and insert new one
-        await supabase.from("user_roles").delete().eq("user_id", selectedUser.id);
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: selectedUser.id, role: editRole as "student" | "super_admin" });
-        if (roleError) throw roleError;
+        const existingRoles = await listUserRoles(selectedUser.id);
+        await Promise.all(existingRoles.map((r) => deleteUserRole(r.id, selectedUser.id)));
+        await createUserRole({ user_id: selectedUser.id, role: editRole });
       }
 
       toast.success("User updated successfully");
@@ -285,13 +279,7 @@ const UserManagement: React.FC = () => {
     if (!selectedUser) return;
     setIsMutating(true);
     try {
-      // Delete profile (cascade will handle related data)
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", selectedUser.id);
-      if (error) throw error;
-
+      await deleteProfile(selectedUser.id);
       toast.success("User deleted");
       closeModal();
       fetchUsers();
@@ -312,15 +300,11 @@ const UserManagement: React.FC = () => {
           ? null
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          is_banned: true,
-          ban_reason: banReason.trim(),
-          banned_until: bannedUntil,
-        })
-        .eq("id", selectedUser.id);
-      if (error) throw error;
+      await updateProfile(selectedUser.id, {
+        is_banned: true,
+        ban_reason: banReason.trim(),
+        banned_until: bannedUntil,
+      });
 
       toast.success(`${selectedUser.full_name ?? "User"} has been banned`);
       closeModal();

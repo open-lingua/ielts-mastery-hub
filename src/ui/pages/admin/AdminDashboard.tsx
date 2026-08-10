@@ -19,7 +19,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminLayout } from "@/components/AdminLayout";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { listReadingTests, listWritingTests, listListeningTests, listProfiles } from "@/lib/tauri";
+import { getAnonId } from "@/lib/anonId";
 import { formatDistanceToNow } from "date-fns";
 
 // ── Types ──────────────────────────────────────────────────
@@ -52,53 +53,30 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
+      const adminId = getAnonId();
       try {
-        // Fetch recent content + counts in parallel
-        const [readingRes, writingRes, listeningRes, studentsRes] = await Promise.all([
-          supabase
-            .from("reading_tests")
-            .select("id, title, status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(5),
-          supabase
-            .from("writing_tests")
-            .select("id, title, status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(5),
-          supabase
-            .from("listening_tests")
-            .select("id, title, status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(5),
-          supabase
-            .from("profiles")
-            .select("id", { count: "exact", head: true }),
+        const [reading, writing, listening, profiles] = await Promise.all([
+          listReadingTests(adminId),
+          listWritingTests(adminId),
+          listListeningTests(adminId),
+          listProfiles(),
         ]);
 
-        // Merge and sort all content by updated_at descending
         const all: RecentItem[] = [
-          ...(readingRes.data ?? []).map((r) => ({ ...r, module: "Reading" as const })),
-          ...(writingRes.data ?? []).map((w) => ({ ...w, module: "Writing" as const })),
-          ...(listeningRes.data ?? []).map((l) => ({ ...l, module: "Listening" as const })),
+          ...reading.map((r) => ({ id: r.id, title: r.title, status: r.status, updated_at: r.updated_at, module: "Reading" as const })),
+          ...writing.map((w) => ({ id: w.id, title: w.title, status: w.status, updated_at: w.updated_at, module: "Writing" as const })),
+          ...listening.map((l) => ({ id: l.id, title: l.title, status: l.status, updated_at: l.updated_at, module: "Listening" as const })),
         ]
           .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
           .slice(0, 6);
 
         setRecentItems(all);
 
-        // Compute stats
-        const allTests = [
-          ...(readingRes.data ?? []),
-          ...(writingRes.data ?? []),
-          ...(listeningRes.data ?? []),
-        ];
-        const totalTests = allTests.length;
-        const published = allTests.filter((t) => t.status === "published").length;
-
+        const allTests = [...reading, ...writing, ...listening];
         setStats({
-          totalTests,
-          published,
-          activeStudents: studentsRes.count ?? 0,
+          totalTests: allTests.length,
+          published: allTests.filter((t) => t.status === "published").length,
+          activeStudents: profiles.length,
         });
       } catch (err) {
         console.error("Failed to load admin dashboard data", err);
