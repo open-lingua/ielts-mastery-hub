@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { listUserTestSessions } from "@/lib/tauri";
 
 export interface RecentActivity {
   id: string;
@@ -17,19 +17,21 @@ export async function fetchRecentActivity(
   userId: string,
   limit: number = 5
 ): Promise<RecentActivity[]> {
-  const { data, error } = await supabase
-    .from("user_test_sessions")
-    .select(
-      "id, test_type, test_id, status, score_band, progress_percent, started_at, completed_at, last_active_at, attempt_number"
-    )
-    .eq("user_id", userId)
-    .order("last_active_at", { ascending: false })
-    .limit(limit);
+  const sessions = await listUserTestSessions(userId);
 
-  if (error) throw error;
-
-  return (data ?? []).map((row) => ({
-    ...row,
-    score_band: row.score_band ? Number(row.score_band) : null,
-  }));
+  return sessions
+    .sort((a, b) => new Date(b.last_active_at).getTime() - new Date(a.last_active_at).getTime())
+    .slice(0, limit)
+    .map((row) => ({
+      id: row.id,
+      test_type: row.test_type,
+      test_id: row.test_id,
+      status: row.status,
+      score_band: row.score_band !== null ? Number(row.score_band) : null,
+      progress_percent: row.progress_percent,
+      started_at: row.started_at,
+      completed_at: row.completed_at,
+      last_active_at: row.last_active_at,
+      attempt_number: row.attempt_number,
+    }));
 }
