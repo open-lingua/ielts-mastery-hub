@@ -1,10 +1,15 @@
-import { supabase } from "@/integrations/supabase/client";
+import { getAnonId } from "@/lib/anonId";
+import {
+  getListeningTest,
+  listListeningSections,
+  listListeningQuestionGroups,
+  listListeningQuestions,
+  type ListeningQuestion as TauriListeningQuestion,
+  type ListeningQuestionGroup as TauriListeningGroup,
+} from "@/lib/tauri";
 import type { ListeningQuestion, ListeningSection, ListeningTest } from "@/data/listeningTestData";
 import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
-/**
- * Grade a completed listening test and persist the result to user_test_sessions.
- */
 export async function submitListeningTest(
   sessionId: string,
   test: ListeningTest,
@@ -21,166 +26,118 @@ export async function submitListeningTest(
   return { rawScore, bandScore };
 }
 
-interface DBQuestion {
-  id: string;
-  text: string;
-  answer: string;
-  options: { id: string; text: string; isCorrect: boolean }[];
-  matchingPairs: { id: string; left: string; right: string }[];
-  completionGaps: { id: string; gapText: string; answer: string }[];
-  acceptedAnswers: { id: string; text: string }[];
-  timestamp?: string;
-}
+function mapDBQuestionToListening(
+  q: TauriListeningQuestion,
+  group: TauriListeningGroup
+): ListeningQuestion {
+  const options: Array<{ id: string; text: string; isCorrect: boolean }> =
+    q.options ? (JSON.parse(q.options) as any[]) : [];
+  const matchingPairs: Array<{ id: string; left: string; right: string }> =
+    q.matching_pairs ? (JSON.parse(q.matching_pairs) as any[]) : [];
 
-interface DBQuestionGroup {
-  type: string;
-  instructions: string;
-  wordLimit: string;
-  questions: DBQuestion[];
-}
-
-interface DBSection {
-  id: number;
-  title: string;
-  transcript: string;
-  audioUrl: string;
-  questionGroups: DBQuestionGroup[];
-}
-
-function mapDBQuestionToListening(q: DBQuestion, group: DBQuestionGroup): ListeningQuestion {
-  const dbType = group.type;
-
-  if (dbType === "multiple-choice") {
+  if (group.question_type === "multiple-choice") {
     return {
       id: q.id,
       type: "mcq",
       text: q.text,
-      answer: q.answer,
-      options: q.options.map((o) => (typeof o === "string" ? o : o.text)),
+      answer: q.answer || "",
+      options: options.map((o) => (typeof o === "string" ? o : o.text)),
     };
   }
 
-  if (dbType === "matching" || dbType === "matching-features" || dbType === "matching-information") {
-    const leftParts = q.matchingPairs.map((p) => (typeof p === "string" ? p : p.left)).join(", ");
-    const rightOptions = q.matchingPairs.map((p) => (typeof p === "string" ? p : p.right));
+  if (
+    group.question_type === "matching" ||
+    group.question_type === "matching-features" ||
+    group.question_type === "matching-information"
+  ) {
+    const leftParts = matchingPairs.map((p) => p.left).join(", ");
+    const rightOptions = matchingPairs.map((p) => p.right);
     return {
       id: q.id,
       type: "matching",
       text: q.text,
-      answer: q.answer,
+      answer: q.answer || "",
       matchOptions: {
         left: leftParts || q.text,
-        right: rightOptions.length > 0 ? rightOptions : q.options.map((o) => (typeof o === "string" ? o : o.text)),
+        right:
+          rightOptions.length > 0
+            ? rightOptions
+            : options.map((o) => (typeof o === "string" ? o : o.text)),
       },
     };
   }
 
-  // Default: fill-in-the-blank (completion, note-completion, sentence-completion, short-answer, etc.)
-  const wordLimit = parseInt(group.wordLimit) || undefined;
+  // Default: fill-in-the-blank
+  const wordLimit = group.word_limit ? parseInt(group.word_limit) || undefined : undefined;
   return {
     id: q.id,
     type: "fill",
     text: q.text,
-    answer: q.answer,
+    answer: q.answer || "",
     wordLimit,
   };
 }
 
 function buildContextFromSectionNumber(num: number): string {
-  const contexts = ["Social / Everyday", "Social / Monologue", "Educational / Discussion", "Academic / Lecture"];
+  const contexts = [
+    "Social / Everyday",
+    "Social / Monologue",
+    "Educational / Discussion",
+    "Academic / Lecture",
+  ];
   return contexts[num - 1] || "General";
 }
 
-/**
- * Fetch a listening test for the practice engine.
- * Re-uses the existing fetchListeningTest from listeningService and transforms to the UI format.
- */
 export async function fetchListeningTestForPractice(testId: string): Promise<ListeningTest> {
-  // Fetch test
-  const { data: test, error: testError } = await supabase
-    .from("listening_tests")
-    .select("id, title, duration")
-    .eq("id", testId)
-    .single();
+  const userId = getAnonId();
 
-  if (testError || !test) throw new Error(testError?.message || "Listening test not found");
-
-  // Fetch sections
-  const { data: sections, error: secError } = await supabase
-    .from("listening_sections")
-    .select("*")
-    .eq("test_id", testId)
-    .order("section_number");
-
-  if (secError) throw new Error(secError.message);
-
-  const sectionIds = (sections || []).map((s) => s.id);
-
-  // Fetch groups and questions in parallel
-  const [groupsRes, questionsRes] = await Promise.all([
-    supabase
-      .from("listening_question_groups")
-      .select("*")
-      .in("section_id", sectionIds.length ? sectionIds : ["__none__"])
-      .order("group_order"),
-    // We'll fetch questions after we have group IDs
-    Promise.resolve(null),
+  const [test, allSections, allGroups, allQuestions] = await Promise.all([
+    getListeningTest(testId, userId),
+    listListeningSections(userId),
+    listListeningQuestionGroups(userId),
+    listListeningQuestions(userId),
   ]);
 
-  if (groupsRes.error) throw new Error(groupsRes.error.message);
-  const groups = groupsRes.data || [];
-  const groupIds = groups.map((g) => g.id);
+  if (!test) throw new Error("Listening test not found");
 
-  const { data: questions, error: qError } = await supabase
-    .from("listening_questions")
-    .select("*")
-    .in("group_id", groupIds.length ? groupIds : ["__none__"])
-    .order("question_order");
+  const sections = allSections
+    .filter((s) => s.test_id === testId)
+    .sort((a, b) => a.section_number - b.section_number);
 
-  if (qError) throw new Error(qError.message);
+  const sectionIds = new Set(sections.map((s) => s.id));
+  const groups = allGroups
+    .filter((g) => sectionIds.has(g.section_id))
+    .sort((a, b) => a.group_order - b.group_order);
 
-  // Build nested maps
+  const groupIds = new Set(groups.map((g) => g.id));
+  const questions = allQuestions
+    .filter((q) => groupIds.has(q.group_id))
+    .sort((a, b) => a.question_order - b.question_order);
+
+  // Build maps
   const questionsByGroup = new Map<string, typeof questions>();
-  (questions || []).forEach((q) => {
+  for (const q of questions) {
     if (!questionsByGroup.has(q.group_id)) questionsByGroup.set(q.group_id, []);
     questionsByGroup.get(q.group_id)!.push(q);
-  });
+  }
 
   const groupsBySection = new Map<string, typeof groups>();
-  groups.forEach((g) => {
+  for (const g of groups) {
     if (!groupsBySection.has(g.section_id)) groupsBySection.set(g.section_id, []);
     groupsBySection.get(g.section_id)!.push(g);
-  });
+  }
 
-  // Transform to UI format
-  const uiSections: ListeningSection[] = (sections || []).map((s) => {
+  const uiSections: ListeningSection[] = sections.map((s) => {
     const sectionGroups = groupsBySection.get(s.id) || [];
     const flatQuestions: ListeningQuestion[] = [];
 
     for (const g of sectionGroups) {
       const groupQs = questionsByGroup.get(g.id) || [];
-      const dbGroup: DBQuestionGroup = {
-        type: g.question_type,
-        instructions: g.instructions,
-        wordLimit: g.word_limit || "",
-        questions: groupQs.map((q) => ({
-          id: q.id,
-          text: q.text,
-          answer: q.answer || "",
-          options: Array.isArray(q.options) ? q.options as any : [],
-          matchingPairs: Array.isArray(q.matching_pairs) ? q.matching_pairs as any : [],
-          completionGaps: Array.isArray(q.completion_gaps) ? q.completion_gaps as any : [],
-          acceptedAnswers: Array.isArray(q.accepted_answers) ? q.accepted_answers as any : [],
-          timestamp: q.timestamp || "",
-        })),
-      };
-
-      for (const dbQ of dbGroup.questions) {
-        flatQuestions.push(mapDBQuestionToListening(dbQ, dbGroup));
+      for (const q of groupQs) {
+        flatQuestions.push(mapDBQuestionToListening(q, g));
       }
     }
 
-    // Build instructions from first group or default
     const instructions = sectionGroups[0]?.instructions || "Answer the questions below.";
 
     return {
@@ -194,7 +151,6 @@ export async function fetchListeningTestForPractice(testId: string): Promise<Lis
     };
   });
 
-  // Parse duration to seconds (e.g. "30 mins" -> 1800)
   const durationMatch = test.duration?.match(/(\d+)/);
   const totalTime = durationMatch ? parseInt(durationMatch[1]) * 60 : 1800;
 
