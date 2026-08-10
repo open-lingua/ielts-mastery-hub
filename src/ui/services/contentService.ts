@@ -1,4 +1,19 @@
-import { supabase } from "@/integrations/supabase/client";
+import { getAnonId } from "@/lib/anonId";
+import {
+  listReadingTests,
+  listReadingPassages,
+  listReadingQuestionGroups,
+  listReadingQuestions,
+  listWritingTests,
+  listWritingTasks,
+  listListeningTests,
+  listListeningSections,
+  listListeningQuestionGroups,
+  listListeningQuestions,
+  deleteReadingTest,
+  deleteWritingTest,
+  deleteListeningTest,
+} from "@/lib/tauri";
 
 export type ContentModule = "Reading" | "Writing" | "Listening";
 export type ContentStatus = "Draft" | "Published" | "Archived";
@@ -37,71 +52,123 @@ function normalizeStatus(s: string): ContentStatus {
 }
 
 export async function fetchAllContent(): Promise<ContentItem[]> {
-  const [readingRes, writingRes, listeningRes] = await Promise.all([
-    supabase.from("reading_tests").select("id, title, status, difficulty, updated_at, created_at, reading_passages(id, reading_question_groups(id, reading_questions(id)))"),
-    supabase.from("writing_tests").select("id, title, status, updated_at, created_at, writing_tasks(id, difficulty)"),
-    supabase.from("listening_tests").select("id, title, status, difficulty, updated_at, created_at, listening_sections(id, listening_question_groups(id, listening_questions(id)))"),
+  const userId = getAnonId();
+
+  const [
+    readingTests,
+    passages,
+    qGroups,
+    questions,
+    writingTests,
+    tasks,
+    listeningTests,
+    sections,
+    lGroups,
+    lQuestions,
+  ] = await Promise.all([
+    listReadingTests(userId),
+    listReadingPassages(userId),
+    listReadingQuestionGroups(userId),
+    listReadingQuestions(userId),
+    listWritingTests(userId),
+    listWritingTasks(userId),
+    listListeningTests(userId),
+    listListeningSections(userId),
+    listListeningQuestionGroups(userId),
+    listListeningQuestions(userId),
   ]);
 
   const items: ContentItem[] = [];
 
-  // Reading
-  if (readingRes.data) {
-    for (const r of readingRes.data) {
-      const qCount = (r.reading_passages || []).reduce(
-        (sum: number, p: any) => sum + (p.reading_question_groups || []).reduce(
-          (s2: number, g: any) => s2 + (g.reading_questions || []).length, 0
-        ), 0
-      );
-      items.push({
-        id: r.id,
-        title: r.title || "Untitled Reading Test",
-        module: "Reading",
-        status: normalizeStatus(r.status),
-        questions: qCount,
-        lastEdited: formatRelativeTime(r.updated_at),
-        band: r.difficulty || "7",
-        createdAt: r.created_at,
-      });
+  // Build passage → groups → questions counts for reading
+  const questionsByGroup = new Map<string, number>();
+  for (const q of questions) {
+    questionsByGroup.set(q.group_id, (questionsByGroup.get(q.group_id) ?? 0) + 1);
+  }
+  const groupsByPassage = new Map<string, number>();
+  for (const g of qGroups) {
+    groupsByPassage.set(
+      g.passage_id,
+      (groupsByPassage.get(g.passage_id) ?? 0) + (questionsByGroup.get(g.id) ?? 0)
+    );
+  }
+  const questionsByTest = new Map<string, number>();
+  for (const p of passages) {
+    questionsByTest.set(
+      p.test_id,
+      (questionsByTest.get(p.test_id) ?? 0) + (groupsByPassage.get(p.id) ?? 0)
+    );
+  }
+
+  for (const r of readingTests) {
+    items.push({
+      id: r.id,
+      title: r.title || "Untitled Reading Test",
+      module: "Reading",
+      status: normalizeStatus(r.status),
+      questions: questionsByTest.get(r.id) ?? 0,
+      lastEdited: formatRelativeTime(r.updated_at),
+      band: r.difficulty || "7",
+      createdAt: r.created_at,
+    });
+  }
+
+  // Writing: task count per test
+  const tasksByTest = new Map<string, number>();
+  for (const t of tasks) {
+    tasksByTest.set(t.test_id, (tasksByTest.get(t.test_id) ?? 0) + 1);
+  }
+  const taskDifficultyByTest = new Map<string, string>();
+  for (const t of tasks.sort((a, b) => a.task_number - b.task_number)) {
+    if (!taskDifficultyByTest.has(t.test_id)) {
+      taskDifficultyByTest.set(t.test_id, t.difficulty);
     }
   }
 
-  // Writing
-  if (writingRes.data) {
-    for (const w of writingRes.data) {
-      const tasks = w.writing_tasks || [];
-      items.push({
-        id: w.id,
-        title: w.title || "Untitled Writing Test",
-        module: "Writing",
-        status: normalizeStatus(w.status),
-        questions: tasks.length,
-        lastEdited: formatRelativeTime(w.updated_at),
-        band: tasks[0]?.difficulty || "7",
-        createdAt: w.created_at,
-      });
-    }
+  for (const w of writingTests) {
+    items.push({
+      id: w.id,
+      title: w.title || "Untitled Writing Test",
+      module: "Writing",
+      status: normalizeStatus(w.status),
+      questions: tasksByTest.get(w.id) ?? 0,
+      lastEdited: formatRelativeTime(w.updated_at),
+      band: taskDifficultyByTest.get(w.id) || "7",
+      createdAt: w.created_at,
+    });
   }
 
-  // Listening
-  if (listeningRes.data) {
-    for (const l of listeningRes.data) {
-      const qCount = (l.listening_sections || []).reduce(
-        (sum: number, s: any) => sum + (s.listening_question_groups || []).reduce(
-          (s2: number, g: any) => s2 + (g.listening_questions || []).length, 0
-        ), 0
-      );
-      items.push({
-        id: l.id,
-        title: l.title || "Untitled Listening Test",
-        module: "Listening",
-        status: normalizeStatus(l.status),
-        questions: qCount,
-        lastEdited: formatRelativeTime(l.updated_at),
-        band: l.difficulty || "7",
-        createdAt: l.created_at,
-      });
-    }
+  // Listening: section → groups → questions counts
+  const lQuestionsByGroup = new Map<string, number>();
+  for (const q of lQuestions) {
+    lQuestionsByGroup.set(q.group_id, (lQuestionsByGroup.get(q.group_id) ?? 0) + 1);
+  }
+  const lGroupsBySection = new Map<string, number>();
+  for (const g of lGroups) {
+    lGroupsBySection.set(
+      g.section_id,
+      (lGroupsBySection.get(g.section_id) ?? 0) + (lQuestionsByGroup.get(g.id) ?? 0)
+    );
+  }
+  const lQuestionsByTest = new Map<string, number>();
+  for (const s of sections) {
+    lQuestionsByTest.set(
+      s.test_id,
+      (lQuestionsByTest.get(s.test_id) ?? 0) + (lGroupsBySection.get(s.id) ?? 0)
+    );
+  }
+
+  for (const l of listeningTests) {
+    items.push({
+      id: l.id,
+      title: l.title || "Untitled Listening Test",
+      module: "Listening",
+      status: normalizeStatus(l.status),
+      questions: lQuestionsByTest.get(l.id) ?? 0,
+      lastEdited: formatRelativeTime(l.updated_at),
+      band: l.difficulty || "7",
+      createdAt: l.created_at,
+    });
   }
 
   items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -109,10 +176,8 @@ export async function fetchAllContent(): Promise<ContentItem[]> {
 }
 
 export async function deleteContent(id: string, module: ContentModule): Promise<void> {
-  const table = module === "Reading" ? "reading_tests"
-    : module === "Writing" ? "writing_tests"
-    : "listening_tests";
-
-  const { error } = await supabase.from(table).delete().eq("id", id);
-  if (error) throw error;
+  const userId = getAnonId();
+  if (module === "Reading") return deleteReadingTest(id, userId);
+  if (module === "Writing") return deleteWritingTest(id, userId);
+  return deleteListeningTest(id, userId);
 }
