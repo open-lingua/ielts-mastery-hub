@@ -1,49 +1,37 @@
-import { supabase } from "@/integrations/supabase/client";
+import { gradeWriting, updateUserTestSession, type GradingResult } from "@/lib/tauri";
+import { getAnonId } from "@/lib/anonId";
 
-export interface WritingGradingResult {
-  overallBand: number;
-  criteria: {
-    taskAchievement: number;
-    coherenceCohesion: number;
-    lexicalResource: number;
-    grammaticalRange: number;
-  };
-  feedback: {
-    strengths: string[];
-    weaknesses: string[];
-    improvements: string;
-  };
-}
+export type { GradingResult as WritingGradingResult };
 
 export async function evaluateWriting(
   taskType: "task1" | "task2",
   promptText: string,
   userResponse: string
-): Promise<WritingGradingResult> {
-  const { data: sessionData } = await supabase.auth.getSession();
-  const token = sessionData?.session?.access_token;
+): Promise<GradingResult> {
+  const userId = getAnonId();
+  // AI API credentials must be set via VITE_AI_API_KEY / VITE_AI_GATEWAY_URL
+  const aiApiKey = import.meta.env.VITE_AI_API_KEY as string | undefined;
+  const aiGatewayUrl = import.meta.env.VITE_AI_GATEWAY_URL as string | undefined;
 
-  if (!token) throw new Error("Not authenticated");
-
-  const res = await supabase.functions.invoke("grade-writing", {
-    body: { taskType, prompt: promptText, userResponse },
-  });
-
-  if (res.error) {
-    throw new Error(res.error.message || "AI grading failed");
+  if (!aiApiKey || !aiGatewayUrl) {
+    throw new Error("AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)");
   }
 
-  return res.data as WritingGradingResult;
+  return gradeWriting({
+    user_id: userId,
+    task_type: taskType,
+    prompt: promptText,
+    user_response: userResponse,
+    ai_api_key: aiApiKey,
+    ai_gateway_url: aiGatewayUrl,
+  });
 }
 
-/**
- * Grade both tasks and return combined results.
- */
 export async function gradeWritingTest(
   tasks: Array<{ taskType: "task1" | "task2"; prompt: string; userResponse: string }>
 ): Promise<{
-  task1: WritingGradingResult;
-  task2: WritingGradingResult;
+  task1: GradingResult;
+  task2: GradingResult;
   overallBand: number;
 }> {
   const [result1, result2] = await Promise.all(
@@ -57,21 +45,14 @@ export async function gradeWritingTest(
   return { task1: result1, task2: result2, overallBand };
 }
 
-/**
- * Persist AI feedback to the session record.
- */
 export async function persistFeedback(
   sessionId: string,
   overallBand: number,
   feedbackData: Record<string, unknown>
 ): Promise<void> {
-  const { error } = await supabase
-    .from("user_test_sessions")
-    .update({
-      score_band: overallBand,
-      feedback_data: feedbackData as any,
-    })
-    .eq("id", sessionId);
-
-  if (error) throw error;
+  const userId = getAnonId();
+  await updateUserTestSession(sessionId, userId, {
+    score_band: overallBand,
+    feedback_data: JSON.stringify(feedbackData),
+  });
 }
