@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import BandScoreChart from "@/components/dashboard/BandScoreChart";
-import { supabase } from "@/integrations/supabase/client";
+import { listUserTestSessions } from "@/lib/tauri";
 
 const quickActions = [
   {
@@ -75,17 +75,9 @@ const Dashboard: React.FC = () => {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    const fetchStreak = async () => {
-      const { data } = await supabase
-        .from("user_test_sessions")
-        .select("started_at")
-        .eq("user_id", userId)
-        .order("started_at", { ascending: false });
-      if (data) {
-        setStreak(calculateStreak(data.map((r) => r.started_at)));
-      }
-    };
-    fetchStreak();
+    listUserTestSessions(userId)
+      .then((sessions) => setStreak(calculateStreak(sessions.map((s) => s.started_at))))
+      .catch(() => {});
   }, [userId]);
 
   return (
