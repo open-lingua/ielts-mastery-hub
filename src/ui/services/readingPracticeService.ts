@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { fetchReadingTest } from "./readingTestService";
 import { calculateReadingBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 import type {
