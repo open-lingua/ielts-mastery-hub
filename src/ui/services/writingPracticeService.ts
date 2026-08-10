@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { getWritingTest, listWritingTasks } from "@/lib/tauri";
 
 export interface WritingTaskPayload {
   id: string;
@@ -27,10 +27,6 @@ export interface WritingAnswers {
   task2WordCount: number;
 }
 
-/**
- * Persist a completed writing test session to user_test_sessions.
- * Writing is subjectively graded, so score_band is null (pending review).
- */
 export async function submitWritingTest(
   sessionId: string,
   answers: WritingAnswers
@@ -44,36 +40,22 @@ export async function submitWritingTest(
   });
 }
 
-/**
- * Fetch a published writing test with its tasks for the student practice engine.
- */
-export async function fetchWritingTestForPractice(
-  testId: string
-): Promise<WritingTestPayload> {
-  const { data: test, error: testError } = await supabase
-    .from("writing_tests")
-    .select("id, title, status")
-    .eq("id", testId)
-    .single();
+export async function fetchWritingTestForPractice(testId: string): Promise<WritingTestPayload> {
+  const { getAnonId } = await import("@/lib/anonId");
+  const userId = getAnonId();
 
-  if (testError || !test) {
-    throw new Error(testError?.message || "Writing test not found");
-  }
+  const test = await getWritingTest(testId, userId);
+  if (!test) throw new Error("Writing test not found");
 
-  const { data: tasks, error: tasksError } = await supabase
-    .from("writing_tasks")
-    .select("*")
-    .eq("test_id", testId)
-    .order("task_number");
-
-  if (tasksError) {
-    throw new Error(tasksError.message || "Failed to load writing tasks");
-  }
+  const allTasks = await listWritingTasks(userId);
+  const tasks = allTasks
+    .filter((t) => t.test_id === testId)
+    .sort((a, b) => a.task_number - b.task_number);
 
   return {
     id: test.id,
     title: test.title,
-    tasks: (tasks || []).map((t) => ({
+    tasks: tasks.map((t) => ({
       id: t.id,
       taskType: t.task_type as "task1" | "task2",
       title: t.title,
