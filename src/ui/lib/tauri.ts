@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 
 // ── Shared response types (snake_case — no serde rename_all on Rust structs) ──
 
@@ -517,6 +517,28 @@ export async function createUserRole(input: { user_id: string; role: string }): 
 
 export async function deleteUserRole(id: string, userId: string): Promise<void> {
   return invoke<void>("delete_user_roles", { id, user_id: userId });
+}
+
+// ── storage ────────────────────────────────────────────────────────────────
+
+export async function uploadWritingAsset(userId: string, file: File): Promise<string> {
+  const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
+  const path = await invoke<string>("upload_writing_asset", {
+    user_id: userId,
+    file_name: file.name,
+    file_data: bytes,
+  });
+  return convertFileSrc(path);
+}
+
+export async function uploadListeningAudio(userId: string, file: File): Promise<string> {
+  const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
+  const path = await invoke<string>("upload_listening_audio", {
+    user_id: userId,
+    file_name: file.name,
+    file_data: bytes,
+  });
+  return convertFileSrc(path);
 }
 
 // ── grade_writing ──────────────────────────────────────────────────────────
