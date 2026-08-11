@@ -20,6 +20,6 @@ pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .await?;
     sqlx::query("PRAGMA journal_mode=WAL").execute(&pool).await?;
     sqlx::query("PRAGMA foreign_keys=ON").execute(&pool).await?;
-    sqlx::migrate!("./migrations").run(&pool).await?;
+    sqlx::migrate!("./database/migrations").run(&pool).await?;
     Ok(pool)
 }
