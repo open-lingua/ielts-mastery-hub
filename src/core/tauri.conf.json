@@ -10,6 +10,12 @@
   },
   "app": {
     "withGlobalTauri": false,
+    "security": {
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$HOME/.ielts-hub/**"]
+      }
+    },
     "windows": [
       {
         "title": "IELTS Mastery Hub",
