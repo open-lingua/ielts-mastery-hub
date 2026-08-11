@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::writing_tests as repo;
 use crate::repositories::writing_tests::{CreateWritingTest, UpdateWritingTest, WritingTest};
 

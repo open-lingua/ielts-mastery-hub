@@ -1,5 +1,5 @@
 pub mod commands;
-pub mod db;
+pub mod database;
 pub mod error;
 pub mod repositories;
 
@@ -9,7 +9,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let pool = tauri::async_runtime::block_on(db::init(app.handle()))?;
+            let pool = tauri::async_runtime::block_on(database::init(app.handle()))?;
             app.manage(pool);
             Ok(())
         })

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 
 const MAX_RESPONSE_LEN: usize = 10_000;
 const MAX_PROMPT_LEN: usize = 5_000;

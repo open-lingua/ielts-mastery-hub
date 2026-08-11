@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::reading_passages as repo;
 use crate::repositories::reading_passages::{
     CreateReadingPassage, ReadingPassage, UpdateReadingPassage,

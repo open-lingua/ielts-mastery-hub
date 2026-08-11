@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::error::AppError;
 
 #[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]

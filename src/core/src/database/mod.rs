@@ -21,6 +21,6 @@ pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .execute(&pool)
         .await?;
     sqlx::query("PRAGMA foreign_keys=ON").execute(&pool).await?;
-    sqlx::migrate!("./database/migrations").run(&pool).await?;
+    sqlx::migrate!("./src/database/migrations").run(&pool).await?;
     Ok(pool)
 }

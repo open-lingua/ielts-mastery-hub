@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::reading_questions as repo;
 use crate::repositories::reading_questions::{
     CreateReadingQuestion, ReadingQuestion, UpdateReadingQuestion,

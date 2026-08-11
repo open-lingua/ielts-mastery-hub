@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::writing_tasks as repo;
 use crate::repositories::writing_tasks::{CreateWritingTask, UpdateWritingTask, WritingTask};
 

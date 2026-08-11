@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::user_roles as repo;
 use crate::repositories::user_roles::{CreateUserRole, UpdateUserRole, UserRole};
 

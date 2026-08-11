@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::db::Db;
+use crate::database::Db;
 use crate::repositories::listening_tests as repo;
 use crate::repositories::listening_tests::{
     CreateListeningTest, ListeningTest, UpdateListeningTest,
