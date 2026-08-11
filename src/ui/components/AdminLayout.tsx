@@ -58,7 +58,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="text-sm font-bold text-foreground truncate">Admin Portal</p>
-              <p className="text-[10px] text-muted-foreground">IELTS PrepMaster</p>
+              <p className="text-[10px] text-muted-foreground">IELTS Mastery Hub</p>
             </div>
           )}
         </div>
