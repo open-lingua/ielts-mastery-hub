@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { getAnonId } from "@/lib/anonId";
 import {
   getWritingTest,
@@ -7,6 +6,7 @@ import {
   listWritingTasks,
   createWritingTask,
   deleteWritingTask,
+  uploadWritingAsset,
 } from "@/lib/tauri";
 
 interface WritingTaskData {
@@ -37,20 +37,6 @@ interface UpdateWritingTestParams {
   tasks: WritingTaskData[];
 }
 
-// SUPABASE_KEPT: no Tauri command for storage
-export async function uploadWritingAsset(userId: string, file: File): Promise<string> {
-  const ext = file.name.split(".").pop() || "png";
-  const filePath = `${userId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from("writing-assets")
-    .upload(filePath, file, { upsert: false });
-
-  if (error) throw new Error(`Image upload failed: ${error.message}`);
-
-  const { data: urlData } = supabase.storage.from("writing-assets").getPublicUrl(filePath);
-  return urlData.publicUrl;
-}
 
 async function resolveTasks(userId: string, tasks: WritingTaskData[]) {
   const resolved: Array<WritingTaskData & { resolvedImageUrl: string }> = [];
