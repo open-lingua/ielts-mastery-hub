@@ -5,8 +5,6 @@ use crate::error::AppError;
 
 pub type Db = sqlx::SqlitePool;
 
-const SCHEMA: &str = include_str!("schema.sql");
-
 pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
     let data_dir = app_handle
         .path()
@@ -22,13 +20,6 @@ pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .await?;
     sqlx::query("PRAGMA journal_mode=WAL").execute(&pool).await?;
     sqlx::query("PRAGMA foreign_keys=ON").execute(&pool).await?;
-    run_migrations(&pool).await?;
+    sqlx::migrate!("./migrations").run(&pool).await?;
     Ok(pool)
-}
-
-async fn run_migrations(pool: &Db) -> Result<(), AppError> {
-    for statement in SCHEMA.split(';').map(str::trim).filter(|s| !s.is_empty()) {
-        sqlx::query(statement).execute(pool).await?;
-    }
-    Ok(())
 }
