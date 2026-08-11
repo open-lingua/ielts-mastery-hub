@@ -52,7 +52,11 @@ pub struct UpdateWritingTask {
     pub model_answer: Option<String>,
 }
 
-pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<WritingTask>, AppError> {
+pub async fn find_by_id(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+) -> Result<Option<WritingTask>, AppError> {
     let result = sqlx::query_as!(
         WritingTask,
         r#"SELECT wt.id, wt.test_id, wt.task_number, wt.task_type, wt.title, wt.difficulty,
@@ -83,7 +87,11 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<WritingTask>, AppE
     Ok(result)
 }
 
-pub async fn insert(pool: &Db, input: &CreateWritingTask, user_id: &str) -> Result<String, AppError> {
+pub async fn insert(
+    pool: &Db,
+    input: &CreateWritingTask,
+    user_id: &str,
+) -> Result<String, AppError> {
     let owned: i64 = sqlx::query_scalar!(
         "SELECT COUNT(*) FROM writing_tests WHERE id = ? AND created_by = ?",
         input.test_id,
@@ -129,7 +137,12 @@ pub async fn insert(pool: &Db, input: &CreateWritingTask, user_id: &str) -> Resu
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateWritingTask) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateWritingTask,
+) -> Result<(), AppError> {
     let include_model_answer = input.include_model_answer.map(|b| b as i64);
     sqlx::query!(
         "UPDATE writing_tasks SET

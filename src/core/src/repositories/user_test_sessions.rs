@@ -39,7 +39,11 @@ pub struct UpdateUserTestSession {
     pub last_active_at: Option<String>,
 }
 
-pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<UserTestSession>, AppError> {
+pub async fn find_by_id(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+) -> Result<Option<UserTestSession>, AppError> {
     let result = sqlx::query_as!(
         UserTestSession,
         "SELECT id, user_id, test_id, test_type, status, progress_percent, score_band,
@@ -66,7 +70,11 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<UserTestSession>, 
     Ok(result)
 }
 
-pub async fn insert(pool: &Db, input: &CreateUserTestSession, user_id: &str) -> Result<String, AppError> {
+pub async fn insert(
+    pool: &Db,
+    input: &CreateUserTestSession,
+    user_id: &str,
+) -> Result<String, AppError> {
     let id = uuid::Uuid::new_v4().to_string();
     let now = chrono::Utc::now().to_rfc3339();
     let attempt_number = input.attempt_number.unwrap_or(1);
@@ -88,7 +96,12 @@ pub async fn insert(pool: &Db, input: &CreateUserTestSession, user_id: &str) -> 
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateUserTestSession) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateUserTestSession,
+) -> Result<(), AppError> {
     sqlx::query!(
         "UPDATE user_test_sessions SET
          status = COALESCE(?, status),

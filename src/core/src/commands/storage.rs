@@ -30,11 +30,15 @@ async fn save_file(
     data: Vec<u8>,
 ) -> std::io::Result<String> {
     let ext = file_name.rsplit('.').next().unwrap_or("bin");
-    let stored_name = format!("{}-{}.{}", Utc::now().timestamp_millis(), Uuid::new_v4(), ext);
+    let stored_name = format!(
+        "{}-{}.{}",
+        Utc::now().timestamp_millis(),
+        Uuid::new_v4(),
+        ext
+    );
 
-    let home = std::env::var("HOME").map_err(|e| {
-        std::io::Error::new(std::io::ErrorKind::NotFound, e)
-    })?;
+    let home =
+        std::env::var("HOME").map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, e))?;
 
     let dir = std::path::Path::new(&home)
         .join(".ielts-hub")

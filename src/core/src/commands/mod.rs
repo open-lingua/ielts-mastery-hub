@@ -1,5 +1,4 @@
 pub mod grade_writing;
-pub mod storage;
 pub mod listening_question_groups;
 pub mod listening_questions;
 pub mod listening_sections;
@@ -9,6 +8,7 @@ pub mod reading_passages;
 pub mod reading_question_groups;
 pub mod reading_questions;
 pub mod reading_tests;
+pub mod storage;
 pub mod user_roles;
 pub mod user_test_sessions;
 pub mod writing_tasks;

@@ -31,7 +31,11 @@ pub struct UpdateListeningSection {
     pub audio_url: Option<String>,
 }
 
-pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<ListeningSection>, AppError> {
+pub async fn find_by_id(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+) -> Result<Option<ListeningSection>, AppError> {
     let result = sqlx::query_as!(
         ListeningSection,
         "SELECT s.id, s.test_id, s.section_number, s.title, s.transcript, s.audio_url, s.created_at
@@ -58,7 +62,11 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<ListeningSection>,
     Ok(result)
 }
 
-pub async fn insert(pool: &Db, input: &CreateListeningSection, user_id: &str) -> Result<String, AppError> {
+pub async fn insert(
+    pool: &Db,
+    input: &CreateListeningSection,
+    user_id: &str,
+) -> Result<String, AppError> {
     let owned: i64 = sqlx::query_scalar!(
         "SELECT COUNT(*) FROM listening_tests WHERE id = ? AND created_by = ?",
         input.test_id,
@@ -89,7 +97,12 @@ pub async fn insert(pool: &Db, input: &CreateListeningSection, user_id: &str) ->
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateListeningSection) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateListeningSection,
+) -> Result<(), AppError> {
     sqlx::query!(
         "UPDATE listening_sections SET
          section_number = COALESCE(?, section_number),

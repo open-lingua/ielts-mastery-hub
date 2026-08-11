@@ -31,7 +31,11 @@ pub struct UpdateListeningTest {
     pub status: Option<String>,
 }
 
-pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<ListeningTest>, AppError> {
+pub async fn find_by_id(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+) -> Result<Option<ListeningTest>, AppError> {
     let result = sqlx::query_as!(
         ListeningTest,
         "SELECT id, created_by, title, difficulty, duration, status, created_at, updated_at
@@ -56,7 +60,11 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<ListeningTest>, Ap
     Ok(result)
 }
 
-pub async fn insert(pool: &Db, input: &CreateListeningTest, user_id: &str) -> Result<String, AppError> {
+pub async fn insert(
+    pool: &Db,
+    input: &CreateListeningTest,
+    user_id: &str,
+) -> Result<String, AppError> {
     let id = uuid::Uuid::new_v4().to_string();
     let now = chrono::Utc::now().to_rfc3339();
     let title = input.title.as_deref().unwrap_or("");
@@ -80,7 +88,12 @@ pub async fn insert(pool: &Db, input: &CreateListeningTest, user_id: &str) -> Re
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateListeningTest) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateListeningTest,
+) -> Result<(), AppError> {
     let now = chrono::Utc::now().to_rfc3339();
     sqlx::query!(
         "UPDATE listening_tests SET

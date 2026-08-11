@@ -60,7 +60,12 @@ pub async fn insert(pool: &Db, input: &CreateUserRole) -> Result<String, AppErro
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateUserRole) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateUserRole,
+) -> Result<(), AppError> {
     sqlx::query!(
         "UPDATE user_roles SET role = COALESCE(?, role) WHERE id = ? AND user_id = ?",
         input.role,

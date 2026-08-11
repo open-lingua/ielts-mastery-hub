@@ -78,13 +78,23 @@ pub async fn grade_writing(
         return Err("taskType must be 'task1' or 'task2'".to_string());
     }
     if input.user_response.len() > MAX_RESPONSE_LEN {
-        return Err(format!("userResponse must be under {} characters", MAX_RESPONSE_LEN));
+        return Err(format!(
+            "userResponse must be under {} characters",
+            MAX_RESPONSE_LEN
+        ));
     }
     if input.prompt.len() > MAX_PROMPT_LEN {
-        return Err(format!("prompt must be under {} characters", MAX_PROMPT_LEN));
+        return Err(format!(
+            "prompt must be under {} characters",
+            MAX_PROMPT_LEN
+        ));
     }
 
-    let task_label = if input.task_type == "task1" { "Task 1" } else { "Task 2" };
+    let task_label = if input.task_type == "task1" {
+        "Task 1"
+    } else {
+        "Task 2"
+    };
     let user_content = format!(
         "IELTS Writing {}\n\nPrompt:\n{}\n\nStudent Response:\n{}",
         task_label, input.prompt, input.user_response

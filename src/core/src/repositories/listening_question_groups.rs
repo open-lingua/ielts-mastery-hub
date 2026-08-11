@@ -46,7 +46,11 @@ pub struct UpdateListeningQuestionGroup {
     pub select_count: Option<i64>,
 }
 
-pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<ListeningQuestionGroup>, AppError> {
+pub async fn find_by_id(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+) -> Result<Option<ListeningQuestionGroup>, AppError> {
     let result = sqlx::query_as!(
         ListeningQuestionGroup,
         r#"SELECT g.id, g.section_id, g.group_order, g.question_type, g.instructions,
@@ -85,7 +89,11 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<ListeningQuestionG
     Ok(result)
 }
 
-pub async fn insert(pool: &Db, input: &CreateListeningQuestionGroup, user_id: &str) -> Result<String, AppError> {
+pub async fn insert(
+    pool: &Db,
+    input: &CreateListeningQuestionGroup,
+    user_id: &str,
+) -> Result<String, AppError> {
     let owned: i64 = sqlx::query_scalar!(
         "SELECT COUNT(*) FROM listening_sections s
          JOIN listening_tests t ON t.id = s.test_id
@@ -131,7 +139,12 @@ pub async fn insert(pool: &Db, input: &CreateListeningQuestionGroup, user_id: &s
     Ok(id)
 }
 
-pub async fn update(pool: &Db, id: &str, user_id: &str, input: &UpdateListeningQuestionGroup) -> Result<(), AppError> {
+pub async fn update(
+    pool: &Db,
+    id: &str,
+    user_id: &str,
+    input: &UpdateListeningQuestionGroup,
+) -> Result<(), AppError> {
     let has_word_bank = input.has_word_bank.map(|b| b as i64);
     let sequential_order = input.sequential_order.map(|b| b as i64);
     let multiple_selection = input.multiple_selection.map(|b| b as i64);
