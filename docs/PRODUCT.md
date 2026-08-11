@@ -21,7 +21,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 | Goal | In Scope | Out of Scope |
 |---|---|---|
 | Exam-realistic modules | Writing (Task 1 & 2), Reading (3 passages, 40 Qs), Listening (4 sections, 40 Qs) | Speaking module |
-| AI Grading | Writing essays graded on 4 IELTS criteria via Lovable AI | Reading/Listening AI explanations |
+| AI Grading | Writing essays graded on 4 IELTS criteria via AI | Reading/Listening AI explanations |
 | Content Management | Admin CRUD for all test types, publish/draft workflow | Bulk CSV import |
 | Progress Tracking | Session history, band scores, streak tracking | Spaced repetition / adaptive learning |
 | Auth & Profiles | Email signup/login, profile, plan type | OAuth / SSO |
@@ -109,7 +109,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 **TS-1: Grade-Writing Edge Function**
 - **Story:** As the system, I need a serverless function that calls the AI gateway so that essays are graded securely without exposing API keys.
 - **Acceptance Criteria:**
-  - Uses `LOVABLE_API_KEY` secret; never exposed client-side
+  - Uses `AI_API_KEY` secret; never exposed client-side
   - Returns structured `WritingGradingResult` JSON
   - Handles token limits and returns graceful errors
 

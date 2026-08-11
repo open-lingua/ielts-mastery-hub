@@ -12,7 +12,7 @@
 | **Rendering** | Client-Side Rendering (CSR) via Vite dev server & static build |
 | **Language** | TypeScript (strict mode) |
 | **Architectural Pattern** | **Layered Modular** — Pages → Services → Supabase SDK. Components are grouped by domain feature (writing, reading, listening) with a shared UI library (shadcn/ui). |
-| **Backend** | Lovable Cloud (Supabase) — Auth, PostgreSQL, Edge Functions |
+| **Backend** | Supabase — Auth, PostgreSQL, Edge Functions |
 
 ### Request Lifecycle
 
@@ -21,7 +21,7 @@ User Interaction
   → React Component (pages/)
     → Service Layer (services/)
       → Supabase Client SDK (integrations/supabase/client.ts)
-        → Lovable Cloud (PostgreSQL + Edge Functions)
+        → Supabase (PostgreSQL + Edge Functions)
 ```
 
 ---
@@ -175,7 +175,7 @@ Page Component
 ```
 
 - **Service Layer** (`services/`): All database interactions are encapsulated in plain async functions. Services handle the Supabase query construction and **map raw DB rows to typed UI models** (e.g., handling JSONB `options` that may be `string[]` or `{id, text}[]`).
-- **Edge Functions**: AI grading calls go through `aiGradingService.ts` → Supabase Edge Function (`grade-writing`) → Lovable AI Gateway.
+- **Edge Functions**: AI grading calls go through `aiGradingService.ts` → Supabase Edge Function (`grade-writing`) → AI Gateway.
 - **Caching**: React Query provides automatic caching. `staleTime` and `gcTime` are configured per-query as needed.
 - **Error Handling**: Supabase errors are surfaced via toast notifications using the `sonner` library.
 
@@ -281,4 +281,4 @@ ReadingModule (page — smart)
 2. **Services are framework-agnostic** — pure async functions, no React imports.
 3. **Auto-generated files are read-only** — `client.ts`, `types.ts`, `.env`, `config.toml`.
 4. **Database schema changes** go through migration tooling, never manual SQL.
-5. **Secrets** are stored via Lovable Cloud secrets, never committed to source.
+5. **Secrets** are stored via Supabase secrets, never committed to source.
