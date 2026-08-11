@@ -80,6 +80,8 @@ pub fn run() {
             commands::user_test_sessions::create_user_test_sessions,
             commands::user_test_sessions::update_user_test_sessions,
             commands::user_test_sessions::delete_user_test_sessions,
+            commands::storage::upload_writing_asset,
+            commands::storage::upload_listening_audio,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
