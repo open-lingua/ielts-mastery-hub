@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { getAnonId } from "@/lib/anonId";
 import {
   getListeningTest,
@@ -13,6 +12,7 @@ import {
   listListeningQuestions,
   createListeningQuestion,
   deleteListeningQuestion,
+  uploadListeningAudio,
 } from "@/lib/tauri";
 
 interface QuestionItem {
@@ -62,20 +62,6 @@ function parseJsonField<T>(raw: string | null | undefined, fallback: T): T {
   try { return JSON.parse(raw) as T; } catch { return fallback; }
 }
 
-// SUPABASE_KEPT: no Tauri command for storage
-export async function uploadListeningAudio(userId: string, file: File): Promise<string> {
-  const ext = file.name.split(".").pop() || "mp3";
-  const filePath = `${userId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from("listening-audio")
-    .upload(filePath, file, { upsert: false });
-
-  if (error) throw new Error(`Audio upload failed: ${error.message}`);
-
-  const { data: urlData } = supabase.storage.from("listening-audio").getPublicUrl(filePath);
-  return urlData.publicUrl;
-}
 
 async function resolveAudioUrls(userId: string, sections: ListeningSectionData[]): Promise<string[]> {
   const urls: string[] = [];
