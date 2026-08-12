@@ -115,7 +115,7 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUE
 ('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 14, 'Paragraph B', 'vi'),
 ('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 15, 'Paragraph C', 'iv'),
 ('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 16, 'Paragraph D', 'v'),
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 17, 'Paragraph E', 'i'),
+('d419ba78-1bd7-4468-b4f6-bec2189271de', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 17, 'Paragraph E', 'i'),
 ('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 18, 'Paragraph F', 'iii');
 
 -- ── Group 18: MATCHING INFORMATION (Q19–23) ────────────────
@@ -133,10 +133,10 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, match
 ('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 21,
  'Mention of a theoretical disaster caused by malicious software.', 'E',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'),
-('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 22,
+('f2b2e5f8-0b6c-4872-99b1-69f170caf96d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 22,
  'The primary cause of current road traffic accidents.', 'C',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]'),
-('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 23,
+('1592ca65-db32-4688-b75f-bb57f1ec7cf4', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 23,
  'How energy consumers are encouraged to alter their usage times.', 'D',
  '[{"id":"1","left":"","right":"A"},{"id":"2","left":"","right":"B"},{"id":"3","left":"","right":"C"},{"id":"4","left":"","right":"D"},{"id":"5","left":"","right":"E"},{"id":"6","left":"","right":"F"}]');
 
@@ -146,11 +146,11 @@ INSERT INTO reading_question_groups (id, passage_id, group_order, question_type,
  'multiple-choice', 'Choose the correct letter, A, B, C or D.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 24,
+('7a3a5ea7-c848-46e3-9eb2-e06ba535b8c7', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 24,
  'According to Paragraph B, smart streetlights in Barcelona are designed to:',
  'B',
  '[{"id":"A","text":"A. notify waste management teams of garbage levels.","isCorrect":false},{"id":"B","text":"B. change brightness depending on if people are nearby.","isCorrect":true},{"id":"C","text":"C. track the exact movements of citizens at night.","isCorrect":false},{"id":"D","text":"D. run entirely on solar power.","isCorrect":false}]'),
-('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 25,
+('575ce793-71a2-4de5-8b8f-b059c6bd1715', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 25,
  'What does the writer suggest about autonomous vehicles in Paragraph C?',
  'C',
  '[{"id":"A","text":"A. They will completely replace public transit.","isCorrect":false},{"id":"B","text":"B. They are currently causing congestion in Singapore.","isCorrect":false},{"id":"C","text":"C. They have the potential to make roads safer.","isCorrect":true},{"id":"D","text":"D. They rely exclusively on smartphone applications.","isCorrect":false}]'),
@@ -158,7 +158,7 @@ INSERT INTO reading_questions (id, group_id, question_order, text, answer, optio
  'The main concern highlighted in Paragraph E is that:',
  'D',
  '[{"id":"A","text":"A. citizens are unwilling to share their personal data.","isCorrect":false},{"id":"B","text":"B. building the infrastructure is too expensive.","isCorrect":false},{"id":"C","text":"C. autonomous vehicles are susceptible to hacking.","isCorrect":false},{"id":"D","text":"D. centralised networks pose serious security and privacy risks.","isCorrect":true}]'),
-('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 27,
+('5be076e6-c173-4cad-bf0a-84f931378a9a', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 27,
  'What is "civic tech" designed to do?',
  'A',
  '[{"id":"A","text":"A. Give citizens a voice in their city''s digital development.","isCorrect":true},{"id":"B","text":"B. Prioritise municipal efficiency over human needs.","isCorrect":false},{"id":"C","text":"C. Replace human government officials with AI.","isCorrect":false},{"id":"D","text":"D. Create a sterile but safe urban environment.","isCorrect":false}]');
@@ -188,36 +188,36 @@ INSERT INTO reading_question_groups (id, passage_id, group_order, question_type,
  'yes-no-not-given', 'Do the following statements agree with the views of the writer? Write YES, NO, or NOT GIVEN.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 28,
+('2794320f-acf1-4281-8a65-bd77859ac18e', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 28,
  'Children require formal classroom instruction to master their native language before age five.', 'NO', '["NO","No","no"]'),
-('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 29,
+('8d6c2202-fc59-4eb3-ab39-b1d138ac29b1', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 29,
  'Chomsky believed that children learn language primarily by copying the adults around them.', 'NO', '["NO","No","no"]'),
-('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 30,
+('0efd449f-fc3a-4093-a9ac-abd23a316b28', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 30,
  'Lenneberg argued that it is extremely difficult to achieve fluency if language is not learned before puberty.', 'YES', '["YES","Yes","yes"]'),
-('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 31,
+('3825dc74-0a34-4ca9-8fa1-4226fefcbb3e', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 31,
  'Adults deliberately teach grammar rules when using Child-Directed Speech.', 'NOT GIVEN', '["NOT GIVEN","Not Given","not given"]'),
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 32,
+('27a3f998-12ea-42ca-a8b9-0b474c7db800', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 32,
  'Bilingual children generally perform better on certain cognitive tasks than monolingual children.', 'YES', '["YES","Yes","yes"]');
 
 -- ── Group 21: MATCHING SENTENCE ENDINGS (Q33–36) ─────────
 INSERT INTO reading_question_groups (id, passage_id, group_order, question_type, instructions, sequential_order) VALUES
-('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'bf9a8b7c-6d5e-4a3b-2c1d-0e1f2a3b4c5d', 2,
+('fca9b62d-b0b2-4fd8-a5eb-3bd91ca9e41e', 'bf9a8b7c-6d5e-4a3b-2c1d-0e1f2a3b4c5d', 2,
  'matching-sentence-endings', 'Complete each sentence with the correct ending, A–F, from the box below.', true);
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer, options) VALUES
-('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 33,
+('632d3c1f-c918-4c48-998d-7343eeeff70d', 'fca9b62d-b0b2-4fd8-a5eb-3bd91ca9e41e', 33,
  'B.F. Skinner''s behaviorist approach asserts that language',
  'E',
  '[{"id":"A","text":"is an innate biological framework present from birth.","isCorrect":false},{"id":"B","text":"helps infants identify distinct words.","isCorrect":false},{"id":"C","text":"prevents the acquisition of syntax in later life.","isCorrect":false},{"id":"D","text":"results in enhanced executive functioning.","isCorrect":false},{"id":"E","text":"is acquired through systems of reward and repetition.","isCorrect":true},{"id":"F","text":"generates sentences that have never been heard before.","isCorrect":false}]'),
-('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 34,
+('c5e588b3-55bd-4841-8bbd-f960dd632813', 'fca9b62d-b0b2-4fd8-a5eb-3bd91ca9e41e', 34,
  'Noam Chomsky highlighted that children often',
  'F',
  '[{"id":"A","text":"is an innate biological framework present from birth.","isCorrect":false},{"id":"B","text":"helps infants identify distinct words.","isCorrect":false},{"id":"C","text":"prevents the acquisition of syntax in later life.","isCorrect":false},{"id":"D","text":"results in enhanced executive functioning.","isCorrect":false},{"id":"E","text":"is acquired through systems of reward and repetition.","isCorrect":false},{"id":"F","text":"generates sentences that have never been heard before.","isCorrect":true}]'),
-('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 35,
+('dd528a0a-a1ca-48b1-a7c6-42dfea06d668', 'fca9b62d-b0b2-4fd8-a5eb-3bd91ca9e41e', 35,
  'The interactionist approach suggests that Child-Directed Speech',
  'B',
  '[{"id":"A","text":"is an innate biological framework present from birth.","isCorrect":false},{"id":"B","text":"helps infants identify distinct words.","isCorrect":true},{"id":"C","text":"prevents the acquisition of syntax in later life.","isCorrect":false},{"id":"D","text":"results in enhanced executive functioning.","isCorrect":false},{"id":"E","text":"is acquired through systems of reward and repetition.","isCorrect":false},{"id":"F","text":"generates sentences that have never been heard before.","isCorrect":false}]'),
-('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 36,
+('885abc46-2610-4562-8805-67ad1942f95c', 'fca9b62d-b0b2-4fd8-a5eb-3bd91ca9e41e', 36,
  'Research into bilingualism indicates that managing two languages',
  'D',
  '[{"id":"A","text":"is an innate biological framework present from birth.","isCorrect":false},{"id":"B","text":"helps infants identify distinct words.","isCorrect":false},{"id":"C","text":"prevents the acquisition of syntax in later life.","isCorrect":false},{"id":"D","text":"results in enhanced executive functioning.","isCorrect":true},{"id":"E","text":"is acquired through systems of reward and repetition.","isCorrect":false},{"id":"F","text":"generates sentences that have never been heard before.","isCorrect":false}]');
@@ -229,14 +229,14 @@ INSERT INTO reading_question_groups (id, passage_id, group_order, question_type,
  true, '["window","reward","imitation","device","interaction","isolation","flexibility"]');
 
 INSERT INTO reading_questions (id, group_id, question_order, text, answer) VALUES
-('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 37,
+('f8cedb9c-0b08-43e5-aed9-8d713a20f4bf', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 37,
  'There are multiple theories regarding how children acquire language. Skinner believed it relied on reinforcement and {{gap_a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d_0}}. In contrast, Chomsky proposed humans possess an innate linguistic {{gap_a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d_1}}. Lenneberg added that there is a specific time {{gap_a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d_2}} for optimal learning, which is supported by evidence from children who suffered from extreme {{gap_a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d_3}}.',
  'reward'),
-('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 38,
+('162f6c84-7280-43a5-a854-b5339044109e', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 38,
  '', 'device'),
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 39,
+('a357f04d-c58c-41fd-a1ee-046732d12c1e', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 39,
  '', 'window'),
-('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 40,
+('919095d2-52f3-4210-9f2e-32a34cde51fa', 'a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 40,
  '', 'isolation');
 
 
@@ -332,8 +332,8 @@ INSERT INTO listening_questions (id, group_id, question_order, text, answer) VAL
 ('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 16, 'Straight through the double doors from Reception', 'A'),
 ('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 17, 'To the right of the Reception', 'B'),
 ('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 18, 'First room on the right, down the left corridor', 'C'),
-('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 19, 'At the end of the left corridor', 'D'),
-('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 20, 'Just behind the Café', 'E');
+('2b4c1788-e30d-4ce1-8e98-76adf5653ed9', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 19, 'At the end of the left corridor', 'D'),
+('8cdb059a-9c40-4eed-bcb4-482fc517bd91', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 20, 'Just behind the Café', 'E');
 
 
 -- ── Section 3: Student-Tutor Discussion ─────────────────────
@@ -356,19 +356,19 @@ INSERT INTO listening_question_groups (id, section_id, group_order, question_typ
  'multiple-choice', 'Choose the correct letter, A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 21,
+('446b8048-2c94-4137-b3c0-b840f9b9d21d', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 21,
  'What specific marine life are the students investigating?',
  '["A. Fish", "B. Mussels", "C. Seaweed"]', 'B'),
 ('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 22,
  'How many samples did they collect?',
  '["A. 50", "B. 100", "C. 150"]', 'B'),
-('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 23,
+('ab05d63f-5423-4b27-b527-ef194b35287e', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 23,
  'Where were the samples collected from?',
  '["A. The open ocean", "B. A local beach", "C. The harbour"]', 'C'),
-('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 24,
+('7c6a6d0b-84b8-438e-aa4b-ae54ff354671', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 24,
  'When did they collect the samples?',
  '["A. Yesterday", "B. Last week", "C. Last month"]', 'B'),
-('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 25,
+('09ecd0ae-31c5-43ce-97d6-8c5c407dd568', 'c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 25,
  'What type of pollutant are they looking for?',
  '["A. Oil spills", "B. Heavy metals", "C. Microplastics"]', 'C');
 
@@ -378,11 +378,11 @@ INSERT INTO listening_question_groups (id, section_id, group_order, question_typ
  '["A. Emma", "B. Liam", "C. Both Emma and Liam"]');
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer) VALUES
-('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 26, 'Chemical digestion of tissue', 'A'),
-('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 27, 'Microscopic analysis', 'B'),
-('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 28, 'Statistical modelling', 'C'),
-('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 29, 'Writing the literature review', 'B'),
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 30, 'Designing visual graphs', 'A');
+('e0076ad3-16fa-4fcc-a1eb-a72127f0c521', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 26, 'Chemical digestion of tissue', 'A'),
+('ff54334e-f651-4472-95d9-ce08bf29056c', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 27, 'Microscopic analysis', 'B'),
+('f08683ce-b1ca-48d7-85f6-c124258d2206', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 28, 'Statistical modelling', 'C'),
+('e59099cc-55fc-4809-a5c4-34ac80851c85', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 29, 'Writing the literature review', 'B'),
+('d21a8f99-2e00-4ef0-9a78-f3d7b01808b0', 'c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 30, 'Designing visual graphs', 'A');
 
 -- ── Section 4: Lecture on Mars Exploration ──────────────────
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
@@ -401,25 +401,25 @@ INSERT INTO listening_question_groups (id, section_id, group_order, question_typ
  'sentence-completion', 'Complete the notes below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 31,
+('f3036687-5568-4541-a3b4-0a2d555a6438', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 31,
  'Sojourner landed on Mars in the year ________.', '1997', '["1997"]'),
-('c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 32,
+('ca090a7d-7164-44ea-9c20-3b3f31d3c796', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 32,
  'Sojourner was roughly the size of a ________.', 'microwave', '["microwave"]'),
-('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 33,
+('55c20895-68e2-4f6e-90ba-05c369fab90d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 33,
  'Spirit and Opportunity searched for evidence of past ________.', 'water activity', '["water activity","water"]'),
-('a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 34,
+('1b6ae499-d96e-4674-8f65-c49dba1aa6dc', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 34,
  'The Opportunity rover was eventually disabled by a ________.', 'dust storm', '["dust storm","storm"]'),
-('c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 35,
+('0793437d-f318-404c-986f-3ca1ab05e9af', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 35,
  'Curiosity is powered by a ________ generator.', 'nuclear', '["nuclear","radioisotope"]'),
-('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 36,
+('6eac7dbd-68a8-49c5-bee5-3382ede4a4f0', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 36,
  'Curiosity confirmed Mars once had the conditions to support ________ life.', 'microbial', '["microbial","microbial life"]'),
-('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 37,
+('3d57fb1e-6c8e-429c-86dd-9e681457de9a', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 37,
  'The main objective of the Perseverance rover is ________.', 'astrobiology', '["astrobiology"]'),
-('c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 38,
+('20a1b011-0bfb-40fa-a265-ade97e1837eb', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 38,
  'Perseverance is storing rock cores inside ________ tubes.', 'titanium', '["titanium"]'),
-('e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 39,
+('5e2580de-57e7-4c80-b9e5-b8882decfa34', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 39,
  'A future mission will return these samples to Earth by the early ________.', '2030s', '["2030s","2030"]'),
-('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 40,
+('1befb1c2-2263-492b-9a93-03f732f0b654', 'e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b', 40,
  'The sample return is a joint mission between NASA and ________.', 'ESA', '["ESA","esa"]');
 
 
