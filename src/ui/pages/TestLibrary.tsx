@@ -244,8 +244,9 @@ const TestLibrary: React.FC = () => {
         } else {
           setActiveSessionInfo(null);
         }
-      } catch {
+      } catch (error) {
         toast.error("Failed to load tests");
+        console.error(error);
       } finally {
         setIsLoading(false);
       }

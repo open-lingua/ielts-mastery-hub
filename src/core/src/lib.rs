@@ -9,6 +9,11 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
+            if std::env::var("OPEN_DEVTOOLS").as_deref() == Ok("true") {
+                if let Some(window) = app.get_webview_window("main") {
+                    window.open_devtools();
+                }
+            }
             let pool = tauri::async_runtime::block_on(database::init(app.handle()))?;
             app.manage(pool);
             Ok(())
