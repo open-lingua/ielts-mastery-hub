@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-// https://vitejs.dev/config/
 export default defineConfig(({ mode: _mode }) => ({
   root: __dirname,
   envDir: path.resolve(__dirname, "../.."),
@@ -12,7 +12,7 @@ export default defineConfig(({ mode: _mode }) => ({
       overlay: false,
     },
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   publicDir: path.resolve(__dirname, "../../public"),
   build: {
     outDir: path.resolve(__dirname, "dist"),
