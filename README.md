@@ -3,6 +3,10 @@
 </h1>
 
 <p align="center">
+  <img src="assets/IELTS-Mastery-hub.png" alt="IELTS Mastery Hub" width="800" />
+</p>
+
+<p align="center">
 An open-source desktop IELTS preparation platform offering timed reading, listening, and AI-graded writing practice — with progress tracking and realistic exam simulations.
 </p>
 
