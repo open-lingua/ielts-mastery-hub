@@ -13,11 +13,9 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 
 This is an independent, non-commercial, open-source project for educational purposes. It is **not affiliated with or endorsed by** the British Council, IDP Education, or Cambridge Assessment English.
 
-**IELTS** and **International English Language Testing System** are registered trademarks of their respective owners. All practice content in this repository is original or created for demonstration purposes only — no official test material is used or reproduced.
+**IELTS** and **International English Language Testing System** are registered trademarks of their respective owners. All practice content in this repository is AI-generated for educational and demonstration purposes only — no official IELTS test material is used or reproduced.
 
 This software is provided **"as is"** without warranty of any kind. The authors are not liable for any damages arising from its use.
-
-Trademark concerns? Open an issue and it will be addressed promptly.
 
 ## What it is
 
