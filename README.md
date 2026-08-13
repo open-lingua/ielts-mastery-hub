@@ -1,5 +1,5 @@
 <h1 align="center">
-  <code>IELTS Mastery Hub</code>
+  <code>@open-lingua/ielts-mastery-hub</code>
 </h1>
 
 <p align="center">
