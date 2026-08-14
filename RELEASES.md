@@ -3,6 +3,14 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.3 / 2026.08.14
+
+- fix(test): replace ResizeObserver mock with class implementation in CountryPicker test
+- fix(biome): resolve lint errors from Biome migration
+- chore: migrate from ESLint to Biome for linting and formatting
+- feat(test-library): add Unresolved filter to show incomplete tests
+- chore: remove Supabase backend and migrate docs to Tauri/SQLite architecture
+
 ### 1.0.0-beta.2 / 2026.08.14
 
 - fix(navigation): redirect Writing, Reading and Listening nav links to Test Library with tab filter
