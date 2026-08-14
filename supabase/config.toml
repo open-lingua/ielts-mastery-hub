@@ -1,7 +1,0 @@
-project_id = "rbpypwhbtptkqkdfwpic"
-
-[functions.grade-writing]
-verify_jwt = false
-
-[functions.lemon-squeezy-webhook]
-verify_jwt = false

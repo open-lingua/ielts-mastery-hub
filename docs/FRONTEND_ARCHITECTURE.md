@@ -11,8 +11,8 @@
 | **Framework** | React 18 (SPA) |
 | **Rendering** | Client-Side Rendering (CSR) via Vite dev server & static build |
 | **Language** | TypeScript (strict mode) |
-| **Architectural Pattern** | **Layered Modular** — Pages → Services → Supabase SDK. Components are grouped by domain feature (writing, reading, listening) with a shared UI library (shadcn/ui). |
-| **Backend** | Supabase — Auth, PostgreSQL, Edge Functions |
+| **Architectural Pattern** | **Layered Modular** — Pages → Services → Tauri IPC. Components are grouped by domain feature (writing, reading, listening) with a shared UI library (shadcn/ui). |
+| **Backend** | Tauri (Rust) — SQLite via `tauri-plugin-sql` |
 
 ### Request Lifecycle
 
@@ -20,8 +20,8 @@
 User Interaction
   → React Component (pages/)
     → Service Layer (services/)
-      → Supabase Client SDK (integrations/supabase/client.ts)
-        → Supabase (PostgreSQL + Edge Functions)
+      → Tauri IPC (lib/tauri.ts)
+        → Rust backend → SQLite
 ```
 
 ---
@@ -53,7 +53,7 @@ User Interaction
 |---|---|
 | **React Context** | Global state (Auth, Theme) |
 | **TanStack React Query** | Server state, caching, and async data management |
-| **Supabase JS SDK** | Database queries, auth, realtime subscriptions |
+| **Tauri IPC (`@tauri-apps/api`)** | Invoke Rust commands; read/write SQLite via backend |
 
 ### Forms & Validation
 
@@ -97,10 +97,7 @@ src/
 │   ├── use-toast.ts         # Toast notification hook
 │   ├── usePersistedTimer.ts # Timer with localStorage persistence
 │   └── useTestTimer.ts      # Countdown timer for test sessions
-├── integrations/
-│   └── supabase/
-│       ├── client.ts        # Auto-generated Supabase client (DO NOT EDIT)
-│       └── types.ts         # Auto-generated DB types (DO NOT EDIT)
+├── integrations/            # (reserved for future third-party SDK clients)
 ├── lib/
 │   └── utils.ts             # Tailwind `cn()` merge utility
 ├── pages/
@@ -142,12 +139,11 @@ src/
 | `components/{module}/` | Domain-specific composites (e.g., `reading/QuestionRenderer`) | May import from `ui/` and `shared/`. Must not import from other modules. |
 | `components/shared/` | Cross-cutting components used by multiple modules | Timer, Overlays, Banners. No domain-specific logic. |
 | `pages/` | Route-level components | Compose layouts + domain components. Orchestrate data fetching. |
-| `services/` | Data access & transformation layer | All Supabase calls live here. Map DB rows → UI models. No React imports. |
+| `services/` | Data access & transformation layer | All Tauri IPC calls live here. Map DB rows → UI models. No React imports. |
 | `contexts/` | React Context providers for global state | Auth and Theme only. Kept minimal. |
 | `hooks/` | Reusable stateful logic | Must be generic and composable. Prefixed with `use`. |
 | `data/` | Static seed/mock data | Used for offline dev and fallback. No runtime DB calls. |
 | `utils/` | Pure utility functions | No side effects. No React dependencies. |
-| `integrations/` | Auto-generated SDK clients & types | **Read-only.** Never manually edited. |
 
 ---
 
@@ -171,13 +167,13 @@ The application uses a **three-tier state model**:
 Page Component
   └── useQuery({ queryFn: () => practiceLibraryService.fetchTests() })
         └── practiceLibraryService.ts
-              └── supabase.from('reading_tests').select('*')
+              └── invoke('fetch_reading_tests') → Rust → SQLite
 ```
 
-- **Service Layer** (`services/`): All database interactions are encapsulated in plain async functions. Services handle the Supabase query construction and **map raw DB rows to typed UI models** (e.g., handling JSONB `options` that may be `string[]` or `{id, text}[]`).
-- **Edge Functions**: AI grading calls go through `aiGradingService.ts` → Supabase Edge Function (`grade-writing`) → AI Gateway.
+- **Service Layer** (`services/`): All database interactions are encapsulated in plain async functions. Services call Tauri commands via `lib/tauri.ts` and **map raw DB rows to typed UI models**.
+- **AI Grading**: Grading calls go through `aiGradingService.ts` → Tauri command → Rust → AI gateway (API key stays in Rust, never exposed to the frontend).
 - **Caching**: React Query provides automatic caching. `staleTime` and `gcTime` are configured per-query as needed.
-- **Error Handling**: Supabase errors are surfaced via toast notifications using the `sonner` library.
+- **Error Handling**: Errors from Tauri commands are surfaced via toast notifications using the `sonner` library.
 
 ### 4.3 Component Design
 
@@ -279,6 +275,5 @@ ReadingModule (page — smart)
 
 1. **All colors must use HSL design tokens** — no hardcoded hex/rgb values in components.
 2. **Services are framework-agnostic** — pure async functions, no React imports.
-3. **Auto-generated files are read-only** — `client.ts`, `types.ts`, `.env`, `config.toml`.
-4. **Database schema changes** go through migration tooling, never manual SQL.
-5. **Secrets** are stored via Supabase secrets, never committed to source.
+3. **Database schema changes** go through migration tooling, never manual SQL.
+4. **Secrets** are stored in the Rust environment, never committed to source or exposed to the frontend.

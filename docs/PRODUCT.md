@@ -6,7 +6,7 @@
 
 ### Executive Summary
 
-IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-graded Writing practice alongside timed Reading and Listening simulation engines. It covers all 13 official IELTS question types, uses real exam-format timing, and stores progress per user via a cloud backend. The core value proposition is **exam-realistic practice with instant, AI-powered feedback** — accessible from any browser.
+IELTS Mastery Hub is a desktop IELTS preparation platform built with Tauri + React that provides AI-graded Writing practice alongside timed Reading and Listening simulation engines. It covers all 13 official IELTS question types, uses real exam-format timing, and stores progress locally via SQLite. The core value proposition is **exam-realistic practice with instant, AI-powered feedback** — works fully offline.
 
 ### Target Audience / User Personas
 
@@ -44,8 +44,8 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 | Category | Requirement |
 |---|---|
 | **Performance** | < 2s initial load; lazy-load audio assets; paginate large question sets |
-| **Security** | RLS on all tables; JWT-based auth; edge function secrets via Cloud; no anonymous signups |
-| **Scalability** | Serverless edge functions; Supabase auto-scaling; CDN for static assets |
+| **Security** | API keys stay in Rust layer; never exposed to frontend; no anonymous network access |
+| **Scalability** | Local SQLite; no server required; data lives on-device |
 | **Accessibility** | Semantic HTML; keyboard navigation for question types; ARIA labels on interactive elements |
 | **Browser Support** | Modern evergreen browsers (Chrome, Firefox, Safari, Edge) |
 | **Data Integrity** | Deterministic UUIDs in seed data; foreign key constraints; cascade deletes |
@@ -78,7 +78,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 - **Story:** As a student, I want to browse all published tests filtered by module type so that I can choose what to practice.
 - **Acceptance Criteria:**
   - Lists Reading, Listening, Writing tests with difficulty badges
-  - Only `status = 'published'` tests visible (enforced by RLS)
+  - Only `status = 'published'` tests visible
   - Shows attempt count and last score if previously taken
 
 **US-4: Resume In-Progress Test**
@@ -97,7 +97,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 - **Acceptance Criteria:**
   - Timer starts on first keystroke (20 min Task 1, 40 min Task 2)
   - Live word count with color-coded min-word indicator
-  - Auto-save draft to `user_test_sessions.answers`
+  - Auto-save draft to `user_test_sessions` in SQLite
 
 **US-6: AI Essay Grading**
 - **Story:** As a student, I want AI feedback on my essay so that I know my estimated band score and how to improve.
@@ -106,11 +106,11 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
   - Overall band calculated with Task 2 weighted 2/3
   - Feedback includes strengths, weaknesses, and actionable improvements
 
-**TS-1: Grade-Writing Edge Function**
-- **Story:** As the system, I need a serverless function that calls the AI gateway so that essays are graded securely without exposing API keys.
+**TS-1: Grade-Writing Tauri Command**
+- **Story:** As the system, I need a Rust command that calls the AI gateway so that essays are graded securely without exposing API keys.
 - **Acceptance Criteria:**
-  - Uses `AI_API_KEY` secret; never exposed client-side
-  - Returns structured `WritingGradingResult` JSON
+  - Uses `AI_API_KEY` stored in Rust environment; never exposed to frontend
+  - Returns structured `WritingGradingResult` JSON via Tauri IPC
   - Handles token limits and returns graceful errors
 
 ---
@@ -136,7 +136,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 - **Acceptance Criteria:**
   - Band score calculated from raw score using official conversion
   - Review mode highlights correct/incorrect with explanations
-  - Results persisted to `user_test_sessions`
+  - Results persisted to `user_test_sessions` in SQLite
 
 ---
 
@@ -171,7 +171,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 - **Story:** As a student, I want to see a heatmap of my study activity so that I can identify consistency gaps.
 - **Acceptance Criteria:**
   - GitHub-style contribution grid
-  - Sourced from `user_test_sessions` timestamps
+  - Sourced from `user_test_sessions` timestamps in SQLite
   - Covers last 12 weeks
 
 ---
@@ -182,7 +182,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 - **Story:** As an admin, I want to create reading/listening/writing tests and publish them so that students can practice.
 - **Acceptance Criteria:**
   - Form-based creation with nested passages/sections/question groups
-  - Draft/Published toggle with RLS enforcement
+  - Draft/Published toggle enforced in the Rust command layer
   - Preview modal before publishing
 
 **US-15: User Management**
@@ -195,7 +195,7 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
 **TS-2: Admin Role Authorization**
 - **Story:** As the system, I need role-based access control so that only admins can access CMS routes.
 - **Acceptance Criteria:**
-  - Admin role stored in profiles or custom claims
+  - Admin role stored in the local SQLite `profiles` table
   - `ProtectedRoute` component checks role before rendering
   - Non-admin users redirected to dashboard
 
@@ -210,12 +210,12 @@ IELTS Mastery Hub is a web-based IELTS preparation platform that provides AI-gra
   - Covers all 13 reading + listening question types
   - `TRUNCATE CASCADE` cleanup prevents duplication
 
-**TS-4: RLS Policy Coverage**
-- **Story:** As the system, I need RLS policies on every table so that users only access their own data and published content.
+**TS-4: Data Access Control**
+- **Story:** As the system, I need access control in Rust commands so that users only access their own data and published content.
 - **Acceptance Criteria:**
-  - Students: SELECT on published tests; full CRUD on own sessions
+  - Students: read published tests; full CRUD on own sessions
   - Admins: full CRUD on tests they created
-  - No anonymous access to any table
+  - Access checks enforced in the Rust command layer, not the frontend
 
 **TS-5: Dark/Light Theme System**
 - **Story:** As the system, I need a theme provider with CSS custom properties so that all components respect the user's preference.
