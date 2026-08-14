@@ -1,6 +1,5 @@
 {
   "name": "@open-lingua/ielts-mastery-hub-website",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
