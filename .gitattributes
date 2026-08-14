@@ -11,6 +11,7 @@ src/ui/index.html linguist-generated
 
 # Documentation
 *.md linguist-documentation
+*.mdx linguist-documentation
 
 # Lock files
 *.lockb           linguist-generated
