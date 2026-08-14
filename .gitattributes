@@ -23,3 +23,7 @@ dist/**/* linguist-generated
 
 # Generated JSON schemas
 src/core/gen/**/* linguist-generated
+
+# Docusaurus docs
+website/docs/**/*
+website/blog/**/*
