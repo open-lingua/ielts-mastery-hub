@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img src="assets/IELTS-Mastery-hub.png" alt="IELTS Mastery Hub" width="800" />
+  <img src="assets/app-banner.png" alt="IELTS Mastery Hub" width="800" />
 </p>
 
 <p align="center">
