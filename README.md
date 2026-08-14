@@ -11,7 +11,7 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 </p>
 
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)  [![](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue.svg)](https://github.com/open-lingua/ielts-mastery-hub)
+![License](https://img.shields.io/badge/license-MIT-yellow)  [![](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue.svg)](https://github.com/open-lingua/ielts-mastery-hub)
 
 ## Disclaimer
 
