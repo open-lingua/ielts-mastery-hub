@@ -1,13 +1,13 @@
 # IELTS Mastery Hub — Agent Context
 
 ## Description
-Browser-based IELTS preparation platform with timed reading, listening, AI-graded writing, and exam simulations — built as a desktop app with Tauri 2 + React.
+Browser-based IELTS preparation platform with timed reading, listening, AI-graded writing, and exam simulations — built as a desktop app with Tauri@2 + React@19.
 
 ## Tech Stack
 | Layer    | Technology                              | Location   |
 |----------|-----------------------------------------|------------|
-| Backend  | Rust, Tauri 2                           | `src/core` |
-| Frontend | React [YOUR REACT VERSION], TypeScript  | `src/ui`   |
+| Backend  | Rust, Tauri@2                           | `src/core` |
+| Frontend | React@19, TypeScript  | `src/ui`   |
 
 ## Dev & Build Commands
 
