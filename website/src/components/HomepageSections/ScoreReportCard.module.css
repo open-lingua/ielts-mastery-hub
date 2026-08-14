@@ -1,0 +1,215 @@
+.report {
+  position: relative;
+  background: var(--imh-panel);
+  color: var(--imh-on-navy);
+  border-radius: var(--imh-radius-lg);
+  padding: 26px;
+  box-shadow: var(--imh-shadow-navy);
+  border: 1px solid rgba(255,255,255,.06);
+  background-image: radial-gradient(circle at 88% 8%, rgba(201,149,42,.16), transparent 40%);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.lbl {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--imh-on-navy-2);
+}
+
+.chip {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .06em;
+  color: var(--imh-on-navy-gold);
+  border: 1px solid rgba(231,198,135,.32);
+  padding: .28em .7em;
+  border-radius: 20px;
+  display: inline-flex;
+  gap: .5em;
+  align-items: center;
+}
+
+.live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--imh-accent);
+  box-shadow: 0 0 0 0 rgba(201,149,42,.7);
+  animation: pulse 2.4s infinite;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(201,149,42,.6); }
+  70%  { box-shadow: 0 0 0 7px rgba(201,149,42,0); }
+  100% { box-shadow: 0 0 0 0 rgba(201,149,42,0); }
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 0 20px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+
+.overall .k {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--imh-on-navy-2);
+}
+
+.overall .band {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 4.6rem;
+  line-height: .92;
+  color: var(--brand-gold);
+  margin-top: 6px;
+  letter-spacing: -.02em;
+}
+
+[data-theme='dark'] .band {
+  color: var(--imh-accent);
+}
+
+.delta {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .78rem;
+  color: var(--imh-on-navy-gold);
+  margin-top: 8px;
+}
+
+.scale {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  height: 150px;
+}
+
+.scaleTicks {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .6rem;
+  color: var(--imh-on-navy-2);
+  text-align: right;
+  padding: 2px 0;
+}
+
+.scaleTrack {
+  position: relative;
+  width: 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.09);
+  overflow: visible;
+}
+
+.scaleFill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--brand-gold), #9d7420);
+  transition: height 1.4s var(--imh-ease);
+}
+
+.scaleTarget {
+  position: absolute;
+  left: -4px;
+  width: 20px;
+  height: 2px;
+  background: var(--imh-on-navy);
+  opacity: .5;
+  transition: bottom 1.4s var(--imh-ease);
+}
+
+.scaleTarget::after {
+  content: "8.0 target";
+  position: absolute;
+  left: 24px;
+  top: -8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .56rem;
+  color: var(--imh-on-navy-2);
+  white-space: nowrap;
+}
+
+.modules {
+  display: grid;
+  gap: 13px;
+  padding-top: 18px;
+}
+
+.mod {
+  display: grid;
+  grid-template-columns: 78px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.modName {
+  font-size: .82rem;
+  color: var(--imh-on-navy-2);
+}
+
+.bar {
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,.1);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--brand-gold);
+  transition: width 1.2s var(--imh-ease);
+}
+
+[data-theme='dark'] .bar span {
+  background: var(--imh-accent);
+}
+
+.val {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .82rem;
+  color: var(--imh-on-navy);
+  font-weight: 500;
+}
+
+.foot {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .7rem;
+  color: var(--imh-on-navy-2);
+}
+
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  color: var(--imh-on-navy);
+}
+
+.clock {
+  width: 13px;
+  height: 13px;
+  color: var(--brand-gold);
+}

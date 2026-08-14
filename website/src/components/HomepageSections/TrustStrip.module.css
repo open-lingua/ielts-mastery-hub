@@ -1,0 +1,33 @@
+.trust {
+  border-top: 1px solid var(--imh-border);
+  border-bottom: 1px solid var(--imh-border);
+  background: var(--imh-bg-subtle);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px 24px;
+  max-width: var(--imh-maxw);
+  margin: 0 auto;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .78rem;
+  color: var(--imh-ink-2);
+  letter-spacing: .02em;
+}
+
+.item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--imh-accent);
+  flex: 0 0 auto;
+}

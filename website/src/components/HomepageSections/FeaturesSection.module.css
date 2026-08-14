@@ -1,0 +1,142 @@
+.section {
+  padding: 96px 0;
+  background: var(--imh-bg-subtle);
+  border-top: 1px solid var(--imh-border);
+  border-bottom: 1px solid var(--imh-border);
+}
+
+.wrap {
+  max-width: var(--imh-maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.head {
+  max-width: 660px;
+}
+
+.center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--imh-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  justify-content: center;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1.5px;
+  background: var(--imh-accent);
+  display: inline-block;
+}
+
+[data-theme='dark'] .eyebrow {
+  color: var(--imh-accent);
+}
+
+.head h2 {
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.95rem, 3.6vw, 2.9rem);
+  margin-top: 16px;
+  color: var(--imh-ink);
+}
+
+.head p {
+  margin-top: 16px;
+  color: var(--imh-ink-2);
+  font-size: 1.08rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 52px;
+  background: var(--imh-border);
+  border: 1px solid var(--imh-border);
+  border-radius: var(--imh-radius-lg);
+  overflow: hidden;
+}
+
+.feat {
+  background: var(--imh-bg);
+  padding: 34px 30px;
+  transition: background .25s var(--imh-ease);
+}
+
+.feat:hover {
+  background: var(--imh-bg-inset);
+}
+
+.fi {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--imh-border-strong);
+  color: var(--imh-accent-ink);
+  margin-bottom: 18px;
+  background: var(--imh-accent-tint);
+}
+
+.fi svg {
+  width: 21px;
+  height: 21px;
+}
+
+[data-theme='dark'] .fi {
+  color: var(--imh-accent);
+  border-color: var(--imh-border-strong);
+}
+
+.tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--imh-accent-ink);
+  display: inline-block;
+  margin-bottom: 11px;
+}
+
+[data-theme='dark'] .tag {
+  color: var(--imh-accent);
+}
+
+.feat h3 {
+  font-family: "Fraunces", serif;
+  font-size: 1.16rem;
+  color: var(--imh-ink);
+  margin: 0;
+}
+
+.feat p {
+  margin-top: 9px;
+  color: var(--imh-ink-2);
+  font-size: .95rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

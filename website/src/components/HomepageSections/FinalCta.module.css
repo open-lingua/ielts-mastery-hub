@@ -1,0 +1,135 @@
+.cta {
+  padding: 0 24px 100px;
+  background: var(--imh-bg);
+}
+
+.box {
+  max-width: var(--imh-maxw);
+  margin: 0 auto;
+  background: var(--imh-panel);
+  color: #fff;
+  border-radius: 26px;
+  padding: 66px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--imh-shadow-navy);
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 50% -10%, rgba(201,149,42,.28), transparent 46%);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--imh-on-navy-gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6em;
+  position: relative;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1.5px;
+  background: var(--imh-on-navy-gold);
+  display: inline-block;
+}
+
+.box h2 {
+  font-family: "Fraunces", serif;
+  color: #fff;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-top: 16px;
+  position: relative;
+}
+
+.box > p {
+  color: var(--imh-on-navy-2);
+  max-width: 520px;
+  margin: 16px auto 0;
+  position: relative;
+  font-size: 1.08rem;
+  line-height: 1.62;
+}
+
+.actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 13px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.btnGold {
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: .98rem;
+  padding: .82em 1.35em;
+  border-radius: 11px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--brand-gold);
+  color: #1B2A5E;
+  box-shadow: 0 8px 22px -10px rgba(201,149,42,.6);
+  transition: transform .18s var(--imh-ease), box-shadow .2s var(--imh-ease);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btnGold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(201,149,42,.7);
+  color: #1B2A5E;
+}
+
+.btnGold svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: .98rem;
+  padding: .82em 1.35em;
+  border-radius: 11px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.25);
+  background: transparent;
+  color: #fff;
+  transition: transform .18s var(--imh-ease), border-color .2s var(--imh-ease);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btnGhost:hover {
+  border-color: rgba(255,255,255,.55);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.fine {
+  margin-top: 20px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .72rem;
+  color: var(--imh-on-navy-2);
+  position: relative;
+}
