@@ -1,4 +1,4 @@
-# IELTS Mastery Hub — Project Context
+# IELTS Mastery Hub — Agent Context
 
 ## Description
 Browser-based IELTS preparation platform with timed reading, listening, AI-graded writing, and exam simulations — built as a desktop app with Tauri 2 + React.
