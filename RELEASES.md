@@ -3,6 +3,10 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.2 / 2026.08.14
+
+- fix(navigation): redirect Writing, Reading and Listening nav links to Test Library with tab filter
+
 ### 1.0.0-beta.1 / 2026.08.14
 
 - chore: bump version to 1.0.0-beta.1 and drop version from website package

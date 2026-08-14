@@ -13,9 +13,9 @@ import {
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Test Library", path: "/tests", icon: Library },
-  { label: "Writing", path: "/writing", icon: PenTool },
-  { label: "Reading", path: "/reading", icon: BookOpen },
-  { label: "Listening", path: "/listening", icon: Headphones },
+  { label: "Writing", path: "/tests?tab=Writing", icon: PenTool },
+  { label: "Reading", path: "/tests?tab=Reading", icon: BookOpen },
+  { label: "Listening", path: "/tests?tab=Listening", icon: Headphones },
   { label: "Admin Portal", path: "/admin", icon: Shield },
 ];
 
@@ -54,7 +54,9 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
         <TooltipProvider delayDuration={0}>
           <nav className={cn("flex-1 space-y-1 p-4 transition-all duration-300", collapsed && "px-2")}>
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const [itemPath, itemQuery] = item.path.split("?");
+              const isActive = location.pathname === itemPath &&
+                (!itemQuery || location.search.includes(itemQuery));
               const linkContent = (
                 <Link
                   key={item.path}

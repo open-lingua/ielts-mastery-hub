@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -219,7 +219,12 @@ const TestCard: React.FC<{
 const TestLibrary: React.FC = () => {
   const userId = getAnonId();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("All");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "All");
+
+  useEffect(() => {
+    setActiveTab(searchParams.get("tab") ?? "All");
+  }, [searchParams]);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [tests, setTests] = useState<PracticeTestCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
