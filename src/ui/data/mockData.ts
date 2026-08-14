@@ -22,13 +22,15 @@ export const mockUser = {
 export const ieltsModules = [
   {
     title: "Listening",
-    description: "40 minutes, 4 sections, 40 questions. Tests your ability to understand spoken English in academic and everyday contexts.",
+    description:
+      "40 minutes, 4 sections, 40 questions. Tests your ability to understand spoken English in academic and everyday contexts.",
     icon: "Headphones",
     duration: "40 min",
   },
   {
     title: "Reading",
-    description: "60 minutes, 3 passages, 40 questions. Assesses reading skills including skimming, scanning, and detailed comprehension.",
+    description:
+      "60 minutes, 3 passages, 40 questions. Assesses reading skills including skimming, scanning, and detailed comprehension.",
     icon: "BookOpen",
     duration: "60 min",
   },
@@ -40,7 +42,8 @@ export const ieltsModules = [
   },
   {
     title: "Speaking",
-    description: "11–14 minutes, 3 parts. A face-to-face interview assessing fluency, vocabulary, grammar, and pronunciation.",
+    description:
+      "11–14 minutes, 3 parts. A face-to-face interview assessing fluency, vocabulary, grammar, and pronunciation.",
     icon: "Mic",
     duration: "14 min",
   },
@@ -76,7 +79,8 @@ export const writingTasks = [
     title: "Urban Population Growth",
     question:
       "The chart below shows the percentage of the population living in urban areas in four different countries between 1980 and 2020.",
-    context: "Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+    context:
+      "Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
     minWords: 150,
     timeMinutes: 20,
   },
@@ -87,7 +91,8 @@ export const writingTasks = [
     title: "Letter to Landlord",
     question:
       "You have a problem with the apartment you are renting. Write a letter to your landlord. In your letter:\n\n• describe the problem\n• explain how it is affecting you\n• suggest what should be done about it",
-    context: "Write at least 150 words. You do NOT need to write any addresses. Begin your letter as follows: Dear Sir or Madam,",
+    context:
+      "Write at least 150 words. You do NOT need to write any addresses. Begin your letter as follows: Dear Sir or Madam,",
     minWords: 150,
     timeMinutes: 20,
   },
@@ -158,8 +163,18 @@ export const listeningQuestions = [
     section: "Section 1",
     title: "Student Accommodation Inquiry",
     questions: [
-      { id: 1, text: "The student is looking for accommodation near the ___.", answer: "university campus", type: "fill" as const },
-      { id: 2, text: "The maximum budget per month is ___.", answer: "£800", type: "fill" as const },
+      {
+        id: 1,
+        text: "The student is looking for accommodation near the ___.",
+        answer: "university campus",
+        type: "fill" as const,
+      },
+      {
+        id: 2,
+        text: "The maximum budget per month is ___.",
+        answer: "£800",
+        type: "fill" as const,
+      },
       {
         id: 3,
         text: "Which facility is most important to the student?",

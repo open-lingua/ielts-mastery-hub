@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export interface UsePersistedTimerOptions {
   /** Total allowed time in seconds */
@@ -51,7 +51,7 @@ export function usePersistedTimer({
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [startedAt, totalSeconds, isFinished, onTimeUp]);
+  }, [startedAt, isFinished, onTimeUp, remainingSeconds, calcRemaining]);
 
   // Fire immediately if expired on load
   useEffect(() => {
@@ -65,7 +65,7 @@ export function usePersistedTimer({
   useEffect(() => {
     firedRef.current = false;
     setRemainingSeconds(calcRemaining());
-  }, [startedAt]);
+  }, [calcRemaining]);
 
   return { remainingSeconds, expiredOnLoad };
 }

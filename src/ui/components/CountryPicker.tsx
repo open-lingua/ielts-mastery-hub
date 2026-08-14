@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Check, ChevronsUpDown, Globe } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { countries } from "@/data/countries";
 import { cn } from "@/lib/utils";
@@ -50,12 +51,7 @@ export const CountryPicker: React.FC<CountryPickerProps> = ({ value, onChange, h
                       setOpen(false);
                     }}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === country.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
+                    <Check className={cn("mr-2 h-4 w-4", value === country.value ? "opacity-100" : "opacity-0")} />
                     <span className="mr-2">{country.flag}</span>
                     {country.label}
                   </CommandItem>

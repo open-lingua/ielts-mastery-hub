@@ -1,59 +1,47 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Search,
-  Edit2,
-  Trash2,
-  Ban,
-  Users,
-  MoreHorizontal,
   AlertTriangle,
-  ShieldAlert,
+  Ban,
+  Edit2,
   Loader2,
+  MoreHorizontal,
   RefreshCw,
+  Search,
+  ShieldAlert,
+  Trash2,
+  Users,
 } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { listProfiles, listUserRoles, updateProfile, deleteProfile, createUserRole, deleteUserRole } from "@/lib/tauri";
-import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { createUserRole, deleteProfile, deleteUserRole, listProfiles, listUserRoles, updateProfile } from "@/lib/tauri";
 
 // ── Types ──────────────────────────────────────────────────
 interface UserRow {
@@ -129,11 +117,21 @@ const TableSkeleton = () => (
             </div>
           </div>
         </TableCell>
-        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
-        <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-14" /></TableCell>
-        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+        <TableCell>
+          <Skeleton className="h-5 w-14" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-5 w-14" />
+        </TableCell>
+        <TableCell className="hidden md:table-cell">
+          <Skeleton className="h-4 w-20" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-5 w-14" />
+        </TableCell>
+        <TableCell className="text-right">
+          <Skeleton className="h-8 w-8 ml-auto" />
+        </TableCell>
       </TableRow>
     ))}
   </>
@@ -179,10 +177,7 @@ const UserManagement: React.FC = () => {
       const filtered = debouncedSearch
         ? allProfiles.filter((p) => {
             const q = debouncedSearch.toLowerCase();
-            return (
-              (p.full_name ?? "").toLowerCase().includes(q) ||
-              (p.email ?? "").toLowerCase().includes(q)
-            );
+            return (p.full_name ?? "").toLowerCase().includes(q) || (p.email ?? "").toLowerCase().includes(q);
           })
         : allProfiles;
 
@@ -296,9 +291,7 @@ const UserManagement: React.FC = () => {
     setIsMutating(true);
     try {
       const bannedUntil =
-        banDuration === "permanent"
-          ? null
-          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        banDuration === "permanent" ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
       await updateProfile(selectedUser.id, {
         is_banned: true,
@@ -414,9 +407,7 @@ const UserManagement: React.FC = () => {
                         <PlanBadge plan={user.plan_type ?? "free"} />
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                        {user.updated_at
-                          ? formatDistanceToNow(new Date(user.updated_at), { addSuffix: true })
-                          : "—"}
+                        {user.updated_at ? formatDistanceToNow(new Date(user.updated_at), { addSuffix: true }) : "—"}
                       </TableCell>
                       <TableCell>
                         <StatusBadge isBanned={user.is_banned} />
@@ -594,10 +585,7 @@ const UserManagement: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label>Duration</Label>
-              <Select
-                value={banDuration}
-                onValueChange={(v) => setBanDuration(v as "temporary" | "permanent")}
-              >
+              <Select value={banDuration} onValueChange={(v) => setBanDuration(v as "temporary" | "permanent")}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -612,11 +600,7 @@ const UserManagement: React.FC = () => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button
-              variant="destructive"
-              onClick={handleBan}
-              disabled={!banReason.trim() || isMutating}
-            >
+            <Button variant="destructive" onClick={handleBan} disabled={!banReason.trim() || isMutating}>
               {isMutating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Confirm Ban
             </Button>

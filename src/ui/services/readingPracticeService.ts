@@ -1,23 +1,23 @@
-import { fetchReadingTest } from "./readingTestService";
-import { calculateReadingBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 import type {
-  ReadingPassage,
-  ReadingSection,
-  QuestionSection,
-  MCQuestion,
-  TFNGQuestion,
-  YNNGQuestion,
+  FlowchartCompletionQuestion,
+  MatchingFeaturesQuestion,
   MatchingHeadingsQuestion,
   MatchingInformationQuestion,
-  MatchingFeaturesQuestion,
   MatchingSentenceEndingsQuestion,
-  SentenceCompletionQuestion,
-  SummaryCompletionQuestion,
+  MCQuestion,
   NoteCompletionQuestion,
-  TableCompletionQuestion,
-  FlowchartCompletionQuestion,
+  QuestionSection,
+  ReadingPassage,
+  ReadingSection,
+  SentenceCompletionQuestion,
   ShortAnswerQuestion,
+  SummaryCompletionQuestion,
+  TableCompletionQuestion,
+  TFNGQuestion,
+  YNNGQuestion,
 } from "@/data/readingTestData";
+import { calculateReadingBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
+import { fetchReadingTest } from "./readingTestService";
 
 // ─── Types from DB service ───────────────────────────
 interface DBQuestion {
@@ -113,7 +113,7 @@ const typeMap: Record<string, string> = {
  */
 function buildQuestionSection(
   group: DBQuestionGroup,
-  startNum: number,
+  startNum: number
 ): { data: QuestionSection; count: number; title: string; questionRange: string } {
   const mappedType = typeMap[group.type] || group.type;
   const qs = group.questions;
@@ -125,32 +125,52 @@ function buildQuestionSection(
   switch (mappedType) {
     case "TRUE_FALSE_NOT_GIVEN":
       return {
-        data: { id: group.id, type: "TRUE_FALSE_NOT_GIVEN", text: "", answer: "TRUE" } as TFNGQuestion,
-        count, title, questionRange,
+        data: {
+          id: group.id,
+          type: "TRUE_FALSE_NOT_GIVEN",
+          text: "",
+          answer: "TRUE",
+        } as TFNGQuestion,
+        count,
+        title,
+        questionRange,
       };
 
     case "YES_NO_NOT_GIVEN":
       return {
         data: { id: group.id, type: "YES_NO_NOT_GIVEN", text: "", answer: "YES" } as YNNGQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
 
     case "MULTIPLE_CHOICE":
       return {
-        data: { id: group.id, type: "MULTIPLE_CHOICE", text: "", options: [], answer: "" } as MCQuestion,
-        count, title, questionRange,
+        data: {
+          id: group.id,
+          type: "MULTIPLE_CHOICE",
+          text: "",
+          options: [],
+          answer: "",
+        } as MCQuestion,
+        count,
+        title,
+        questionRange,
       };
 
     case "MATCHING_INFORMATION": {
-      const paragraphs = qs.length > 0 && qs[0].matchingPairs.length > 0
-        ? [...new Set(qs[0].matchingPairs.map((p) => p.right))]
-        : extractParagraphLabels(qs);
+      const paragraphs =
+        qs.length > 0 && qs[0].matchingPairs.length > 0
+          ? [...new Set(qs[0].matchingPairs.map((p) => p.right))]
+          : extractParagraphLabels(qs);
       const statements = qs.map((q, i) => ({
         label: String(startNum + i),
         text: q.text,
       }));
       const answers: Record<string, string> = {};
-      qs.forEach((q, i) => { answers[String(startNum + i)] = q.answer; });
+      qs.forEach((q, i) => {
+        answers[String(startNum + i)] = q.answer;
+      });
       return {
         data: {
           id: group.id,
@@ -159,17 +179,22 @@ function buildQuestionSection(
           paragraphs,
           answers,
         } as MatchingInformationQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
     case "MATCHING_HEADINGS": {
       const paragraphs = qs.map((q) => q.text);
-      const headings = group.wordBank.length > 0
-        ? group.wordBank
-        : qs.flatMap((q) => q.options.map((o) => (typeof o === "string" ? o : o.text)));
+      const headings =
+        group.wordBank.length > 0
+          ? group.wordBank
+          : qs.flatMap((q) => q.options.map((o) => (typeof o === "string" ? o : o.text)));
       const answers: Record<string, string> = {};
-      qs.forEach((q) => { answers[q.text] = q.answer; });
+      qs.forEach((q) => {
+        answers[q.text] = q.answer;
+      });
       return {
         data: {
           id: group.id,
@@ -178,7 +203,9 @@ function buildQuestionSection(
           headings,
           answers,
         } as MatchingHeadingsQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -187,11 +214,11 @@ function buildQuestionSection(
         label: String(startNum + i),
         text: q.text,
       }));
-      const entities = group.wordBank.length > 0
-        ? group.wordBank
-        : [...new Set(qs.map((q) => q.answer))];
+      const entities = group.wordBank.length > 0 ? group.wordBank : [...new Set(qs.map((q) => q.answer))];
       const answers: Record<string, string> = {};
-      qs.forEach((q, i) => { answers[String(startNum + i)] = q.answer; });
+      qs.forEach((q, i) => {
+        answers[String(startNum + i)] = q.answer;
+      });
       return {
         data: {
           id: group.id,
@@ -200,7 +227,9 @@ function buildQuestionSection(
           entities,
           answers,
         } as MatchingFeaturesQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -209,12 +238,15 @@ function buildQuestionSection(
         label: String(startNum + i),
         text: q.text,
       }));
-      const endings = qs[0]?.options?.map((o) => ({
-        label: o.id || o.text.charAt(0),
-        text: o.text,
-      })) || [];
+      const endings =
+        qs[0]?.options?.map((o) => ({
+          label: o.id || o.text.charAt(0),
+          text: o.text,
+        })) || [];
       const answers: Record<string, string> = {};
-      qs.forEach((q, i) => { answers[String(startNum + i)] = q.answer; });
+      qs.forEach((q, i) => {
+        answers[String(startNum + i)] = q.answer;
+      });
       return {
         data: {
           id: group.id,
@@ -223,7 +255,9 @@ function buildQuestionSection(
           endings,
           answers,
         } as MatchingSentenceEndingsQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -238,10 +272,12 @@ function buildQuestionSection(
         data: {
           id: group.id,
           type: "SENTENCE_COMPLETION",
-          wordLimit: parseInt(group.wordLimit) || 2,
+          wordLimit: parseInt(group.wordLimit, 10) || 2,
           sentences,
         } as SentenceCompletionQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -256,13 +292,15 @@ function buildQuestionSection(
         data: {
           id: group.id,
           type: "SUMMARY_COMPLETION",
-          wordLimit: parseInt(group.wordLimit) || 2,
+          wordLimit: parseInt(group.wordLimit, 10) || 2,
           useWordBank: group.hasWordBank,
           wordBank: group.hasWordBank ? group.wordBank : undefined,
           summaryText,
           gaps,
         } as SummaryCompletionQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -277,34 +315,38 @@ function buildQuestionSection(
         data: {
           id: group.id,
           type: "NOTE_COMPLETION",
-          wordLimit: parseInt(group.wordLimit) || 2,
+          wordLimit: parseInt(group.wordLimit, 10) || 2,
           notes,
         } as NoteCompletionQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
     case "TABLE_COMPLETION": {
       // Reconstruct table from completion_gaps
-      const headers = qs[0]?.completionGaps?.length > 0
-        ? qs[0].completionGaps.map((g) => g.gapText)
-        : ["Column 1", "Column 2", "Column 3"];
+      const headers =
+        qs[0]?.completionGaps?.length > 0
+          ? qs[0].completionGaps.map((g) => g.gapText)
+          : ["Column 1", "Column 2", "Column 3"];
       const rows = qs.map((q) => ({
-        cells: q.completionGaps.length > 0
-          ? q.completionGaps.map((g) =>
-              g.answer ? { gap: g.id, answer: g.answer } : g.gapText
-            )
-          : [q.text, { gap: `gap_${q.id}`, answer: q.answer }],
+        cells:
+          q.completionGaps.length > 0
+            ? q.completionGaps.map((g) => (g.answer ? { gap: g.id, answer: g.answer } : g.gapText))
+            : [q.text, { gap: `gap_${q.id}`, answer: q.answer }],
       }));
       return {
         data: {
           id: group.id,
           type: "TABLE_COMPLETION",
-          wordLimit: parseInt(group.wordLimit) || 2,
+          wordLimit: parseInt(group.wordLimit, 10) || 2,
           headers,
           rows,
         } as TableCompletionQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -318,10 +360,12 @@ function buildQuestionSection(
         data: {
           id: group.id,
           type: "FLOWCHART_COMPLETION",
-          wordLimit: parseInt(group.wordLimit) || 2,
+          wordLimit: parseInt(group.wordLimit, 10) || 2,
           steps,
         } as FlowchartCompletionQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
@@ -336,17 +380,21 @@ function buildQuestionSection(
         data: {
           id: group.id,
           type: "SHORT_ANSWER",
-          wordLimit: parseInt(group.wordLimit) || 3,
+          wordLimit: parseInt(group.wordLimit, 10) || 3,
           questions,
         } as ShortAnswerQuestion,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
     }
 
     default:
       return {
         data: { id: group.id, type: mappedType, text: "" } as unknown as QuestionSection,
-        count, title, questionRange,
+        count,
+        title,
+        questionRange,
       };
   }
 }
@@ -364,7 +412,7 @@ function extractParagraphLabels(qs: DBQuestion[]): string[] {
  */
 function buildFlatOverrides(
   group: DBQuestionGroup,
-  startNum: number,
+  startNum: number
 ): {
   tfng?: FlatTFNGQuestion[];
   ynng?: FlatYNNGQuestion[];
@@ -413,9 +461,7 @@ function buildFlatOverrides(
 /**
  * Fetch a reading test for the practice engine and transform to ReadingPassage[] format.
  */
-export async function fetchReadingTestForPractice(
-  testId: string,
-): Promise<ReadingTestPracticePayload> {
+export async function fetchReadingTestForPractice(testId: string): Promise<ReadingTestPracticePayload> {
   const result = await fetchReadingTest(testId);
 
   const passages: ReadingPassage[] = [];

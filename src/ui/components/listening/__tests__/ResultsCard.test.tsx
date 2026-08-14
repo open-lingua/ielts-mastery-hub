@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ResultsCard from "../ResultsCard";
+import { describe, expect, it, vi } from "vitest";
 import { mockListeningTest } from "@/test/mockTestData";
+import ResultsCard from "../ResultsCard";
 
 const allCorrect: Record<string, string> = {};
 mockListeningTest.sections.forEach((s) =>
@@ -35,10 +35,7 @@ describe("ResultsCard", () => {
         onRetry={vi.fn()}
       />
     );
-    const totalQuestions = mockListeningTest.sections.reduce(
-      (a, s) => a + s.questions.length,
-      0
-    );
+    const totalQuestions = mockListeningTest.sections.reduce((a, s) => a + s.questions.length, 0);
     expect(screen.getByText(`${totalQuestions}/${totalQuestions}`)).toBeInTheDocument();
   });
 
@@ -71,13 +68,7 @@ describe("ResultsCard", () => {
 
   it("shows Hide Answers button in review mode", () => {
     render(
-      <ResultsCard
-        test={mockListeningTest}
-        answers={{}}
-        reviewMode={true}
-        onToggleReview={vi.fn()}
-        onRetry={vi.fn()}
-      />
+      <ResultsCard test={mockListeningTest} answers={{}} reviewMode={true} onToggleReview={vi.fn()} onRetry={vi.fn()} />
     );
     expect(screen.getByText("Hide Answers")).toBeInTheDocument();
   });

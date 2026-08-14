@@ -1,11 +1,11 @@
 import { getAnonId } from "@/lib/anonId";
 import {
-  getWritingTest,
-  createWritingTest,
-  updateWritingTest as tauriUpdateWritingTest,
-  listWritingTasks,
   createWritingTask,
+  createWritingTest,
   deleteWritingTask,
+  getWritingTest,
+  listWritingTasks,
+  updateWritingTest as tauriUpdateWritingTest,
   uploadWritingAsset,
 } from "@/lib/tauri";
 
@@ -36,7 +36,6 @@ interface UpdateWritingTestParams {
   status: "draft" | "published";
   tasks: WritingTaskData[];
 }
-
 
 async function resolveTasks(userId: string, tasks: WritingTaskData[]) {
   const resolved: Array<WritingTaskData & { resolvedImageUrl: string }> = [];
@@ -107,15 +106,10 @@ export async function updateWritingTest(params: UpdateWritingTestParams): Promis
 
 export async function fetchWritingTest(testId: string) {
   const userId = getAnonId();
-  const [test, allTasks] = await Promise.all([
-    getWritingTest(testId, userId),
-    listWritingTasks(userId),
-  ]);
+  const [test, allTasks] = await Promise.all([getWritingTest(testId, userId), listWritingTasks(userId)]);
   if (!test) throw new Error("Writing test not found");
 
-  const tasks = allTasks
-    .filter((t) => t.test_id === testId)
-    .sort((a, b) => a.task_number - b.task_number);
+  const tasks = allTasks.filter((t) => t.test_id === testId).sort((a, b) => a.task_number - b.task_number);
 
   return {
     id: test.id,

@@ -1,13 +1,13 @@
+import type { ListeningQuestion, ListeningSection, ListeningTest } from "@/data/listeningTestData";
 import { getAnonId } from "@/lib/anonId";
 import {
   getListeningTest,
-  listListeningSections,
   listListeningQuestionGroups,
   listListeningQuestions,
-  type ListeningQuestion as TauriListeningQuestion,
+  listListeningSections,
   type ListeningQuestionGroup as TauriListeningGroup,
+  type ListeningQuestion as TauriListeningQuestion,
 } from "@/lib/tauri";
-import type { ListeningQuestion, ListeningSection, ListeningTest } from "@/data/listeningTestData";
 import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
 export async function submitListeningTest(
@@ -17,23 +17,20 @@ export async function submitListeningTest(
 ): Promise<{ rawScore: number; bandScore: number }> {
   const { completeSession } = await import("./practiceLibraryService");
   const allQuestions = test.sections.flatMap((s) => s.questions);
-  const rawScore = allQuestions.filter((q) =>
-    isAnswerCorrect(answers[q.id], q.answer)
-  ).length;
+  const rawScore = allQuestions.filter((q) => isAnswerCorrect(answers[q.id], q.answer)).length;
   const bandScore = calculateListeningBandScore(rawScore);
 
   await completeSession(sessionId, bandScore, { userAnswers: answers });
   return { rawScore, bandScore };
 }
 
-function mapDBQuestionToListening(
-  q: TauriListeningQuestion,
-  group: TauriListeningGroup
-): ListeningQuestion {
-  const options: Array<{ id: string; text: string; isCorrect: boolean }> =
-    q.options ? (JSON.parse(q.options) as any[]) : [];
-  const matchingPairs: Array<{ id: string; left: string; right: string }> =
-    q.matching_pairs ? (JSON.parse(q.matching_pairs) as any[]) : [];
+function mapDBQuestionToListening(q: TauriListeningQuestion, group: TauriListeningGroup): ListeningQuestion {
+  const options: Array<{ id: string; text: string; isCorrect: boolean }> = q.options
+    ? (JSON.parse(q.options) as any[])
+    : [];
+  const matchingPairs: Array<{ id: string; left: string; right: string }> = q.matching_pairs
+    ? (JSON.parse(q.matching_pairs) as any[])
+    : [];
 
   if (group.question_type === "multiple-choice") {
     return {
@@ -59,16 +56,13 @@ function mapDBQuestionToListening(
       answer: q.answer || "",
       matchOptions: {
         left: leftParts || q.text,
-        right:
-          rightOptions.length > 0
-            ? rightOptions
-            : options.map((o) => (typeof o === "string" ? o : o.text)),
+        right: rightOptions.length > 0 ? rightOptions : options.map((o) => (typeof o === "string" ? o : o.text)),
       },
     };
   }
 
   // Default: fill-in-the-blank
-  const wordLimit = group.word_limit ? parseInt(group.word_limit) || undefined : undefined;
+  const wordLimit = group.word_limit ? parseInt(group.word_limit, 10) || undefined : undefined;
   return {
     id: q.id,
     type: "fill",
@@ -79,12 +73,7 @@ function mapDBQuestionToListening(
 }
 
 function buildContextFromSectionNumber(num: number): string {
-  const contexts = [
-    "Social / Everyday",
-    "Social / Monologue",
-    "Educational / Discussion",
-    "Academic / Lecture",
-  ];
+  const contexts = ["Social / Everyday", "Social / Monologue", "Educational / Discussion", "Academic / Lecture"];
   return contexts[num - 1] || "General";
 }
 
@@ -100,14 +89,10 @@ export async function fetchListeningTestForPractice(testId: string): Promise<Lis
 
   if (!test) throw new Error("Listening test not found");
 
-  const sections = allSections
-    .filter((s) => s.test_id === testId)
-    .sort((a, b) => a.section_number - b.section_number);
+  const sections = allSections.filter((s) => s.test_id === testId).sort((a, b) => a.section_number - b.section_number);
 
   const sectionIds = new Set(sections.map((s) => s.id));
-  const groups = allGroups
-    .filter((g) => sectionIds.has(g.section_id))
-    .sort((a, b) => a.group_order - b.group_order);
+  const groups = allGroups.filter((g) => sectionIds.has(g.section_id)).sort((a, b) => a.group_order - b.group_order);
 
   const groupIds = new Set(groups.map((g) => g.id));
   const questions = allQuestions
@@ -118,13 +103,13 @@ export async function fetchListeningTestForPractice(testId: string): Promise<Lis
   const questionsByGroup = new Map<string, typeof questions>();
   for (const q of questions) {
     if (!questionsByGroup.has(q.group_id)) questionsByGroup.set(q.group_id, []);
-    questionsByGroup.get(q.group_id)!.push(q);
+    questionsByGroup.get(q.group_id)?.push(q);
   }
 
   const groupsBySection = new Map<string, typeof groups>();
   for (const g of groups) {
     if (!groupsBySection.has(g.section_id)) groupsBySection.set(g.section_id, []);
-    groupsBySection.get(g.section_id)!.push(g);
+    groupsBySection.get(g.section_id)?.push(g);
   }
 
   const uiSections: ListeningSection[] = sections.map((s) => {
@@ -152,7 +137,7 @@ export async function fetchListeningTestForPractice(testId: string): Promise<Lis
   });
 
   const durationMatch = test.duration?.match(/(\d+)/);
-  const totalTime = durationMatch ? parseInt(durationMatch[1]) * 60 : 1800;
+  const totalTime = durationMatch ? parseInt(durationMatch[1], 10) * 60 : 1800;
 
   return {
     id: test.id,

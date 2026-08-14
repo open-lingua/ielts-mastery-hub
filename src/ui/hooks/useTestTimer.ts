@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface UseTestTimerOptions {
   initialSeconds: number;
@@ -52,11 +52,7 @@ export function useTestTimer({
   const isUrgent = timeLeft <= 60;
   const isWarning = timeLeft <= 300 && !isUrgent;
 
-  const timerColor = isUrgent
-    ? "text-destructive"
-    : isWarning
-    ? "text-warning"
-    : "text-foreground";
+  const timerColor = isUrgent ? "text-destructive" : isWarning ? "text-warning" : "text-foreground";
 
   return { timeLeft, formattedTime, progressPercent, isWarning, isUrgent, timerColor };
 }

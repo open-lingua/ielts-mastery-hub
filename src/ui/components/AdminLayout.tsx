@@ -1,25 +1,20 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  Library,
-  PlusCircle,
-  Users,
-  Settings,
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  LayoutDashboard,
+  Library,
   LogOut,
   Moon,
+  PlusCircle,
   Sun,
+  Users,
 } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +23,7 @@ const navItems = [
   { label: "Content Library", icon: Library, path: "/admin/content" },
   { label: "Create New", icon: PlusCircle, path: "/admin/create" },
   { label: "Students", icon: Users, path: "/admin/users" },
- //  { label: "Settings", icon: Settings, path: "/admin/settings" },
+  //  { label: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -37,9 +32,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
   const { theme, toggleTheme } = useTheme();
 
   const isActive = (path: string) =>
-    path === "/admin"
-      ? location.pathname === "/admin"
-      : location.pathname.startsWith(path);
+    path === "/admin" ? location.pathname === "/admin" : location.pathname.startsWith(path);
 
   return (
     <div className="flex min-h-screen bg-background">

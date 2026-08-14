@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { CountryPicker } from "../CountryPicker";
 
 describe("CountryPicker", () => {
@@ -28,9 +28,9 @@ describe("CountryPicker", () => {
 
   it("opens dropdown on click", async () => {
     // Mock ResizeObserver for Radix Popover
-    window.ResizeObserver = vi.fn().mockImplementation(function() {
-      return { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
-    });
+    window.ResizeObserver = vi
+      .fn()
+      .mockImplementation(() => ({ observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() }));
     const user = userEvent.setup();
     render(<CountryPicker value="" onChange={vi.fn()} />);
     await user.click(screen.getByRole("combobox"));

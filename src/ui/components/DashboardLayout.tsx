@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Headphones,
+  LayoutDashboard,
+  Library,
+  Menu,
+  Moon,
+  PenTool,
+  Shield,
+  Sun,
+} from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, LayoutDashboard, Moon, Sun, Menu, ChevronLeft, ChevronRight, Library, Shield } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -28,7 +36,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       <aside
@@ -38,10 +49,12 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           collapsed ? "w-[70px]" : "w-64"
         )}
       >
-        <div className={cn(
-          "flex h-16 items-center border-b border-border transition-all duration-300",
-          collapsed ? "justify-center px-2" : "gap-2 px-6"
-        )}>
+        <div
+          className={cn(
+            "flex h-16 items-center border-b border-border transition-all duration-300",
+            collapsed ? "justify-center px-2" : "gap-2 px-6"
+          )}
+        >
           <BookOpen className="h-6 w-6 shrink-0 text-primary" />
           {!collapsed && (
             <>
@@ -55,8 +68,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           <nav className={cn("flex-1 space-y-1 p-4 transition-all duration-300", collapsed && "px-2")}>
             {navItems.map((item) => {
               const [itemPath, itemQuery] = item.path.split("?");
-              const isActive = location.pathname === itemPath &&
-                (!itemQuery || location.search.includes(itemQuery));
+              const isActive = location.pathname === itemPath && (!itemQuery || location.search.includes(itemQuery));
               const linkContent = (
                 <Link
                   key={item.path}

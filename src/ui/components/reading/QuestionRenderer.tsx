@@ -1,33 +1,29 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowRight, CheckCircle2, HelpCircle, X, XCircle } from "lucide-react";
+import type React from "react";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, HelpCircle, ArrowRight, X } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type {
-  QuestionSection,
-  MCQuestion,
-  MatchingInformationQuestion,
-  MatchingHeadingsQuestion,
-  MatchingFeaturesQuestion,
-  MatchingSentenceEndingsQuestion,
-  SentenceCompletionQuestion,
-  SummaryCompletionQuestion,
-  NoteCompletionQuestion,
-  TableCompletionQuestion,
   FlowchartCompletionQuestion,
+  MatchingFeaturesQuestion,
+  MatchingHeadingsQuestion,
+  MatchingInformationQuestion,
+  MatchingSentenceEndingsQuestion,
+  NoteCompletionQuestion,
+  QuestionSection,
+  SentenceCompletionQuestion,
   ShortAnswerQuestion,
+  SummaryCompletionQuestion,
+  TableCompletionQuestion,
 } from "@/data/readingTestData";
-import { tfngQuestions as defaultTfng, mcQuestions as defaultMc, ynngQuestions as defaultYnng } from "@/data/readingTestData";
+import {
+  mcQuestions as defaultMc,
+  tfngQuestions as defaultTfng,
+  ynngQuestions as defaultYnng,
+} from "@/data/readingTestData";
+import { cn } from "@/lib/utils";
 
 // ─── Types ──────────────────────────────────────────
 
@@ -80,7 +76,10 @@ const TFNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, tf
                       ? "border-primary bg-primary/10 text-primary ring-2 ring-primary/20"
                       : "border-border text-muted-foreground hover:bg-secondary",
                     submitted && q.answer === opt && "!border-success !bg-success/10 !text-success",
-                    submitted && selected === opt && !isCorrect && "!border-destructive !bg-destructive/10 !text-destructive"
+                    submitted &&
+                      selected === opt &&
+                      !isCorrect &&
+                      "!border-destructive !bg-destructive/10 !text-destructive"
                   )}
                 >
                   {opt}
@@ -130,7 +129,10 @@ const YNNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, yn
                       ? "border-primary bg-primary/10 text-primary ring-2 ring-primary/20"
                       : "border-border text-muted-foreground hover:bg-secondary",
                     submitted && q.answer === opt && "!border-success !bg-success/10 !text-success",
-                    submitted && selected === opt && !isCorrect && "!border-destructive !bg-destructive/10 !text-destructive"
+                    submitted &&
+                      selected === opt &&
+                      !isCorrect &&
+                      "!border-destructive !bg-destructive/10 !text-destructive"
                   )}
                 >
                   {opt}
@@ -224,18 +226,18 @@ const MatchingInformationRenderer: React.FC<SectionProps> = ({ data, answers, on
               <span className="font-bold text-primary mr-2">{s.label}.</span>
               {s.text}
             </p>
-            <Select
-              value={selected || ""}
-              onValueChange={(v) => !submitted && onAnswer(key, v)}
-              disabled={submitted}
-            >
+            <Select value={selected || ""} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Paragraph" />
               </SelectTrigger>
               <SelectContent>
-                {d.paragraphs.filter((p) => p !== "").map((p) => (
-                  <SelectItem key={p} value={p}>Paragraph {p}</SelectItem>
-                ))}
+                {d.paragraphs
+                  .filter((p) => p !== "")
+                  .map((p) => (
+                    <SelectItem key={p} value={p}>
+                      Paragraph {p}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {submitted && (
@@ -263,7 +265,9 @@ const MatchingHeadingsRenderer: React.FC<SectionProps> = ({ data, answers, onAns
         <p className="text-xs font-semibold text-muted-foreground mb-2">List of Headings</p>
         <div className="space-y-1">
           {d.headings.map((h, i) => (
-            <p key={i} className="text-xs text-foreground">{h}</p>
+            <p key={i} className="text-xs text-foreground">
+              {h}
+            </p>
           ))}
         </div>
       </div>
@@ -277,11 +281,7 @@ const MatchingHeadingsRenderer: React.FC<SectionProps> = ({ data, answers, onAns
           <div key={para} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
             <span className="text-sm font-bold text-primary w-6">{qNum}.</span>
             <span className="text-sm font-medium text-foreground flex-1">Paragraph {para}</span>
-            <Select
-              value={selected || ""}
-              onValueChange={(v) => !submitted && onAnswer(key, v)}
-              disabled={submitted}
-            >
+            <Select value={selected || ""} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
               <SelectTrigger className="w-28">
                 <SelectValue placeholder="Heading" />
               </SelectTrigger>
@@ -290,7 +290,9 @@ const MatchingHeadingsRenderer: React.FC<SectionProps> = ({ data, answers, onAns
                   const numeral = h.split(".")[0]?.trim() || h;
                   const safeValue = numeral || `heading_${h}`;
                   return (
-                    <SelectItem key={safeValue} value={safeValue}>{numeral || h}</SelectItem>
+                    <SelectItem key={safeValue} value={safeValue}>
+                      {numeral || h}
+                    </SelectItem>
                   );
                 })}
               </SelectContent>
@@ -317,7 +319,9 @@ const MatchingFeaturesRenderer: React.FC<SectionProps> = ({ data, answers, onAns
       <div className="rounded-lg border border-border bg-secondary/50 p-3 mb-4">
         <p className="text-xs font-semibold text-muted-foreground mb-2">List of Researchers</p>
         {d.entities.map((e, i) => (
-          <p key={i} className="text-xs text-foreground">{e}</p>
+          <p key={i} className="text-xs text-foreground">
+            {e}
+          </p>
         ))}
       </div>
       {d.features.map((f) => {
@@ -331,18 +335,18 @@ const MatchingFeaturesRenderer: React.FC<SectionProps> = ({ data, answers, onAns
               <span className="font-bold text-primary mr-2">{f.label}.</span>
               {f.text}
             </p>
-            <Select
-              value={selected || ""}
-              onValueChange={(v) => !submitted && onAnswer(key, v)}
-              disabled={submitted}
-            >
+            <Select value={selected || ""} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
               <SelectTrigger className="w-56">
                 <SelectValue placeholder="Select researcher" />
               </SelectTrigger>
               <SelectContent>
-                {d.entities.filter((e) => e !== "").map((e) => (
-                  <SelectItem key={e} value={e}>{e}</SelectItem>
-                ))}
+                {d.entities
+                  .filter((e) => e !== "")
+                  .map((e) => (
+                    <SelectItem key={e} value={e}>
+                      {e}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {submitted && (
@@ -369,7 +373,9 @@ const MatchingSentenceEndingsRenderer: React.FC<SectionProps> = ({ data, answers
       <div className="rounded-lg border border-border bg-secondary/50 p-3 mb-4">
         <p className="text-xs font-semibold text-muted-foreground mb-2">Sentence Endings</p>
         {d.endings.map((e) => (
-          <p key={e.label} className="text-xs text-foreground"><span className="font-bold">{e.label}.</span> {e.text}</p>
+          <p key={e.label} className="text-xs text-foreground">
+            <span className="font-bold">{e.label}.</span> {e.text}
+          </p>
         ))}
       </div>
       {d.stems.map((s) => {
@@ -383,18 +389,18 @@ const MatchingSentenceEndingsRenderer: React.FC<SectionProps> = ({ data, answers
               <span className="font-bold text-primary mr-2">{s.label}.</span>
               {s.text}...
             </p>
-            <Select
-              value={selected || ""}
-              onValueChange={(v) => !submitted && onAnswer(key, v)}
-              disabled={submitted}
-            >
+            <Select value={selected || ""} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
               <SelectTrigger className="w-24">
                 <SelectValue placeholder="Ending" />
               </SelectTrigger>
               <SelectContent>
-                {d.endings.filter((e) => e.label !== "").map((e) => (
-                  <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>
-                ))}
+                {d.endings
+                  .filter((e) => e.label !== "")
+                  .map((e) => (
+                    <SelectItem key={e.label} value={e.label}>
+                      {e.label}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {submitted && (
@@ -419,7 +425,8 @@ const SentenceCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onA
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       {d.sentences.map((s) => {
         const key = `sc_${s.gap}`;
@@ -478,23 +485,24 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
 
         if (d.useWordBank && d.wordBank) {
           return (
-            <Select
-              key={i}
-              value={val}
-              onValueChange={(v) => !submitted && onAnswer(key, v)}
-              disabled={submitted}
-            >
-              <SelectTrigger className={cn(
-                "inline-flex w-40 h-8 text-xs mx-1",
-                submitted && isCorrect && "border-success",
-                submitted && !isCorrect && val && "border-destructive"
-              )}>
+            <Select key={i} value={val} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
+              <SelectTrigger
+                className={cn(
+                  "inline-flex w-40 h-8 text-xs mx-1",
+                  submitted && isCorrect && "border-success",
+                  submitted && !isCorrect && val && "border-destructive"
+                )}
+              >
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
-                {d.wordBank!.filter((w) => w !== "").map((w) => (
-                  <SelectItem key={w} value={w}>{w}</SelectItem>
-                ))}
+                {d.wordBank
+                  ?.filter((w) => w !== "")
+                  .map((w) => (
+                    <SelectItem key={w} value={w}>
+                      {w}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           );
@@ -515,19 +523,26 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
           />
         );
       }
-      return <span key={i} className="text-sm text-foreground">{part}</span>;
+      return (
+        <span key={i} className="text-sm text-foreground">
+          {part}
+        </span>
+      );
     });
   };
 
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       {d.useWordBank && d.wordBank && (
         <div className="flex flex-wrap gap-1.5 p-3 rounded-lg border border-border bg-secondary/50">
           {d.wordBank.map((w) => (
-            <Badge key={w} variant="secondary" className="text-xs">{w}</Badge>
+            <Badge key={w} variant="secondary" className="text-xs">
+              {w}
+            </Badge>
           ))}
         </div>
       )}
@@ -562,7 +577,8 @@ const NoteCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAnswe
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       {d.notes.map((n) => {
         const key = `nc_${n.gap}`;
@@ -609,14 +625,17 @@ const TableCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAnsw
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       <div className="rounded-lg border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-secondary">
               {d.headers.map((h) => (
-                <th key={h} className="px-4 py-2.5 text-left font-semibold text-foreground">{h}</th>
+                <th key={h} className="px-4 py-2.5 text-left font-semibold text-foreground">
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
@@ -645,9 +664,7 @@ const TableCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAnsw
                                 submitted && !isCorrect && val && "border-destructive bg-destructive/10"
                               )}
                             />
-                            {submitted && !isCorrect && (
-                              <span className="text-xs text-destructive">{cell.answer}</span>
-                            )}
+                            {submitted && !isCorrect && <span className="text-xs text-destructive">{cell.answer}</span>}
                           </div>
                         );
                       })()
@@ -670,7 +687,8 @@ const FlowchartCompletionRenderer: React.FC<SectionProps> = ({ data, answers, on
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       <div className="space-y-0">
         {d.steps.map((step, i) => {
@@ -683,7 +701,7 @@ const FlowchartCompletionRenderer: React.FC<SectionProps> = ({ data, answers, on
                     const parts = step.text.split("{{gap}}");
                     const key = `fc_${step.gap}`;
                     const val = (answers[key] as string) || "";
-                    const isCorrect = val.toLowerCase().trim() === step.answer!.toLowerCase();
+                    const isCorrect = val.toLowerCase().trim() === step.answer?.toLowerCase();
                     return (
                       <>
                         <span>{parts[0]}</span>
@@ -729,7 +747,8 @@ const ShortAnswerRenderer: React.FC<SectionProps> = ({ data, answers, onAnswer, 
   return (
     <div className="space-y-4">
       <Badge variant="outline" className="text-xs">
-        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word{d.wordLimit > 1 ? "s" : ""}
+        <HelpCircle className="h-3 w-3 mr-1" /> No more than {d.wordLimit} word
+        {d.wordLimit > 1 ? "s" : ""}
       </Badge>
       {d.questions.map((q) => {
         const key = `sa_${q.label}`;
@@ -837,22 +856,44 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   const label = typeLabels[type] || type;
 
   const renderSection = () => {
-    const props: SectionProps = { data: section.data, answers, onAnswer, submitted, tfngOverride, mcOverride, ynngOverride };
+    const props: SectionProps = {
+      data: section.data,
+      answers,
+      onAnswer,
+      submitted,
+      tfngOverride,
+      mcOverride,
+      ynngOverride,
+    };
     switch (type) {
-      case "TRUE_FALSE_NOT_GIVEN": return <TFNGRenderer {...props} />;
-      case "YES_NO_NOT_GIVEN": return <YNNGRenderer {...props} />;
-      case "MULTIPLE_CHOICE": return <MCRenderer {...props} />;
-      case "MATCHING_INFORMATION": return <MatchingInformationRenderer {...props} />;
-      case "MATCHING_HEADINGS": return <MatchingHeadingsRenderer {...props} />;
-      case "MATCHING_FEATURES": return <MatchingFeaturesRenderer {...props} />;
-      case "MATCHING_SENTENCE_ENDINGS": return <MatchingSentenceEndingsRenderer {...props} />;
-      case "SENTENCE_COMPLETION": return <SentenceCompletionRenderer {...props} />;
-      case "SUMMARY_COMPLETION": return <SummaryCompletionRenderer {...props} />;
-      case "NOTE_COMPLETION": return <NoteCompletionRenderer {...props} />;
-      case "TABLE_COMPLETION": return <TableCompletionRenderer {...props} />;
-      case "FLOWCHART_COMPLETION": return <FlowchartCompletionRenderer {...props} />;
-      case "SHORT_ANSWER": return <ShortAnswerRenderer {...props} />;
-      default: return <p className="text-muted-foreground text-sm">Unknown question type</p>;
+      case "TRUE_FALSE_NOT_GIVEN":
+        return <TFNGRenderer {...props} />;
+      case "YES_NO_NOT_GIVEN":
+        return <YNNGRenderer {...props} />;
+      case "MULTIPLE_CHOICE":
+        return <MCRenderer {...props} />;
+      case "MATCHING_INFORMATION":
+        return <MatchingInformationRenderer {...props} />;
+      case "MATCHING_HEADINGS":
+        return <MatchingHeadingsRenderer {...props} />;
+      case "MATCHING_FEATURES":
+        return <MatchingFeaturesRenderer {...props} />;
+      case "MATCHING_SENTENCE_ENDINGS":
+        return <MatchingSentenceEndingsRenderer {...props} />;
+      case "SENTENCE_COMPLETION":
+        return <SentenceCompletionRenderer {...props} />;
+      case "SUMMARY_COMPLETION":
+        return <SummaryCompletionRenderer {...props} />;
+      case "NOTE_COMPLETION":
+        return <NoteCompletionRenderer {...props} />;
+      case "TABLE_COMPLETION":
+        return <TableCompletionRenderer {...props} />;
+      case "FLOWCHART_COMPLETION":
+        return <FlowchartCompletionRenderer {...props} />;
+      case "SHORT_ANSWER":
+        return <ShortAnswerRenderer {...props} />;
+      default:
+        return <p className="text-muted-foreground text-sm">Unknown question type</p>;
     }
   };
 
@@ -861,7 +902,9 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-foreground">{section.title}</h3>
-          <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", badgeColor)}>
+          <span
+            className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", badgeColor)}
+          >
             {label}
           </span>
         </div>

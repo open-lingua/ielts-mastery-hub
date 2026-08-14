@@ -1,9 +1,9 @@
-import React from "react";
-import { Play, Timer, BookOpen, FileText, Headphones, Info } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/card";
+import { AnimatePresence, motion } from "framer-motion";
+import { BookOpen, FileText, Headphones, Info, Play, Timer } from "lucide-react";
+import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface TestStartOverlayProps {

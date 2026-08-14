@@ -1,29 +1,28 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Headphones, ChevronRight, Lock, Info, AlertTriangle, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, ChevronRight, Headphones, Info } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import AudioPlayer from "@/components/listening/AudioPlayer";
+import QuestionCard from "@/components/listening/QuestionCard";
+import ResultsCard from "@/components/listening/ResultsCard";
+import SectionStepper from "@/components/listening/SectionStepper";
+import TestStartOverlay from "@/components/shared/TestStartOverlay";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import SectionStepper from "@/components/listening/SectionStepper";
-import AudioPlayer from "@/components/listening/AudioPlayer";
-import QuestionCard from "@/components/listening/QuestionCard";
-import ResultsCard from "@/components/listening/ResultsCard";
-import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
-import TestStartOverlay from "@/components/shared/TestStartOverlay";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { getAnonId } from "@/lib/anonId";
-import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
-import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
-import { usePersistedTimer } from "@/hooks/usePersistedTimer";
-import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { ListeningTest } from "@/data/listeningTestData";
-import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
+import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { getAnonId } from "@/lib/anonId";
+import { fetchListeningTestForPractice, submitListeningTest } from "@/services/listeningPracticeService";
+import { fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
 
 const ListeningLoadingSkeleton = () => (
   <DashboardLayout>
@@ -285,9 +284,7 @@ const ListeningModule: React.FC = () => {
   const sectionQuestions = currentSection.questions;
   const answeredCount = sectionQuestions.filter((q) => answers[q.id]?.trim()).length;
   const canSubmit = answeredCount > 0;
-  const globalOffset = test.sections
-    .slice(0, activeSection)
-    .reduce((acc, s) => acc + s.questions.length, 0);
+  const globalOffset = test.sections.slice(0, activeSection).reduce((acc, s) => acc + s.questions.length, 0);
 
   return (
     <DashboardLayout>
@@ -364,7 +361,7 @@ const ListeningModule: React.FC = () => {
                       />
                       {reviewMode && (
                         <div className="space-y-6">
-                        {test.sections.map((section, sectionIdx) => {
+                          {test.sections.map((section, sectionIdx) => {
                             const offset = test.sections
                               .slice(0, sectionIdx)
                               .reduce((acc, s) => acc + s.questions.length, 0);
@@ -445,10 +442,7 @@ const ListeningModule: React.FC = () => {
                         ))}
                       </div>
 
-                      <motion.div
-                        animate={canSubmit ? { scale: [1, 1.02, 1] } : {}}
-                        transition={{ duration: 0.4 }}
-                      >
+                      <motion.div animate={canSubmit ? { scale: [1, 1.02, 1] } : {}} transition={{ duration: 0.4 }}>
                         <Button
                           onClick={handleSubmitSection}
                           disabled={!canSubmit}
@@ -456,7 +450,9 @@ const ListeningModule: React.FC = () => {
                           size="lg"
                         >
                           {activeSection < totalSections - 1 ? (
-                            <>Submit & Continue to Section {activeSection + 2} <ChevronRight className="h-4 w-4" /></>
+                            <>
+                              Submit & Continue to Section {activeSection + 2} <ChevronRight className="h-4 w-4" />
+                            </>
                           ) : (
                             "Submit & View Results"
                           )}

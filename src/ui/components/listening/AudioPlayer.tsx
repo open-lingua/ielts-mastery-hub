@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import { Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
@@ -36,7 +37,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-  }, [sectionIndex, audioUrl]);
+  }, [audioUrl]);
 
   // Simulated playback
   useEffect(() => {
@@ -144,9 +145,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
         onClick={hasEnded ? restart : togglePlay}
         className={cn(
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-transform hover:scale-105",
-          hasEnded
-            ? "bg-muted text-muted-foreground"
-            : "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+          hasEnded ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground shadow-md shadow-primary/20"
         )}
       >
         {hasEnded ? (
@@ -182,9 +181,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
       </button>
 
       {hasEnded && (
-        <span className="text-[10px] font-semibold text-success uppercase tracking-wider shrink-0">
-          Ended
-        </span>
+        <span className="text-[10px] font-semibold text-success uppercase tracking-wider shrink-0">Ended</span>
       )}
     </div>
   );

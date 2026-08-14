@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the toast hook
 vi.mock("@/hooks/use-toast", () => ({
@@ -42,9 +42,7 @@ describe("UnifiedTimer", () => {
   });
 
   it("returns null when testFinished is true", () => {
-    const { container } = render(
-      <UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} testFinished />
-    );
+    const { container } = render(<UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} testFinished />);
     expect(container.innerHTML).toBe("");
   });
 
@@ -62,17 +60,13 @@ describe("UnifiedTimer", () => {
   });
 
   it("renders progress bar by default", () => {
-    const { container } = render(
-      <UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} />
-    );
+    const { container } = render(<UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} />);
     // Progress component renders with role="progressbar"
     expect(container.querySelector('[role="progressbar"]')).not.toBeNull();
   });
 
   it("hides progress bar when showProgressBar is false", () => {
-    const { container } = render(
-      <UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} showProgressBar={false} />
-    );
+    const { container } = render(<UnifiedTimer totalSeconds={60} onTimeUp={vi.fn()} showProgressBar={false} />);
     expect(container.querySelector('[role="progressbar"]')).toBeNull();
   });
 });

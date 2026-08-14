@@ -1,82 +1,131 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowRightLeft,
   BookOpen,
-  PenTool,
-  Headphones,
-  Plus,
-  Trash2,
-  Save,
-  Eye,
-  Send,
-  Upload,
-  Clock,
-  GripVertical,
-  Image as ImageIcon,
+  CheckSquare,
   ChevronDown,
   ChevronUp,
+  Clock,
+  Eye,
+  GripVertical,
+  Headphones,
+  Image as ImageIcon,
   ListChecks,
-  CheckSquare,
-  ArrowRightLeft,
-  AlignLeft,
-  FileText,
-  MessageSquare,
-  Table2,
-  GitBranch,
-  MapPin,
-  Type,
   Loader2,
+  MessageSquare,
+  PenTool,
+  Plus,
+  Save,
+  Send,
+  Trash2,
+  Type,
+  Upload,
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AdminLayout } from "@/components/AdminLayout";
 import { TestPreviewModal } from "@/components/admin/TestPreviewModal";
-import { cn } from "@/lib/utils";
-import { saveReadingTest, updateReadingTest, fetchReadingTest } from "@/services/readingTestService";
-import { saveWritingTest, updateWritingTest, fetchWritingTest } from "@/services/writingService";
-import { saveListeningTest, updateListeningTest, fetchListeningTest } from "@/services/listeningService";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { fetchListeningTest, saveListeningTest, updateListeningTest } from "@/services/listeningService";
+import { fetchReadingTest, saveReadingTest, updateReadingTest } from "@/services/readingTestService";
+import { fetchWritingTest, saveWritingTest, updateWritingTest } from "@/services/writingService";
 
 // ─── Types ────────────────────────────────────
 const QUESTION_TYPES = [
   // Identification
   { value: "multiple-choice", label: "Multiple Choice", category: "choice", color: "bg-blue-500" },
-  { value: "tfng", label: "True / False / Not Given", category: "identification", color: "bg-sky-500" },
-  { value: "ynng", label: "Yes / No / Not Given", category: "identification", color: "bg-cyan-500" },
+  {
+    value: "tfng",
+    label: "True / False / Not Given",
+    category: "identification",
+    color: "bg-sky-500",
+  },
+  {
+    value: "ynng",
+    label: "Yes / No / Not Given",
+    category: "identification",
+    color: "bg-cyan-500",
+  },
   // Matching
-  { value: "matching-headings", label: "Matching Headings", category: "matching", color: "bg-violet-500" },
-  { value: "matching-information", label: "Matching Information", category: "matching", color: "bg-purple-500" },
-  { value: "matching-features", label: "Matching Features", category: "matching", color: "bg-fuchsia-500" },
-  { value: "matching-sentence-endings", label: "Matching Sentence Endings", category: "matching", color: "bg-pink-500" },
+  {
+    value: "matching-headings",
+    label: "Matching Headings",
+    category: "matching",
+    color: "bg-violet-500",
+  },
+  {
+    value: "matching-information",
+    label: "Matching Information",
+    category: "matching",
+    color: "bg-purple-500",
+  },
+  {
+    value: "matching-features",
+    label: "Matching Features",
+    category: "matching",
+    color: "bg-fuchsia-500",
+  },
+  {
+    value: "matching-sentence-endings",
+    label: "Matching Sentence Endings",
+    category: "matching",
+    color: "bg-pink-500",
+  },
   // Completion
-  { value: "sentence-completion", label: "Sentence Completion", category: "completion", color: "bg-emerald-500" },
-  { value: "summary-completion", label: "Summary Completion", category: "completion", color: "bg-green-500" },
-  { value: "note-completion", label: "Note Completion", category: "completion", color: "bg-teal-500" },
-  { value: "table-completion", label: "Table Completion", category: "completion", color: "bg-lime-500" },
-  { value: "flow-chart-completion", label: "Flow-chart Completion", category: "completion", color: "bg-emerald-600" },
+  {
+    value: "sentence-completion",
+    label: "Sentence Completion",
+    category: "completion",
+    color: "bg-emerald-500",
+  },
+  {
+    value: "summary-completion",
+    label: "Summary Completion",
+    category: "completion",
+    color: "bg-green-500",
+  },
+  {
+    value: "note-completion",
+    label: "Note Completion",
+    category: "completion",
+    color: "bg-teal-500",
+  },
+  {
+    value: "table-completion",
+    label: "Table Completion",
+    category: "completion",
+    color: "bg-lime-500",
+  },
+  {
+    value: "flow-chart-completion",
+    label: "Flow-chart Completion",
+    category: "completion",
+    color: "bg-emerald-600",
+  },
   // Other
-  { value: "diagram-labeling", label: "Diagram Labeling", category: "completion", color: "bg-amber-500" },
-  { value: "short-answer", label: "Short Answer Questions", category: "other", color: "bg-orange-500" },
+  {
+    value: "diagram-labeling",
+    label: "Diagram Labeling",
+    category: "completion",
+    color: "bg-amber-500",
+  },
+  {
+    value: "short-answer",
+    label: "Short Answer Questions",
+    category: "other",
+    color: "bg-orange-500",
+  },
 ] as const;
 
 type QuestionType = (typeof QUESTION_TYPES)[number]["value"];
@@ -160,16 +209,20 @@ const emptyGroup = (type: QuestionType = "multiple-choice"): QuestionGroup => ({
   questions: [emptyQuestion()],
 });
 
-const getTypeMeta = (type: QuestionType) =>
-  QUESTION_TYPES.find((t) => t.value === type) || QUESTION_TYPES[0];
+const getTypeMeta = (type: QuestionType) => QUESTION_TYPES.find((t) => t.value === type) || QUESTION_TYPES[0];
 
 const getCategoryBadge = (category: string) => {
   switch (category) {
-    case "choice": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
-    case "identification": return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
-    case "matching": return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
-    case "completion": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
-    default: return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+    case "choice":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+    case "identification":
+      return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
+    case "matching":
+      return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
+    case "completion":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+    default:
+      return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
   }
 };
 
@@ -220,7 +273,12 @@ const MCQuestionEditor: React.FC<{
             className="text-sm h-8 flex-1"
           />
           {q.options.length > 2 && (
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeOpt(oIdx)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive shrink-0"
+              onClick={() => removeOpt(oIdx)}
+            >
               <Trash2 className="h-3 w-3" />
             </Button>
           )}
@@ -249,7 +307,9 @@ const IdentificationEditor: React.FC<{
         </SelectTrigger>
         <SelectContent>
           {options.map((o) => (
-            <SelectItem key={o} value={o}>{o}</SelectItem>
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -274,16 +334,22 @@ const MatchingEditor: React.FC<{
   const removePair = (idx: number) => onChange({ matchingPairs: pairs.filter((_, i) => i !== idx) });
 
   const leftLabel =
-    type === "matching-headings" ? "Paragraph" :
-    type === "matching-information" ? "Detail" :
-    type === "matching-features" ? "Name / Entity" :
-    "Sentence Stem";
+    type === "matching-headings"
+      ? "Paragraph"
+      : type === "matching-information"
+        ? "Detail"
+        : type === "matching-features"
+          ? "Name / Entity"
+          : "Sentence Stem";
 
   const rightLabel =
-    type === "matching-headings" ? "Heading (e.g. iv)" :
-    type === "matching-information" ? "Paragraph (A, B...)" :
-    type === "matching-features" ? "Statement" :
-    "Ending Option";
+    type === "matching-headings"
+      ? "Heading (e.g. iv)"
+      : type === "matching-information"
+        ? "Paragraph (A, B...)"
+        : type === "matching-features"
+          ? "Statement"
+          : "Ending Option";
 
   return (
     <div className="space-y-2">
@@ -309,7 +375,12 @@ const MatchingEditor: React.FC<{
             className="text-sm h-8"
           />
           {pairs.length > 1 && (
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removePair(idx)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive shrink-0"
+              onClick={() => removePair(idx)}
+            >
               <Trash2 className="h-3 w-3" />
             </Button>
           )}
@@ -340,7 +411,9 @@ const CompletionEditor: React.FC<{
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] text-muted-foreground">Use <code className="bg-muted px-1 rounded text-[10px]">{`{{gap}}`}</code> in the text to mark blanks.</p>
+      <p className="text-[10px] text-muted-foreground">
+        Use <code className="bg-muted px-1 rounded text-[10px]">{`{{gap}}`}</code> in the text to mark blanks.
+      </p>
       {gaps.map((gap, idx) => (
         <div key={gap.id} className="flex items-start gap-2">
           <span className="text-xs text-muted-foreground mt-2 w-4 shrink-0">{idx + 1}.</span>
@@ -359,7 +432,12 @@ const CompletionEditor: React.FC<{
             />
           </div>
           {gaps.length > 1 && (
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0 mt-1" onClick={() => removeGap(idx)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive shrink-0 mt-1"
+              onClick={() => removeGap(idx)}
+            >
               <Trash2 className="h-3 w-3" />
             </Button>
           )}
@@ -397,7 +475,9 @@ const DiagramLabelingEditor: React.FC<{
         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Labels</span>
         {gaps.map((gap, idx) => (
           <div key={gap.id} className="flex items-center gap-2">
-            <Badge variant="outline" className="text-[10px] shrink-0 w-8 justify-center">{idx + 1}</Badge>
+            <Badge variant="outline" className="text-[10px] shrink-0 w-8 justify-center">
+              {idx + 1}
+            </Badge>
             <Input
               placeholder="Label position / part name"
               value={gap.gapText}
@@ -411,7 +491,12 @@ const DiagramLabelingEditor: React.FC<{
               className="text-sm h-8 w-32"
             />
             {gaps.length > 1 && (
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeGap(idx)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-destructive shrink-0"
+                onClick={() => removeGap(idx)}
+              >
                 <Trash2 className="h-3 w-3" />
               </Button>
             )}
@@ -452,7 +537,12 @@ const ShortAnswerEditor: React.FC<{
             className="text-sm h-8 flex-1"
           />
           {accepted.length > 1 && (
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeAccepted(idx)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive shrink-0"
+              onClick={() => removeAccepted(idx)}
+            >
               <Trash2 className="h-3 w-3" />
             </Button>
           )}
@@ -507,7 +597,13 @@ const QuestionBuilder: React.FC<{
 
   const isMatching = (t: QuestionType) => t.startsWith("matching");
   const isCompletion = (t: QuestionType) =>
-    ["sentence-completion", "summary-completion", "note-completion", "table-completion", "flow-chart-completion"].includes(t);
+    [
+      "sentence-completion",
+      "summary-completion",
+      "note-completion",
+      "table-completion",
+      "flow-chart-completion",
+    ].includes(t);
   const isIdentification = (t: QuestionType) => t === "tfng" || t === "ynng";
 
   const renderQuestionEditor = (group: QuestionGroup, q: QuestionItem, gIdx: number, qIdx: number) => {
@@ -542,33 +638,68 @@ const QuestionBuilder: React.FC<{
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem disabled value="__choice" className="text-[10px] font-semibold text-muted-foreground uppercase">── Choice ──</SelectItem>
+                    <SelectItem
+                      disabled
+                      value="__choice"
+                      className="text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      ── Choice ──
+                    </SelectItem>
                     <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                    <SelectItem disabled value="__id" className="text-[10px] font-semibold text-muted-foreground uppercase">── Identification ──</SelectItem>
+                    <SelectItem
+                      disabled
+                      value="__id"
+                      className="text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      ── Identification ──
+                    </SelectItem>
                     <SelectItem value="tfng">True / False / Not Given</SelectItem>
                     <SelectItem value="ynng">Yes / No / Not Given</SelectItem>
-                    <SelectItem disabled value="__match" className="text-[10px] font-semibold text-muted-foreground uppercase">── Matching ──</SelectItem>
+                    <SelectItem
+                      disabled
+                      value="__match"
+                      className="text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      ── Matching ──
+                    </SelectItem>
                     <SelectItem value="matching-headings">Matching Headings</SelectItem>
                     <SelectItem value="matching-information">Matching Information</SelectItem>
                     <SelectItem value="matching-features">Matching Features</SelectItem>
                     <SelectItem value="matching-sentence-endings">Matching Sentence Endings</SelectItem>
-                    <SelectItem disabled value="__comp" className="text-[10px] font-semibold text-muted-foreground uppercase">── Completion ──</SelectItem>
+                    <SelectItem
+                      disabled
+                      value="__comp"
+                      className="text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      ── Completion ──
+                    </SelectItem>
                     <SelectItem value="sentence-completion">Sentence Completion</SelectItem>
                     <SelectItem value="summary-completion">Summary Completion</SelectItem>
                     <SelectItem value="note-completion">Note Completion</SelectItem>
                     <SelectItem value="table-completion">Table Completion</SelectItem>
                     <SelectItem value="flow-chart-completion">Flow-chart Completion</SelectItem>
                     <SelectItem value="diagram-labeling">Diagram Labeling</SelectItem>
-                    <SelectItem disabled value="__other" className="text-[10px] font-semibold text-muted-foreground uppercase">── Other ──</SelectItem>
+                    <SelectItem
+                      disabled
+                      value="__other"
+                      className="text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      ── Other ──
+                    </SelectItem>
                     <SelectItem value="short-answer">Short Answer Questions</SelectItem>
                   </SelectContent>
                 </Select>
-                <Badge className={cn("text-[10px] border-0", getCategoryBadge(meta.category))}>
-                  {meta.category}
+                <Badge className={cn("text-[10px] border-0", getCategoryBadge(meta.category))}>{meta.category}</Badge>
+                <Badge variant="secondary" className="text-[10px]">
+                  {group.questions.length} Qs
                 </Badge>
-                <Badge variant="secondary" className="text-[10px]">{group.questions.length} Qs</Badge>
               </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeGroup(gIdx)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-destructive shrink-0"
+                onClick={() => removeGroup(gIdx)}
+              >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </CardHeader>
@@ -591,13 +722,15 @@ const QuestionBuilder: React.FC<{
                         checked={group.multipleSelection}
                         onCheckedChange={(v) => updateGroup(gIdx, { multipleSelection: v })}
                       />
-                      <Label htmlFor={`multi-${group.id}`} className="text-xs cursor-pointer">Multiple Selection</Label>
+                      <Label htmlFor={`multi-${group.id}`} className="text-xs cursor-pointer">
+                        Multiple Selection
+                      </Label>
                       {group.multipleSelection && (
                         <Input
                           type="number"
                           min={2}
                           value={group.selectCount}
-                          onChange={(e) => updateGroup(gIdx, { selectCount: parseInt(e.target.value) || 2 })}
+                          onChange={(e) => updateGroup(gIdx, { selectCount: parseInt(e.target.value, 10) || 2 })}
                           className="w-14 h-7 text-xs"
                           placeholder="2"
                         />
@@ -612,7 +745,9 @@ const QuestionBuilder: React.FC<{
                         checked={group.sequentialOrder}
                         onCheckedChange={(v) => updateGroup(gIdx, { sequentialOrder: v })}
                       />
-                      <Label htmlFor={`seq-${group.id}`} className="text-xs cursor-pointer">Sequential Order</Label>
+                      <Label htmlFor={`seq-${group.id}`} className="text-xs cursor-pointer">
+                        Sequential Order
+                      </Label>
                     </div>
                   )}
                   {/* Word limit for completion */}
@@ -635,7 +770,9 @@ const QuestionBuilder: React.FC<{
                         checked={group.hasWordBank}
                         onCheckedChange={(v) => updateGroup(gIdx, { hasWordBank: v })}
                       />
-                      <Label htmlFor={`wb-${group.id}`} className="text-xs cursor-pointer">Word Bank</Label>
+                      <Label htmlFor={`wb-${group.id}`} className="text-xs cursor-pointer">
+                        Word Bank
+                      </Label>
                     </div>
                   )}
                 </div>
@@ -646,7 +783,11 @@ const QuestionBuilder: React.FC<{
                     <Input
                       placeholder="e.g. increase, decline, stable, fluctuate"
                       value={group.wordBank.join(", ")}
-                      onChange={(e) => updateGroup(gIdx, { wordBank: e.target.value.split(",").map((w) => w.trim()) })}
+                      onChange={(e) =>
+                        updateGroup(gIdx, {
+                          wordBank: e.target.value.split(",").map((w) => w.trim()),
+                        })
+                      }
                       className="text-sm h-8"
                     />
                   </div>
@@ -666,10 +807,12 @@ const QuestionBuilder: React.FC<{
                     className="relative"
                   >
                     {/* Timeline dot */}
-                    <div className={cn(
-                      "absolute -left-[calc(1.5rem+5px)] top-4 h-2.5 w-2.5 rounded-full border-2 border-background",
-                      meta.color
-                    )} />
+                    <div
+                      className={cn(
+                        "absolute -left-[calc(1.5rem+5px)] top-4 h-2.5 w-2.5 rounded-full border-2 border-background",
+                        meta.color
+                      )}
+                    />
 
                     <div className="rounded-lg border border-border p-4 space-y-3 bg-card">
                       <div className="flex items-start justify-between gap-2">
@@ -681,8 +824,8 @@ const QuestionBuilder: React.FC<{
                                 group.type === "short-answer"
                                   ? "Enter question..."
                                   : isIdentification(group.type)
-                                  ? "Enter statement..."
-                                  : "Enter question text..."
+                                    ? "Enter statement..."
+                                    : "Enter question text..."
                               }
                               value={q.text}
                               onChange={(e) => updateQuestion(gIdx, qIdx, { text: e.target.value })}
@@ -702,7 +845,12 @@ const QuestionBuilder: React.FC<{
                           )}
                           {renderQuestionEditor(group, q, gIdx, qIdx)}
                         </div>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={() => removeQuestion(gIdx, qIdx)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive shrink-0"
+                          onClick={() => removeQuestion(gIdx, qIdx)}
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -823,10 +971,7 @@ const ReadingPassageEditor: React.FC<{
               {passage.questionGroups.reduce((a, g) => a + g.questions.length, 0)} Qs
             </Badge>
           </div>
-          <QuestionBuilder
-            groups={passage.questionGroups}
-            onChange={(g) => onChange({ questionGroups: g })}
-          />
+          <QuestionBuilder groups={passage.questionGroups} onChange={(g) => onChange({ questionGroups: g })} />
         </div>
       </div>
     </div>
@@ -835,12 +980,28 @@ const ReadingPassageEditor: React.FC<{
 
 // ─── Reading Creator (3-Passage) ──────────────
 const ReadingCreator: React.FC<{
-  testTitle: string; onTestTitleChange: (v: string) => void;
-  testType: string; onTestTypeChange: (v: string) => void;
-  difficulty: string; onDifficultyChange: (v: string) => void;
-  duration: string; onDurationChange: (v: string) => void;
-  passages: ReadingPassageState[]; onPassagesChange: (p: ReadingPassageState[]) => void;
-}> = ({ testTitle, onTestTitleChange, testType, onTestTypeChange, difficulty, onDifficultyChange, duration, onDurationChange, passages, onPassagesChange }) => {
+  testTitle: string;
+  onTestTitleChange: (v: string) => void;
+  testType: string;
+  onTestTypeChange: (v: string) => void;
+  difficulty: string;
+  onDifficultyChange: (v: string) => void;
+  duration: string;
+  onDurationChange: (v: string) => void;
+  passages: ReadingPassageState[];
+  onPassagesChange: (p: ReadingPassageState[]) => void;
+}> = ({
+  testTitle,
+  onTestTitleChange,
+  testType,
+  onTestTypeChange,
+  difficulty,
+  onDifficultyChange,
+  duration,
+  onDurationChange,
+  passages,
+  onPassagesChange,
+}) => {
   const [activePassage, setActivePassage] = useState(0);
 
   const updatePassage = (idx: number, patch: Partial<ReadingPassageState>) => {
@@ -870,17 +1031,20 @@ const ReadingCreator: React.FC<{
     const hasTitle = p.title.trim().length > 0;
     const hasContent = p.content.trim().length > 0;
     const hasQuestions = p.questionGroups.some((g) =>
-      g.questions.some((q) => q.text.trim() || q.options.some((o) => o.text.trim()) || q.completionGaps.some((g) => g.answer.trim()) || q.matchingPairs.some((p) => p.left.trim()))
+      g.questions.some(
+        (q) =>
+          q.text.trim() ||
+          q.options.some((o) => o.text.trim()) ||
+          q.completionGaps.some((g) => g.answer.trim()) ||
+          q.matchingPairs.some((p) => p.left.trim())
+      )
     );
     if (hasTitle && hasContent && hasQuestions) return "complete";
     if (hasTitle || hasContent || hasQuestions) return "partial";
     return "empty";
   };
 
-  const totalQuestions = passages.reduce(
-    (a, p) => a + p.questionGroups.reduce((b, g) => b + g.questions.length, 0),
-    0
-  );
+  const totalQuestions = passages.reduce((a, p) => a + p.questionGroups.reduce((b, g) => b + g.questions.length, 0), 0);
 
   return (
     <div className="space-y-6">
@@ -888,12 +1052,18 @@ const ReadingCreator: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2 md:col-span-2">
           <Label>Test Title</Label>
-          <Input placeholder="e.g. Academic Reading Practice Test 14" value={testTitle} onChange={(e) => onTestTitleChange(e.target.value)} />
+          <Input
+            placeholder="e.g. Academic Reading Practice Test 14"
+            value={testTitle}
+            onChange={(e) => onTestTitleChange(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <Label>Test Type</Label>
           <Select value={testType} onValueChange={onTestTypeChange}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="Academic">Academic</SelectItem>
               <SelectItem value="General">General Training</SelectItem>
@@ -903,10 +1073,14 @@ const ReadingCreator: React.FC<{
         <div className="space-y-2">
           <Label>Difficulty</Label>
           <Select value={difficulty} onValueChange={onDifficultyChange}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
-                <SelectItem key={b} value={b}>Band {b}</SelectItem>
+                <SelectItem key={b} value={b}>
+                  Band {b}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -937,10 +1111,12 @@ const ReadingCreator: React.FC<{
               const qCount = p.questionGroups.reduce((a, g) => a + g.questions.length, 0);
               return (
                 <Badge key={idx} variant="outline" className="text-[10px] gap-1">
-                  <span className={cn(
-                    "h-1.5 w-1.5 rounded-full inline-block",
-                    status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
-                  )} />
+                  <span
+                    className={cn(
+                      "h-1.5 w-1.5 rounded-full inline-block",
+                      status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                    )}
+                  />
                   P{idx + 1}: {qCount}Qs
                 </Badge>
               );
@@ -965,10 +1141,12 @@ const ReadingCreator: React.FC<{
                     : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
                 )}
               >
-                <span className={cn(
-                  "h-2 w-2 rounded-full shrink-0",
-                  status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
-                )} />
+                <span
+                  className={cn(
+                    "h-2 w-2 rounded-full shrink-0",
+                    status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                  )}
+                />
                 <span className="truncate">{meta.label}</span>
               </button>
             );
@@ -1032,10 +1210,30 @@ interface ListeningSectionState {
 }
 
 const SECTION_LABELS = [
-  { id: 1, label: "Section 1", desc: "Social / Conversation", placeholder: "e.g. Library Registration" },
-  { id: 2, label: "Section 2", desc: "Social / Monologue", placeholder: "e.g. City Cycling Tour Guide" },
-  { id: 3, label: "Section 3", desc: "Educational / Discussion", placeholder: "e.g. Research Project Discussion" },
-  { id: 4, label: "Section 4", desc: "Academic / Lecture", placeholder: "e.g. Psychology of Decision-Making" },
+  {
+    id: 1,
+    label: "Section 1",
+    desc: "Social / Conversation",
+    placeholder: "e.g. Library Registration",
+  },
+  {
+    id: 2,
+    label: "Section 2",
+    desc: "Social / Monologue",
+    placeholder: "e.g. City Cycling Tour Guide",
+  },
+  {
+    id: 3,
+    label: "Section 3",
+    desc: "Educational / Discussion",
+    placeholder: "e.g. Research Project Discussion",
+  },
+  {
+    id: 4,
+    label: "Section 4",
+    desc: "Academic / Lecture",
+    placeholder: "e.g. Psychology of Decision-Making",
+  },
 ];
 
 const emptySections = (): ListeningSectionState[] =>
@@ -1059,7 +1257,11 @@ const ListeningSectionEditor: React.FC<{
   const handleAudioSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      onChange({ audioFile: file, audioFileName: file.name, audioPreviewUrl: URL.createObjectURL(file) });
+      onChange({
+        audioFile: file,
+        audioFileName: file.name,
+        audioPreviewUrl: URL.createObjectURL(file),
+      });
     }
   };
 
@@ -1166,11 +1368,24 @@ const ListeningSectionEditor: React.FC<{
 
 // ─── Listening Creator (4-Section Tabs) ───────
 const ListeningCreator: React.FC<{
-  testTitle: string; onTestTitleChange: (v: string) => void;
-  difficulty: string; onDifficultyChange: (v: string) => void;
-  duration: string; onDurationChange: (v: string) => void;
-  sections: ListeningSectionState[]; onSectionsChange: (s: ListeningSectionState[]) => void;
-}> = ({ testTitle, onTestTitleChange, difficulty, onDifficultyChange, duration, onDurationChange, sections, onSectionsChange }) => {
+  testTitle: string;
+  onTestTitleChange: (v: string) => void;
+  difficulty: string;
+  onDifficultyChange: (v: string) => void;
+  duration: string;
+  onDurationChange: (v: string) => void;
+  sections: ListeningSectionState[];
+  onSectionsChange: (s: ListeningSectionState[]) => void;
+}> = ({
+  testTitle,
+  onTestTitleChange,
+  difficulty,
+  onDifficultyChange,
+  duration,
+  onDurationChange,
+  sections,
+  onSectionsChange,
+}) => {
   const [activeSection, setActiveSection] = useState(0);
 
   const updateSection = (idx: number, patch: Partial<ListeningSectionState>) => {
@@ -1191,7 +1406,15 @@ const ListeningCreator: React.FC<{
 
   const getSectionStatus = (s: ListeningSectionState) => {
     const hasTitle = s.title.trim().length > 0;
-    const hasQuestions = s.questionGroups.some((g) => g.questions.some((q) => q.text.trim() || q.options.some((o) => o.text.trim()) || q.completionGaps.some((g) => g.answer.trim()) || q.matchingPairs.some((p) => p.left.trim())));
+    const hasQuestions = s.questionGroups.some((g) =>
+      g.questions.some(
+        (q) =>
+          q.text.trim() ||
+          q.options.some((o) => o.text.trim()) ||
+          q.completionGaps.some((g) => g.answer.trim()) ||
+          q.matchingPairs.some((p) => p.left.trim())
+      )
+    );
     if (hasTitle && hasQuestions) return "complete";
     if (hasTitle || hasQuestions) return "partial";
     return "empty";
@@ -1203,15 +1426,23 @@ const ListeningCreator: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label>Test Title</Label>
-          <Input placeholder="e.g. IELTS Listening Practice Test 1" value={testTitle} onChange={(e) => onTestTitleChange(e.target.value)} />
+          <Input
+            placeholder="e.g. IELTS Listening Practice Test 1"
+            value={testTitle}
+            onChange={(e) => onTestTitleChange(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <Label>Difficulty</Label>
           <Select value={difficulty} onValueChange={onDifficultyChange}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
-                <SelectItem key={b} value={b}>Band {b}</SelectItem>
+                <SelectItem key={b} value={b}>
+                  Band {b}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -1238,10 +1469,12 @@ const ListeningCreator: React.FC<{
                     : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
                 )}
               >
-                <span className={cn(
-                  "h-2 w-2 rounded-full shrink-0",
-                  status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
-                )} />
+                <span
+                  className={cn(
+                    "h-2 w-2 rounded-full shrink-0",
+                    status === "complete" ? "bg-emerald-500" : status === "partial" ? "bg-amber-500" : "bg-border"
+                  )}
+                />
                 <span className="truncate">{meta.label}</span>
               </button>
             );
@@ -1381,7 +1614,11 @@ const WritingCreator: React.FC<{
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input
-                  placeholder={task.taskType === "task1" ? "e.g. Bar Chart – International Tourism" : "e.g. Essay on Technology in Education"}
+                  placeholder={
+                    task.taskType === "task1"
+                      ? "e.g. Bar Chart – International Tourism"
+                      : "e.g. Essay on Technology in Education"
+                  }
                   value={task.title}
                   onChange={(e) => updateTask({ title: e.target.value })}
                 />
@@ -1390,17 +1627,25 @@ const WritingCreator: React.FC<{
                 <div className="space-y-2">
                   <Label>Difficulty</Label>
                   <Select value={task.difficulty} onValueChange={(v) => updateTask({ difficulty: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {["6", "6.5", "7", "7.5", "8", "8.5", "9"].map((b) => (
-                        <SelectItem key={b} value={b}>Band {b}</SelectItem>
+                        <SelectItem key={b} value={b}>
+                          Band {b}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Suggested Time</Label>
-                  <Input placeholder="e.g. 20 mins" value={task.suggestedTime} onChange={(e) => updateTask({ suggestedTime: e.target.value })} />
+                  <Input
+                    placeholder="e.g. 20 mins"
+                    value={task.suggestedTime}
+                    onChange={(e) => updateTask({ suggestedTime: e.target.value })}
+                  />
                 </div>
               </div>
 
@@ -1417,7 +1662,11 @@ const WritingCreator: React.FC<{
                   />
                   {task.imagePreview ? (
                     <div className="relative rounded-xl border border-border overflow-hidden">
-                      <img src={task.imagePreview} alt="Chart preview" className="w-full max-h-48 object-contain bg-muted/30" />
+                      <img
+                        src={task.imagePreview}
+                        alt="Chart preview"
+                        className="w-full max-h-48 object-contain bg-muted/30"
+                      />
                       <Button
                         variant="destructive"
                         size="icon"
@@ -1459,11 +1708,20 @@ const WritingCreator: React.FC<{
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Min. Words</Label>
-                  <Input type="number" value={task.minWords} onChange={(e) => updateTask({ minWords: parseInt(e.target.value) || 0 })} />
+                  <Input
+                    type="number"
+                    value={task.minWords}
+                    onChange={(e) => updateTask({ minWords: parseInt(e.target.value, 10) || 0 })}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Max. Words (optional)</Label>
-                  <Input type="number" placeholder="No limit" value={task.maxWords} onChange={(e) => updateTask({ maxWords: e.target.value })} />
+                  <Input
+                    type="number"
+                    placeholder="No limit"
+                    value={task.maxWords}
+                    onChange={(e) => updateTask({ maxWords: e.target.value })}
+                  />
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
@@ -1472,7 +1730,9 @@ const WritingCreator: React.FC<{
                   checked={task.includeModelAnswer}
                   onCheckedChange={(v) => updateTask({ includeModelAnswer: v })}
                 />
-                <Label htmlFor={`model-answer-${activeIndex}`} className="text-sm cursor-pointer">Include Model Answer</Label>
+                <Label htmlFor={`model-answer-${activeIndex}`} className="text-sm cursor-pointer">
+                  Include Model Answer
+                </Label>
               </div>
               {task.includeModelAnswer && (
                 <div className="space-y-2">
@@ -1549,7 +1809,7 @@ const CreateContent: React.FC = () => {
 
   // The editId from the URL is only valid for the tab type that was originally navigated to.
   const editTabRef = React.useRef<TabValue | null>(tabParam && VALID_TABS.includes(tabParam) ? tabParam : null);
-  const effectiveEditId = (editTabRef.current === activeTab) ? editId : null;
+  const effectiveEditId = editTabRef.current === activeTab ? editId : null;
 
   // ── Load existing test for edit mode ──
   useEffect(() => {
@@ -1563,16 +1823,22 @@ const CreateContent: React.FC = () => {
           setReadingTestType(data.testType);
           setReadingDifficulty(data.difficulty);
           setReadingDuration(data.duration);
-          setReadingPassages(data.passages.map((p) => ({
-            ...p,
-            questionGroups: p.questionGroups.map((g) => ({
-              ...g,
-              type: g.type as QuestionType,
-            })),
-          })));
+          setReadingPassages(
+            data.passages.map((p) => ({
+              ...p,
+              questionGroups: p.questionGroups.map((g) => ({
+                ...g,
+                type: g.type as QuestionType,
+              })),
+            }))
+          );
         })
         .catch((err) => {
-          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+          toast({
+            title: "Failed to load test",
+            description: err?.message,
+            variant: "destructive",
+          });
         })
         .finally(() => setIsLoadingEdit(false));
     }
@@ -1581,10 +1847,7 @@ const CreateContent: React.FC = () => {
       setIsLoadingEdit(true);
       fetchWritingTest(effectiveEditId)
         .then((data) => {
-          const newTasks: [WritingTaskState, WritingTaskState] = [
-            emptyWritingTask("task1"),
-            emptyWritingTask("task2"),
-          ];
+          const newTasks: [WritingTaskState, WritingTaskState] = [emptyWritingTask("task1"), emptyWritingTask("task2")];
           data.tasks.forEach((t, i) => {
             if (i < 2) {
               newTasks[i] = {
@@ -1605,7 +1868,11 @@ const CreateContent: React.FC = () => {
           setWritingTasks(newTasks);
         })
         .catch((err) => {
-          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+          toast({
+            title: "Failed to load test",
+            description: err?.message,
+            variant: "destructive",
+          });
         })
         .finally(() => setIsLoadingEdit(false));
     }
@@ -1629,26 +1896,31 @@ const CreateContent: React.FC = () => {
                 audioFileName: s.audioUrl ? s.audioUrl.split("/").pop() || "Audio" : "",
                 audioFile: null,
                 audioPreviewUrl: s.audioUrl || "",
-                questionGroups: s.questionGroups.length > 0
-                  ? s.questionGroups.map((g) => ({
-                      ...g,
-                      type: g.type as QuestionType,
-                      questions: g.questions.map((q) => ({
-                        ...q,
-                        options: (q.options || []) as unknown as MCOption[],
-                        matchingPairs: (q.matchingPairs || []) as unknown as MatchingPair[],
-                        completionGaps: (q.completionGaps || []) as unknown as CompletionGap[],
-                        acceptedAnswers: (q.acceptedAnswers || []) as unknown as AcceptedAnswer[],
-                      })),
-                    }))
-                  : [emptyGroup()],
+                questionGroups:
+                  s.questionGroups.length > 0
+                    ? s.questionGroups.map((g) => ({
+                        ...g,
+                        type: g.type as QuestionType,
+                        questions: g.questions.map((q) => ({
+                          ...q,
+                          options: (q.options || []) as unknown as MCOption[],
+                          matchingPairs: (q.matchingPairs || []) as unknown as MatchingPair[],
+                          completionGaps: (q.completionGaps || []) as unknown as CompletionGap[],
+                          acceptedAnswers: (q.acceptedAnswers || []) as unknown as AcceptedAnswer[],
+                        })),
+                      }))
+                    : [emptyGroup()],
               };
             }
           });
           setListeningSections(newSections);
         })
         .catch((err) => {
-          toast({ title: "Failed to load test", description: err?.message, variant: "destructive" });
+          toast({
+            title: "Failed to load test",
+            description: err?.message,
+            variant: "destructive",
+          });
         })
         .finally(() => setIsLoadingEdit(false));
     }
@@ -1692,9 +1964,7 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: effectiveEditId
-          ? "Test Updated!"
-          : status === "published" ? "Test Published!" : "Draft Saved!",
+        title: effectiveEditId ? "Test Updated!" : status === "published" ? "Test Published!" : "Draft Saved!",
         description: `"${readingTestTitle || "Untitled Test"}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved as draft"} successfully.`,
       });
       if (status === "published" || effectiveEditId) {
@@ -1746,9 +2016,7 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: effectiveEditId
-          ? "Test Updated!"
-          : status === "published" ? "Test Published!" : "Draft Saved!",
+        title: effectiveEditId ? "Test Updated!" : status === "published" ? "Test Published!" : "Draft Saved!",
         description: `"${testTitle}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
       if (status === "published" || effectiveEditId) {
@@ -1796,9 +2064,7 @@ const CreateContent: React.FC = () => {
         });
       }
       toast({
-        title: effectiveEditId
-          ? "Test Updated!"
-          : status === "published" ? "Test Published!" : "Draft Saved!",
+        title: effectiveEditId ? "Test Updated!" : status === "published" ? "Test Published!" : "Draft Saved!",
         description: `"${listeningTestTitle || "Untitled"}" has been ${effectiveEditId ? "updated" : status === "published" ? "published" : "saved"} successfully.`,
       });
       if (status === "published" || effectiveEditId) {
@@ -1831,9 +2097,7 @@ const CreateContent: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold md:text-3xl">
-              {effectiveEditId ? "Edit Test" : "Test Creator Studio"}
-            </h1>
+            <h1 className="text-2xl font-bold md:text-3xl">{effectiveEditId ? "Edit Test" : "Test Creator Studio"}</h1>
             <p className="text-muted-foreground mt-1">
               {effectiveEditId ? "Editing an existing test." : "Build IELTS practice tests for your students."}
             </p>
@@ -1871,11 +2135,16 @@ const CreateContent: React.FC = () => {
             </div>
           ) : (
             <ReadingCreator
-              testTitle={readingTestTitle} onTestTitleChange={setReadingTestTitle}
-              testType={readingTestType} onTestTypeChange={setReadingTestType}
-              difficulty={readingDifficulty} onDifficultyChange={setReadingDifficulty}
-              duration={readingDuration} onDurationChange={setReadingDuration}
-              passages={readingPassages} onPassagesChange={setReadingPassages}
+              testTitle={readingTestTitle}
+              onTestTitleChange={setReadingTestTitle}
+              testType={readingTestType}
+              onTestTypeChange={setReadingTestType}
+              difficulty={readingDifficulty}
+              onDifficultyChange={setReadingDifficulty}
+              duration={readingDuration}
+              onDurationChange={setReadingDuration}
+              passages={readingPassages}
+              onPassagesChange={setReadingPassages}
             />
           )}
         </TabPanel>
@@ -1887,10 +2156,14 @@ const CreateContent: React.FC = () => {
             </div>
           ) : (
             <ListeningCreator
-              testTitle={listeningTestTitle} onTestTitleChange={setListeningTestTitle}
-              difficulty={listeningDifficulty} onDifficultyChange={setListeningDifficulty}
-              duration={listeningDuration} onDurationChange={setListeningDuration}
-              sections={listeningSections} onSectionsChange={setListeningSections}
+              testTitle={listeningTestTitle}
+              onTestTitleChange={setListeningTestTitle}
+              difficulty={listeningDifficulty}
+              onDifficultyChange={setListeningDifficulty}
+              duration={listeningDuration}
+              onDurationChange={setListeningDuration}
+              sections={listeningSections}
+              onSectionsChange={setListeningSections}
             />
           )}
         </TabPanel>
@@ -1901,10 +2174,7 @@ const CreateContent: React.FC = () => {
               <span className="text-muted-foreground">Loading test data...</span>
             </div>
           ) : (
-            <WritingCreator
-              tasks={writingTasks}
-              onTasksChange={setWritingTasks}
-            />
+            <WritingCreator tasks={writingTasks} onTasksChange={setWritingTasks} />
           )}
         </TabPanel>
 
@@ -1913,12 +2183,7 @@ const CreateContent: React.FC = () => {
           <div className="flex items-center justify-between max-w-6xl mx-auto">
             <p className="text-xs text-muted-foreground">Auto-saved as draft</p>
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                className="gap-2"
-                disabled={isSaving}
-                onClick={() => handleSave("draft")}
-              >
+              <Button variant="outline" className="gap-2" disabled={isSaving} onClick={() => handleSave("draft")}>
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {effectiveEditId ? "Update Draft" : "Save Draft"}
               </Button>

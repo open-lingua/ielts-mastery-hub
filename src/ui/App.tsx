@@ -1,16 +1,15 @@
-import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
   state = { error: null };
-  static getDerivedStateFromError(error: Error) { return { error }; }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
   render() {
     if (this.state.error) {
       return (
@@ -24,46 +23,47 @@ class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
+
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import WritingSimulator from "./pages/WritingSimulator";
-import ReadingModule from "./pages/ReadingModule";
-import ListeningModule from "./pages/ListeningModule";
-import TestLibrary from "./pages/TestLibrary";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ContentLibrary from "./pages/admin/ContentLibrary";
 import CreateContent from "./pages/admin/CreateContent";
 import UserManagement from "./pages/admin/UserManagement";
+import Dashboard from "./pages/Dashboard";
+import LandingPage from "./pages/LandingPage";
+import ListeningModule from "./pages/ListeningModule";
 import NotFound from "./pages/NotFound";
+import ReadingModule from "./pages/ReadingModule";
+import TestLibrary from "./pages/TestLibrary";
+import WritingSimulator from "./pages/WritingSimulator";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/writing" element={<WritingSimulator />} />
-            <Route path="/reading" element={<ReadingModule />} />
-            <Route path="/listening" element={<ListeningModule />} />
-            <Route path="/tests" element={<TestLibrary />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/content" element={<ContentLibrary />} />
-            <Route path="/admin/create" element={<CreateContent />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/writing" element={<WritingSimulator />} />
+              <Route path="/reading" element={<ReadingModule />} />
+              <Route path="/listening" element={<ListeningModule />} />
+              <Route path="/tests" element={<TestLibrary />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/content" element={<ContentLibrary />} />
+              <Route path="/admin/create" element={<CreateContent />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
 );
 

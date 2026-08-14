@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { BookOpen, Headphones, PenTool, Clock, CheckCircle, ChevronRight, AlertCircle, PlayCircle } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { AlertCircle, BookOpen, CheckCircle, ChevronRight, Clock, Headphones, PenTool, PlayCircle } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAnonId } from "@/lib/anonId";
-import { fetchRecentActivity, type RecentActivity as ActivityItem } from "@/services/dashboardService";
-import { formatDistanceToNow } from "date-fns";
+import { type RecentActivity as ActivityItem, fetchRecentActivity } from "@/services/dashboardService";
 
 const typeConfig: Record<string, { label: string; icon: React.FC<{ className?: string }>; color: string }> = {
   reading: { label: "Reading Practice", icon: BookOpen, color: "text-success bg-success/10" },
@@ -113,12 +114,12 @@ const RecentActivity: React.FC = () => {
                     <span className="text-sm font-bold text-foreground">{activity.score_band}</span>
                   </div>
                 ) : activity.status === "in_progress" ? (
-                  <Badge variant="outline" className={badge.className + " text-xs"}>
+                  <Badge variant="outline" className={`${badge.className} text-xs`}>
                     <PlayCircle className="h-3 w-3 mr-1" />
                     {activity.progress_percent}%
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className={badge.className + " text-xs"}>
+                  <Badge variant="outline" className={`${badge.className} text-xs`}>
                     {badge.label}
                   </Badge>
                 )}

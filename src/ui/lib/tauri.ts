@@ -228,7 +228,13 @@ export async function getReadingTest(id: string, userId: string): Promise<Readin
 
 export async function createReadingTest(
   userId: string,
-  input: { title?: string; test_type?: string; difficulty?: string; duration?: string; status?: string }
+  input: {
+    title?: string;
+    test_type?: string;
+    difficulty?: string;
+    duration?: string;
+    status?: string;
+  }
 ): Promise<string> {
   return invoke<string>("create_reading_tests", { userId, input });
 }
@@ -236,7 +242,13 @@ export async function createReadingTest(
 export async function updateReadingTest(
   id: string,
   userId: string,
-  input: { title?: string; test_type?: string; difficulty?: string; duration?: string; status?: string }
+  input: {
+    title?: string;
+    test_type?: string;
+    difficulty?: string;
+    duration?: string;
+    status?: string;
+  }
 ): Promise<void> {
   return invoke<void>("update_reading_tests", { id, userId, input });
 }
@@ -253,7 +265,13 @@ export async function listReadingPassages(userId: string): Promise<ReadingPassag
 
 export async function createReadingPassage(
   userId: string,
-  input: { test_id: string; passage_number?: number; title?: string; content?: string; notes?: string }
+  input: {
+    test_id: string;
+    passage_number?: number;
+    title?: string;
+    content?: string;
+    notes?: string;
+  }
 ): Promise<string> {
   return invoke<string>("create_reading_passages", { userId, input });
 }
@@ -326,10 +344,7 @@ export async function getWritingTest(id: string, userId: string): Promise<Writin
   return invoke<WritingTest | null>("get_writing_tests", { id, userId });
 }
 
-export async function createWritingTest(
-  userId: string,
-  input: { title?: string; status?: string }
-): Promise<string> {
+export async function createWritingTest(userId: string, input: { title?: string; status?: string }): Promise<string> {
   return invoke<string>("create_writing_tests", { userId, input });
 }
 
@@ -412,7 +427,13 @@ export async function listListeningSections(userId: string): Promise<ListeningSe
 
 export async function createListeningSection(
   userId: string,
-  input: { test_id: string; section_number?: number; title?: string; transcript?: string; audio_url?: string }
+  input: {
+    test_id: string;
+    section_number?: number;
+    title?: string;
+    transcript?: string;
+    audio_url?: string;
+  }
 ): Promise<string> {
   return invoke<string>("create_listening_sections", { userId, input });
 }

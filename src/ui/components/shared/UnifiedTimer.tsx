@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Timer, EyeOff, AlertTriangle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, EyeOff, Timer } from "lucide-react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { useTestTimer } from "@/hooks/useTestTimer";
@@ -29,8 +30,12 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
   showProgressBar = true,
   variant = "inline",
 }) => {
-  const { timeLeft, formattedTime, progressPercent, isWarning, isUrgent, timerColor } =
-    useTestTimer({ initialSeconds: totalSeconds, onTimeUp, isPaused, isFinished: testFinished });
+  const { timeLeft, formattedTime, progressPercent, isWarning, isUrgent, timerColor } = useTestTimer({
+    initialSeconds: totalSeconds,
+    onTimeUp,
+    isPaused,
+    isFinished: testFinished,
+  });
 
   const [minimized, setMinimized] = useState(false);
   const warned5 = useRef(false);
@@ -41,11 +46,18 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
     if (testFinished) return;
     if (timeLeft <= 300 && timeLeft > 299 && !warned5.current) {
       warned5.current = true;
-      toast({ title: "⏱ 5 minutes remaining", description: "Review your answers before time runs out." });
+      toast({
+        title: "⏱ 5 minutes remaining",
+        description: "Review your answers before time runs out.",
+      });
     }
     if (timeLeft <= 60 && timeLeft > 59 && !warned1.current) {
       warned1.current = true;
-      toast({ title: "⚠ 1 minute remaining!", description: "Your test will be auto-submitted shortly.", variant: "destructive" });
+      toast({
+        title: "⚠ 1 minute remaining!",
+        description: "Your test will be auto-submitted shortly.",
+        variant: "destructive",
+      });
     }
   }, [timeLeft, testFinished]);
 
@@ -57,19 +69,15 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
     }
   }, [timeLeft, totalSeconds]);
 
-  const progressColor = isUrgent
-    ? "[&>div]:bg-destructive"
-    : isWarning
-    ? "[&>div]:bg-warning"
-    : "[&>div]:bg-primary";
+  const progressColor = isUrgent ? "[&>div]:bg-destructive" : isWarning ? "[&>div]:bg-warning" : "[&>div]:bg-primary";
 
   const pillClasses = cn(
     "flex items-center gap-2 rounded-lg px-3 py-1.5 border backdrop-blur-md transition-colors min-w-[8rem] justify-center",
     isUrgent
       ? "border-destructive/30 bg-destructive/5"
       : isWarning
-      ? "border-warning/30 bg-warning/5"
-      : "border-border bg-card/80"
+        ? "border-warning/30 bg-warning/5"
+        : "border-border bg-card/80"
   );
 
   if (testFinished) return null;
@@ -84,11 +92,10 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          onClick={() => { if (minimized) setMinimized(false); }}
-          className={cn(
-            "fixed top-20 right-4 z-50 shadow-lg",
-            pillClasses
-          )}
+          onClick={() => {
+            if (minimized) setMinimized(false);
+          }}
+          className={cn("fixed top-20 right-4 z-50 shadow-lg", pillClasses)}
         >
           <motion.div
             animate={isUrgent ? { scale: [1, 1.06, 1] } : {}}
@@ -96,9 +103,7 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
             className="flex items-center gap-2"
           >
             <Timer className={cn("h-3.5 w-3.5", timerColor)} />
-            <span className={cn("font-mono text-sm font-bold tabular-nums", timerColor)}>
-              {formattedTime}
-            </span>
+            <span className={cn("font-mono text-sm font-bold tabular-nums", timerColor)}>{formattedTime}</span>
           </motion.div>
         </motion.button>
       </>
@@ -108,9 +113,7 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
   // ── Inline variant (inside header bar) ──
   return (
     <div className="shrink-0">
-      {showProgressBar && (
-        <Progress value={progressPercent} className={cn("h-1 rounded-none", progressColor)} />
-      )}
+      {showProgressBar && <Progress value={progressPercent} className={cn("h-1 rounded-none", progressColor)} />}
       <div className="flex items-center justify-center gap-3 py-1.5 bg-card/80 backdrop-blur-md border-b border-border px-4">
         <motion.div
           animate={isUrgent ? { scale: [1, 1.04, 1] } : {}}
@@ -118,9 +121,7 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
           className={pillClasses}
         >
           <Timer className={cn("h-4 w-4 shrink-0", timerColor)} />
-          <span className={cn("font-mono text-lg font-bold tabular-nums", timerColor)}>
-            {formattedTime}
-          </span>
+          <span className={cn("font-mono text-lg font-bold tabular-nums", timerColor)}>{formattedTime}</span>
         </motion.div>
         <button
           onClick={() => setMinimized(true)}

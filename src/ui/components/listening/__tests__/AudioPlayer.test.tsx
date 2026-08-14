@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AudioPlayer from "../AudioPlayer";
 
 describe("AudioPlayer", () => {
@@ -30,9 +30,13 @@ describe("AudioPlayer", () => {
     render(<AudioPlayer sectionIndex={0} onEnded={vi.fn()} />);
     const playBtn = screen.getAllByRole("button")[0];
     // Click play
-    act(() => { playBtn.click(); });
+    act(() => {
+      playBtn.click();
+    });
     // Advance 2 seconds
-    act(() => { vi.advanceTimersByTime(2000); });
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
     expect(screen.getByText("0:02")).toBeInTheDocument();
   });
 
@@ -46,15 +50,23 @@ describe("AudioPlayer", () => {
     const onEnded = vi.fn();
     render(<AudioPlayer sectionIndex={0} onEnded={onEnded} />);
     const playBtn = screen.getAllByRole("button")[0];
-    act(() => { playBtn.click(); });
-    act(() => { vi.advanceTimersByTime(180_000); });
+    act(() => {
+      playBtn.click();
+    });
+    act(() => {
+      vi.advanceTimersByTime(180_000);
+    });
     expect(onEnded).toHaveBeenCalledTimes(1);
   });
 
   it("shows Ended text after playback completes", () => {
     render(<AudioPlayer sectionIndex={0} onEnded={vi.fn()} />);
-    act(() => { screen.getAllByRole("button")[0].click(); });
-    act(() => { vi.advanceTimersByTime(180_000); });
+    act(() => {
+      screen.getAllByRole("button")[0].click();
+    });
+    act(() => {
+      vi.advanceTimersByTime(180_000);
+    });
     expect(screen.getByText("Ended")).toBeInTheDocument();
   });
 
@@ -62,7 +74,9 @@ describe("AudioPlayer", () => {
     render(<AudioPlayer sectionIndex={0} onEnded={vi.fn()} />);
     const buttons = screen.getAllByRole("button");
     const muteBtn = buttons[buttons.length - 1];
-    act(() => { muteBtn.click(); });
+    act(() => {
+      muteBtn.click();
+    });
     expect(muteBtn).toBeInTheDocument();
   });
 });

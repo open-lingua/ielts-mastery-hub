@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),
@@ -28,8 +28,6 @@ describe("RecentActivity", () => {
         <RecentActivity />
       </MemoryRouter>
     );
-    expect(
-      await screen.findByText(/Start a practice test/)
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Start a practice test/)).toBeInTheDocument();
   });
 });

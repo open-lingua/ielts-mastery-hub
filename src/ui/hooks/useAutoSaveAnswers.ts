@@ -1,6 +1,6 @@
-import { useEffect, useRef, useCallback } from "react";
-import { updateUserTestSession } from "@/lib/tauri";
+import { useCallback, useEffect, useRef } from "react";
 import { getAnonId } from "@/lib/anonId";
+import { updateUserTestSession } from "@/lib/tauri";
 
 interface UseAutoSaveOptions {
   sessionId: string | null;

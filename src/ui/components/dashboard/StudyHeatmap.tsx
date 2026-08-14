@@ -1,24 +1,14 @@
-import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays } from "lucide-react";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAnonId } from "@/lib/anonId";
 import { listUserTestSessions } from "@/lib/tauri";
+import { cn } from "@/lib/utils";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -77,8 +67,12 @@ function calculateLongestStreak(days: DayData[]): number {
   let max = 0;
   let current = 0;
   for (const day of days) {
-    if (day.count > 0) { current++; max = Math.max(max, current); }
-    else { current = 0; }
+    if (day.count > 0) {
+      current++;
+      max = Math.max(max, current);
+    } else {
+      current = 0;
+    }
   }
   return max;
 }
@@ -158,7 +152,9 @@ const StudyHeatmap: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             {availableYears.map((y) => (
-              <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -182,7 +178,11 @@ const StudyHeatmap: React.FC = () => {
                   ? Array.from({ length: 53 }).map((_, i) => (
                       <div key={i} className="flex flex-col gap-[3px]">
                         {Array.from({ length: 7 }).map((_, j) => (
-                          <Skeleton key={j} className="w-[10px] h-[10px] rounded-sm" style={{ animationDelay: `${(i * 7 + j) * 5}ms` }} />
+                          <Skeleton
+                            key={j}
+                            className="w-[10px] h-[10px] rounded-sm"
+                            style={{ animationDelay: `${(i * 7 + j) * 5}ms` }}
+                          />
                         ))}
                       </div>
                     ))
@@ -210,7 +210,12 @@ const StudyHeatmap: React.FC = () => {
                               <TooltipContent className="text-center">
                                 <p className="font-semibold">{day.count === 0 ? "No" : day.count} sessions</p>
                                 <p className="text-muted-foreground text-xs">
-                                  {day.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+                                  {day.date.toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -234,8 +239,12 @@ const StudyHeatmap: React.FC = () => {
             <span>More</span>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <span>Total: <strong className="text-foreground">{total.toLocaleString()}</strong> sessions</span>
-            <span>Longest Streak: <strong className="text-foreground">{longestStreak}</strong> days</span>
+            <span>
+              Total: <strong className="text-foreground">{total.toLocaleString()}</strong> sessions
+            </span>
+            <span>
+              Longest Streak: <strong className="text-foreground">{longestStreak}</strong> days
+            </span>
           </div>
         </div>
       </CardContent>

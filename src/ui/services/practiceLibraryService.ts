@@ -1,13 +1,13 @@
 import {
-  listReadingTests,
-  listWritingTests,
-  listListeningTests,
-  listUserTestSessions,
   createUserTestSession,
-  updateUserTestSession,
+  getListeningTest,
   getReadingTest,
   getWritingTest,
-  getListeningTest,
+  listListeningTests,
+  listReadingTests,
+  listUserTestSessions,
+  listWritingTests,
+  updateUserTestSession,
 } from "@/lib/tauri";
 
 export type TestModule = "reading" | "writing" | "listening";
@@ -41,7 +41,7 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
   const publishedListening = listeningTests.filter((t) => t.status === "published");
 
   // Group sessions by test_type + test_id, pick highest attempt_number
-  const latestSessionMap = new Map<string, typeof sessions[0]>();
+  const latestSessionMap = new Map<string, (typeof sessions)[0]>();
   for (const s of sessions) {
     const key = `${s.test_type}_${s.test_id}`;
     const existing = latestSessionMap.get(key);
@@ -51,7 +51,13 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
   }
 
   const merge = (
-    tests: Array<{ id: string; title: string; difficulty?: string; duration?: string; created_at: string }>,
+    tests: Array<{
+      id: string;
+      title: string;
+      difficulty?: string;
+      duration?: string;
+      created_at: string;
+    }>,
     module: TestModule,
     defaultDifficulty = "7",
     defaultDuration = "60 mins"
@@ -66,9 +72,8 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
         duration: (t as any).duration ?? defaultDuration,
         status: (session?.status as SessionStatus) ?? "not_started",
         progress_percent: session?.progress_percent ?? 0,
-        score_band: session?.score_band !== null && session?.score_band !== undefined
-          ? Number(session.score_band)
-          : null,
+        score_band:
+          session?.score_band !== null && session?.score_band !== undefined ? Number(session.score_band) : null,
         last_active_at: session?.last_active_at ?? null,
         session_id: session?.id ?? null,
         created_at: t.created_at,
@@ -91,15 +96,9 @@ export interface TestSessionInfo {
   attempt_number: number;
 }
 
-export async function startTestSession(
-  userId: string,
-  testId: string,
-  testType: TestModule
-): Promise<TestSessionInfo> {
+export async function startTestSession(userId: string, testId: string, testType: TestModule): Promise<TestSessionInfo> {
   const sessions = await listUserTestSessions(userId);
-  const matching = sessions.filter(
-    (s) => s.test_id === testId && s.test_type === testType
-  );
+  const matching = sessions.filter((s) => s.test_id === testId && s.test_type === testType);
   const maxAttempt = matching.reduce((max, s) => Math.max(max, s.attempt_number ?? 1), 0);
   const nextAttempt = maxAttempt + 1;
 
@@ -138,7 +137,11 @@ export async function fetchExistingSession(
 
   let answers: Record<string, unknown> | null = null;
   if (s.answers) {
-    try { answers = JSON.parse(s.answers); } catch { answers = null; }
+    try {
+      answers = JSON.parse(s.answers);
+    } catch {
+      answers = null;
+    }
   }
 
   return {

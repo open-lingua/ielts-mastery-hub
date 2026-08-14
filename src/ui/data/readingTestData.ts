@@ -166,7 +166,8 @@ const passage1: ReadingPassage = {
   sections: [
     {
       title: "Questions 1–3",
-      instructions: "Do the following statements agree with the information given in the Reading Passage? Write TRUE, FALSE, or NOT GIVEN.",
+      instructions:
+        "Do the following statements agree with the information given in the Reading Passage? Write TRUE, FALSE, or NOT GIVEN.",
       questionRange: "1-3",
       data: {
         id: "p1_tfng",
@@ -212,9 +213,24 @@ const passage1: ReadingPassage = {
         type: "SENTENCE_COMPLETION",
         wordLimit: 2,
         sentences: [
-          { label: "9", text: "In temperate regions, moderate warming has led to longer {{gap}}.", gap: "p1gap9", answer: "growing seasons" },
-          { label: "10", text: "Some regions face a higher risk of {{gap}} due to changing rainfall.", gap: "p1gap10", answer: "flooding" },
-          { label: "11", text: "Agriculture accounts for about 10-12 percent of global {{gap}}.", gap: "p1gap11", answer: "greenhouse gas" },
+          {
+            label: "9",
+            text: "In temperate regions, moderate warming has led to longer {{gap}}.",
+            gap: "p1gap9",
+            answer: "growing seasons",
+          },
+          {
+            label: "10",
+            text: "Some regions face a higher risk of {{gap}} due to changing rainfall.",
+            gap: "p1gap10",
+            answer: "flooding",
+          },
+          {
+            label: "11",
+            text: "Agriculture accounts for about 10-12 percent of global {{gap}}.",
+            gap: "p1gap11",
+            answer: "greenhouse gas",
+          },
         ],
       } as SentenceCompletionQuestion,
     },
@@ -227,8 +243,18 @@ const passage1: ReadingPassage = {
         type: "SHORT_ANSWER",
         wordLimit: 3,
         questions: [
-          { label: "12", text: "What technology has helped reduce the impact of water changes on farming?", answer: "irrigation technology", acceptedAnswers: ["irrigation technology", "irrigation"] },
-          { label: "13", text: "What type of agriculture practices are being adopted as an adaptation strategy?", answer: "conservation agriculture", acceptedAnswers: ["conservation agriculture", "conservation agriculture practices"] },
+          {
+            label: "12",
+            text: "What technology has helped reduce the impact of water changes on farming?",
+            answer: "irrigation technology",
+            acceptedAnswers: ["irrigation technology", "irrigation"],
+          },
+          {
+            label: "13",
+            text: "What type of agriculture practices are being adopted as an adaptation strategy?",
+            answer: "conservation agriculture",
+            acceptedAnswers: ["conservation agriculture", "conservation agriculture practices"],
+          },
         ],
       } as ShortAnswerQuestion,
     },
@@ -269,23 +295,34 @@ const passage2: ReadingPassage = {
           "v. New tools for uncovering the past",
           "vi. The mystery of Andean writing systems",
         ],
-        answers: { "B": "i", "C": "iv", "D": "iii", "E": "v" },
+        answers: { B: "i", C: "iv", D: "iii", E: "v" },
       } as MatchingHeadingsQuestion,
     },
     {
       title: "Questions 18–20",
-      instructions: "Look at the following statements and the list of researchers below. Match each statement with the correct researcher.",
+      instructions:
+        "Look at the following statements and the list of researchers below. Match each statement with the correct researcher.",
       questionRange: "18-20",
       data: {
         id: "p2_mf",
         type: "MATCHING_FEATURES",
         features: [
-          { label: "18", text: "Proposed that one civilization's infrastructure influenced a later empire" },
+          {
+            label: "18",
+            text: "Proposed that one civilization's infrastructure influenced a later empire",
+          },
           { label: "19", text: "Has directed archaeological work at a site for over 25 years" },
-          { label: "20", text: "Suggests that trade and religion were more important than warfare" },
+          {
+            label: "20",
+            text: "Suggests that trade and religion were more important than warfare",
+          },
         ],
         entities: ["A. Dr. Patricia Hernández", "B. Professor Ruth Shady Solís"],
-        answers: { "18": "A. Dr. Patricia Hernández", "19": "B. Professor Ruth Shady Solís", "20": "B. Professor Ruth Shady Solís" },
+        answers: {
+          "18": "A. Dr. Patricia Hernández",
+          "19": "B. Professor Ruth Shady Solís",
+          "20": "B. Professor Ruth Shady Solís",
+        },
       } as MatchingFeaturesQuestion,
     },
     {
@@ -308,8 +345,18 @@ const passage2: ReadingPassage = {
         type: "SUMMARY_COMPLETION",
         wordLimit: 2,
         useWordBank: true,
-        wordBank: ["raised fields", "frost protection", "terrace cultivation", "road network", "aquatic plants", "platform mounds", "DNA analysis", "isotope analysis"],
-        summaryText: "The Tiwanaku civilization developed {{gap1}} surrounded by water channels. These channels provided natural {{gap2}} and created a self-fertilizing system as {{gap3}} decomposed. Modern technology such as {{gap4}} has helped trace migration patterns of ancient peoples.",
+        wordBank: [
+          "raised fields",
+          "frost protection",
+          "terrace cultivation",
+          "road network",
+          "aquatic plants",
+          "platform mounds",
+          "DNA analysis",
+          "isotope analysis",
+        ],
+        summaryText:
+          "The Tiwanaku civilization developed {{gap1}} surrounded by water channels. These channels provided natural {{gap2}} and created a self-fertilizing system as {{gap3}} decomposed. Modern technology such as {{gap4}} has helped trace migration patterns of ancient peoples.",
         gaps: [
           { id: "gap1", answer: "raised fields" },
           { id: "gap2", answer: "frost protection" },
@@ -385,9 +432,24 @@ const passage3: ReadingPassage = {
         type: "NOTE_COMPLETION",
         wordLimit: 2,
         notes: [
-          { label: "34", text: "SDT identifies three basic psychological needs: autonomy, competence, and {{gap}}", gap: "p3gap34", answer: "relatedness" },
-          { label: "35", text: "Controlling management relies on external rewards, deadlines, and {{gap}}", gap: "p3gap35", answer: "surveillance" },
-          { label: "36", text: "Organizations are redesigning office spaces to prioritize {{gap}} over individual work", gap: "p3gap36", answer: "collaboration" },
+          {
+            label: "34",
+            text: "SDT identifies three basic psychological needs: autonomy, competence, and {{gap}}",
+            gap: "p3gap34",
+            answer: "relatedness",
+          },
+          {
+            label: "35",
+            text: "Controlling management relies on external rewards, deadlines, and {{gap}}",
+            gap: "p3gap35",
+            answer: "surveillance",
+          },
+          {
+            label: "36",
+            text: "Organizations are redesigning office spaces to prioritize {{gap}} over individual work",
+            gap: "p3gap36",
+            answer: "collaboration",
+          },
         ],
       } as NoteCompletionQuestion,
     },
@@ -401,8 +463,12 @@ const passage3: ReadingPassage = {
         wordLimit: 2,
         headers: ["Theorist / Theory", "Key Concept", "Criticism or Limitation"],
         rows: [
-          { cells: ["Maslow", "Hierarchy of needs", { gap: "p3gap37", answer: "rigid hierarchical" }] },
-          { cells: ["Herzberg", { gap: "p3gap38", answer: "two-factor" }, "Oversimplifies motivation"] },
+          {
+            cells: ["Maslow", "Hierarchy of needs", { gap: "p3gap37", answer: "rigid hierarchical" }],
+          },
+          {
+            cells: ["Herzberg", { gap: "p3gap38", answer: "two-factor" }, "Oversimplifies motivation"],
+          },
         ],
       } as TableCompletionQuestion,
     },
@@ -416,8 +482,16 @@ const passage3: ReadingPassage = {
         wordLimit: 2,
         steps: [
           { text: "Routine tasks become automated" },
-          { text: "Human work shifts toward {{gap}} and complex problem-solving", gap: "p3gap39", answer: "creativity" },
-          { text: "Tasks provide greater {{gap}} satisfaction", gap: "p3gap40", answer: "intrinsic" },
+          {
+            text: "Human work shifts toward {{gap}} and complex problem-solving",
+            gap: "p3gap39",
+            answer: "creativity",
+          },
+          {
+            text: "Tasks provide greater {{gap}} satisfaction",
+            gap: "p3gap40",
+            answer: "intrinsic",
+          },
         ],
       } as FlowchartCompletionQuestion,
     },
@@ -444,14 +518,30 @@ export const comprehensiveReadingTest: ReadingTest = {
 
 // Flatten question arrays for backward-compatible renderers
 export const tfngQuestions = [
-  { id: "q1", label: "1", text: "Rising temperatures always lead to decreased crop yields.", answer: "FALSE" as const },
-  { id: "q2", label: "2", text: "The IPCC projects food production could decline by up to 25% by century's end.", answer: "TRUE" as const },
-  { id: "q3", label: "3", text: "Organic farming has been proven more effective than conventional methods in combating climate change.", answer: "NOT GIVEN" as const },
+  {
+    id: "q1",
+    label: "1",
+    text: "Rising temperatures always lead to decreased crop yields.",
+    answer: "FALSE" as const,
+  },
+  {
+    id: "q2",
+    label: "2",
+    text: "The IPCC projects food production could decline by up to 25% by century's end.",
+    answer: "TRUE" as const,
+  },
+  {
+    id: "q3",
+    label: "3",
+    text: "Organic farming has been proven more effective than conventional methods in combating climate change.",
+    answer: "NOT GIVEN" as const,
+  },
 ];
 
 export const mcQuestions = [
   {
-    id: "q4", label: "4",
+    id: "q4",
+    label: "4",
     text: "What effect has moderate warming had in temperate regions?",
     options: [
       "A. Decreased growing seasons",
@@ -462,7 +552,8 @@ export const mcQuestions = [
     answer: "B. Longer growing seasons and increased productivity",
   },
   {
-    id: "q5", label: "5",
+    id: "q5",
+    label: "5",
     text: "Which of the following is NOT mentioned as an adaptation strategy?",
     options: [
       "A. Drought-resistant crop varieties",
@@ -476,22 +567,53 @@ export const mcQuestions = [
 ];
 
 export const ynngQuestions = [
-  { id: "q6", label: "6", text: "The author believes adaptation strategies alone will be sufficient to address the crisis.", answer: "NO" as const },
-  { id: "q7", label: "7", text: "Reducing agricultural emissions is important alongside adaptation efforts.", answer: "YES" as const },
-  { id: "q8", label: "8", text: "The author suggests that developing countries will be more affected than developed nations.", answer: "NOT GIVEN" as const },
+  {
+    id: "q6",
+    label: "6",
+    text: "The author believes adaptation strategies alone will be sufficient to address the crisis.",
+    answer: "NO" as const,
+  },
+  {
+    id: "q7",
+    label: "7",
+    text: "Reducing agricultural emissions is important alongside adaptation efforts.",
+    answer: "YES" as const,
+  },
+  {
+    id: "q8",
+    label: "8",
+    text: "The author suggests that developing countries will be more affected than developed nations.",
+    answer: "NOT GIVEN" as const,
+  },
 ];
 
 // Passage 2 standalone questions for renderers
 export const p2YnngQuestions = [
-  { id: "p2q21", label: "21", text: "The Tiwanaku civilization pre-dated the Inca Empire.", answer: "YES" as const },
-  { id: "p2q22", label: "22", text: "Caral's society was organized primarily around military power.", answer: "NO" as const },
-  { id: "p2q23", label: "23", text: "Lidar technology was first developed specifically for archaeological purposes.", answer: "NOT GIVEN" as const },
+  {
+    id: "p2q21",
+    label: "21",
+    text: "The Tiwanaku civilization pre-dated the Inca Empire.",
+    answer: "YES" as const,
+  },
+  {
+    id: "p2q22",
+    label: "22",
+    text: "Caral's society was organized primarily around military power.",
+    answer: "NO" as const,
+  },
+  {
+    id: "p2q23",
+    label: "23",
+    text: "Lidar technology was first developed specifically for archaeological purposes.",
+    answer: "NOT GIVEN" as const,
+  },
 ];
 
 // Passage 3 standalone MC questions for renderers
 export const p3McQuestions = [
   {
-    id: "p3q28", label: "28",
+    id: "p3q28",
+    label: "28",
     text: "According to the passage, what was Frederick Taylor's main approach to motivation?",
     options: [
       "A. Emotional intelligence training",
@@ -502,7 +624,8 @@ export const p3McQuestions = [
     answer: "B. Financial incentives and task optimization",
   },
   {
-    id: "p3q29", label: "29",
+    id: "p3q29",
+    label: "29",
     text: "What criticism has been made of Maslow's theory?",
     options: [
       "A. It ignores financial factors entirely",
@@ -513,7 +636,8 @@ export const p3McQuestions = [
     answer: "B. It is too rigid and hierarchical in structure",
   },
   {
-    id: "p3q30", label: "30",
+    id: "p3q30",
+    label: "30",
     text: "According to Self-Determination Theory, intrinsic motivation requires",
     options: [
       "A. high salaries and bonuses",

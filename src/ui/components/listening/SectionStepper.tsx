@@ -1,7 +1,7 @@
+import { CheckCircle2, Headphones, Lock } from "lucide-react";
 import React from "react";
-import { CheckCircle2, Lock, Headphones } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface SectionStepperProps {
   totalSections: number;
@@ -31,9 +31,7 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
               <div
                 className={cn(
                   "h-0.5 flex-1 rounded-full transition-colors",
-                  isCompleted || (unlockedSections[i] && completedSections[i - 1])
-                    ? "bg-success"
-                    : "bg-border"
+                  isCompleted || (unlockedSections[i] && completedSections[i - 1]) ? "bg-success" : "bg-border"
                 )}
               />
             )}
@@ -44,8 +42,7 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
                   disabled={!isUnlocked}
                   className={cn(
                     "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all",
-                    isCompleted &&
-                      "border-success bg-success text-success-foreground",
+                    isCompleted && "border-success bg-success text-success-foreground",
                     isActive &&
                       !isCompleted &&
                       "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-110",
@@ -53,8 +50,7 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
                       !isCompleted &&
                       isUnlocked &&
                       "border-border bg-card text-muted-foreground hover:border-primary/50 cursor-pointer",
-                    !isUnlocked &&
-                      "border-border bg-muted text-muted-foreground/40 cursor-not-allowed opacity-60"
+                    !isUnlocked && "border-border bg-muted text-muted-foreground/40 cursor-not-allowed opacity-60"
                   )}
                 >
                   {isCompleted ? (
@@ -72,8 +68,8 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
                 {!isUnlocked
                   ? "Complete the previous section first"
                   : isCompleted
-                  ? `Section ${i + 1} — Completed`
-                  : `Section ${i + 1}`}
+                    ? `Section ${i + 1} — Completed`
+                    : `Section ${i + 1}`}
               </TooltipContent>
             </Tooltip>
           </React.Fragment>

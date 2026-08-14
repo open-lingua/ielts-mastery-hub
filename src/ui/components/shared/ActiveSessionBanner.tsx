@@ -1,9 +1,9 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { AlertTriangle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { AlertTriangle, ArrowRight } from "lucide-react";
+import type React from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { TestModule } from "@/services/practiceLibraryService";
 
 interface ActiveSessionBannerProps {
@@ -18,11 +18,7 @@ const moduleLabels: Record<TestModule, string> = {
   listening: "Listening",
 };
 
-const ActiveSessionBanner: React.FC<ActiveSessionBannerProps> = ({
-  testTitle,
-  testType,
-  testId,
-}) => {
+const ActiveSessionBanner: React.FC<ActiveSessionBannerProps> = ({ testTitle, testType, testId }) => {
   const route = `/${testType}?id=${testId}`;
 
   return (
@@ -39,9 +35,7 @@ const ActiveSessionBanner: React.FC<ActiveSessionBannerProps> = ({
           </div>
         </div>
         <div className="flex-1 min-w-0 space-y-0.5">
-          <p className="text-sm font-semibold text-foreground">
-            You have an active test in progress
-          </p>
+          <p className="text-sm font-semibold text-foreground">You have an active test in progress</p>
           <p className="text-xs text-muted-foreground truncate">
             <Badge variant="outline" className="text-[10px] mr-1.5">
               {moduleLabels[testType]}

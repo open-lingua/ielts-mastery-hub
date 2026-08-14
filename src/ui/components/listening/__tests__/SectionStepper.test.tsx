@@ -1,11 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SectionStepper from "../SectionStepper";
 
-const wrap = (ui: React.ReactElement) =>
-  render(<TooltipProvider>{ui}</TooltipProvider>);
+const wrap = (ui: React.ReactElement) => render(<TooltipProvider>{ui}</TooltipProvider>);
 
 describe("SectionStepper", () => {
   const defaultProps = {
@@ -38,13 +37,7 @@ describe("SectionStepper", () => {
   it("calls onSectionClick for unlocked sections", async () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
-    wrap(
-      <SectionStepper
-        {...defaultProps}
-        unlockedSections={[true, true, false, false]}
-        onSectionClick={onClick}
-      />
-    );
+    wrap(<SectionStepper {...defaultProps} unlockedSections={[true, true, false, false]} onSectionClick={onClick} />);
     await user.click(screen.getAllByRole("button")[1]);
     expect(onClick).toHaveBeenCalledWith(1);
   });

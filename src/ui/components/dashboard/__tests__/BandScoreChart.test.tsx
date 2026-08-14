@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),
@@ -39,8 +39,6 @@ describe("BandScoreChart", () => {
 
   it("shows instruction text in empty state", async () => {
     render(<BandScoreChart />);
-    expect(
-      await screen.findByText(/Complete a test to see your band score progress/)
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Complete a test to see your band score progress/)).toBeInTheDocument();
   });
 });

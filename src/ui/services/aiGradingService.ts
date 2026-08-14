@@ -1,5 +1,5 @@
-import { gradeWriting, updateUserTestSession, type GradingResult } from "@/lib/tauri";
 import { getAnonId } from "@/lib/anonId";
+import { type GradingResult, gradeWriting, updateUserTestSession } from "@/lib/tauri";
 
 export type { GradingResult as WritingGradingResult };
 
@@ -34,13 +34,10 @@ export async function gradeWritingTest(
   task2: GradingResult;
   overallBand: number;
 }> {
-  const [result1, result2] = await Promise.all(
-    tasks.map((t) => evaluateWriting(t.taskType, t.prompt, t.userResponse))
-  );
+  const [result1, result2] = await Promise.all(tasks.map((t) => evaluateWriting(t.taskType, t.prompt, t.userResponse)));
 
   // Task 2 carries more weight (2/3) in official IELTS
-  const overallBand =
-    Math.round(((result1.overallBand * 1 + result2.overallBand * 2) / 3) * 2) / 2;
+  const overallBand = Math.round(((result1.overallBand * 1 + result2.overallBand * 2) / 3) * 2) / 2;
 
   return { task1: result1, task2: result2, overallBand };
 }

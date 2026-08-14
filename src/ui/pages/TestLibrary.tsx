@@ -1,47 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  BookOpen,
-  PenTool,
-  Headphones,
-  CheckCircle2,
-  PlayCircle,
-  Clock,
   ArrowRight,
   ArrowUpDown,
-  BarChart3,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Headphones,
   MoreHorizontal,
-  Trophy,
+  PenTool,
+  PlayCircle,
   RotateCcw,
+  Trophy,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import ActiveSessionBanner from "@/components/shared/ActiveSessionBanner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getAnonId } from "@/lib/anonId";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import {
-  fetchLibraryData,
+  type ActiveSessionInfo,
   fetchActiveSession,
+  fetchLibraryData,
   fetchTestTitle,
   type PracticeTestCard,
-  type TestModule,
   type SessionStatus,
-  type ActiveSessionInfo,
+  type TestModule,
 } from "@/services/practiceLibraryService";
-import { formatDistanceToNow } from "date-fns";
-import ActiveSessionBanner from "@/components/shared/ActiveSessionBanner";
 
 const moduleIcons: Record<TestModule, React.ElementType> = {
   reading: BookOpen,
@@ -123,9 +117,7 @@ const TestCard: React.FC<{
             Band {test.difficulty}
           </Badge>
         </div>
-        <h3 className="font-semibold leading-tight text-lg text-foreground">
-          {test.title}
-        </h3>
+        <h3 className="font-semibold leading-tight text-lg text-foreground">{test.title}</h3>
       </div>
 
       {/* Status */}
@@ -136,9 +128,7 @@ const TestCard: React.FC<{
               <span className="text-[10px] text-[hsl(var(--success))] font-medium uppercase tracking-wider">
                 Score Achieved
               </span>
-              <span className="text-2xl font-bold text-[hsl(var(--success))]">
-                Band {test.score_band}
-              </span>
+              <span className="text-2xl font-bold text-[hsl(var(--success))]">Band {test.score_band}</span>
             </div>
             <Trophy className="h-8 w-8 text-[hsl(var(--success))]/40" />
           </div>
@@ -180,9 +170,7 @@ const TestCard: React.FC<{
                 <PlayCircle className="h-3 w-3" /> Resumable
               </Badge>
             )}
-            {test.status === "not_started" && (
-              <Badge variant="secondary">New</Badge>
-            )}
+            {test.status === "not_started" && <Badge variant="secondary">New</Badge>}
           </div>
           <Button
             variant={isCompleted ? "secondary" : "default"}
@@ -202,11 +190,7 @@ const TestCard: React.FC<{
             ) : (
               <Link to={targetRoute}>
                 {isCompleted ? "Review" : "Continue"}
-                {isCompleted ? (
-                  <RotateCcw className="h-3 w-3" />
-                ) : (
-                  <ArrowRight className="h-3 w-3" />
-                )}
+                {isCompleted ? <RotateCcw className="h-3 w-3" /> : <ArrowRight className="h-3 w-3" />}
               </Link>
             )}
           </Button>
@@ -228,7 +212,10 @@ const TestLibrary: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [tests, setTests] = useState<PracticeTestCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSessionInfo, setActiveSessionInfo] = useState<{ session: ActiveSessionInfo; title: string } | null>(null);
+  const [activeSessionInfo, setActiveSessionInfo] = useState<{
+    session: ActiveSessionInfo;
+    title: string;
+  } | null>(null);
 
   const tabs = ["All", "Reading", "Writing", "Listening"];
 
@@ -237,10 +224,7 @@ const TestLibrary: React.FC = () => {
 
     const load = async () => {
       try {
-        const [testsData, active] = await Promise.all([
-          fetchLibraryData(userId),
-          fetchActiveSession(userId),
-        ]);
+        const [testsData, active] = await Promise.all([fetchLibraryData(userId), fetchActiveSession(userId)]);
         setTests(testsData);
 
         if (active) {
@@ -270,7 +254,6 @@ const TestLibrary: React.FC = () => {
     });
 
   const handleStart = (test: PracticeTestCard) => {
-
     // Block if another test is already in progress
     if (activeSessionInfo && activeSessionInfo.session.test_id !== test.id) {
       toast.error("You already have a test in progress. Please resume or submit it first.");
@@ -380,10 +363,7 @@ const TestLibrary: React.FC = () => {
                       dotColors[test.status]
                     )}
                   />
-                  <TestCard
-                    test={test}
-                    onStart={handleStart}
-                  />
+                  <TestCard test={test} onStart={handleStart} />
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -399,9 +379,7 @@ const TestLibrary: React.FC = () => {
                 <p className="text-muted-foreground max-w-sm mt-1 mb-4">
                   No published tests are available in this category yet.
                 </p>
-                <Button onClick={() => setActiveTab("All")}>
-                  View All Tests
-                </Button>
+                <Button onClick={() => setActiveTab("All")}>View All Tests</Button>
               </div>
             </div>
           )}

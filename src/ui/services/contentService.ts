@@ -1,18 +1,18 @@
 import { getAnonId } from "@/lib/anonId";
 import {
-  listReadingTests,
+  deleteListeningTest,
+  deleteReadingTest,
+  deleteWritingTest,
+  listListeningQuestionGroups,
+  listListeningQuestions,
+  listListeningSections,
+  listListeningTests,
   listReadingPassages,
   listReadingQuestionGroups,
   listReadingQuestions,
-  listWritingTests,
+  listReadingTests,
   listWritingTasks,
-  listListeningTests,
-  listListeningSections,
-  listListeningQuestionGroups,
-  listListeningQuestions,
-  deleteReadingTest,
-  deleteWritingTest,
-  deleteListeningTest,
+  listWritingTests,
 } from "@/lib/tauri";
 
 export type ContentModule = "Reading" | "Writing" | "Listening";
@@ -87,17 +87,11 @@ export async function fetchAllContent(): Promise<ContentItem[]> {
   }
   const groupsByPassage = new Map<string, number>();
   for (const g of qGroups) {
-    groupsByPassage.set(
-      g.passage_id,
-      (groupsByPassage.get(g.passage_id) ?? 0) + (questionsByGroup.get(g.id) ?? 0)
-    );
+    groupsByPassage.set(g.passage_id, (groupsByPassage.get(g.passage_id) ?? 0) + (questionsByGroup.get(g.id) ?? 0));
   }
   const questionsByTest = new Map<string, number>();
   for (const p of passages) {
-    questionsByTest.set(
-      p.test_id,
-      (questionsByTest.get(p.test_id) ?? 0) + (groupsByPassage.get(p.id) ?? 0)
-    );
+    questionsByTest.set(p.test_id, (questionsByTest.get(p.test_id) ?? 0) + (groupsByPassage.get(p.id) ?? 0));
   }
 
   for (const r of readingTests) {
@@ -145,17 +139,11 @@ export async function fetchAllContent(): Promise<ContentItem[]> {
   }
   const lGroupsBySection = new Map<string, number>();
   for (const g of lGroups) {
-    lGroupsBySection.set(
-      g.section_id,
-      (lGroupsBySection.get(g.section_id) ?? 0) + (lQuestionsByGroup.get(g.id) ?? 0)
-    );
+    lGroupsBySection.set(g.section_id, (lGroupsBySection.get(g.section_id) ?? 0) + (lQuestionsByGroup.get(g.id) ?? 0));
   }
   const lQuestionsByTest = new Map<string, number>();
   for (const s of sections) {
-    lQuestionsByTest.set(
-      s.test_id,
-      (lQuestionsByTest.get(s.test_id) ?? 0) + (lGroupsBySection.get(s.id) ?? 0)
-    );
+    lQuestionsByTest.set(s.test_id, (lQuestionsByTest.get(s.test_id) ?? 0) + (lGroupsBySection.get(s.id) ?? 0));
   }
 
   for (const l of listeningTests) {

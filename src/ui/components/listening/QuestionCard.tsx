@@ -1,6 +1,6 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import type React from "react";
 import type { ListeningQuestion } from "@/data/listeningTestData";
+import { cn } from "@/lib/utils";
 
 interface QuestionCardProps {
   question: ListeningQuestion;
@@ -11,14 +11,7 @@ interface QuestionCardProps {
   reviewMode: boolean;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({
-  question,
-  index,
-  answer,
-  onAnswer,
-  submitted,
-  reviewMode,
-}) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, index, answer, onAnswer, submitted, reviewMode }) => {
   const isCorrect = answer?.toLowerCase().trim() === question.answer.toLowerCase().trim();
 
   return (
@@ -110,12 +103,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       )}
 
       {submitted && reviewMode && (
-        <p
-          className={cn(
-            "mt-2 text-xs font-medium",
-            isCorrect ? "text-success" : "text-destructive"
-          )}
-        >
+        <p className={cn("mt-2 text-xs font-medium", isCorrect ? "text-success" : "text-destructive")}>
           {isCorrect ? "✓ Correct" : `✗ Correct answer: ${question.answer}`}
         </p>
       )}

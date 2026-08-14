@@ -1,6 +1,6 @@
-import React from "react";
+import { ArrowRight, BookOpen, Headphones, Mic, Moon, PenTool, Star, Sun } from "lucide-react";
+import type React from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, PenTool, Headphones, Mic, ArrowRight, Star, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ieltsModules } from "@/data/mockData";
 
@@ -55,7 +55,8 @@ const LandingPage: React.FC = () => {
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            Practice Writing, Reading, and Listening with instant AI feedback. Track your progress and achieve your target band score.
+            Practice Writing, Reading, and Listening with instant AI feedback. Track your progress and achieve your
+            target band score.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
@@ -99,7 +100,10 @@ const LandingPage: React.FC = () => {
           {/* Band Score */}
           <div className="mt-16 rounded-2xl border border-border bg-background p-8 text-center">
             <h3 className="text-2xl font-bold mb-3">Band Score System (0–9)</h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">Each module is scored on a scale of 0–9. Your overall band score is the average of all four modules, rounded to the nearest half band.</p>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Each module is scored on a scale of 0–9. Your overall band score is the average of all four modules,
+              rounded to the nearest half band.
+            </p>
             <div className="flex flex-wrap justify-center gap-3">
               {[
                 { band: "9", label: "Expert" },
@@ -108,7 +112,10 @@ const LandingPage: React.FC = () => {
                 { band: "6", label: "Competent" },
                 { band: "5", label: "Modest" },
               ].map((b) => (
-                <div key={b.band} className="rounded-xl border border-border bg-card px-4 py-3 text-center min-w-[100px]">
+                <div
+                  key={b.band}
+                  className="rounded-xl border border-border bg-card px-4 py-3 text-center min-w-[100px]"
+                >
                   <div className="text-2xl font-bold text-primary">{b.band}</div>
                   <div className="text-xs text-muted-foreground mt-1">{b.label}</div>
                 </div>
@@ -128,10 +135,18 @@ const LandingPage: React.FC = () => {
               <span className="font-medium">Mastery Hub</span>
             </div>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground">Resources</a>
-              <a href="#" className="hover:text-foreground">Privacy</a>
-              <a href="#" className="hover:text-foreground">Terms</a>
-              <a href="#" className="hover:text-foreground">Contact</a>
+              <a href="#" className="hover:text-foreground">
+                Resources
+              </a>
+              <a href="#" className="hover:text-foreground">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-foreground">
+                Terms
+              </a>
+              <a href="#" className="hover:text-foreground">
+                Contact
+              </a>
             </div>
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">

@@ -28,8 +28,7 @@ export const academicWritingTest: WritingTest = {
       suggestedTime: "20 mins",
       prompt:
         "The chart below shows the percentage of the population living in urban areas in four different countries between 1980 and 2020.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-      context:
-        "Write at least 150 words. You should spend about 20 minutes on this task.",
+      context: "Write at least 150 words. You should spend about 20 minutes on this task.",
       imageUrl: "/placeholder.svg",
       initialValue: "",
     },

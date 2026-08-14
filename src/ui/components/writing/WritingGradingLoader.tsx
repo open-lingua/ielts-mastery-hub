@@ -1,6 +1,6 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { BrainCircuit, Sparkles } from "lucide-react";
+import type React from "react";
 
 const WritingGradingLoader: React.FC = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md">

@@ -1,17 +1,17 @@
 import { getAnonId } from "@/lib/anonId";
 import {
-  getListeningTest,
-  createListeningTest,
-  updateListeningTest as tauriUpdateListeningTest,
-  listListeningSections,
-  createListeningSection,
-  deleteListeningSection,
-  listListeningQuestionGroups,
-  createListeningQuestionGroup,
-  deleteListeningQuestionGroup,
-  listListeningQuestions,
   createListeningQuestion,
+  createListeningQuestionGroup,
+  createListeningSection,
+  createListeningTest,
   deleteListeningQuestion,
+  deleteListeningQuestionGroup,
+  deleteListeningSection,
+  getListeningTest,
+  listListeningQuestionGroups,
+  listListeningQuestions,
+  listListeningSections,
+  updateListeningTest as tauriUpdateListeningTest,
   uploadListeningAudio,
 } from "@/lib/tauri";
 
@@ -59,9 +59,12 @@ interface SaveListeningTestParams {
 
 function parseJsonField<T>(raw: string | null | undefined, fallback: T): T {
   if (!raw) return fallback;
-  try { return JSON.parse(raw) as T; } catch { return fallback; }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
 }
-
 
 async function resolveAudioUrls(userId: string, sections: ListeningSectionData[]): Promise<string[]> {
   const urls: string[] = [];
@@ -155,14 +158,10 @@ export async function fetchListeningTest(testId: string) {
 
   if (!test) throw new Error("Listening test not found");
 
-  const sections = allSections
-    .filter((s) => s.test_id === testId)
-    .sort((a, b) => a.section_number - b.section_number);
+  const sections = allSections.filter((s) => s.test_id === testId).sort((a, b) => a.section_number - b.section_number);
 
   const sectionIds = new Set(sections.map((s) => s.id));
-  const groups = allGroups
-    .filter((g) => sectionIds.has(g.section_id))
-    .sort((a, b) => a.group_order - b.group_order);
+  const groups = allGroups.filter((g) => sectionIds.has(g.section_id)).sort((a, b) => a.group_order - b.group_order);
 
   const groupIds = new Set(groups.map((g) => g.id));
   const questions = allQuestions
@@ -172,13 +171,13 @@ export async function fetchListeningTest(testId: string) {
   const questionsByGroup = new Map<string, typeof questions>();
   for (const q of questions) {
     if (!questionsByGroup.has(q.group_id)) questionsByGroup.set(q.group_id, []);
-    questionsByGroup.get(q.group_id)!.push(q);
+    questionsByGroup.get(q.group_id)?.push(q);
   }
 
   const groupsBySection = new Map<string, typeof groups>();
   for (const g of groups) {
     if (!groupsBySection.has(g.section_id)) groupsBySection.set(g.section_id, []);
-    groupsBySection.get(g.section_id)!.push(g);
+    groupsBySection.get(g.section_id)?.push(g);
   }
 
   return {

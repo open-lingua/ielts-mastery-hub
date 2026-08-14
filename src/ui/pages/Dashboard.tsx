@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { BookOpen, Clock, Flame, Headphones, PenTool } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { PenTool, BookOpen, Headphones, Flame, Clock } from "lucide-react";
-import { getAnonId } from "@/lib/anonId";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
-import RecentActivity from "@/components/dashboard/RecentActivity";
 import BandScoreChart from "@/components/dashboard/BandScoreChart";
+import RecentActivity from "@/components/dashboard/RecentActivity";
+import StudyHeatmap from "@/components/dashboard/StudyHeatmap";
+import { getAnonId } from "@/lib/anonId";
 import { listUserTestSessions } from "@/lib/tauri";
 
 const quickActions = [
@@ -42,7 +43,9 @@ function calculateStreak(dates: string[]): number {
   const uniqueDays = new Set<string>();
   dates.forEach((d) => {
     const local = new Date(d);
-    uniqueDays.add(`${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, "0")}-${String(local.getDate()).padStart(2, "0")}`);
+    uniqueDays.add(
+      `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, "0")}-${String(local.getDate()).padStart(2, "0")}`
+    );
   });
 
   const sorted = Array.from(uniqueDays).sort().reverse();
@@ -87,12 +90,8 @@ const Dashboard: React.FC = () => {
         <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold md:text-3xl">
-                Welcome back! 👋
-              </h1>
-              <p className="mt-1 text-muted-foreground">
-                Keep up the great work on your IELTS journey.
-              </p>
+              <h1 className="text-2xl font-bold md:text-3xl">Welcome back! 👋</h1>
+              <p className="mt-1 text-muted-foreground">Keep up the great work on your IELTS journey.</p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-warning/10 px-4 py-2.5 text-warning">
               <Flame className="h-5 w-5" />

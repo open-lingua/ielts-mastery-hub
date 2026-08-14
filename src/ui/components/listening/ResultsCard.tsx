@@ -1,9 +1,9 @@
-import React from "react";
-import { Trophy, BarChart3, RotateCcw, Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Eye, EyeOff, RotateCcw, Trophy } from "lucide-react";
+import type React from "react";
 import { Button } from "@/components/ui/button";
-import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 import type { ListeningTest } from "@/data/listeningTestData";
+import { cn } from "@/lib/utils";
+import { calculateListeningBandScore, isAnswerCorrect } from "@/utils/ieltsGrading";
 
 interface ResultsCardProps {
   test: ListeningTest;
@@ -23,15 +23,11 @@ const ResultsCard: React.FC<ResultsCardProps> = ({
   onBackToLibrary,
 }) => {
   const allQuestions = test.sections.flatMap((s) => s.questions);
-  const totalCorrect = allQuestions.filter(
-    (q) => isAnswerCorrect(answers[q.id], q.answer)
-  ).length;
+  const totalCorrect = allQuestions.filter((q) => isAnswerCorrect(answers[q.id], q.answer)).length;
   const bandScore = calculateListeningBandScore(totalCorrect);
 
   const sectionResults = test.sections.map((section) => {
-    const correct = section.questions.filter(
-      (q) => isAnswerCorrect(answers[q.id], q.answer)
-    ).length;
+    const correct = section.questions.filter((q) => isAnswerCorrect(answers[q.id], q.answer)).length;
     return { title: `S${section.id}`, correct, total: section.questions.length };
   });
 
@@ -60,10 +56,16 @@ const ResultsCard: React.FC<ResultsCardProps> = ({
         {sectionResults.map((s) => (
           <div key={s.title} className="rounded-xl border border-border bg-background p-3 text-center">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{s.title}</p>
-            <p className={cn(
-              "text-lg font-bold mt-1",
-              s.correct / s.total >= 0.7 ? "text-success" : s.correct / s.total >= 0.4 ? "text-warning" : "text-destructive"
-            )}>
+            <p
+              className={cn(
+                "text-lg font-bold mt-1",
+                s.correct / s.total >= 0.7
+                  ? "text-success"
+                  : s.correct / s.total >= 0.4
+                    ? "text-warning"
+                    : "text-destructive"
+              )}
+            >
               {s.correct}/{s.total}
             </p>
           </div>

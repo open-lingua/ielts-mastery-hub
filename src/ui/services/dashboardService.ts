@@ -13,10 +13,7 @@ export interface RecentActivity {
   attempt_number: number;
 }
 
-export async function fetchRecentActivity(
-  userId: string,
-  limit: number = 5
-): Promise<RecentActivity[]> {
+export async function fetchRecentActivity(userId: string, limit: number = 5): Promise<RecentActivity[]> {
   const sessions = await listUserTestSessions(userId);
 
   return sessions

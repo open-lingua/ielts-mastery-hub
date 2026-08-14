@@ -1,27 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import {
-  FileText,
-  Users,
-  TrendingUp,
-  PlusCircle,
-  Clock,
-  CheckCircle2,
-  Edit3,
   BookOpen,
+  CheckCircle2,
+  Clock,
+  Edit3,
+  FileText,
   Headphones,
   PenTool,
+  PlusCircle,
+  TrendingUp,
+  Users,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/AdminLayout";
-import { cn } from "@/lib/utils";
-import { listReadingTests, listWritingTests, listListeningTests, listProfiles } from "@/lib/tauri";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getAnonId } from "@/lib/anonId";
-import { formatDistanceToNow } from "date-fns";
+import { listListeningTests, listProfiles, listReadingTests, listWritingTests } from "@/lib/tauri";
+import { cn } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────
 interface RecentItem {
@@ -47,7 +48,11 @@ const moduleIcons: Record<string, React.ElementType> = {
 // ── Component ──────────────────────────────────────────────
 const AdminDashboard: React.FC = () => {
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({ totalTests: 0, published: 0, activeStudents: 0 });
+  const [stats, setStats] = useState<DashboardStats>({
+    totalTests: 0,
+    published: 0,
+    activeStudents: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -63,9 +68,27 @@ const AdminDashboard: React.FC = () => {
         ]);
 
         const all: RecentItem[] = [
-          ...reading.map((r) => ({ id: r.id, title: r.title, status: r.status, updated_at: r.updated_at, module: "Reading" as const })),
-          ...writing.map((w) => ({ id: w.id, title: w.title, status: w.status, updated_at: w.updated_at, module: "Writing" as const })),
-          ...listening.map((l) => ({ id: l.id, title: l.title, status: l.status, updated_at: l.updated_at, module: "Listening" as const })),
+          ...reading.map((r) => ({
+            id: r.id,
+            title: r.title,
+            status: r.status,
+            updated_at: r.updated_at,
+            module: "Reading" as const,
+          })),
+          ...writing.map((w) => ({
+            id: w.id,
+            title: w.title,
+            status: w.status,
+            updated_at: w.updated_at,
+            module: "Writing" as const,
+          })),
+          ...listening.map((l) => ({
+            id: l.id,
+            title: l.title,
+            status: l.status,
+            updated_at: l.updated_at,
+            module: "Listening" as const,
+          })),
         ]
           .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
           .slice(0, 6);
@@ -90,9 +113,24 @@ const AdminDashboard: React.FC = () => {
   const publishedPercent = stats.totalTests > 0 ? Math.round((stats.published / stats.totalTests) * 100) : 0;
 
   const statCards = [
-    { label: "Total Tests", value: String(stats.totalTests), icon: FileText, change: `Across all modules` },
-    { label: "Published", value: String(stats.published), icon: CheckCircle2, change: `${publishedPercent}% of total` },
-    { label: "Registered Students", value: String(stats.activeStudents), icon: Users, change: "All accounts" },
+    {
+      label: "Total Tests",
+      value: String(stats.totalTests),
+      icon: FileText,
+      change: `Across all modules`,
+    },
+    {
+      label: "Published",
+      value: String(stats.published),
+      icon: CheckCircle2,
+      change: `${publishedPercent}% of total`,
+    },
+    {
+      label: "Registered Students",
+      value: String(stats.activeStudents),
+      icon: Users,
+      change: "All accounts",
+    },
     { label: "Modules", value: "3", icon: TrendingUp, change: "Reading · Writing · Listening" },
   ];
 
@@ -124,7 +162,9 @@ const AdminDashboard: React.FC = () => {
               <Card>
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {stat.label}
+                    </span>
                     <stat.icon className="h-4 w-4 text-violet-500" />
                   </div>
                   {isLoading ? (
@@ -186,7 +226,8 @@ const AdminDashboard: React.FC = () => {
                           <Badge
                             variant={isPublished ? "default" : "secondary"}
                             className={cn(
-                              isPublished && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                              isPublished &&
+                                "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                             )}
                           >
                             {isPublished ? "Published" : "Draft"}

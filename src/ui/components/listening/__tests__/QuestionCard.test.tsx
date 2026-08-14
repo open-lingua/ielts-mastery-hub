@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+import { mockListeningMCQQuestion, mockListeningQuestion } from "@/test/mockTestData";
 import QuestionCard from "../QuestionCard";
-import { mockListeningQuestion, mockListeningMCQQuestion } from "@/test/mockTestData";
 
 describe("QuestionCard", () => {
   it("renders fill-type question text", () => {

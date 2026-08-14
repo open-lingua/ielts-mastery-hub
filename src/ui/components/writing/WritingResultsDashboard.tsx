@@ -1,13 +1,8 @@
-import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, AlertTriangle, Sparkles, X, ArrowLeft } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle, Sparkles, X } from "lucide-react";
+import type React from "react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import type { WritingGradingResult } from "@/services/aiGradingService";
 
 interface Props {
@@ -24,11 +19,9 @@ interface Props {
   onReset: () => void;
 }
 
-const bandColor = (score: number) =>
-  score >= 7 ? "text-success" : score >= 5.5 ? "text-warning" : "text-destructive";
+const bandColor = (score: number) => (score >= 7 ? "text-success" : score >= 5.5 ? "text-warning" : "text-destructive");
 
-const bandBg = (score: number) =>
-  score >= 7 ? "bg-success/5" : score >= 5.5 ? "text-warning/5" : "bg-destructive/5";
+const bandBg = (score: number) => (score >= 7 ? "bg-success/5" : score >= 5.5 ? "text-warning/5" : "bg-destructive/5");
 
 const progressColor = (score: number) =>
   score >= 7 ? "[&>div]:bg-success" : score >= 5.5 ? "[&>div]:bg-warning" : "[&>div]:bg-destructive";
@@ -45,18 +38,13 @@ const fadeUp = {
 
 const CriteriaCard: React.FC<{ label: string; score: number }> = ({ label, score }) => (
   <motion.div variants={fadeUp} className={`rounded-xl p-4 border border-border ${bandBg(score)}`}>
-    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-tight">
-      {label}
-    </span>
+    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-tight">{label}</span>
     <div className={`text-2xl font-bold mt-1 ${bandColor(score)}`}>{score.toFixed(1)}</div>
     <Progress value={(score / 9) * 100} className={`h-1.5 mt-2 ${progressColor(score)}`} />
   </motion.div>
 );
 
-const TaskFeedback: React.FC<{ label: string; result: WritingGradingResult }> = ({
-  label,
-  result,
-}) => (
+const TaskFeedback: React.FC<{ label: string; result: WritingGradingResult }> = ({ label, result }) => (
   <AccordionItem value={label}>
     <AccordionTrigger className="text-sm font-semibold">
       <span className="flex items-center gap-2">
@@ -110,9 +98,7 @@ const TaskFeedback: React.FC<{ label: string; result: WritingGradingResult }> = 
         <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5 mb-2">
           <Sparkles className="h-3.5 w-3.5" /> Suggested Improvements
         </h4>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {result.feedback.improvements}
-        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{result.feedback.improvements}</p>
       </div>
     </AccordionContent>
   </AccordionItem>
@@ -143,9 +129,7 @@ const WritingResultsDashboard: React.FC<Props> = ({
         <div className="bg-primary p-6 flex justify-between items-start text-primary-foreground shrink-0">
           <div>
             <h2 className="text-2xl font-bold">AI Writing Assessment</h2>
-            <p className="text-primary-foreground/70 text-sm mt-1">
-              {testTitle} · Powered by AI
-            </p>
+            <p className="text-primary-foreground/70 text-sm mt-1">{testTitle} · Powered by AI</p>
           </div>
           <button
             onClick={onClose}
@@ -164,30 +148,16 @@ const WritingResultsDashboard: React.FC<Props> = ({
               { label: "Task 2", wc: task2WordCount, min: task2MinWords },
             ].map((t) => (
               <div key={t.label} className="flex-1 rounded-xl border border-border bg-secondary/50 p-4">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">
-                  {t.label}
-                </span>
-                <div
-                  className={`text-2xl font-bold mt-1 ${
-                    t.wc >= t.min ? "text-success" : "text-warning"
-                  }`}
-                >
-                  {t.wc}{" "}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    / {t.min}+ words
-                  </span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">{t.label}</span>
+                <div className={`text-2xl font-bold mt-1 ${t.wc >= t.min ? "text-success" : "text-warning"}`}>
+                  {t.wc} <span className="text-sm font-normal text-muted-foreground">/ {t.min}+ words</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Overall band */}
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate="show"
-            className="flex flex-col items-center gap-2"
-          >
+          <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col items-center gap-2">
             <motion.div variants={fadeUp} className="relative h-32 w-32">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                 <path
@@ -209,9 +179,7 @@ const WritingResultsDashboard: React.FC<Props> = ({
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-4xl font-bold ${bandColor(overallBand)}`}>
-                  {overallBand.toFixed(1)}
-                </span>
+                <span className={`text-4xl font-bold ${bandColor(overallBand)}`}>{overallBand.toFixed(1)}</span>
                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                   Overall Band
                 </span>

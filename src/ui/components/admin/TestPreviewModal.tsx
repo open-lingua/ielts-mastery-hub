@@ -1,35 +1,27 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Monitor,
-  Tablet,
-  Smartphone,
-  X,
+  AlertCircle,
   BookOpen,
-  Headphones,
-  PenTool,
   Clock,
   FileText,
+  Headphones,
   ImageIcon,
-  AlertCircle,
+  Monitor,
+  PenTool,
   RotateCcw,
+  Smartphone,
+  Tablet,
+  X,
 } from "lucide-react";
+import React, { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 // ─── Types (shared with CreateContent) ────────
@@ -149,20 +141,62 @@ const deviceConfigs: Record<DeviceType, DeviceConfig> = {
 // ─── Question Type Config ───────────────────────
 
 const typeLabels: Record<string, { label: string; badgeClass: string }> = {
-  "multiple-choice": { label: "Multiple Choice", badgeClass: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-  tfng: { label: "True / False / Not Given", badgeClass: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400" },
-  ynng: { label: "Yes / No / Not Given", badgeClass: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400" },
-  "matching-headings": { label: "Matching Headings", badgeClass: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400" },
-  "matching-information": { label: "Matching Info", badgeClass: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
-  "matching-features": { label: "Matching Features", badgeClass: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-400" },
-  "matching-sentence-endings": { label: "Sentence Endings", badgeClass: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400" },
-  "sentence-completion": { label: "Sentence Completion", badgeClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
-  "summary-completion": { label: "Summary Completion", badgeClass: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
-  "note-completion": { label: "Note Completion", badgeClass: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400" },
-  "table-completion": { label: "Table Completion", badgeClass: "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400" },
-  "flow-chart-completion": { label: "Flowchart", badgeClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
-  "diagram-labeling": { label: "Diagram Label", badgeClass: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
-  "short-answer": { label: "Short Answer", badgeClass: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" },
+  "multiple-choice": {
+    label: "Multiple Choice",
+    badgeClass: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  },
+  tfng: {
+    label: "True / False / Not Given",
+    badgeClass: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+  },
+  ynng: {
+    label: "Yes / No / Not Given",
+    badgeClass: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
+  },
+  "matching-headings": {
+    label: "Matching Headings",
+    badgeClass: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+  },
+  "matching-information": {
+    label: "Matching Info",
+    badgeClass: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  },
+  "matching-features": {
+    label: "Matching Features",
+    badgeClass: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-400",
+  },
+  "matching-sentence-endings": {
+    label: "Sentence Endings",
+    badgeClass: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
+  },
+  "sentence-completion": {
+    label: "Sentence Completion",
+    badgeClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  },
+  "summary-completion": {
+    label: "Summary Completion",
+    badgeClass: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  },
+  "note-completion": {
+    label: "Note Completion",
+    badgeClass: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+  },
+  "table-completion": {
+    label: "Table Completion",
+    badgeClass: "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400",
+  },
+  "flow-chart-completion": {
+    label: "Flowchart",
+    badgeClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  },
+  "diagram-labeling": {
+    label: "Diagram Label",
+    badgeClass: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  },
+  "short-answer": {
+    label: "Short Answer",
+    badgeClass: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+  },
 };
 
 // ─── Empty State ────────────────────────────────
@@ -181,33 +215,55 @@ const EmptyPreview: React.FC<{ message?: string }> = ({ message }) => (
 
 // ─── Student-Style Question Preview ─────────────
 
-const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; compact?: boolean }> = ({ group, groupIndex, compact }) => {
-  const meta = typeLabels[group.type] || { label: group.type, badgeClass: "bg-muted text-muted-foreground" };
+const QuestionPreview: React.FC<{
+  group: QuestionGroup;
+  groupIndex: number;
+  compact?: boolean;
+}> = ({ group, groupIndex, compact }) => {
+  const meta = typeLabels[group.type] || {
+    label: group.type,
+    badgeClass: "bg-muted text-muted-foreground",
+  };
   const isIdentification = group.type === "tfng" || group.type === "ynng";
   const isMatching = group.type.startsWith("matching");
-  const isCompletion = ["sentence-completion", "summary-completion", "note-completion", "table-completion", "flow-chart-completion"].includes(group.type);
+  const isCompletion = [
+    "sentence-completion",
+    "summary-completion",
+    "note-completion",
+    "table-completion",
+    "flow-chart-completion",
+  ].includes(group.type);
 
   const tfngOptions = group.type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"] : ["YES", "NO", "NOT GIVEN"];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border", meta.badgeClass)}>
+        <span
+          className={cn(
+            "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border",
+            meta.badgeClass
+          )}
+        >
           {meta.label}
         </span>
-        <Badge variant="secondary" className="text-[10px]">{group.questions.length} Qs</Badge>
+        <Badge variant="secondary" className="text-[10px]">
+          {group.questions.length} Qs
+        </Badge>
       </div>
-      {group.instructions && (
-        <p className="text-xs text-muted-foreground italic">{group.instructions}</p>
-      )}
+      {group.instructions && <p className="text-xs text-muted-foreground italic">{group.instructions}</p>}
       {group.wordLimit && (
-        <Badge variant="outline" className="text-[10px]">📏 {group.wordLimit}</Badge>
+        <Badge variant="outline" className="text-[10px]">
+          📏 {group.wordLimit}
+        </Badge>
       )}
 
       {group.hasWordBank && group.wordBank.length > 0 && (
         <div className="flex flex-wrap gap-1 p-2 rounded-lg border border-border bg-secondary/50">
           {group.wordBank.map((w, i) => (
-            <Badge key={i} variant="secondary" className="text-[10px]">{w}</Badge>
+            <Badge key={i} variant="secondary" className="text-[10px]">
+              {w}
+            </Badge>
           ))}
         </div>
       )}
@@ -226,12 +282,17 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; comp
             {group.type === "multiple-choice" && q.options.length > 0 && (
               <div className={cn("space-y-1.5", compact ? "ml-2" : "ml-4")}>
                 {q.options.map((opt, oIdx) => (
-                  <div key={opt.id} className={cn(
-                    "flex items-center gap-2 rounded-lg border border-border text-muted-foreground hover:bg-secondary transition-colors",
-                    compact ? "px-2 py-1.5 text-xs" : "px-3 py-2 text-sm"
-                  )}>
+                  <div
+                    key={opt.id}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg border border-border text-muted-foreground hover:bg-secondary transition-colors",
+                      compact ? "px-2 py-1.5 text-xs" : "px-3 py-2 text-sm"
+                    )}
+                  >
                     <div className="h-3.5 w-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
-                    <span className="break-words min-w-0">{String.fromCharCode(65 + oIdx)}. {opt.text || "(empty)"}</span>
+                    <span className="break-words min-w-0">
+                      {String.fromCharCode(65 + oIdx)}. {opt.text || "(empty)"}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -241,10 +302,13 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; comp
             {isIdentification && (
               <div className={cn("flex flex-wrap gap-1.5", compact ? "ml-2" : "ml-4")}>
                 {tfngOptions.map((opt) => (
-                  <button key={opt} className={cn(
-                    "rounded-lg border border-border font-medium text-muted-foreground hover:bg-secondary transition-colors",
-                    compact ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
-                  )}>
+                  <button
+                    key={opt}
+                    className={cn(
+                      "rounded-lg border border-border font-medium text-muted-foreground hover:bg-secondary transition-colors",
+                      compact ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
+                    )}
+                  >
                     {opt}
                   </button>
                 ))}
@@ -256,7 +320,9 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; comp
               <div className={cn("space-y-1.5", compact ? "ml-2" : "ml-4")}>
                 {q.matchingPairs.map((pair) => (
                   <div key={pair.id} className="flex items-center gap-2 text-sm flex-wrap">
-                    <span className="font-medium text-foreground flex-1 min-w-0 break-words text-xs">{pair.left || "—"}</span>
+                    <span className="font-medium text-foreground flex-1 min-w-0 break-words text-xs">
+                      {pair.left || "—"}
+                    </span>
                     <Select disabled>
                       <SelectTrigger className={cn("h-7 text-xs shrink-0", compact ? "w-24" : "w-28")}>
                         <SelectValue placeholder="Select..." />
@@ -276,7 +342,11 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; comp
                     <span className="text-foreground flex-1 min-w-0 break-words">
                       {gap.gapText ? gap.gapText.replace(/\{\{gap\}\}/g, "______") : "(empty)"}
                     </span>
-                    <Input disabled placeholder="..." className={cn("h-7 text-xs shrink-0", compact ? "w-20" : "w-28")} />
+                    <Input
+                      disabled
+                      placeholder="..."
+                      className={cn("h-7 text-xs shrink-0", compact ? "w-20" : "w-28")}
+                    />
                   </div>
                 ))}
               </div>
@@ -297,7 +367,11 @@ const QuestionPreview: React.FC<{ group: QuestionGroup; groupIndex: number; comp
 
 // ─── Questions Panel (reused across modules) ────
 
-const QuestionsPanel: React.FC<{ groups: QuestionGroup[]; compact?: boolean; className?: string }> = ({ groups, compact, className }) => (
+const QuestionsPanel: React.FC<{
+  groups: QuestionGroup[];
+  compact?: boolean;
+  className?: string;
+}> = ({ groups, compact, className }) => (
   <div className={cn("bg-background overflow-y-auto", className)}>
     <h3 className={cn("font-bold text-foreground mb-4", compact ? "text-xs" : "text-sm")}>Questions</h3>
     <div className="space-y-5">
@@ -327,9 +401,7 @@ const PaneToggle: React.FC<{
       onClick={() => onToggle("content")}
       className={cn(
         "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
-        activePane === "content"
-          ? "bg-background text-foreground shadow-sm"
-          : "text-muted-foreground"
+        activePane === "content" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
       )}
     >
       {contentLabel}
@@ -338,9 +410,7 @@ const PaneToggle: React.FC<{
       onClick={() => onToggle("questions")}
       className={cn(
         "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
-        activePane === "questions"
-          ? "bg-background text-foreground shadow-sm"
-          : "text-muted-foreground"
+        activePane === "questions" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
       )}
     >
       Questions ({questionCount})
@@ -355,7 +425,17 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
   const [activePane, setActivePane] = useState<"content" | "questions">("content");
 
   const hasAny = data.passages.some(
-    (p) => p.title.trim() || p.content.trim() || p.questionGroups.some((g) => g.questions.length > 0 && (g.questions[0].text || g.questions[0].options.some((o) => o.text) || g.questions[0].matchingPairs.length > 0 || g.questions[0].completionGaps.length > 0))
+    (p) =>
+      p.title.trim() ||
+      p.content.trim() ||
+      p.questionGroups.some(
+        (g) =>
+          g.questions.length > 0 &&
+          (g.questions[0].text ||
+            g.questions[0].options.some((o) => o.text) ||
+            g.questions[0].matchingPairs.length > 0 ||
+            g.questions[0].completionGaps.length > 0)
+      )
   );
 
   if (!hasAny && !data.testTitle.trim()) {
@@ -370,7 +450,10 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
       {data.passages.map((p, i) => (
         <button
           key={p.id}
-          onClick={() => { setActivePassage(i); setActivePane("content"); }}
+          onClick={() => {
+            setActivePassage(i);
+            setActivePane("content");
+          }}
           className={cn(
             "flex-1 min-w-0 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-all text-center",
             activePassage === i
@@ -388,9 +471,7 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
     <div className={cn(split ? "p-5" : "p-4")}>
       <div className="flex items-center gap-2 mb-3">
         <BookOpen className="h-4 w-4 text-primary" />
-        <span className="text-sm font-semibold text-foreground">
-          {data.testTitle || "Reading Test"}
-        </span>
+        <span className="text-sm font-semibold text-foreground">{data.testTitle || "Reading Test"}</span>
       </div>
       {passageTabs}
       {currentPassage?.title && (
@@ -400,7 +481,15 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
       )}
       {currentPassage?.content ? (
         currentPassage.content.split("\n\n").map((para, i) => (
-          <p key={i} className={cn("font-serif text-foreground/90 mb-3", split ? "text-sm leading-[1.8]" : "text-xs leading-[1.7]")}>{para}</p>
+          <p
+            key={i}
+            className={cn(
+              "font-serif text-foreground/90 mb-3",
+              split ? "text-sm leading-[1.8]" : "text-xs leading-[1.7]"
+            )}
+          >
+            {para}
+          </p>
         ))
       ) : (
         <p className="text-sm text-muted-foreground italic mt-4">Passage content will appear here...</p>
@@ -411,10 +500,11 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
   if (split) {
     return (
       <div className="flex flex-row h-full min-h-[500px]">
-        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
-          {passageContent}
-        </div>
-        <QuestionsPanel groups={currentPassage?.questionGroups || []} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">{passageContent}</div>
+        <QuestionsPanel
+          groups={currentPassage?.questionGroups || []}
+          className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto"
+        />
       </div>
     );
   }
@@ -448,9 +538,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
   const [previewSection, setPreviewSection] = useState(0);
   const [activePane, setActivePane] = useState<"content" | "questions">("content");
 
-  const hasSections = data.sections.some(
-    (s) => s.title.trim() || s.questionGroups.some((g) => g.questions.length > 0)
-  );
+  const hasSections = data.sections.some((s) => s.title.trim() || s.questionGroups.some((g) => g.questions.length > 0));
 
   if (!hasSections && !data.testTitle.trim()) {
     return <EmptyPreview message="Add section titles and questions in the Listening editor to see the student view." />;
@@ -464,7 +552,10 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
       {data.sections.map((s, i) => (
         <button
           key={s.id}
-          onClick={() => { setPreviewSection(i); setActivePane("content"); }}
+          onClick={() => {
+            setPreviewSection(i);
+            setActivePane("content");
+          }}
           className={cn(
             "flex-1 min-w-0 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-all text-center",
             previewSection === i
@@ -482,9 +573,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
     <div className={cn(split ? "p-5" : "p-4", "space-y-4")}>
       <div className="flex items-center gap-2">
         <Headphones className="h-4 w-4 text-primary" />
-        <span className="text-sm font-semibold text-foreground">
-          {data.testTitle || "Listening Test"}
-        </span>
+        <span className="text-sm font-semibold text-foreground">{data.testTitle || "Listening Test"}</span>
       </div>
       {sectionTabs}
       {currentSection?.title && (
@@ -512,7 +601,9 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
           <p className="text-xs font-semibold text-muted-foreground">Transcript</p>
           <div className="rounded-lg border border-border bg-background p-3">
             {currentSection.transcript.split("\n\n").map((para, i) => (
-              <p key={i} className="text-xs text-foreground/90 mb-2">{para}</p>
+              <p key={i} className="text-xs text-foreground/90 mb-2">
+                {para}
+              </p>
             ))}
           </div>
         </div>
@@ -523,10 +614,11 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
   if (split) {
     return (
       <div className="flex flex-row h-full min-h-[500px]">
-        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
-          {audioContent}
-        </div>
-        <QuestionsPanel groups={currentSection?.questionGroups || []} className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto" />
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">{audioContent}</div>
+        <QuestionsPanel
+          groups={currentSection?.questionGroups || []}
+          className="w-[45%] shrink-0 p-5 max-h-[80vh] overflow-y-auto"
+        />
       </div>
     );
   }
@@ -571,9 +663,7 @@ const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolea
           Writing {data.taskType === "task1" ? "Task 1" : "Task 2"}
         </span>
       </div>
-      {data.title && (
-        <h2 className={cn("font-bold text-foreground", split ? "text-xl" : "text-lg")}>{data.title}</h2>
-      )}
+      {data.title && <h2 className={cn("font-bold text-foreground", split ? "text-xl" : "text-lg")}>{data.title}</h2>}
       {data.taskType === "task1" && (
         <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 bg-muted/30 overflow-hidden">
           <ImageIcon className="h-6 w-6 text-muted-foreground" />
@@ -583,13 +673,19 @@ const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolea
       {data.prompt && (
         <div className="rounded-lg border border-border bg-background p-3 overflow-hidden">
           {data.prompt.split("\n").map((line, i) => (
-            <p key={i} className="text-xs text-foreground/90 mb-1 break-words">{line || <br />}</p>
+            <p key={i} className="text-xs text-foreground/90 mb-1 break-words">
+              {line || <br />}
+            </p>
           ))}
         </div>
       )}
       <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-        <span className="flex items-center gap-1"><FileText className="h-3 w-3" /> Min: {data.minWords} words</span>
-        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {data.suggestedTime}</span>
+        <span className="flex items-center gap-1">
+          <FileText className="h-3 w-3" /> Min: {data.minWords} words
+        </span>
+        <span className="flex items-center gap-1">
+          <Clock className="h-3 w-3" /> {data.suggestedTime}
+        </span>
       </div>
     </div>
   );
@@ -597,15 +693,19 @@ const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolea
   if (split) {
     return (
       <div className="flex flex-row h-full min-h-[500px]">
-        <div className="flex-1 overflow-y-auto border-r border-border bg-card">
-          {promptContent}
-        </div>
+        <div className="flex-1 overflow-y-auto border-r border-border bg-card">{promptContent}</div>
         <div className="w-[45%] shrink-0 overflow-y-auto bg-background p-5">
           <h3 className="text-sm font-bold text-foreground mb-3">Your Response</h3>
-          <Textarea disabled placeholder="Students will write their response here..." className="min-h-[300px] text-sm font-serif w-full" />
+          <Textarea
+            disabled
+            placeholder="Students will write their response here..."
+            className="min-h-[300px] text-sm font-serif w-full"
+          />
           <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground">
             <span>Word count: 0 / {data.minWords}+</span>
-            <Badge variant="outline" className="text-[10px]">Practice Mode</Badge>
+            <Badge variant="outline" className="text-[10px]">
+              Practice Mode
+            </Badge>
           </div>
         </div>
       </div>
@@ -615,15 +715,19 @@ const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolea
   // Stacked (mobile)
   return (
     <div className="overflow-hidden">
-      <div className="bg-card border-b border-border">
-        {promptContent}
-      </div>
+      <div className="bg-card border-b border-border">{promptContent}</div>
       <div className="p-3 bg-background">
         <h3 className="text-xs font-bold text-foreground mb-2">Your Response</h3>
-        <Textarea disabled placeholder="Students will write here..." className="min-h-[200px] text-xs font-serif w-full" />
+        <Textarea
+          disabled
+          placeholder="Students will write here..."
+          className="min-h-[200px] text-xs font-serif w-full"
+        />
         <div className="flex justify-between items-center mt-2 text-[10px] text-muted-foreground">
           <span>0 / {data.minWords}+ words</span>
-          <Badge variant="outline" className="text-[10px]">Practice</Badge>
+          <Badge variant="outline" className="text-[10px]">
+            Practice
+          </Badge>
         </div>
       </div>
     </div>
@@ -671,7 +775,9 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
               <ModuleIcon className="h-4 w-4 text-primary" />
               Preview — <span className="capitalize">{activeModule}</span>
             </DialogTitle>
-            <Badge variant="outline" className="text-[10px]">Read-only</Badge>
+            <Badge variant="outline" className="text-[10px]">
+              Read-only
+            </Badge>
           </div>
 
           <div className="flex items-center gap-2">
@@ -682,7 +788,10 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
                 return (
                   <button
                     key={type}
-                    onClick={() => { setDevice(type); setLandscape(false); }}
+                    onClick={() => {
+                      setDevice(type);
+                      setLandscape(false);
+                    }}
                     title={deviceConfigs[type].label}
                     className={cn(
                       "p-1.5 rounded-md transition-all",
@@ -704,7 +813,9 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
                 title={landscape ? "Portrait" : "Landscape"}
                 className={cn(
                   "p-1.5 rounded-md border border-border transition-all",
-                  landscape ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground bg-background"
+                  landscape
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground bg-background"
                 )}
               >
                 <RotateCcw className="h-4 w-4" />
@@ -739,9 +850,18 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
                   >
-                    {activeModule === "reading" && <ReadingPreviewContent data={reading} split={useSplit || (landscape && device !== "desktop")} />}
-                    {activeModule === "listening" && <ListeningPreviewContent data={listening} split={useSplit || (landscape && device !== "desktop")} />}
-                    {activeModule === "writing" && <WritingPreviewContent data={writing} split={useSplit || (landscape && device !== "desktop")} />}
+                    {activeModule === "reading" && (
+                      <ReadingPreviewContent data={reading} split={useSplit || (landscape && device !== "desktop")} />
+                    )}
+                    {activeModule === "listening" && (
+                      <ListeningPreviewContent
+                        data={listening}
+                        split={useSplit || (landscape && device !== "desktop")}
+                      />
+                    )}
+                    {activeModule === "writing" && (
+                      <WritingPreviewContent data={writing} split={useSplit || (landscape && device !== "desktop")} />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>

@@ -27,10 +27,7 @@ export interface WritingAnswers {
   task2WordCount: number;
 }
 
-export async function submitWritingTest(
-  sessionId: string,
-  answers: WritingAnswers
-): Promise<void> {
+export async function submitWritingTest(sessionId: string, answers: WritingAnswers): Promise<void> {
   const { completeSession } = await import("./practiceLibraryService");
   await completeSession(sessionId, null, {
     task1: answers.task1,
@@ -48,9 +45,7 @@ export async function fetchWritingTestForPractice(testId: string): Promise<Writi
   if (!test) throw new Error("Writing test not found");
 
   const allTasks = await listWritingTasks(userId);
-  const tasks = allTasks
-    .filter((t) => t.test_id === testId)
-    .sort((a, b) => a.task_number - b.task_number);
+  const tasks = allTasks.filter((t) => t.test_id === testId).sort((a, b) => a.task_number - b.task_number);
 
   return {
     id: test.id,

@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import {
+  BookOpen,
+  Clock,
+  Edit3,
+  Headphones,
+  Loader2,
+  MoreHorizontal,
+  PenTool,
   PlusCircle,
   Search,
-  MoreHorizontal,
-  BookOpen,
-  PenTool,
-  Headphones,
-  Clock,
-  Eye,
   Trash2,
-  Edit3,
-  Loader2,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AdminLayout } from "@/components/AdminLayout";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,11 +24,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AdminLayout } from "@/components/AdminLayout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
-import { fetchAllContent, deleteContent, type ContentItem, type ContentModule } from "@/services/contentService";
+import { cn } from "@/lib/utils";
+import { type ContentItem, deleteContent, fetchAllContent } from "@/services/contentService";
 
 const moduleIcons: Record<string, React.ElementType> = {
   Reading: BookOpen,
@@ -68,7 +68,7 @@ const ContentLibrary: React.FC = () => {
 
   useEffect(() => {
     loadContent();
-  }, []);
+  }, [loadContent]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -119,7 +119,9 @@ const ContentLibrary: React.FC = () => {
             <p className="text-muted-foreground mt-1">Manage all your IELTS test content.</p>
           </div>
           <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
-            <Link to="/admin/create"><PlusCircle className="h-4 w-4" /> Create New</Link>
+            <Link to="/admin/create">
+              <PlusCircle className="h-4 w-4" /> Create New
+            </Link>
           </Button>
         </div>
 
@@ -176,11 +178,21 @@ const ContentLibrary: React.FC = () => {
                         <Skeleton className="h-3 w-16" />
                       </div>
                     </div>
-                    <div className="col-span-2"><Skeleton className="h-5 w-16 rounded-full" /></div>
-                    <div className="col-span-1 text-center"><Skeleton className="h-4 w-6 mx-auto" /></div>
-                    <div className="col-span-1"><Skeleton className="h-4 w-8" /></div>
-                    <div className="col-span-2"><Skeleton className="h-4 w-20" /></div>
-                    <div className="col-span-1"><Skeleton className="h-8 w-8 ml-auto rounded" /></div>
+                    <div className="col-span-2">
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                    <div className="col-span-1 text-center">
+                      <Skeleton className="h-4 w-6 mx-auto" />
+                    </div>
+                    <div className="col-span-1">
+                      <Skeleton className="h-4 w-8" />
+                    </div>
+                    <div className="col-span-2">
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <div className="col-span-1">
+                      <Skeleton className="h-8 w-8 ml-auto rounded" />
+                    </div>
                   </div>
                 ))
               ) : filtered.length === 0 ? (
@@ -191,7 +203,10 @@ const ContentLibrary: React.FC = () => {
                 filtered.map((item) => {
                   const ModIcon = moduleIcons[item.module];
                   return (
-                    <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors">
+                    <div
+                      key={item.id}
+                      className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors"
+                    >
                       <div className="col-span-5 flex items-center gap-3">
                         <ModIcon className={cn("h-4 w-4 shrink-0", moduleColors[item.module])} />
                         <div className="min-w-0">
@@ -200,7 +215,9 @@ const ContentLibrary: React.FC = () => {
                         </div>
                       </div>
                       <div className="col-span-2">
-                        <Badge variant="secondary" className={cn("text-[10px]", statusColors[item.status])}>{item.status}</Badge>
+                        <Badge variant="secondary" className={cn("text-[10px]", statusColors[item.status])}>
+                          {item.status}
+                        </Badge>
                       </div>
                       <div className="col-span-1 text-center text-sm text-muted-foreground">{item.questions}</div>
                       <div className="col-span-1 text-sm text-muted-foreground">{item.band}</div>
@@ -239,7 +256,8 @@ const ContentLibrary: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete "{deleteTarget?.title}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this {deleteTarget?.module.toLowerCase()} test and all its associated content. This action cannot be undone.
+              This will permanently delete this {deleteTarget?.module.toLowerCase()} test and all its associated
+              content. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -249,7 +267,13 @@ const ContentLibrary: React.FC = () => {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Deleting...</> : "Delete"}
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

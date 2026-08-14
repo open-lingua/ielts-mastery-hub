@@ -1,17 +1,17 @@
 import { getAnonId } from "@/lib/anonId";
 import {
-  getReadingTest,
-  createReadingTest,
-  updateReadingTest as tauriUpdateReadingTest,
-  listReadingPassages,
   createReadingPassage,
-  deleteReadingPassage,
-  listReadingQuestionGroups,
-  createReadingQuestionGroup,
-  deleteReadingQuestionGroup,
-  listReadingQuestions,
   createReadingQuestion,
+  createReadingQuestionGroup,
+  createReadingTest,
+  deleteReadingPassage,
   deleteReadingQuestion,
+  deleteReadingQuestionGroup,
+  getReadingTest,
+  listReadingPassages,
+  listReadingQuestionGroups,
+  listReadingQuestions,
+  updateReadingTest as tauriUpdateReadingTest,
 } from "@/lib/tauri";
 
 interface MCOption {
@@ -71,7 +71,11 @@ export interface ReadingPassageState {
 
 function parseJsonField<T>(raw: string | null | undefined, fallback: T): T {
   if (!raw) return fallback;
-  try { return JSON.parse(raw) as T; } catch { return fallback; }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
 }
 
 export async function fetchReadingTest(testId: string): Promise<{
@@ -93,14 +97,10 @@ export async function fetchReadingTest(testId: string): Promise<{
 
   if (!test) throw new Error("Test not found");
 
-  const passages = allPassages
-    .filter((p) => p.test_id === testId)
-    .sort((a, b) => a.passage_number - b.passage_number);
+  const passages = allPassages.filter((p) => p.test_id === testId).sort((a, b) => a.passage_number - b.passage_number);
 
   const passageIds = new Set(passages.map((p) => p.id));
-  const groups = allGroups
-    .filter((g) => passageIds.has(g.passage_id))
-    .sort((a, b) => a.group_order - b.group_order);
+  const groups = allGroups.filter((g) => passageIds.has(g.passage_id)).sort((a, b) => a.group_order - b.group_order);
 
   const groupIds = new Set(groups.map((g) => g.id));
   const questions = allQuestions
@@ -110,7 +110,7 @@ export async function fetchReadingTest(testId: string): Promise<{
   const questionsByGroup = new Map<string, QuestionItem[]>();
   for (const q of questions) {
     if (!questionsByGroup.has(q.group_id)) questionsByGroup.set(q.group_id, []);
-    questionsByGroup.get(q.group_id)!.push({
+    questionsByGroup.get(q.group_id)?.push({
       id: q.id,
       text: q.text,
       answer: q.answer || "",
@@ -124,7 +124,7 @@ export async function fetchReadingTest(testId: string): Promise<{
   const groupsByPassage = new Map<string, QuestionGroup[]>();
   for (const g of groups) {
     if (!groupsByPassage.has(g.passage_id)) groupsByPassage.set(g.passage_id, []);
-    groupsByPassage.get(g.passage_id)!.push({
+    groupsByPassage.get(g.passage_id)?.push({
       id: g.id,
       type: g.question_type,
       instructions: g.instructions,
@@ -147,7 +147,13 @@ export async function fetchReadingTest(testId: string): Promise<{
   }));
 
   while (mappedPassages.length < 3) {
-    mappedPassages.push({ id: mappedPassages.length + 1, title: "", content: "", notes: "", questionGroups: [] });
+    mappedPassages.push({
+      id: mappedPassages.length + 1,
+      title: "",
+      content: "",
+      notes: "",
+      questionGroups: [],
+    });
   }
 
   return {
@@ -228,7 +234,13 @@ export async function saveReadingTest(params: {
   passages: ReadingPassageState[];
 }): Promise<{ testId: string }> {
   const { userId, title, testType, difficulty, duration, status, passages } = params;
-  const testId = await createReadingTest(userId, { title, test_type: testType, difficulty, duration, status });
+  const testId = await createReadingTest(userId, {
+    title,
+    test_type: testType,
+    difficulty,
+    duration,
+    status,
+  });
   await insertPassagesAndQuestions(testId, userId, passages);
   return { testId };
 }
@@ -245,7 +257,13 @@ export async function updateReadingTest(params: {
   const { testId, title, testType, difficulty, duration, status, passages } = params;
   const userId = getAnonId();
 
-  await tauriUpdateReadingTest(testId, userId, { title, test_type: testType, difficulty, duration, status });
+  await tauriUpdateReadingTest(testId, userId, {
+    title,
+    test_type: testType,
+    difficulty,
+    duration,
+    status,
+  });
 
   const allPassages = (await listReadingPassages(userId)).filter((p) => p.test_id === testId);
   const passageIdSet = new Set(allPassages.map((p) => p.id));

@@ -1,17 +1,19 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/data/readingTestData", () => ({
-  tfngQuestions: [
-    { id: "tfng1", label: "1", text: "The sky is blue.", answer: "TRUE" },
-  ],
+  tfngQuestions: [{ id: "tfng1", label: "1", text: "The sky is blue.", answer: "TRUE" }],
   mcQuestions: [
-    { id: "mc1", label: "5", text: "What color is the sky?", options: ["Red", "Blue", "Green"], answer: "Blue" },
+    {
+      id: "mc1",
+      label: "5",
+      text: "What color is the sky?",
+      options: ["Red", "Blue", "Green"],
+      answer: "Blue",
+    },
   ],
-  ynngQuestions: [
-    { id: "ynng1", label: "10", text: "The writer agrees with this view.", answer: "YES" },
-  ],
+  ynngQuestions: [{ id: "ynng1", label: "10", text: "The writer agrees with this view.", answer: "YES" }],
 }));
 
 import { QuestionRenderer } from "../QuestionRenderer";

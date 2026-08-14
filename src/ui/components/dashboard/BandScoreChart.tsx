@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { format } from "date-fns";
 import { TrendingUp } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAnonId } from "@/lib/anonId";
 import { listUserTestSessions } from "@/lib/tauri";
-import { format } from "date-fns";
 
 interface SessionRow {
   test_type: string;
@@ -88,7 +89,11 @@ const BandScoreChart: React.FC = () => {
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-              <YAxis domain={[0, 9]} ticks={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis
+                domain={[0, 9]}
+                ticks={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
@@ -104,13 +109,40 @@ const BandScoreChart: React.FC = () => {
                 />
               )}
               {activeModules.includes("reading") && (
-                <Line type="monotone" dataKey="reading" name="Reading" stroke={MODULE_COLORS.reading} strokeWidth={2.5} dot={{ r: 4, fill: MODULE_COLORS.reading }} activeDot={{ r: 6 }} connectNulls />
+                <Line
+                  type="monotone"
+                  dataKey="reading"
+                  name="Reading"
+                  stroke={MODULE_COLORS.reading}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: MODULE_COLORS.reading }}
+                  activeDot={{ r: 6 }}
+                  connectNulls
+                />
               )}
               {activeModules.includes("listening") && (
-                <Line type="monotone" dataKey="listening" name="Listening" stroke={MODULE_COLORS.listening} strokeWidth={2.5} dot={{ r: 4, fill: MODULE_COLORS.listening }} activeDot={{ r: 6 }} connectNulls />
+                <Line
+                  type="monotone"
+                  dataKey="listening"
+                  name="Listening"
+                  stroke={MODULE_COLORS.listening}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: MODULE_COLORS.listening }}
+                  activeDot={{ r: 6 }}
+                  connectNulls
+                />
               )}
               {activeModules.includes("writing") && (
-                <Line type="monotone" dataKey="writing" name="Writing" stroke={MODULE_COLORS.writing} strokeWidth={2.5} dot={{ r: 4, fill: MODULE_COLORS.writing }} activeDot={{ r: 6 }} connectNulls />
+                <Line
+                  type="monotone"
+                  dataKey="writing"
+                  name="Writing"
+                  stroke={MODULE_COLORS.writing}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: MODULE_COLORS.writing }}
+                  activeDot={{ r: 6 }}
+                  connectNulls
+                />
               )}
             </LineChart>
           </ResponsiveContainer>

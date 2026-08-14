@@ -1,25 +1,28 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { BookOpen, CheckCircle2, RotateCcw, Trophy, Eye, EyeOff, ChevronRight, AlertTriangle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, BookOpen, CheckCircle2, ChevronRight, Eye, EyeOff, RotateCcw, Trophy } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { QuestionRenderer, type Answers } from "@/components/reading/QuestionRenderer";
-
+import { type Answers, QuestionRenderer } from "@/components/reading/QuestionRenderer";
+import ExamSandbox from "@/components/shared/ExamSandbox";
+import TestStartOverlay from "@/components/shared/TestStartOverlay";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
-import TestStartOverlay from "@/components/shared/TestStartOverlay";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import ExamSandbox from "@/components/shared/ExamSandbox";
-import { toast } from "sonner";
-import { getAnonId } from "@/lib/anonId";
-import { fetchReadingTestForPractice, submitReadingTest, type ReadingTestPracticePayload } from "@/services/readingPracticeService";
-import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
-import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { getAnonId } from "@/lib/anonId";
+import { cn } from "@/lib/utils";
+import { fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
+import {
+  fetchReadingTestForPractice,
+  type ReadingTestPracticePayload,
+  submitReadingTest,
+} from "@/services/readingPracticeService";
 
 // ─── Loading Skeleton ────────────────────────────────
 const ReadingLoadingSkeleton: React.FC = () => (
@@ -62,7 +65,9 @@ const ReadingErrorState: React.FC<{ message: string; onBack: () => void }> = ({ 
         </div>
         <h2 className="text-xl font-bold text-foreground">Test Not Found</h2>
         <p className="text-muted-foreground">{message}</p>
-        <Button onClick={onBack} variant="default">Return to Library</Button>
+        <Button onClick={onBack} variant="default">
+          Return to Library
+        </Button>
       </div>
     </div>
   </DashboardLayout>
@@ -143,7 +148,10 @@ const ReadingModule: React.FC = () => {
     loadData();
   }, [testId, navigate, userId]);
 
-  const [gradingResult, setGradingResult] = useState<{ rawScore: number; bandScore: number } | null>(null);
+  const [gradingResult, setGradingResult] = useState<{
+    rawScore: number;
+    bandScore: number;
+  } | null>(null);
 
   const persistResults = useCallback(async () => {
     if (!sessionId || !testData) return;
@@ -154,7 +162,9 @@ const ReadingModule: React.FC = () => {
       }
       const result = await submitReadingTest(sessionId, testData, flatAnswers);
       setGradingResult(result);
-      toast.success(`Reading test submitted! Band Score: ${result.bandScore} (${result.rawScore}/${testData.totalQuestions} correct)`);
+      toast.success(
+        `Reading test submitted! Band Score: ${result.bandScore} (${result.rawScore}/${testData.totalQuestions} correct)`
+      );
     } catch (err) {
       console.error("Failed to persist reading submission:", err);
       toast.error("Failed to save your submission.");
@@ -183,10 +193,13 @@ const ReadingModule: React.FC = () => {
     enabled: isStarted && !submitted,
   });
 
-  const handleAnswer = useCallback((key: string, value: string) => {
-    if (submitted) return;
-    setAnswers((prev) => ({ ...prev, [key]: value }));
-  }, [submitted]);
+  const handleAnswer = useCallback(
+    (key: string, value: string) => {
+      if (submitted) return;
+      setAnswers((prev) => ({ ...prev, [key]: value }));
+    },
+    [submitted]
+  );
 
   const handlePassageChange = useCallback((idx: number) => {
     setActivePassage(idx);
@@ -238,7 +251,9 @@ const ReadingModule: React.FC = () => {
 
   // Error
   if (fetchError || !testData) {
-    return <ReadingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />;
+    return (
+      <ReadingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />
+    );
   }
 
   const { passages, totalQuestions, passageQuestionRanges, passageOverrides } = testData;
@@ -288,10 +303,16 @@ const ReadingModule: React.FC = () => {
                           : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
                       )}
                     >
-                      <span className={cn(
-                        "h-2 w-2 rounded-full shrink-0",
-                        visitedPassages[idx] && activePassage !== idx ? "bg-success" : activePassage === idx ? "bg-primary" : "bg-border"
-                      )} />
+                      <span
+                        className={cn(
+                          "h-2 w-2 rounded-full shrink-0",
+                          visitedPassages[idx] && activePassage !== idx
+                            ? "bg-success"
+                            : activePassage === idx
+                              ? "bg-primary"
+                              : "bg-border"
+                        )}
+                      />
                       <span className="hidden sm:inline">Passage</span> {idx + 1}
                     </button>
                   ))}
@@ -333,7 +354,9 @@ const ReadingModule: React.FC = () => {
                     <Separator orientation="vertical" className="h-10 hidden md:block" />
                     <div className="hidden md:block">
                       <p className="text-sm text-muted-foreground">Correct Answers</p>
-                      <p className="text-xl font-bold text-primary">{gradingResult ? gradingResult.rawScore : answeredCount}/{totalQuestions}</p>
+                      <p className="text-xl font-bold text-primary">
+                        {gradingResult ? gradingResult.rawScore : answeredCount}/{totalQuestions}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -366,39 +389,47 @@ const ReadingModule: React.FC = () => {
 
             {/* Main Split Content */}
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-              <ExamSandbox enabled={isStarted && !submitted} className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card">
-              <div ref={passagePaneRef} className="h-full overflow-y-auto">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activePassage}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.25 }}
-                    className="p-6 md:p-10 max-w-2xl mx-auto"
-                  >
-                    <div className="flex items-center gap-2 mb-4">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
-                        Passage {activePassage + 1} — {testData.testType}
-                      </Badge>
-                    </div>
-                    <h2 className="text-2xl font-serif font-bold text-foreground mb-6">{currentPassage.title}</h2>
-                    {currentPassage.passage.split("\n\n").map((para, i) => (
-                      <p key={i} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">{para}</p>
-                    ))}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+              <ExamSandbox
+                enabled={isStarted && !submitted}
+                className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card"
+              >
+                <div ref={passagePaneRef} className="h-full overflow-y-auto">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activePassage}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.25 }}
+                      className="p-6 md:p-10 max-w-2xl mx-auto"
+                    >
+                      <div className="flex items-center gap-2 mb-4">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
+                          Passage {activePassage + 1} — {testData.testType}
+                        </Badge>
+                      </div>
+                      <h2 className="text-2xl font-serif font-bold text-foreground mb-6">{currentPassage.title}</h2>
+                      {currentPassage.passage.split("\n\n").map((para, i) => (
+                        <p key={i} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">
+                          {para}
+                        </p>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </ExamSandbox>
 
               <div className="w-full md:w-[460px] lg:w-[520px] flex flex-col shrink-0 bg-background">
                 <div className="sticky top-0 z-10 bg-background border-b border-border px-5 py-3">
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-bold text-foreground">
-                      Questions {passageQuestionRanges[activePassage]?.start}–{passageQuestionRanges[activePassage]?.end}
+                      Questions {passageQuestionRanges[activePassage]?.start}–
+                      {passageQuestionRanges[activePassage]?.end}
                     </h2>
-                    <Badge variant="outline" className="text-[10px]">Passage {activePassage + 1} of {passages.length}</Badge>
+                    <Badge variant="outline" className="text-[10px]">
+                      Passage {activePassage + 1} of {passages.length}
+                    </Badge>
                   </div>
                 </div>
 
@@ -446,15 +477,17 @@ const ReadingModule: React.FC = () => {
                                 isCurrentPassage
                                   ? "bg-primary text-primary-foreground"
                                   : visitedPassages[passageIdx]
-                                  ? "bg-secondary text-foreground"
-                                  : "bg-muted text-muted-foreground/50",
+                                    ? "bg-secondary text-foreground"
+                                    : "bg-muted text-muted-foreground/50",
                                 "hover:ring-1 hover:ring-primary/30"
                               )}
                             >
                               {qNum}
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="text-[10px]">Passage {passageIdx + 1}, Q{qNum}</TooltipContent>
+                          <TooltipContent side="top" className="text-[10px]">
+                            Passage {passageIdx + 1}, Q{qNum}
+                          </TooltipContent>
                         </Tooltip>
                       );
                     })}
@@ -463,14 +496,22 @@ const ReadingModule: React.FC = () => {
                   {!submitted ? (
                     <div className="flex gap-2">
                       {activePassage < passages.length - 1 && (
-                        <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => handlePassageChange(activePassage + 1)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 gap-1.5 text-xs"
+                          onClick={() => handlePassageChange(activePassage + 1)}
+                        >
                           Next Passage <ChevronRight className="h-3.5 w-3.5" />
                         </Button>
                       )}
                       <Button
                         size="sm"
                         className="flex-1 gap-1.5 text-xs shadow-lg shadow-primary/20"
-                        onClick={() => { setSubmitted(true); persistResults(); }}
+                        onClick={() => {
+                          setSubmitted(true);
+                          persistResults();
+                        }}
                         disabled={answeredCount === 0}
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />

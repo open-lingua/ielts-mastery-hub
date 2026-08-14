@@ -1,39 +1,41 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  CheckCircle,
-  AlertCircle,
-  RefreshCw,
-  X,
+  AlertTriangle,
   AlignLeft,
-  PenTool,
+  CheckCircle,
+  Clock,
   FileText,
   Info,
+  PenTool,
+  RefreshCw,
   ZoomIn,
   ZoomOut,
-  Clock,
-  Loader2,
-  AlertTriangle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import TestStartOverlay from "@/components/shared/TestStartOverlay";
+import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import WritingGradingLoader from "@/components/writing/WritingGradingLoader";
 import WritingResultsDashboard from "@/components/writing/WritingResultsDashboard";
-import { getAnonId } from "@/lib/anonId";
-import { toast } from "sonner";
-import { fetchWritingTestForPractice, submitWritingTest, type WritingTestPayload, type WritingTaskPayload } from "@/services/writingPracticeService";
-import { startTestSession, fetchExistingSession, fetchActiveSession } from "@/services/practiceLibraryService";
-import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
-import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
+import { usePersistedTimer } from "@/hooks/usePersistedTimer";
+import { getAnonId } from "@/lib/anonId";
+import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
+import { fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
+import {
+  fetchWritingTestForPractice,
+  submitWritingTest,
+  type WritingTaskPayload,
+  type WritingTestPayload,
+} from "@/services/writingPracticeService";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -132,7 +134,9 @@ const WritingErrorState: React.FC<{ message: string; onBack: () => void }> = ({ 
         </div>
         <h2 className="text-xl font-bold text-foreground">Test Not Found</h2>
         <p className="text-muted-foreground">{message}</p>
-        <Button onClick={onBack} variant="default">Return to Library</Button>
+        <Button onClick={onBack} variant="default">
+          Return to Library
+        </Button>
       </div>
     </div>
   </DashboardLayout>
@@ -202,7 +206,11 @@ const WritingSimulator: React.FC = () => {
               // Restore saved drafts from DB
               if (session.answers && typeof session.answers === "object") {
                 const saved = session.answers as Record<string, unknown>;
-                const countWords = (t: string) => t.trim().split(/\s+/).filter((w) => w.length > 0).length;
+                const countWords = (t: string) =>
+                  t
+                    .trim()
+                    .split(/\s+/)
+                    .filter((w) => w.length > 0).length;
                 setDrafts([
                   {
                     text: (saved.task1 as string) || "",
@@ -240,7 +248,9 @@ const WritingSimulator: React.FC = () => {
         localStorage.setItem(`ielts_writing_drafts_${testId}`, JSON.stringify(drafts));
       }
     }, 30000);
-    return () => { if (autoSaveRef.current) clearInterval(autoSaveRef.current); };
+    return () => {
+      if (autoSaveRef.current) clearInterval(autoSaveRef.current);
+    };
   }, [drafts, testId]);
 
   // ── Load saved drafts ──
@@ -248,11 +258,17 @@ const WritingSimulator: React.FC = () => {
     if (!testId) return;
     const saved = localStorage.getItem(`ielts_writing_drafts_${testId}`);
     if (saved) {
-      try { setDrafts(JSON.parse(saved)); } catch {}
+      try {
+        setDrafts(JSON.parse(saved));
+      } catch {}
     }
   }, [testId]);
 
-  const countWords = (text: string) => text.trim().split(/\s+/).filter((w) => w.length > 0).length;
+  const countWords = (text: string) =>
+    text
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 0).length;
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -265,7 +281,7 @@ const WritingSimulator: React.FC = () => {
       });
       if (!isActive && text.length > 0) setIsActive(true);
     },
-    [activeTask, isActive],
+    [activeTask, isActive, countWords]
   );
 
   const getWordCountColor = (wc: number, min: number) =>
@@ -326,7 +342,10 @@ const WritingSimulator: React.FC = () => {
     setShowResults(false);
     setAutoSubmitted(false);
     setGradingResults(null);
-    setDrafts([{ text: "", wordCount: 0 }, { text: "", wordCount: 0 }]);
+    setDrafts([
+      { text: "", wordCount: 0 },
+      { text: "", wordCount: 0 },
+    ]);
     setActiveTask(0);
     setIsActive(false);
     setTimerKey((k) => k + 1);
@@ -364,10 +383,7 @@ const WritingSimulator: React.FC = () => {
   });
 
   // Auto-save writing drafts to DB
-  const writingAnswers = React.useMemo(
-    () => ({ task1: drafts[0].text, task2: drafts[1].text }),
-    [drafts]
-  );
+  const writingAnswers = React.useMemo(() => ({ task1: drafts[0].text, task2: drafts[1].text }), [drafts]);
   useAutoSaveAnswers({
     sessionId,
     answers: writingAnswers,
@@ -381,7 +397,9 @@ const WritingSimulator: React.FC = () => {
 
   // ── Error ──
   if (fetchError || !testData || !currentTask) {
-    return <WritingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />;
+    return (
+      <WritingErrorState message={fetchError || "Test data could not be loaded."} onBack={() => navigate("/tests")} />
+    );
   }
 
   const isTask1 = currentTask.taskType === "task1";
@@ -420,11 +438,12 @@ const WritingSimulator: React.FC = () => {
               {tasks.map((task, idx) => {
                 const draft = drafts[idx];
                 const isActiveTask = activeTask === idx;
-                const statusColor = draft.wordCount >= task.minWords
-                  ? "bg-success/10 border-success/30 text-success"
-                  : draft.wordCount > 0
-                  ? "bg-warning/10 border-warning/30 text-warning"
-                  : "";
+                const statusColor =
+                  draft.wordCount >= task.minWords
+                    ? "bg-success/10 border-success/30 text-success"
+                    : draft.wordCount > 0
+                      ? "bg-warning/10 border-warning/30 text-warning"
+                      : "";
                 return (
                   <button
                     key={task.id}
@@ -438,10 +457,7 @@ const WritingSimulator: React.FC = () => {
                     <PenTool className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Task {idx + 1}</span>
                     <span className="sm:hidden">T{idx + 1}</span>
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] px-1.5 py-0 ${statusColor}`}
-                    >
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${statusColor}`}>
                       {draft.wordCount}/{task.minWords}+
                     </Badge>
                   </button>
@@ -488,7 +504,8 @@ const WritingSimulator: React.FC = () => {
                         </h2>
                         <Separator className="my-4" />
                         <p className="text-sm text-muted-foreground italic leading-relaxed">
-                          Write at least {currentTask.minWords} words. You should spend about {currentTask.suggestedTime} on this task.
+                          Write at least {currentTask.minWords} words. You should spend about{" "}
+                          {currentTask.suggestedTime} on this task.
                         </p>
                       </div>
 
@@ -500,13 +517,33 @@ const WritingSimulator: React.FC = () => {
                         </h3>
                         {isTask1 ? (
                           <>
-                            <TipRow icon={<FileText className="h-4 w-4" />} title="Paraphrase the prompt" desc="Rewrite the question in your own words in the introduction." color="success" />
-                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Report key trends" desc="Identify and describe the main patterns in the data or situation." color="primary" />
+                            <TipRow
+                              icon={<FileText className="h-4 w-4" />}
+                              title="Paraphrase the prompt"
+                              desc="Rewrite the question in your own words in the introduction."
+                              color="success"
+                            />
+                            <TipRow
+                              icon={<AlignLeft className="h-4 w-4" />}
+                              title="Report key trends"
+                              desc="Identify and describe the main patterns in the data or situation."
+                              color="primary"
+                            />
                           </>
                         ) : (
                           <>
-                            <TipRow icon={<AlignLeft className="h-4 w-4" />} title="Plan your structure" desc="Introduction → Body 1 → Body 2 → Conclusion." color="success" />
-                            <TipRow icon={<Clock className="h-4 w-4" />} title="Budget your time" desc="~5 min planning, ~30 min writing, ~5 min reviewing." color="warning" />
+                            <TipRow
+                              icon={<AlignLeft className="h-4 w-4" />}
+                              title="Plan your structure"
+                              desc="Introduction → Body 1 → Body 2 → Conclusion."
+                              color="success"
+                            />
+                            <TipRow
+                              icon={<Clock className="h-4 w-4" />}
+                              title="Budget your time"
+                              desc="~5 min planning, ~30 min writing, ~5 min reviewing."
+                              color="warning"
+                            />
                           </>
                         )}
                       </div>
@@ -532,11 +569,7 @@ const WritingSimulator: React.FC = () => {
                       ref={textareaRef}
                       value={currentDraft.text}
                       onChange={handleTextChange}
-                      placeholder={
-                        isTask1
-                          ? "Begin your response here..."
-                          : "Start typing your essay here..."
-                      }
+                      placeholder={isTask1 ? "Begin your response here..." : "Start typing your essay here..."}
                       className="w-full h-full min-h-[300px] resize-none outline-none border-none bg-transparent text-lg leading-relaxed font-serif text-foreground placeholder:text-muted-foreground/40 placeholder:font-sans"
                       spellCheck={false}
                     />
@@ -546,17 +579,25 @@ const WritingSimulator: React.FC = () => {
                   <div className="border-t border-border bg-card px-4 py-3 md:px-6 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-4">
                       <div>
-                        <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">Words</span>
-                        <span className={`text-lg font-bold ${getWordCountColor(currentDraft.wordCount, currentTask.minWords)}`}>
+                        <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block">
+                          Words
+                        </span>
+                        <span
+                          className={`text-lg font-bold ${getWordCountColor(currentDraft.wordCount, currentTask.minWords)}`}
+                        >
                           {currentDraft.wordCount}
                           <span className="text-xs font-normal text-muted-foreground"> / {currentTask.minWords}+</span>
                         </span>
                       </div>
                       <div className="hidden md:flex items-center text-xs text-muted-foreground bg-secondary px-3 py-1 rounded-full">
                         {isActive ? (
-                          <span className="flex items-center text-primary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...</span>
+                          <span className="flex items-center text-primary">
+                            <RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Writing...
+                          </span>
                         ) : (
-                          <span className="flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>
+                          <span className="flex items-center">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Ready
+                          </span>
                         )}
                       </div>
                     </div>
@@ -631,16 +672,26 @@ const WritingSimulator: React.FC = () => {
             <AlertTriangle className="h-10 w-10 text-warning mx-auto" />
             <h2 className="text-xl font-bold text-foreground">Test Submitted</h2>
             <p className="text-sm text-muted-foreground">
-              Your answers have been saved but AI grading was unavailable. You can review your essays or return to the library.
+              Your answers have been saved but AI grading was unavailable. You can review your essays or return to the
+              library.
             </p>
             <div className="flex justify-center gap-3 pt-2">
-              <button onClick={() => navigate("/tests")} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                onClick={() => navigate("/tests")}
+                className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
                 ← Practice Library
               </button>
-              <button onClick={() => setShowResults(false)} className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                onClick={() => setShowResults(false)}
+                className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Review Essays
               </button>
-              <button onClick={handleReset} className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button
+                onClick={handleReset}
+                className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
                 Start New Test
               </button>
             </div>
@@ -656,7 +707,10 @@ const WritingSimulator: React.FC = () => {
 // ─── Tip Row ─────────────────────────────────────────────────────────
 
 const TipRow: React.FC<{ icon: React.ReactNode; title: string; desc: string; color: string }> = ({
-  icon, title, desc, color,
+  icon,
+  title,
+  desc,
+  color,
 }) => (
   <div className="flex gap-3 items-start">
     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-${color}/10 text-${color}`}>
