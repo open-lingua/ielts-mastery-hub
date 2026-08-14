@@ -32,7 +32,7 @@ const config: Config = {
     },
     {
       tagName: 'link',
-      attributes: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+      attributes: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
     },
     {
       tagName: 'link',
