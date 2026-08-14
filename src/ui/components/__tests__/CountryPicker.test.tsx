@@ -28,9 +28,11 @@ describe("CountryPicker", () => {
 
   it("opens dropdown on click", async () => {
     // Mock ResizeObserver for Radix Popover
-    window.ResizeObserver = vi
-      .fn()
-      .mockImplementation(() => ({ observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() }));
+    window.ResizeObserver = class {
+      observe = vi.fn();
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+    };
     const user = userEvent.setup();
     render(<CountryPicker value="" onChange={vi.fn()} />);
     await user.click(screen.getByRole("combobox"));
