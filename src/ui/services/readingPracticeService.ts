@@ -402,7 +402,7 @@ function buildQuestionSection(
 function extractParagraphLabels(qs: DBQuestion[]): string[] {
   const labels = new Set<string>();
   qs.forEach((q) => {
-    q.matchingPairs.forEach((p) => labels.add(p.right));
+    q.matchingPairs.forEach((p) => { labels.add(p.right); });
   });
   return labels.size > 0 ? Array.from(labels) : ["A", "B", "C", "D", "E", "F"];
 }

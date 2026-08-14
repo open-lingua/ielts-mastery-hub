@@ -5,11 +5,11 @@ import { mockListeningTest } from "@/test/mockTestData";
 import ResultsCard from "../ResultsCard";
 
 const allCorrect: Record<string, string> = {};
-mockListeningTest.sections.forEach((s) =>
+mockListeningTest.sections.forEach((s) => {
   s.questions.forEach((q) => {
     allCorrect[q.id] = q.answer;
-  })
-);
+  });
+});
 
 describe("ResultsCard", () => {
   it("renders estimated band score", () => {

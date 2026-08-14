@@ -66,10 +66,6 @@ const ContentLibrary: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    loadContent();
-  }, [loadContent]);
-
   const loadContent = async () => {
     setLoading(true);
     try {
@@ -81,6 +77,10 @@ const ContentLibrary: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadContent();
+  }, [loadContent]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
