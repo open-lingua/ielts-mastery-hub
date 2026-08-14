@@ -260,10 +260,13 @@ const TestLibrary: React.FC = () => {
   }, [userId]);
 
   const filteredTests = tests
-    .filter((t) => activeTab === "All" || moduleLabels[t.module] === activeTab)
+    .filter((t) => {
+      if (activeTab === "Unresolved") return t.status !== "completed";
+      return activeTab === "All" || moduleLabels[t.module] === activeTab;
+    })
     .sort((a, b) => {
       const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      return sortOrder === "newest" ? diff : -diff;
+      return sortOrder === "newest" || activeTab === "Unresolved" ? diff : -diff;
     });
 
   const handleStart = (test: PracticeTestCard) => {
@@ -317,6 +320,25 @@ const TestLibrary: React.FC = () => {
               </button>
             ))}
           </div>
+
+          {/* Unresolved Filter */}
+          <button
+            onClick={() => setActiveTab(activeTab === "Unresolved" ? "All" : "Unresolved")}
+            className={cn(
+              "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all",
+              activeTab === "Unresolved"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/30"
+            )}
+          >
+            <PlayCircle className="h-3.5 w-3.5" />
+            Unresolved
+            {activeTab !== "Unresolved" && (
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs">
+                {tests.filter((t) => t.status !== "completed").length}
+              </span>
+            )}
+          </button>
 
           {/* Sort Dropdown */}
           <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as "newest" | "oldest")}>
