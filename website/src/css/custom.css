@@ -1,30 +1,180 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+/* ============================================================
+   IELTS Mastery Hub — brand system
+   Locked palette: navy #1B2A5E · gold #C9952A · white #FFFFFF
+   ============================================================ */
 
-/* You can override the default Infima variables here. */
+/* --- Infima primary (gold for accents/links in docs) --- */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #C9952A;
+  --ifm-color-primary-dark: #b4841f;
+  --ifm-color-primary-darker: #aa7d1d;
+  --ifm-color-primary-darkest: #8c6618;
+  --ifm-color-primary-light: #d4a43e;
+  --ifm-color-primary-lighter: #d8aa48;
+  --ifm-color-primary-lightest: #e0bc6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* raw brand */
+  --brand-navy: #1B2A5E;
+  --brand-gold: #C9952A;
+  --brand-white: #FFFFFF;
+
+  /* semantic tokens — light */
+  --imh-bg: #FFFFFF;
+  --imh-bg-subtle: #F4F6FC;
+  --imh-bg-inset: #EDF0F9;
+  --imh-panel: #1B2A5E;
+  --imh-panel-2: #22326B;
+  --imh-border: #DCE2F1;
+  --imh-border-strong: #C4CDE6;
+  --imh-ink: #141F3D;
+  --imh-ink-2: #464F73;
+  --imh-ink-3: #727B9C;
+  --imh-accent: #C9952A;
+  --imh-accent-ink: #8A6317;
+  --imh-accent-tint: #F8EFD8;
+  --imh-accent-tint-2: #F2E3BF;
+  --imh-on-navy: #FFFFFF;
+  --imh-on-navy-2: #C3CBE4;
+  --imh-on-navy-gold: #E7C687;
+  --imh-ring: rgba(201,149,42,.55);
+  --imh-shadow-sm: 0 1px 2px rgba(20,31,61,.06), 0 1px 3px rgba(20,31,61,.05);
+  --imh-shadow-md: 0 10px 24px -12px rgba(20,31,61,.22), 0 2px 6px rgba(20,31,61,.06);
+  --imh-shadow-lg: 0 30px 60px -28px rgba(20,31,61,.40), 0 8px 20px -12px rgba(20,31,61,.18);
+  --imh-shadow-navy: 0 30px 70px -30px rgba(9,17,45,.55);
+  --imh-radius: 14px;
+  --imh-radius-lg: 22px;
+  --imh-maxw: 1160px;
+  --imh-ease: cubic-bezier(.22,.61,.36,1);
+
+  --ifm-font-family-base: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-family: "Fraunces", Georgia, serif;
+  --ifm-background-color: var(--imh-bg);
+  --ifm-font-color-base: var(--imh-ink);
+  --ifm-navbar-background-color: color-mix(in srgb, var(--imh-bg) 92%, transparent);
+  --ifm-footer-background-color: var(--imh-panel);
+  --ifm-footer-color: var(--imh-on-navy-2);
+  --ifm-footer-link-color: var(--imh-on-navy-2);
+  --ifm-footer-link-hover-color: var(--imh-on-navy-gold);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #E4B85E;
+  --ifm-color-primary-dark: #dda93f;
+  --ifm-color-primary-darker: #daa332;
+  --ifm-color-primary-darkest: #c48f22;
+  --ifm-color-primary-light: #e9c77d;
+  --ifm-color-primary-lighter: #ecce8a;
+  --ifm-color-primary-lightest: #f2dda8;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --imh-bg: #0B1330;
+  --imh-bg-subtle: #0F1940;
+  --imh-bg-inset: #111C46;
+  --imh-panel: #101A42;
+  --imh-panel-2: #16234F;
+  --imh-border: #25326B;
+  --imh-border-strong: #33427E;
+  --imh-ink: #EAEEFB;
+  --imh-ink-2: #AEB9DC;
+  --imh-ink-3: #7E8AB6;
+  --imh-accent: #E4B85E;
+  --imh-accent-ink: #F0D699;
+  --imh-accent-tint: rgba(201,149,42,.14);
+  --imh-accent-tint-2: rgba(201,149,42,.22);
+  --imh-on-navy: #FFFFFF;
+  --imh-on-navy-2: #C3CBE4;
+  --imh-on-navy-gold: #EBCF8E;
+  --imh-ring: rgba(228,184,94,.6);
+  --imh-shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --imh-shadow-md: 0 12px 28px -14px rgba(0,0,0,.6);
+  --imh-shadow-lg: 0 34px 64px -28px rgba(0,0,0,.7);
+  --imh-shadow-navy: 0 30px 70px -30px rgba(0,0,0,.75);
+
+  --ifm-background-color: var(--imh-bg);
+  --ifm-font-color-base: var(--imh-ink);
+  --ifm-navbar-background-color: color-mix(in srgb, var(--imh-bg) 92%, transparent);
+}
+
+/* global body font */
+body {
+  font-family: var(--ifm-font-family-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Fraunces", Georgia, serif;
+}
+
+::selection {
+  background: var(--imh-accent);
+  color: #1B2A5E;
+}
+
+/* navbar download button */
+.navbar-download-btn {
+  background: var(--brand-gold);
+  color: #1B2A5E !important;
+  border-radius: 10px;
+  padding: 0.5em 1.1em;
+  font-weight: 600;
+  transition: transform 0.18s var(--imh-ease), box-shadow 0.18s var(--imh-ease);
+}
+.navbar-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -8px rgba(201,149,42,.55);
+  color: #1B2A5E !important;
+  background: var(--brand-gold);
+}
+[data-theme='dark'] .navbar-download-btn {
+  background: var(--imh-accent);
+}
+
+/* footer brand overrides */
+.footer {
+  background: var(--brand-navy) !important;
+  --ifm-footer-background-color: var(--brand-navy);
+}
+[data-theme='dark'] .footer {
+  background: #080f26 !important;
+}
+.footer__title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--imh-ink-3) !important;
+}
+[data-theme='dark'] .footer__title {
+  color: #555e80 !important;
+}
+.footer__link-item:hover {
+  color: var(--imh-on-navy-gold) !important;
+}
+
+/* reveal animation */
+.imh-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s var(--imh-ease), transform 0.7s var(--imh-ease);
+}
+.imh-reveal.imh-in {
+  opacity: 1;
+  transform: none;
+}
+.imh-reveal.d1 { transition-delay: 0.08s; }
+.imh-reveal.d2 { transition-delay: 0.16s; }
+.imh-reveal.d3 { transition-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .imh-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    animation: none !important;
+  }
 }
