@@ -34,10 +34,10 @@ cargo install sqlx-cli --no-default-features --features sqlite   # if you don't 
 ### 4. Prepare the database directory and DATABASE_URL
 
 ```bash
-mkdir -p "$HOME/Library/Application Support/com.ielts-mastery-hub.app"
+mkdir -p "$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub"
 
 # Point DATABASE_URL to the same file used by the app
-export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.ielts-mastery-hub.app/ielts.db"
+export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
 ```
 
 ### 5. Drop, create, and migrate the database
@@ -51,7 +51,7 @@ sqlx migrate run --source src/database/migrations
 ### 6. Apply the seed files
 
 ```bash
-DB="$HOME/Library/Application Support/com.ielts-mastery-hub.app/ielts.db"
+DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
 
 for f in src/database/seeds/listening/*.sql \
          src/database/seeds/reading/*.sql \
