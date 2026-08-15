@@ -21,6 +21,8 @@ npm install
 npm run tauri dev
 ```
 
+> If you need to run `sqlx` CLI commands, set `DATABASE_URL` first — see [Environment Variables](#environment-variables) below.
+
 Do not run the Rust binary directly with `cargo run` — Tauri manages the build and links it with the frontend.
 
 ## Project Structure
@@ -69,6 +71,23 @@ Never rename or edit an existing migration file — add a new one instead. Migra
 ### Environment Variables
 
 Backend secrets/config go in `src/core/.env` and are never exposed to the frontend.
+
+If you need to run `sqlx` CLI commands (e.g. `sqlx migrate run`), set `DATABASE_URL` to point to the app's SQLite file. The path varies by OS:
+
+**macOS**
+```bash
+export DATABASE_URL="sqlite:///Users/$(whoami)/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+```
+
+**Linux**
+```bash
+export DATABASE_URL="sqlite:///home/$(whoami)/.local/share/com.openlingua.ieltsmasteryhub/ielts.db"
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:DATABASE_URL = "sqlite:///$env:APPDATA\com.openlingua.ieltsmasteryhub\ielts.db"
+```
 
 ## Branching
 
