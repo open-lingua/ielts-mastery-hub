@@ -61,3 +61,4 @@ src/core/target/
 
 # Local files
 *.local.*
+dev.db
