@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, BookOpen, CheckCircle2, ChevronRight, Eye, EyeOff, RotateCcw, Trophy } from "lucide-react";
+import { AlertTriangle, BookOpen, CheckCircle2, ChevronRight, Eye, EyeOff, RotateCcw, Trophy, XCircle } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,6 +13,18 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteUserTestSession } from "@/lib/tauri";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import { getAnonId } from "@/lib/anonId";
@@ -226,6 +238,28 @@ const ReadingModule: React.FC = () => {
     setSessionId(null);
   };
 
+  const handleAbort = async () => {
+    if (sessionId) {
+      try {
+        await deleteUserTestSession(sessionId, getAnonId());
+      } catch {
+        toast.error("Failed to clear session");
+      }
+    }
+    setAnswers({});
+    setSubmitted(false);
+    setReviewMode(false);
+    setActivePassage(0);
+    setVisitedPassages(testData ? testData.passages.map((_, i) => i === 0) : [true, false, false]);
+    setAutoSubmitted(false);
+    setGradingResult(null);
+    setTimerKey((k) => k + 1);
+    setIsStarted(false);
+    setStartedAt(null);
+    setSessionId(null);
+    navigate("/tests");
+  };
+
   const handleStart = async () => {
     if (testId) {
       try {
@@ -318,10 +352,39 @@ const ReadingModule: React.FC = () => {
                   ))}
                 </div>
 
-                <Badge variant="secondary" className="text-xs gap-1 hidden md:flex">
-                  <BookOpen className="h-3 w-3" />
-                  {answeredCount}/{totalQuestions}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs gap-1 hidden md:flex">
+                    <BookOpen className="h-3 w-3" />
+                    {answeredCount}/{totalQuestions}
+                  </Badge>
+                  {!submitted && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive gap-1">
+                          <XCircle className="h-4 w-4" />
+                          <span className="hidden sm:inline">Abort</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Abort test?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Your progress will not be saved. This cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Continue</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={handleAbort}
+                          >
+                            Abort
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
               </div>
 
               <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">

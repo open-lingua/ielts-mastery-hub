@@ -80,11 +80,17 @@ export async function fetchLibraryData(userId: string): Promise<PracticeTestCard
       };
     });
 
-  return [
+  const all = [
     ...merge(publishedReading, "reading"),
     ...merge(publishedWriting, "writing", "7", "60 mins"),
     ...merge(publishedListening, "listening"),
   ];
+  const seen = new Set<string>();
+  return all.filter((t) => {
+    if (seen.has(t.id)) return false;
+    seen.add(t.id);
+    return true;
+  });
 }
 
 export interface TestSessionInfo {

@@ -8,6 +8,7 @@ import {
   Info,
   PenTool,
   RefreshCw,
+  XCircle,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -23,6 +24,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteUserTestSession } from "@/lib/tauri";
 import WritingGradingLoader from "@/components/writing/WritingGradingLoader";
 import WritingResultsDashboard from "@/components/writing/WritingResultsDashboard";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
@@ -355,6 +368,31 @@ const WritingSimulator: React.FC = () => {
     localStorage.removeItem(`ielts_writing_drafts_${testId}`);
   };
 
+  const handleAbort = async () => {
+    if (sessionId) {
+      try {
+        await deleteUserTestSession(sessionId, getAnonId());
+      } catch {
+        toast.error("Failed to clear session");
+      }
+    }
+    setShowResults(false);
+    setAutoSubmitted(false);
+    setGradingResults(null);
+    setDrafts([
+      { text: "", wordCount: 0 },
+      { text: "", wordCount: 0 },
+    ]);
+    setActiveTask(0);
+    setIsActive(false);
+    setTimerKey((k) => k + 1);
+    setIsStarted(false);
+    setStartedAt(null);
+    setSessionId(null);
+    localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+    navigate("/tests");
+  };
+
   const handleStart = async () => {
     if (testId) {
       try {
@@ -433,6 +471,7 @@ const WritingSimulator: React.FC = () => {
               </Badge>
             </div>
 
+            <div className="flex items-center gap-3">
             {/* Task switcher */}
             <div className="flex items-center gap-1">
               {tasks.map((task, idx) => {
@@ -463,6 +502,34 @@ const WritingSimulator: React.FC = () => {
                   </button>
                 );
               })}
+            </div>
+            {!showResults && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive gap-1">
+                    <XCircle className="h-4 w-4" />
+                    <span className="hidden sm:inline">Abort</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Abort test?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Your progress will not be saved. This cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continue</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={handleAbort}
+                    >
+                      Abort
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             </div>
           </div>
 

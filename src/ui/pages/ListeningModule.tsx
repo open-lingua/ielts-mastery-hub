@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, ChevronRight, Headphones, Info } from "lucide-react";
+import { AlertTriangle, ChevronRight, Headphones, Info, XCircle } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -17,6 +17,18 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteUserTestSession } from "@/lib/tauri";
 import type { ListeningTest } from "@/data/listeningTestData";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
@@ -239,6 +251,31 @@ const ListeningModule: React.FC = () => {
     scrollToTop();
   };
 
+  const handleAbort = async () => {
+    if (sessionId) {
+      try {
+        await deleteUserTestSession(sessionId, getAnonId());
+      } catch {
+        toast.error("Failed to clear session");
+      }
+    }
+    if (!test) return;
+    const count = test.sections.length;
+    setActiveSection(0);
+    setUnlockedSections([true, ...Array(count - 1).fill(false)]);
+    setCompletedSections(Array(count).fill(false));
+    setAudioEnded(Array(count).fill(false));
+    setAnswers({});
+    setTestFinished(false);
+    setReviewMode(false);
+    setAutoSubmitted(false);
+    setTimerKey((k) => k + 1);
+    setIsStarted(false);
+    setStartedAt(null);
+    setSessionId(null);
+    navigate("/tests");
+  };
+
   const handleStart = async () => {
     if (testId) {
       try {
@@ -315,11 +352,40 @@ const ListeningModule: React.FC = () => {
                     <Headphones className="h-5 w-5 text-primary" />
                     <h1 className="text-lg font-bold text-foreground">{test.title}</h1>
                   </div>
-                  {!testFinished && (
-                    <Badge variant="outline" className="text-xs">
-                      Section {activeSection + 1} of {totalSections}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {!testFinished && (
+                      <Badge variant="outline" className="text-xs">
+                        Section {activeSection + 1} of {totalSections}
+                      </Badge>
+                    )}
+                    {!testFinished && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive gap-1">
+                            <XCircle className="h-4 w-4" />
+                            <span className="hidden sm:inline">Abort</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Abort test?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Your progress will not be saved. This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Continue</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={handleAbort}
+                            >
+                              Abort
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-3">
                   <SectionStepper
