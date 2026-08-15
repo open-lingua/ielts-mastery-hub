@@ -80,7 +80,8 @@ const ContentLibrary: React.FC = () => {
 
   useEffect(() => {
     loadContent();
-  }, [loadContent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
