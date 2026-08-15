@@ -3,6 +3,20 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.5 / 2026.08.15
+
+- docs: add DATABASE_URL export to quick start setup
+- docs: add DATABASE_URL setup instructions for sqlx CLI across platforms
+- chore: update package-lock.json
+- chore: remove dev.db from tracking
+- docs: fix bundle identifier mismatch in database reset guide
+- docs: add development database reset guide
+- chore: remove legacy SQL seed files, replace with assets/examples
+- fix: remove loadContent from effect deps to prevent infinite fetch loop
+- feat: add Abort button and session abandonment flow to Writing, Reading, and Listening modules
+- chore(release): bump version to 1.0.0-beta.4 and add changelog entry
+- chore: add issue template config
+
 ### 1.0.0-beta.4 / 2026.08.14
 
 - chore: add feature request issue template
