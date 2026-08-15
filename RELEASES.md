@@ -3,6 +3,19 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.4 / 2026.08.14
+
+- chore: add feature request issue template
+- chore: add bug report issue template
+- chore: add pull request template
+- docs: Add CONTRIBUTING.md with setup, workflow, and PR guidelines
+- fix: set crossorigin to 'anonymous' on fonts.gstatic.com preconnect tag
+- feat(website): add HomepageSections components and hooks for landing page
+- feat(website): replace default homepage with IELTS landing page sections
+- style(website): replace default Infima theme with IELTS brand system (navy/gold)
+- chore(website): configure site for IELTS Mastery Hub (title, org, url)
+- chore(release): bump version to 1.0.0-beta.3 and add changelog entry
+
 ### 1.0.0-beta.3 / 2026.08.14
 
 - fix(test): replace ResizeObserver mock with class implementation in CountryPicker test
