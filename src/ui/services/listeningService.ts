@@ -11,6 +11,7 @@ import {
   listListeningQuestionGroups,
   listListeningQuestions,
   listListeningSections,
+  toPlayableUrl,
   updateListeningTest as tauriUpdateListeningTest,
   uploadListeningAudio,
 } from "@/lib/tauri";
@@ -190,7 +191,7 @@ export async function fetchListeningTest(testId: string) {
       id: s.section_number,
       title: s.title,
       transcript: s.transcript || "",
-      audioUrl: s.audio_url || "",
+      audioUrl: toPlayableUrl(s.audio_url),
       questionGroups: (groupsBySection.get(s.id) || []).map((g) => ({
         id: g.id,
         type: g.question_type,
