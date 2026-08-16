@@ -13,13 +13,13 @@ Desktop IELTS preparation platform with timed reading, listening, AI-graded writ
 
 ```bash
 # Install dependencies
-pnpm install   # or npm install / yarn
+npm install   # or npm install / yarn
 
 # Run in development mode (starts both Rust + Vite dev server)
-pnpm tauri dev
+npm tauri dev
 
 # Build for production
-pnpm tauri build
+npm tauri build
 ```
 
 > Rust is compiled by Tauri automatically. Do not run `cargo` commands for the app binary directly unless working on isolated Rust logic.
