@@ -1,7 +1,9 @@
 pub mod commands;
 pub mod database;
 pub mod error;
+pub mod models;
 pub mod repositories;
+pub mod services;
 
 use tauri::Manager;
 
@@ -87,6 +89,10 @@ pub fn run() {
             commands::user_test_sessions::delete_user_test_sessions,
             commands::storage::upload_writing_asset,
             commands::storage::upload_listening_audio,
+            commands::import::validate_import,
+            commands::import::import_reading_test,
+            commands::import::import_writing_test,
+            commands::import::import_listening_test,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
