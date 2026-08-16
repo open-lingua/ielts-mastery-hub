@@ -562,6 +562,76 @@ export async function uploadListeningAudio(userId: string, file: File): Promise<
   return convertFileSrc(path);
 }
 
+// ── import ─────────────────────────────────────────────────────────────────
+
+export type ImportKind = "reading" | "writing" | "listening";
+
+export interface ImportPreview {
+  title: string;
+  status: string;
+  kind: string;
+  passage_or_section_or_task_count: number;
+  group_count: number;
+  question_count: number;
+  duplicate_of: string | null;
+}
+
+export interface ImportAudioMeta {
+  section_number: number;
+  file_name: string;
+  size: number;
+}
+
+export interface ImportAudioFile {
+  sectionNumber: number;
+  file: File;
+}
+
+// A stored audio_url may be a raw filesystem path (new imports) or an
+// already-converted asset:// URL (existing uploads) — convert only the former.
+export function toPlayableUrl(url?: string | null): string {
+  if (!url) return "";
+  const isFsPath = url.startsWith("/") || /^[A-Za-z]:\\/.test(url);
+  return isFsPath ? convertFileSrc(url) : url;
+}
+
+export async function validateImport(
+  userId: string,
+  kind: ImportKind,
+  json: unknown,
+  audioMeta: ImportAudioMeta[] = []
+): Promise<ImportPreview> {
+  return invoke<ImportPreview>("validate_import", {
+    userId,
+    kind,
+    json_data: json,
+    audio_meta: audioMeta,
+  });
+}
+
+export async function importReadingTest(userId: string, json: unknown): Promise<string> {
+  return invoke<string>("import_reading_test", { userId, json_data: json });
+}
+
+export async function importWritingTest(userId: string, json: unknown): Promise<string> {
+  return invoke<string>("import_writing_test", { userId, json_data: json });
+}
+
+export async function importListeningTest(
+  userId: string,
+  json: unknown,
+  audioFiles: ImportAudioFile[]
+): Promise<string> {
+  const audio_files = await Promise.all(
+    audioFiles.map(async ({ sectionNumber, file }) => ({
+      section_number: sectionNumber,
+      file_name: file.name,
+      file_data: Array.from(new Uint8Array(await file.arrayBuffer())),
+    }))
+  );
+  return invoke<string>("import_listening_test", { userId, json_data: json, audio_files });
+}
+
 // ── grade_writing ──────────────────────────────────────────────────────────
 
 export async function gradeWriting(input: {
