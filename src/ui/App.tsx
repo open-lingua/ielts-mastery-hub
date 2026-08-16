@@ -28,6 +28,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ContentLibrary from "./pages/admin/ContentLibrary";
 import CreateContent from "./pages/admin/CreateContent";
+import ImportDataset from "./pages/admin/ImportDataset";
 import UserManagement from "./pages/admin/UserManagement";
 import Dashboard from "./pages/Dashboard";
 import LandingPage from "./pages/LandingPage";
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/content" element={<ContentLibrary />} />
               <Route path="/admin/create" element={<CreateContent />} />
+              <Route path="/admin/import" element={<ImportDataset />} />
               <Route path="/admin/users" element={<UserManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
