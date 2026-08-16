@@ -5,6 +5,7 @@ import {
   listListeningQuestionGroups,
   listListeningQuestions,
   listListeningSections,
+  toPlayableUrl,
   type ListeningQuestionGroup as TauriListeningGroup,
   type ListeningQuestion as TauriListeningQuestion,
 } from "@/lib/tauri";
@@ -131,7 +132,7 @@ export async function fetchListeningTestForPractice(testId: string): Promise<Lis
       subtitle: "",
       context: buildContextFromSectionNumber(s.section_number),
       instructions,
-      audioUrl: s.audio_url || undefined,
+      audioUrl: toPlayableUrl(s.audio_url) || undefined,
       questions: flatQuestions,
     };
   });
