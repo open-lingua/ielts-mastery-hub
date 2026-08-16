@@ -67,6 +67,7 @@ Before modifying code in a layer, read the corresponding context file (both file
 ## Project Documentation
 
 - **`docs/frontend_architecture.md`** — frontend architecture overview; read before making structural UI changes.
+- **`docs/backend_architecture.md`** — backend architecture overview; read before making structural backend changes.
 - **`docs/product.md`** — product requirements and feature specs; read before adding or changing features.
 - **`docs/folder-structure.md`** — detailed folder structure reference.
 
