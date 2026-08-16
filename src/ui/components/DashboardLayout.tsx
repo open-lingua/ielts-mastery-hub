@@ -105,6 +105,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
 
         <div className={cn("hidden md:flex border-t border-border p-3", collapsed ? "justify-center" : "justify-end")}>
           <button
+            type="button"
             onClick={() => setCollapsed((prev) => !prev)}
             aria-label="Toggle Sidebar"
             className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
@@ -117,6 +118,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6">
           <button
+            type="button"
             onClick={() => setSidebarOpen(true)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-secondary md:hidden"
           >
@@ -131,6 +133,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           <div className="hidden md:block" />
 
           <button
+            type="button"
             onClick={toggleTheme}
             className="rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             aria-label="Toggle theme"

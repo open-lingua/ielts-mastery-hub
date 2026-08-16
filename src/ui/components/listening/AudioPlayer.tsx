@@ -142,6 +142,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
       )}
 
       <button
+        type="button"
         onClick={hasEnded ? restart : togglePlay}
         className={cn(
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-transform hover:scale-105",
@@ -174,6 +175,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
       </div>
 
       <button
+        type="button"
         onClick={() => setMuted((m) => !m)}
         className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
       >

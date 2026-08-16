@@ -38,6 +38,7 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
+                  type="button"
                   onClick={() => isUnlocked && onSectionClick(i)}
                   disabled={!isUnlocked}
                   className={cn(
