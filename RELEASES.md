@@ -3,6 +3,28 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.6 / 2026.08.15
+
+- chore: replace pnpm to npm
+- test(ui): assert Import Dataset nav item renders in AdminLayout
+- feat(ui): add Import Dataset item to admin sidebar nav
+- feat(ui): route /admin/import to ImportDataset page
+- feat(ui): add Admin Import Dataset page
+- feat(ui): add client-side import parsing and validation helpers
+- fix(ui): convert stored audio_url to a playable URL in listeningPracticeService
+- fix(ui): convert stored audio_url to a playable URL in listeningService
+- feat(ui): add typed import invoke wrappers and toPlayableUrl helper
+- feat(core): wire import models/services modules and register import commands
+- chore(core): register import command module
+- feat(core): add import Tauri commands (validate + import per test type)
+- feat(core): add import validation and transactional insert service
+- feat(core): add import JSON contract models for Reading/Writing/Listening
+- docs(admin): add spec for dataset import feature
+- fix: add explicit type=button to button elements
+- docs: add backend architecture reference
+- docs: rename files to lowercase
+- docs: add folder structure reference for AI context
+
 ### 1.0.0-beta.5 / 2026.08.15
 
 - docs: add DATABASE_URL export to quick start setup
