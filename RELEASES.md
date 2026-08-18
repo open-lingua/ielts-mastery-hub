@@ -3,6 +3,12 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.7 / 2026.08.18
+
+- docs(core): move testing conventions into docs/core/testing/
+- docs(testing): add unit testing conventions for core module
+- refactor(ImportDataset): redesign UI with step-based layout and custom drop zones
+
 ### 1.0.0-beta.6 / 2026.08.15
 
 - chore: replace pnpm to npm
