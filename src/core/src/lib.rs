@@ -89,6 +89,7 @@ pub fn run() {
             commands::user_test_sessions::delete_user_test_sessions,
             commands::storage::upload_writing_asset,
             commands::storage::upload_listening_audio,
+            commands::export::export_test_to_zip,
             commands::import::validate_import,
             commands::import::import_reading_test,
             commands::import::import_writing_test,
