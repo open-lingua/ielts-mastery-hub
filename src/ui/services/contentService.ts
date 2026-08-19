@@ -3,6 +3,8 @@ import {
   deleteListeningTest,
   deleteReadingTest,
   deleteWritingTest,
+  type ExportResult,
+  exportTestToZip,
   listListeningQuestionGroups,
   listListeningQuestions,
   listListeningSections,
@@ -168,4 +170,10 @@ export async function deleteContent(id: string, module: ContentModule): Promise<
   if (module === "Reading") return deleteReadingTest(id, userId);
   if (module === "Writing") return deleteWritingTest(id, userId);
   return deleteListeningTest(id, userId);
+}
+
+export async function exportContent(item: ContentItem): Promise<ExportResult> {
+  const userId = getAnonId();
+  const kind = item.module.toLowerCase() as "reading" | "writing" | "listening";
+  return exportTestToZip(userId, kind, item.id);
 }
