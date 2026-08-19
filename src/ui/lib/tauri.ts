@@ -632,6 +632,22 @@ export async function importListeningTest(
   return invoke<string>("import_listening_test", { userId, json_data: json, audio_files });
 }
 
+// ── export ─────────────────────────────────────────────────────────────────
+
+export interface ExportResult {
+  filePath: string;
+  fileName: string;
+  warnings: string[];
+}
+
+export async function exportTestToZip(
+  userId: string,
+  kind: ImportKind,
+  id: string
+): Promise<ExportResult> {
+  return invoke<ExportResult>("export_test_to_zip", { userId, kind, id });
+}
+
 // ── grade_writing ──────────────────────────────────────────────────────────
 
 export async function gradeWriting(input: {
