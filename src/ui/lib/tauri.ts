@@ -644,8 +644,8 @@ export async function exportTestToZip(
   userId: string,
   kind: ImportKind,
   id: string
-): Promise<ExportResult> {
-  return invoke<ExportResult>("export_test_to_zip", { userId, kind, id });
+): Promise<ExportResult | null> {
+  return invoke<ExportResult | null>("export_test_to_zip", { userId, kind, id });
 }
 
 // ── grade_writing ──────────────────────────────────────────────────────────
