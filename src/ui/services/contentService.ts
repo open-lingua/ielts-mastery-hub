@@ -172,7 +172,7 @@ export async function deleteContent(id: string, module: ContentModule): Promise<
   return deleteListeningTest(id, userId);
 }
 
-export async function exportContent(item: ContentItem): Promise<ExportResult> {
+export async function exportContent(item: ContentItem): Promise<ExportResult | null> {
   const userId = getAnonId();
   const kind = item.module.toLowerCase() as "reading" | "writing" | "listening";
   return exportTestToZip(userId, kind, item.id);
