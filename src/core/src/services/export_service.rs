@@ -22,6 +22,13 @@ pub struct ExportResult {
     pub warnings: Vec<String>,
 }
 
+#[derive(Debug)]
+pub struct BuiltExport {
+    pub file_name: String,
+    pub zip_bytes: Vec<u8>,
+    pub warnings: Vec<String>,
+}
+
 struct MediaFile {
     /// Path inside the zip, e.g. `media/section-1.mp3`.
     archive_path: String,
@@ -29,7 +36,10 @@ struct MediaFile {
     source_path: PathBuf,
 }
 
-pub async fn export_test(db: &Db, user_id: &str, kind: &str, id: &str) -> Result<ExportResult, AppError> {
+/// Assembles the Import-schema-compatible JSON for `id`, bundles any linked media, and zips
+/// everything up in memory. Does not touch the filesystem beyond reading source media files —
+/// callers decide where (and whether) to persist the resulting bytes.
+pub async fn build_export(db: &Db, user_id: &str, kind: &str, id: &str) -> Result<BuiltExport, AppError> {
     let mut warnings: Vec<String> = Vec::new();
     let mut media: Vec<MediaFile> = Vec::new();
 
@@ -56,24 +66,7 @@ pub async fn export_test(db: &Db, user_id: &str, kind: &str, id: &str) -> Result
 
     let zip_bytes = build_zip(&folder_name, &json_file_name, &json_bytes, &media, &mut warnings)?;
 
-    let target_dir = downloads_dir()?;
-    tokio::fs::create_dir_all(&target_dir)
-        .await
-        .map_err(|e| AppError::Validation(e.to_string()))?;
-
-    let final_path = unique_path(&target_dir, &file_name).await;
-    tokio::fs::write(&final_path, &zip_bytes)
-        .await
-        .map_err(|e| AppError::Validation(e.to_string()))?;
-
-    Ok(ExportResult {
-        file_path: final_path.to_string_lossy().into_owned(),
-        file_name: final_path
-            .file_name()
-            .map(|n| n.to_string_lossy().into_owned())
-            .unwrap_or(file_name),
-        warnings,
-    })
+    Ok(BuiltExport { file_name, zip_bytes, warnings })
 }
 
 fn json_title(json: &Value) -> String {
@@ -416,32 +409,11 @@ pub(crate) fn slugify(title: &str) -> String {
     }
 }
 
-fn downloads_dir() -> Result<PathBuf, AppError> {
-    let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
-    Ok(Path::new(&home).join("Downloads"))
-}
-
-/// Returns a path guaranteed not to collide with an existing file, appending `-1`, `-2`, ...
-/// before the extension when needed.
-async fn unique_path(dir: &Path, file_name: &str) -> PathBuf {
-    let candidate = dir.join(file_name);
-    if tokio::fs::metadata(&candidate).await.is_err() {
-        return candidate;
-    }
-
-    let (stem, ext) = match file_name.rsplit_once('.') {
-        Some((s, e)) => (s.to_string(), format!(".{e}")),
-        None => (file_name.to_string(), String::new()),
-    };
-
-    let mut n = 1;
-    loop {
-        let attempt = dir.join(format!("{stem}-{n}{ext}"));
-        if tokio::fs::metadata(&attempt).await.is_err() {
-            return attempt;
-        }
-        n += 1;
-    }
+/// Best-effort `~/Downloads` path used only to seed the save dialog's initial directory.
+/// Returns `None` if `$HOME` can't be resolved — the dialog will fall back to its own default.
+pub fn default_export_dir() -> Option<PathBuf> {
+    let home = std::env::var("HOME").ok()?;
+    Some(Path::new(&home).join("Downloads"))
 }
 
 #[cfg(test)]
@@ -483,18 +455,6 @@ mod tests {
     fn parse_or_falls_back_on_invalid_json() {
         assert_eq!(parse_or("nope", Value::Array(vec![])), Value::Array(vec![]));
         assert_eq!(parse_or("[1,2]", Value::Array(vec![])), serde_json::json!([1, 2]));
-    }
-
-    #[tokio::test]
-    async fn unique_path_appends_suffix_on_collision() {
-        let dir = std::env::temp_dir().join(format!("export-test-{}", uuid::Uuid::new_v4()));
-        tokio::fs::create_dir_all(&dir).await.unwrap();
-        tokio::fs::write(dir.join("test_export.zip"), b"x").await.unwrap();
-
-        let path = unique_path(&dir, "test_export.zip").await;
-        assert_eq!(path.file_name().unwrap().to_string_lossy(), "test_export-1.zip");
-
-        tokio::fs::remove_dir_all(&dir).await.unwrap();
     }
 
     #[test]
