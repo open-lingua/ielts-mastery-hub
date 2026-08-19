@@ -250,7 +250,7 @@ const TestLibrary: React.FC = () => {
     })
     .sort((a, b) => {
       const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      return sortOrder === "newest" || activeTab === "Unresolved" ? diff : -diff;
+      return sortOrder === "newest" ? diff : -diff;
     });
 
   const handleStart = (test: PracticeTestCard) => {
