@@ -205,6 +205,7 @@ const TestLibrary: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "All");
+  const [unresolvedOnly, setUnresolvedOnly] = useState(false);
 
   useEffect(() => {
     setActiveTab(searchParams.get("tab") ?? "All");
@@ -245,8 +246,9 @@ const TestLibrary: React.FC = () => {
 
   const filteredTests = tests
     .filter((t) => {
-      if (activeTab === "Unresolved") return t.status !== "completed";
-      return activeTab === "All" || moduleLabels[t.module] === activeTab;
+      const moduleMatch = activeTab === "All" || moduleLabels[t.module] === activeTab;
+      const unresolvedMatch = !unresolvedOnly || t.status !== "completed";
+      return moduleMatch && unresolvedMatch;
     })
     .sort((a, b) => {
       const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -306,17 +308,17 @@ const TestLibrary: React.FC = () => {
 
           {/* Unresolved Filter */}
           <button
-            onClick={() => setActiveTab(activeTab === "Unresolved" ? "All" : "Unresolved")}
+            onClick={() => setUnresolvedOnly((prev) => !prev)}
             className={cn(
               "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all",
-              activeTab === "Unresolved"
+              unresolvedOnly
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/30"
             )}
           >
             <PlayCircle className="h-3.5 w-3.5" />
             Unresolved
-            {activeTab !== "Unresolved" && (
+            {!unresolvedOnly && (
               <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs">
                 {tests.filter((t) => t.status !== "completed").length}
               </span>
