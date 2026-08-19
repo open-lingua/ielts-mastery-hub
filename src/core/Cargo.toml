@@ -17,6 +17,7 @@ reqwest = { version = "0.13.4", features = ["json", "rustls"], default-features 
 tokio = { version = "1.53.1", features = ["full"] }
 thiserror = "2.0.20"
 sqlx = { version = "0.9.0", features = ["sqlite", "runtime-tokio", "macros", "migrate"] }
+zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 
 [build-dependencies]
 tauri-build = { version = "2.6.3", features = [] }
