@@ -1,6 +1,7 @@
 import {
   BookOpen,
   Clock,
+  Download,
   Edit3,
   Headphones,
   Loader2,
@@ -37,7 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { type ContentItem, deleteContent, fetchAllContent } from "@/services/contentService";
+import { type ContentItem, deleteContent, exportContent, fetchAllContent } from "@/services/contentService";
 
 const moduleIcons: Record<string, React.ElementType> = {
   Reading: BookOpen,
@@ -65,6 +66,7 @@ const ContentLibrary: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [exportingId, setExportingId] = useState<string | null>(null);
 
   const loadContent = async () => {
     setLoading(true);
@@ -101,6 +103,28 @@ const ContentLibrary: React.FC = () => {
   const handleEdit = (item: ContentItem) => {
     const type = item.module.toLowerCase();
     navigate(`/admin/create?type=${type}&id=${item.id}`);
+  };
+
+  const handleExport = async (item: ContentItem) => {
+    setExportingId(item.id);
+    try {
+      const result = await exportContent(item);
+      toast({
+        title: "Export complete",
+        description: `Saved ${result.fileName} to ${result.filePath}`,
+      });
+      if (result.warnings.length > 0) {
+        toast({
+          title: "Exported with missing resources",
+          description: result.warnings.join(", "),
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({ title: "Failed to export content", variant: "destructive" });
+    } finally {
+      setExportingId(null);
+    }
   };
 
   const filtered = content.filter((c) => {
@@ -235,6 +259,18 @@ const ContentLibrary: React.FC = () => {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem className="gap-2" onClick={() => handleEdit(item)}>
                               <Edit3 className="h-3.5 w-3.5" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2"
+                              disabled={exportingId === item.id}
+                              onClick={() => handleExport(item)}
+                            >
+                              {exportingId === item.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Download className="h-3.5 w-3.5" />
+                              )}
+                              Export
                             </DropdownMenuItem>
                             <DropdownMenuItem className="gap-2 text-destructive" onClick={() => setDeleteTarget(item)}>
                               <Trash2 className="h-3.5 w-3.5" /> Delete
