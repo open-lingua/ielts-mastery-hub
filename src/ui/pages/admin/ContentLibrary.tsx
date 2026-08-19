@@ -109,6 +109,9 @@ const ContentLibrary: React.FC = () => {
     setExportingId(item.id);
     try {
       const result = await exportContent(item);
+      if (result === null) {
+        return;
+      }
       toast({
         title: "Export complete",
         description: `Saved ${result.fileName} to ${result.filePath}`,
