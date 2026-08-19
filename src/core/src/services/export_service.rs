@@ -50,10 +50,11 @@ pub async fn export_test(db: &Db, user_id: &str, kind: &str, id: &str) -> Result
     };
 
     let file_name = format!("ielts-{module}-{}_export.zip", slugify(&title));
+    let folder_name = file_name.strip_suffix(".zip").unwrap_or(&file_name).to_string();
     let json_file_name = format!("{}.json", slugify(&title).replace('-', "_"));
     let json_bytes = serde_json::to_vec_pretty(&json)?;
 
-    let zip_bytes = build_zip(&json_file_name, &json_bytes, &media, &mut warnings)?;
+    let zip_bytes = build_zip(&folder_name, &json_file_name, &json_bytes, &media, &mut warnings)?;
 
     let target_dir = downloads_dir()?;
     tokio::fs::create_dir_all(&target_dir)
@@ -85,6 +86,7 @@ fn json_title(json: &Value) -> String {
 // ── zip assembly ─────────────────────────────────────────────────────────────
 
 fn build_zip(
+    folder_name: &str,
     json_file_name: &str,
     json_bytes: &[u8],
     media: &[MediaFile],
@@ -96,7 +98,7 @@ fn build_zip(
         let options = SimpleFileOptions::default();
 
         writer
-            .start_file(json_file_name, options)
+            .start_file(format!("{folder_name}/{json_file_name}"), options)
             .map_err(|e| AppError::Validation(e.to_string()))?;
         writer
             .write_all(json_bytes)
@@ -106,7 +108,7 @@ fn build_zip(
             match std::fs::read(&file.source_path) {
                 Ok(bytes) => {
                     writer
-                        .start_file(&file.archive_path, options)
+                        .start_file(format!("{folder_name}/{}", file.archive_path), options)
                         .map_err(|e| AppError::Validation(e.to_string()))?;
                     writer
                         .write_all(&bytes)
@@ -502,17 +504,41 @@ mod tests {
             archive_path: "media/missing.mp3".to_string(),
             source_path: PathBuf::from("/nonexistent/path/missing.mp3"),
         }];
-        let zip_bytes = build_zip("test.json", b"{\"title\":\"t\"}", &media, &mut warnings).unwrap();
+        let zip_bytes =
+            build_zip("ielts-reading-sample_export", "test.json", b"{\"title\":\"t\"}", &media, &mut warnings)
+                .unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("missing.mp3"));
 
         let mut archive = zip::ZipArchive::new(Cursor::new(zip_bytes)).unwrap();
         assert_eq!(archive.len(), 1);
-        let mut file = archive.by_name("test.json").unwrap();
+        let mut file = archive.by_name("ielts-reading-sample_export/test.json").unwrap();
         let mut contents = String::new();
         std::io::Read::read_to_string(&mut file, &mut contents).unwrap();
         assert_eq!(contents, "{\"title\":\"t\"}");
+    }
+
+    #[test]
+    fn build_zip_nests_media_under_same_folder_as_json() {
+        let dir = std::env::temp_dir().join(format!("export-zip-media-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let audio_path = dir.join("section-1.mp3");
+        std::fs::write(&audio_path, b"audio bytes").unwrap();
+
+        let mut warnings = Vec::new();
+        let media = vec![MediaFile {
+            archive_path: "media/section-1.mp3".to_string(),
+            source_path: audio_path,
+        }];
+        let zip_bytes = build_zip("ielts-listening-sample_export", "test.json", b"{}", &media, &mut warnings).unwrap();
+
+        assert!(warnings.is_empty());
+        let mut archive = zip::ZipArchive::new(Cursor::new(zip_bytes)).unwrap();
+        assert!(archive.by_name("ielts-listening-sample_export/test.json").is_ok());
+        assert!(archive.by_name("ielts-listening-sample_export/media/section-1.mp3").is_ok());
+
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     async fn test_pool() -> Db {
