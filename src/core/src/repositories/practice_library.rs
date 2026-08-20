@@ -1,37 +1,8 @@
-use serde::Serialize;
-
 use crate::database::Db;
 use crate::error::AppError;
+use crate::models::practice_library::{PracticeTestCard, PracticeTestRow};
+use crate::models::user_test_sessions::UserTestSession;
 use crate::repositories::user_test_sessions;
-
-/// Normalized shape shared across the reading/writing/listening test tables,
-/// used to build the combined "All" tab.
-#[derive(Debug, Clone)]
-pub struct PracticeTestRow {
-    pub id: String,
-    pub title: String,
-    pub module: String,
-    pub difficulty: String,
-    pub duration: String,
-    pub created_at: String,
-}
-
-/// A single card in the Practice Library, merging a test row with the
-/// current user's session progress (if any).
-#[derive(Debug, Clone, Serialize)]
-pub struct PracticeTestCard {
-    pub id: String,
-    pub title: String,
-    pub module: String,
-    pub difficulty: String,
-    pub duration: String,
-    pub status: String,
-    pub progress_percent: i64,
-    pub score_band: Option<f64>,
-    pub last_active_at: Option<String>,
-    pub session_id: Option<String>,
-    pub created_at: String,
-}
 
 pub async fn count_reading_published(pool: &Db) -> Result<i64, AppError> {
     let count = sqlx::query_scalar!("SELECT COUNT(*) FROM reading_tests WHERE status = 'published'")
@@ -172,7 +143,7 @@ pub async fn merge_sessions(
     rows: Vec<PracticeTestRow>,
 ) -> Result<Vec<PracticeTestCard>, AppError> {
     let sessions = user_test_sessions::find_all(pool, user_id).await?;
-    let mut latest: std::collections::HashMap<(String, String), &user_test_sessions::UserTestSession> =
+    let mut latest: std::collections::HashMap<(String, String), &UserTestSession> =
         std::collections::HashMap::new();
     for session in &sessions {
         let key = (session.test_type.clone(), session.test_id.clone());
