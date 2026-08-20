@@ -1,29 +1,6 @@
-use serde::{Deserialize, Serialize};
-
 use crate::database::Db;
 use crate::error::AppError;
-
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
-pub struct WritingTest {
-    pub id: String,
-    pub created_by: String,
-    pub title: String,
-    pub status: String,
-    pub created_at: String,
-    pub updated_at: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateWritingTest {
-    pub title: Option<String>,
-    pub status: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateWritingTest {
-    pub title: Option<String>,
-    pub status: Option<String>,
-}
+use crate::models::writing_tests::{CreateWritingTest, UpdateWritingTest, WritingTest};
 
 pub async fn find_by_id(
     pool: &Db,
