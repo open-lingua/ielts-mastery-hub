@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::user_test_sessions as repo;
-use crate::repositories::user_test_sessions::{
+use crate::models::user_test_sessions::{
     CreateUserTestSession, UpdateUserTestSession, UserTestSession,
 };
 
