@@ -1,0 +1,56 @@
+---
+sidebar_position: 1
+title: Reading Practice Module
+---
+
+# Reading Practice Module
+
+## Structure
+
+```
+reading_tests → reading_passages → reading_question_groups → reading_questions
+```
+
+A test has one or more passages (typically 3 for a full Academic test). Each passage has one or more question groups, each with a `question_type` (e.g. multiple-choice, matching, completion) and a set of individual questions. Question groups support word banks (`has_word_bank`/`word_bank`), sequential ordering, and multi-select constraints (`multiple_selection`/`select_count`). See [Database Schema](../architecture/database-schema.mdx) for full field definitions.
+
+## Question types
+
+Question data (`options`, `matching_pairs`, `completion_gaps`, `accepted_answers`) is stored as JSON strings on `reading_questions` so a single table can represent multiple-choice, matching, and gap-completion question shapes without a rigid per-type schema.
+
+## Rendering
+
+`QuestionRenderer` (`src/ui/components/reading/QuestionRenderer.tsx`) renders the correct input UI per `question_type`, keeping the passage-reading UI and answer-input UI decoupled from question-type-specific logic.
+
+## Band score calculation
+
+`calculateReadingBandScore(correct, total)` (`src/ui/data/readingTestData.ts`) converts a raw percent-correct score into an IELTS band (0–9 in 0.5 steps):
+
+```typescript
+export function calculateReadingBandScore(correct: number, total: number): number {
+  const pct = correct / total;
+  if (pct >= 0.975) return 9;
+  if (pct >= 0.925) return 8.5;
+  if (pct >= 0.85) return 8;
+  if (pct >= 0.8) return 7.5;
+  if (pct >= 0.725) return 7;
+  if (pct >= 0.65) return 6.5;
+  if (pct >= 0.575) return 6;
+  if (pct >= 0.5) return 5.5;
+  if (pct >= 0.4) return 5;
+  if (pct >= 0.325) return 4.5;
+  if (pct >= 0.25) return 4;
+  if (pct >= 0.175) return 3.5;
+  if (pct >= 0.1) return 3;
+  return 2.5; // floor score
+}
+```
+
+This is the same threshold table used by the Listening module (see [Listening Practice Module](./listening-module.mdx)) — both modules share an identical percent-to-band conversion curve, with a floor of 2.5.
+
+## Timer / exam-simulation behavior
+
+The Reading module (`src/ui/pages/ReadingModule.tsx`) runs under a timed session (see `useTestTimer`/`usePersistedTimer` hooks in `src/ui/hooks/`), replicating exam-realistic timing. Progress and elapsed time persist across app restarts via the timer-persistence hooks and `user_test_sessions.progress_percent`/`last_active_at`.
+
+## Session persistence
+
+As the candidate answers questions, progress is saved into `user_test_sessions` (`test_type = 'reading'`): `status` (`in_progress`/`completed`), `progress_percent`, `answers` (JSON string of the candidate's responses), and eventually `score_band` once graded. `attempt_number` increments per retake, enabling retake history (see [Progress Tracking & Dashboard](./progress-tracking-dashboard.mdx)).

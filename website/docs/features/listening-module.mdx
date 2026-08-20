@@ -1,0 +1,55 @@
+---
+sidebar_position: 2
+title: Listening Practice Module
+---
+
+# Listening Practice Module
+
+## Structure
+
+```
+listening_tests → listening_sections → listening_question_groups → listening_questions
+```
+
+A test has multiple sections (typically 4 for a full test), each with its own audio track and one or more question groups. `listening_questions` additionally carries a `timestamp` field marking the audio cue point relevant to that question (not present on `reading_questions`).
+
+## Audio playback
+
+Each section's `audio_url` points at a locally stored audio file. `AudioPlayer` (`src/ui/components/listening/AudioPlayer.tsx`) renders per-section playback controls. Because the webview cannot load arbitrary filesystem paths directly, raw filesystem audio paths are converted to a playable `asset://` URL via Tauri's `convertFileSrc` — see `toPlayableUrl()` in `src/ui/lib/tauri.ts`:
+
+```typescript
+// A stored audio_url may be a raw filesystem path (new imports) or an
+// already-converted asset:// URL (existing uploads) — convert only the former.
+export function toPlayableUrl(url?: string | null): string {
+  if (!url) return "";
+  const isFsPath = url.startsWith("/") || /^[A-Za-z]:\\/.test(url);
+  return isFsPath ? convertFileSrc(url) : url;
+}
+```
+
+## Question types
+
+`src/ui/data/listeningTestData.ts` defines:
+
+```typescript
+export type ListeningQuestionType = "fill" | "mcq" | "matching" | "map_label";
+```
+
+`fill`-type questions carry an optional `wordLimit` (e.g. "no more than two words") enforced client-side during answer entry.
+
+## Band score calculation
+
+`calculateBandScore(correct, total)` (`src/ui/data/listeningTestData.ts`) uses the **same** percent-to-band threshold table as Reading (see [Reading Practice Module](./reading-module.mdx)), with a floor score of 2.5:
+
+```typescript
+export function calculateBandScore(correct: number, total: number): number {
+  const pct = correct / total;
+  if (pct >= 0.975) return 9;
+  // ... identical thresholds down to ...
+  return 2.5; // floor score
+}
+```
+
+## Audio import & storage
+
+Admins upload listening audio through the Admin CMS (`upload_listening_audio` command, or as part of a full test import — see [Import & Export Commands](../api-reference/import-export-commands.mdx)). Imported audio is written to the app's local storage directory and referenced from `listening_sections.audio_url`; both raw filesystem paths and pre-converted asset URLs are supported and normalized by `toPlayableUrl()` above.

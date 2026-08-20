@@ -1,0 +1,28 @@
+---
+sidebar_position: 4
+title: Full Exam Simulation Mode
+---
+
+# Full Exam Simulation Mode
+
+:::warning Not implemented as a combined feature today
+There is currently **no dedicated "Exam Simulation" page, route, or component** that chains Reading → Listening → Writing into a single timed session with break/transition rules. Each module independently supports exam-realistic timing (see below), and `docs/product.md` describes "full mock exams" as a **Premium Student** capability, but no cross-module orchestration exists in the codebase yet (no `/exam` route in `src/ui/App.tsx`, no `ExamSimulation`/`MockExam` component found). This page documents current per-module exam-realism and the product intent, and should be updated once a combined simulation flow is built.
+:::
+
+## What exists today: per-module exam realism
+
+- **Reading** (`/reading`) — timed session via `useTestTimer`/`usePersistedTimer`, 3-passage structure covering all official IELTS reading question types, matching real exam layout (passage left / questions right per `docs/product.md`).
+- **Listening** (`/listening`) — timed session with 4 sections and section-by-section audio playback, matching the real listening exam's section pacing.
+- **Writing** (`/writing`) — Task 1 (20 min suggested) and Task 2 (`suggested_time` per task) with minimum word counts (`min_words`) enforced, matching real exam timing pressure.
+
+Each module persists progress independently via `user_test_sessions` (`test_type` = `'reading'` | `'writing'` | `'listening'`), scoped per test — there is no shared "exam session" entity spanning all three today.
+
+## Product intent (not yet built)
+
+Per `docs/product.md`, the target experience for Premium Students includes "unlimited AI grading, full mock exams, and advanced analytics." A combined Exam Simulation mode would need to:
+
+- Chain Reading → (break) → Listening → (break) → Writing in one continuous timed run, mirroring real IELTS exam day pacing.
+- Aggregate an overall band score across all attempted modules.
+- Persist a single exam-run record (or a linked set of `user_test_sessions`) rather than three independent, unrelated sessions.
+
+If you are implementing this feature, see [Adding a New Feature End-to-End](../contributing/adding-a-new-feature.mdx) for the standard model → repository → command → frontend wrapper workflow, and update this page to reflect the real implementation once shipped.

@@ -1,0 +1,61 @@
+---
+sidebar_position: 6
+title: Practice Test Library
+---
+
+# Practice Test Library
+
+`src/core/src/repositories/practice_library.rs` powers the combined "All" tab of the Practice Library, which lists published tests across Reading, Writing, and Listening in one feed.
+
+## Why merge-sort in Rust instead of SQL `UNION`
+
+`reading_tests`, `writing_tests`, and `listening_tests` don't share a column shape, and `sqlx`'s compile-time-checked macros (`query!`/`query_as!`) require a single, statically known shape per query — incompatible with a heterogeneous `UNION` across the three tables. Instead:
+
+1. `find_reading_page`, `find_writing_page`, `find_listening_page` each fetch published rows from their own table, normalized into a common `PracticeTestRow { id, title, module, difficulty, duration, created_at }`.
+2. `find_all_page(pool, offset, limit)` fetches **all** rows from all three modules (unbounded, `i64::MAX` limit per module), concatenates them, sorts the combined vector by `created_at DESC` in Rust, then paginates in-memory by slicing `[start..end]`:
+
+```rust
+let mut all: Vec<PracticeTestRow> = Vec::with_capacity(...);
+all.extend(reading);
+all.extend(writing);
+all.extend(listening);
+all.sort_by(|a, b| b.created_at.cmp(&a.created_at));
+// ... then slice [start..end] for the requested page
+```
+
+This trades some efficiency (fetching the full unpaginated set from each module every call) for compile-time query safety and simplicity — acceptable given the local-first, single-user scale of this app.
+
+## Merging session progress onto each card
+
+`merge_sessions(pool, user_id, rows)` builds a `PracticeTestCard` per row by looking up the user's `user_test_sessions` and, for each `(test_type, test_id)` pair, picking the session with the **highest `attempt_number`**:
+
+```rust
+match latest.get(&key) {
+    Some(existing) if existing.attempt_number >= session.attempt_number => {}
+    _ => { latest.insert(key, session); }
+}
+```
+
+`PracticeTestCard` (`src/core/src/models/practice_library.rs`) shape:
+
+```rust
+pub struct PracticeTestCard {
+    pub id: String,
+    pub title: String,
+    pub module: String,
+    pub difficulty: String,
+    pub duration: String,
+    pub status: String,             // session status, or "not_started" if no session exists
+    pub progress_percent: i64,       // 0 if no session
+    pub score_band: Option<f64>,
+    pub last_active_at: Option<String>,
+    pub session_id: Option<String>,
+    pub created_at: String,
+}
+```
+
+If no session exists yet for a test, the card falls back to `status: "not_started"` and `progress_percent: 0`.
+
+## Frontend consumption
+
+`listPracticeTests()` (`src/ui/lib/tauri.ts`) calls the `list_practice_tests` command and returns a `PaginatedResponse<PracticeTestCardDto>` (see [Tauri IPC Contract](../architecture/ipc-contract.mdx) for the pagination shape). `TestLibrary.tsx` (`src/ui/pages/`) renders this feed, letting candidates browse and resume tests across all three modules from a single screen.

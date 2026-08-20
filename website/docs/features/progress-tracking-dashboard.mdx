@@ -1,0 +1,42 @@
+---
+sidebar_position: 5
+title: Progress Tracking & Dashboard
+---
+
+# Progress Tracking & Dashboard
+
+## Dashboard components
+
+`src/ui/pages/Dashboard.tsx` composes several data-driven components:
+
+- **`BandScoreChart`** (`src/ui/components/dashboard/BandScoreChart.tsx`) — a Recharts `LineChart` plotting `score_band` over `completed_at` per module (`reading`/`listening`/`writing`), fetched via `listUserTestSessions(userId)`.
+- **`StudyHeatmap`** (`src/ui/components/dashboard/StudyHeatmap.tsx`) — calendar-style heatmap of study activity.
+- **Streak counter** — `Dashboard.tsx` computes a "day streak" locally by walking session `completed_at`/activity dates and counting consecutive days of activity, displayed as "N day streak".
+
+## Data driving the dashboard
+
+All dashboard state is derived from `user_test_sessions` rows (see [Database Schema](../architecture/database-schema.mdx)):
+
+| Field | Drives |
+|---|---|
+| `status` | in-progress vs. completed test counts |
+| `progress_percent` | resumable-session progress bars |
+| `score_band` | band score trend chart, overall average |
+| `last_active_at` | recency sorting, "continue where you left off" |
+| `attempt_number` | retake history (see below) |
+
+## Retake history & attempt numbering
+
+Each time a candidate retakes the same test, a new `user_test_sessions` row is inserted with an incremented `attempt_number` (same `user_id` + `test_id` + `test_type`). This preserves full retake history rather than overwriting the previous attempt.
+
+## Selecting the session to display
+
+When merging session progress onto a Practice Library card, `practice_library::merge_sessions` (`src/core/src/repositories/practice_library.rs`) picks the session with the **highest `attempt_number`** per test for that user, so the dashboard/library always reflects the candidate's most recent attempt rather than their first:
+
+```rust
+/// the given user onto each test row, picking the session with the highest
+/// `attempt_number` per test.
+pub async fn merge_sessions(...)
+```
+
+See [Practice Test Library](./practice-library.mdx) for the full merge behavior.

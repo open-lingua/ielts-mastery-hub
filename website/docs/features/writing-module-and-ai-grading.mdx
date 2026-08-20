@@ -1,0 +1,139 @@
+---
+sidebar_position: 3
+title: Writing Practice & AI-Graded Feedback
+---
+
+# Writing Practice & AI-Graded Feedback
+
+## End-to-end flow
+
+1. The candidate drafts Task 1 and Task 2 responses in `WritingSimulator.tsx` (`src/ui/pages/`).
+2. `submitWritingTest(sessionId, answers)` (`src/ui/services/writingPracticeService.ts`) persists the raw answers to `user_test_sessions`.
+3. `gradeWritingTest(tasks)` (`src/ui/services/aiGradingService.ts`) calls `evaluateWriting()` for both tasks **in parallel** (`Promise.all`), each of which invokes the Rust `grade_writing` command.
+4. `persistFeedback(sessionId, overallBand, feedbackData)` stores the combined result back onto the session (`score_band`, `feedback_data`).
+
+```typescript
+export async function gradeWritingTest(
+  tasks: Array<{ taskType: "task1" | "task2"; prompt: string; userResponse: string }>
+): Promise<{ task1: GradingResult; task2: GradingResult; overallBand: number }> {
+  const [result1, result2] = await Promise.all(tasks.map((t) => evaluateWriting(t.taskType, t.prompt, t.userResponse)));
+
+  // Task 2 carries more weight (2/3) in official IELTS
+  const overallBand = Math.round(((result1.overallBand * 1 + result2.overallBand * 2) / 3) * 2) / 2;
+
+  return { task1: result1, task2: result2, overallBand };
+}
+```
+
+## Official IELTS weighting
+
+The combined `overallBand` is **not** a simple average — Task 2 counts double Task 1, per the official IELTS Writing weighting: `(band1 * 1 + band2 * 2) / 3`, rounded to the nearest 0.5.
+
+## Grading contract
+
+The Rust `grade_writing` command (`src/core/src/commands/grade_writing.rs`) returns a `GradingResult`:
+
+```typescript
+export interface GradingResult {
+  overallBand: number;
+  criteria: {
+    taskAchievement: number;
+    coherenceCohesion: number;
+    lexicalResource: number;
+    grammaticalRange: number;
+  };
+  feedback: {
+    strengths: string[];
+    weaknesses: string[];
+    improvements: string;
+  };
+}
+```
+
+(Rust field names are `snake_case` internally but each field carries an explicit `#[serde(rename = "...")]` to camelCase for this particular struct — an exception to the general snake_case wire convention described in [IPC Contract](../architecture/ipc-contract.mdx).)
+
+## Required environment variables
+
+The frontend requires:
+
+```bash
+VITE_AI_API_KEY="..."
+VITE_AI_GATEWAY_URL="https://your-gateway.example.com/v1/chat/completions"
+```
+
+Read in `src/ui/services/aiGradingService.ts`; if either is missing, grading throws before any Tauri call is made:
+
+```
+AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)
+```
+
+## `grade_writing` command constraints
+
+| Constraint | Value |
+|---|---|
+| Max `user_response` length | 10,000 characters (`MAX_RESPONSE_LEN`) |
+| Max `prompt` length | 5,000 characters (`MAX_PROMPT_LEN`) |
+| Allowed `task_type` | `"task1"` or `"task2"` only |
+| Model | `google/gemini-2.5-flash`, called through the configured gateway |
+| Auth | Bearer token (`ai_api_key`) sent as `Authorization: Bearer <key>` |
+| Temperature | `0.3` |
+
+## System prompt
+
+```text
+You are an expert IELTS examiner with years of experience. Grade the following user response to the provided IELTS writing prompt. Evaluate strictly according to the official IELTS band descriptors.
+
+You must return ONLY a valid JSON object with this exact structure (no markdown, no extra text):
+{
+  "overallBand": <number between 0 and 9, in 0.5 increments>,
+  "criteria": {
+    "taskAchievement": <number>,
+    "coherenceCohesion": <number>,
+    "lexicalResource": <number>,
+    "grammaticalRange": <number>
+  },
+  "feedback": {
+    "strengths": ["<string>", "<string>"],
+    "weaknesses": ["<string>", "<string>"],
+    "improvements": "<string with specific actionable advice>"
+  }
+}
+
+Rules:
+- All band scores must be between 0.0 and 9.0 in 0.5 increments.
+- overallBand is the average of the 4 criteria scores, rounded to nearest 0.5.
+- Be fair but rigorous. Do not inflate scores.
+- strengths and weaknesses should each have 2-4 bullet points.
+- improvements should be 2-3 sentences of actionable advice.
+```
+
+The Rust command builds the gateway request as:
+
+```rust
+let request_body = serde_json::json!({
+    "model": "google/gemini-2.5-flash",
+    "messages": [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_content}
+    ],
+    "temperature": 0.3
+});
+```
+
+and extracts the model's JSON reply from `choices[0].message.content`, stripping any Markdown code fences before parsing.
+
+## Error handling
+
+| Condition | Error returned |
+|---|---|
+| Gateway responds with a non-2xx status | `"AI grading failed"` |
+| Gateway response body isn't valid `GradingResult` JSON | `"Invalid AI response format"` |
+| `task_type` not `"task1"`/`"task2"` | `"taskType must be 'task1' or 'task2'"` |
+| `user_response` over 10,000 chars | `"userResponse must be under 10000 characters"` |
+| `prompt` over 5,000 chars | `"prompt must be under 5000 characters"` |
+
+See [Error Handling Conventions](../api-reference/error-handling.mdx) for how these surface in the UI.
+
+:::warning Requires network access
+AI grading calls an external gateway over the network and requires valid `VITE_AI_API_KEY`/`VITE_AI_GATEWAY_URL` credentials. **It does not work offline** — unlike Reading and Listening, which are fully local. See [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx) for the privacy implications of sending writing submissions to a third-party gateway.
+:::
