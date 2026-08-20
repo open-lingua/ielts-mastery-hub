@@ -1,0 +1,44 @@
+---
+sidebar_position: 1
+title: Prerequisites
+---
+
+# Prerequisites
+
+Before setting up IELTS Mastery Hub, install the following tooling for your platform.
+
+## Required tooling
+
+| Tool | Version | Notes |
+|---|---|---|
+| Node.js | LTS (see `.nvmrc`, currently `lts/jod`) | Use `nvm use` to match the pinned version |
+| npm | bundled with Node.js | Package manager used by the repo scripts |
+| Rust | stable, via [`rustup`](https://rustup.rs/) | Compiled automatically by Tauri — see warning below |
+| Tauri CLI | installed as a dev dependency (`@tauri-apps/cli`) | Invoked via `npm run tauri` / `npm run tauri:build` |
+
+## Platform-specific Tauri system dependencies
+
+Tauri 2 requires a native WebView on each OS:
+
+- **Windows** — WebView2 (usually preinstalled on modern Windows; otherwise install the [Evergreen Bootstrapper](https://developer.microsoft.com/microsoft-edge/webview2/)).
+- **Linux** — `webkit2gtk` and `libayatana-appindicator` (exact packages vary by distro, e.g. `webkit2gtk-4.1`, `libayatana-appindicator3-dev` on Debian/Ubuntu).
+- **macOS** — Xcode Command Line Tools (`xcode-select --install`).
+
+See the official [Tauri prerequisites guide](https://tauri.app/start/prerequisites/) for the full, current per-OS dependency list.
+
+:::warning Do not build the Rust binary manually
+Rust is compiled automatically by Tauri tooling. Do not invoke raw `cargo build`/`cargo run` for the app binary — use `npm run tauri` (dev) or `npm run tauri:build` (production) instead. Isolated `cargo` commands (e.g. `cargo test`, `cargo clippy`) inside `src/core/` are fine for backend-only work.
+:::
+
+## Verification checklist
+
+Run these commands and confirm each one returns a version:
+
+```bash
+node -v          # should match the version in .nvmrc
+npm -v
+rustc --version
+cargo --version
+```
+
+If any command is missing, revisit the installation steps for that tool before continuing to [Installation & Local Setup](./installation.mdx).

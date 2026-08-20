@@ -1,0 +1,65 @@
+---
+sidebar_position: 2
+title: Installation & Local Setup
+---
+
+# Installation & Local Setup
+
+## Clone and install
+
+```bash
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+cd ielts-mastery-hub
+npm install
+```
+
+## Directory layout
+
+```
+/
+├── src/
+│   ├── core/   # Rust / Tauri 2 backend
+│   └── ui/     # React / TypeScript frontend
+└── website/    # Docusaurus documentation site (this site)
+```
+
+See [Full Technology Stack Reference](../reference/tech-stack-reference.mdx) and [Folder Structure](../architecture/frontend-architecture.mdx) for more detail.
+
+## Environment variables
+
+Frontend environment variables must be prefixed with `VITE_` to be exposed to the Vite/React app. Create a `.env.local` file at the repository root (or under `src/ui/`, depending on your Vite working directory) with:
+
+```bash
+VITE_AI_API_KEY="your-gateway-api-key"
+VITE_AI_GATEWAY_URL="https://your-ai-gateway.example.com/v1/chat/completions"
+```
+
+These two variables are read directly in `src/ui/services/aiGradingService.ts` and are required for the Writing module's AI grading feature (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)). If either is unset, the app throws a clear error:
+
+```
+AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)
+```
+
+:::warning Never commit real API keys
+Use `.env.local` (already gitignored) rather than committing secrets into `.env` or source-controlled config. The repository's tracked `.env.example` currently only documents legacy Supabase-related variables (`VITE_SUPABASE_*`) inherited from an earlier integration — the AI grading variables above are the ones actually consumed by the Writing module today.
+:::
+
+Backend-only secrets (if any are introduced) belong in `src/core/.env` and must never be exposed to the frontend — see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md).
+
+## First run
+
+1. Complete [Prerequisites](./prerequisites.mdx).
+2. `npm install` at the repo root.
+3. Add your `.env.local` with the AI grading variables above (optional if you only want to test Reading/Listening).
+4. Continue to [Running the App in Development](./running-the-app.mdx).
+
+## Troubleshooting missing native dependencies
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| App window fails to open on Windows | WebView2 not installed | Install the Evergreen Bootstrapper |
+| Build fails referencing `webkit2gtk` on Linux | Missing native packages | Install `webkit2gtk`/`libayatana-appindicator` for your distro |
+| Rust compiler errors about missing Xcode tools (macOS) | Command Line Tools not installed | Run `xcode-select --install` |
+| `cargo`/`rustc` not found | Rust toolchain not installed | Install via [rustup.rs](https://rustup.rs/) |
+
+See also [Troubleshooting Common Issues](../desktop/troubleshooting.mdx) for runtime issues after the app is running.

@@ -1,0 +1,44 @@
+---
+sidebar_position: 4
+title: Building for Production
+---
+
+# Building for Production
+
+Build a distributable desktop bundle with:
+
+```bash
+npm run tauri:build
+```
+
+This runs `tauri build --config src/core/tauri.conf.json`, which first runs the frontend production build (`beforeBuildCommand`) and then compiles the Rust binary in release mode, bundling it per the `bundle` section of `tauri.conf.json` (`"targets": "all"`).
+
+## Expected build artifacts
+
+| Platform | Artifact types |
+|---|---|
+| Windows | `.msi`, `.exe` |
+| macOS | `.dmg`, `.app` |
+| Linux | `.deb`, `.AppImage` (and others depending on installed bundlers) |
+
+Artifacts are written under `src-tauri/target/release/bundle/<format>/` relative to the Tauri project (Tauri's standard output location for the configured `frontendDist`/build setup).
+
+## Release build behavior
+
+`src/core/src/main.rs` conditionally suppresses the console window on Windows release builds:
+
+```rust
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+```
+
+This means a console window appears during `npm run tauri` (debug) but not in the shipped release binary — this is expected and intentional, not a bug.
+
+## Code signing / notarization
+
+:::note Not yet configured
+This repository does not currently define code signing or macOS notarization configuration in `tauri.conf.json`. Unsigned builds may trigger OS security warnings (Gatekeeper on macOS, SmartScreen on Windows). Configuring signing certificates and notarization credentials is left as a future improvement.
+:::
+
+## Versioning conventions
+
+The app version in `tauri.conf.json` (`"version": "0.1.0"`) is tracked separately from the npm package version in `package.json` (e.g. `1.0.0-beta.9`). Release notes follow a `MAJOR.MINOR.PATCH-beta.N` scheme and are recorded in [`RELEASES.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/RELEASES.md) as feature-grouped changelog entries per version. See [Release Process & Changelog](../contributing/release-process.mdx) for how to update it when shipping a feature.
