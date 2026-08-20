@@ -3,12 +3,11 @@ import {
   getListeningTest,
   getReadingTest,
   getWritingTest,
-  listListeningTests,
-  listReadingTests,
+  listPracticeTests,
   listUserTestSessions,
-  listWritingTests,
   updateUserTestSession,
 } from "@/lib/tauri";
+import type { PaginatedResponse } from "@/types/pagination";
 
 export type TestModule = "reading" | "writing" | "listening";
 export type SessionStatus = "not_started" | "in_progress" | "completed";
@@ -27,70 +26,34 @@ export interface PracticeTestCard {
   created_at: string;
 }
 
-export async function fetchLibraryData(userId: string): Promise<PracticeTestCard[]> {
-  const [readingTests, writingTests, listeningTests, sessions] = await Promise.all([
-    listReadingTests(userId),
-    listWritingTests(userId),
-    listListeningTests(userId),
-    listUserTestSessions(userId),
-  ]);
-
-  // Only show published tests
-  const publishedReading = readingTests.filter((t) => t.status === "published");
-  const publishedWriting = writingTests.filter((t) => t.status === "published");
-  const publishedListening = listeningTests.filter((t) => t.status === "published");
-
-  // Group sessions by test_type + test_id, pick highest attempt_number
-  const latestSessionMap = new Map<string, (typeof sessions)[0]>();
-  for (const s of sessions) {
-    const key = `${s.test_type}_${s.test_id}`;
-    const existing = latestSessionMap.get(key);
-    if (!existing || (s.attempt_number ?? 1) > (existing.attempt_number ?? 1)) {
-      latestSessionMap.set(key, s);
-    }
-  }
-
-  const merge = (
-    tests: Array<{
-      id: string;
-      title: string;
-      difficulty?: string;
-      duration?: string;
-      created_at: string;
-    }>,
-    module: TestModule,
-    defaultDifficulty = "7",
-    defaultDuration = "60 mins"
-  ): PracticeTestCard[] =>
-    tests.map((t) => {
-      const session = latestSessionMap.get(`${module}_${t.id}`);
-      return {
-        id: t.id,
-        title: t.title,
-        module,
-        difficulty: (t as any).difficulty ?? defaultDifficulty,
-        duration: (t as any).duration ?? defaultDuration,
-        status: (session?.status as SessionStatus) ?? "not_started",
-        progress_percent: session?.progress_percent ?? 0,
-        score_band:
-          session?.score_band !== null && session?.score_band !== undefined ? Number(session.score_band) : null,
-        last_active_at: session?.last_active_at ?? null,
-        session_id: session?.id ?? null,
-        created_at: t.created_at,
-      };
-    });
-
-  const all = [
-    ...merge(publishedReading, "reading"),
-    ...merge(publishedWriting, "writing", "7", "60 mins"),
-    ...merge(publishedListening, "listening"),
-  ];
-  const seen = new Set<string>();
-  return all.filter((t) => {
-    if (seen.has(t.id)) return false;
-    seen.add(t.id);
-    return true;
-  });
+/**
+ * Fetches one page of the Practice Library, optionally scoped to a single
+ * module (matching the Test Library tabs). `module` of `undefined` returns
+ * the combined "All" view, paginated server-side.
+ */
+export async function fetchLibraryPage(
+  userId: string,
+  module: TestModule | undefined,
+  page: number,
+  pageSize: number
+): Promise<PaginatedResponse<PracticeTestCard>> {
+  const response = await listPracticeTests(userId, module, page, pageSize);
+  return {
+    ...response,
+    data: response.data.map((t) => ({
+      id: t.id,
+      title: t.title,
+      module: t.module as TestModule,
+      difficulty: t.difficulty,
+      duration: t.duration,
+      status: t.status as SessionStatus,
+      progress_percent: t.progress_percent,
+      score_band: t.score_band !== null ? Number(t.score_band) : null,
+      last_active_at: t.last_active_at,
+      session_id: t.session_id,
+      created_at: t.created_at,
+    })),
+  };
 }
 
 export interface TestSessionInfo {

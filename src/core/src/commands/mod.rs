@@ -5,6 +5,7 @@ pub mod listening_question_groups;
 pub mod listening_questions;
 pub mod listening_sections;
 pub mod listening_tests;
+pub mod practice_library;
 pub mod profiles;
 pub mod reading_passages;
 pub mod reading_question_groups;

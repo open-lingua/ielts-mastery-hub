@@ -13,24 +13,27 @@ import {
   RotateCcw,
   Trophy,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import ActiveSessionBanner from "@/components/shared/ActiveSessionBanner";
+import Pagination from "@/components/shared/Pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePagination } from "@/hooks/usePagination";
 import { getAnonId } from "@/lib/anonId";
 import { cn } from "@/lib/utils";
 import {
   type ActiveSessionInfo,
   fetchActiveSession,
-  fetchLibraryData,
+  fetchLibraryPage,
   fetchTestTitle,
   type PracticeTestCard,
   type SessionStatus,
@@ -200,34 +203,52 @@ const TestCard: React.FC<{
   );
 };
 
+const moduleForTab: Record<string, TestModule | undefined> = {
+  All: undefined,
+  Reading: "reading",
+  Writing: "writing",
+  Listening: "listening",
+};
+
 const TestLibrary: React.FC = () => {
   const userId = getAnonId();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "All");
   const [unresolvedOnly, setUnresolvedOnly] = useState(false);
+  const listTopRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setActiveTab(searchParams.get("tab") ?? "All");
   }, [searchParams]);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  const [tests, setTests] = useState<PracticeTestCard[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeSessionInfo, setActiveSessionInfo] = useState<{
     session: ActiveSessionInfo;
     title: string;
   } | null>(null);
 
   const tabs = ["All", "Reading", "Writing", "Listening"];
+  const module = moduleForTab[activeTab];
+
+  const { page, pageSize, setPage } = usePagination({
+    resetKey: activeTab,
+    pageSize: 10,
+    scrollTargetRef: listTopRef,
+  });
+
+  const {
+    data: libraryPage,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["practice-tests", userId, module, page, pageSize],
+    queryFn: () => fetchLibraryPage(userId, module, page, pageSize),
+  });
 
   useEffect(() => {
-    setIsLoading(true);
-
-    const load = async () => {
+    const loadActiveSession = async () => {
       try {
-        const [testsData, active] = await Promise.all([fetchLibraryData(userId), fetchActiveSession(userId)]);
-        setTests(testsData);
-
+        const active = await fetchActiveSession(userId);
         if (active) {
           const title = await fetchTestTitle(active.test_id, active.test_type as TestModule);
           setActiveSessionInfo({ session: active, title });
@@ -235,25 +256,30 @@ const TestLibrary: React.FC = () => {
           setActiveSessionInfo(null);
         }
       } catch (error) {
-        toast.error("Failed to load tests");
         console.error(error);
-      } finally {
-        setIsLoading(false);
       }
     };
-    load();
+    loadActiveSession();
   }, [userId]);
 
-  const filteredTests = tests
-    .filter((t) => {
-      const moduleMatch = activeTab === "All" || moduleLabels[t.module] === activeTab;
-      const unresolvedMatch = !unresolvedOnly || t.status !== "completed";
-      return moduleMatch && unresolvedMatch;
-    })
-    .sort((a, b) => {
-      const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      return sortOrder === "newest" ? diff : -diff;
-    });
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load tests");
+    }
+  }, [isError]);
+
+  const tests = useMemo(() => libraryPage?.data ?? [], [libraryPage]);
+
+  const filteredTests = useMemo(
+    () =>
+      tests
+        .filter((t) => !unresolvedOnly || t.status !== "completed")
+        .sort((a, b) => {
+          const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return sortOrder === "newest" ? diff : -diff;
+        }),
+    [tests, unresolvedOnly, sortOrder]
+  );
 
   const handleStart = (test: PracticeTestCard) => {
     // Block if another test is already in progress
@@ -339,7 +365,7 @@ const TestLibrary: React.FC = () => {
         </div>
 
         {/* Timeline */}
-        <div className="relative ml-4 md:ml-6 border-l-2 border-border space-y-8 pb-10">
+        <div ref={listTopRef} className="relative ml-4 md:ml-6 border-l-2 border-border space-y-8 pb-10">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="relative pl-8 md:pl-10">
@@ -386,6 +412,11 @@ const TestLibrary: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {!isLoading && libraryPage && (
+          <Pagination pagination={libraryPage.pagination} onPageChange={setPage} />
+        )}
       </div>
     </DashboardLayout>
   );

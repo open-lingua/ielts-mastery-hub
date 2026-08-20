@@ -1,4 +1,5 @@
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
+import type { PaginatedResponse } from "@/types/pagination";
 
 // ── Shared response types (snake_case — no serde rename_all on Rust structs) ──
 
@@ -214,6 +215,36 @@ export async function updateUserTestSession(
 
 export async function deleteUserTestSession(id: string, userId: string): Promise<void> {
   return invoke<void>("delete_user_test_sessions", { id, userId });
+}
+
+// ── practice_library ─────────────────────────────────────────────────────────
+
+export interface PracticeTestCardDto {
+  id: string;
+  title: string;
+  module: string;
+  difficulty: string;
+  duration: string;
+  status: string;
+  progress_percent: number;
+  score_band: number | null;
+  last_active_at: string | null;
+  session_id: string | null;
+  created_at: string;
+}
+
+export async function listPracticeTests(
+  userId: string,
+  module: string | undefined,
+  page: number,
+  pageSize: number
+): Promise<PaginatedResponse<PracticeTestCardDto>> {
+  return invoke<PaginatedResponse<PracticeTestCardDto>>("list_practice_tests", {
+    userId,
+    module,
+    page,
+    pageSize,
+  });
 }
 
 // ── reading_tests ──────────────────────────────────────────────────────────

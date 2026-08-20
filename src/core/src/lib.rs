@@ -63,6 +63,7 @@ pub fn run() {
             commands::writing_tasks::create_writing_tasks,
             commands::writing_tasks::update_writing_tasks,
             commands::writing_tasks::delete_writing_tasks,
+            commands::practice_library::list_practice_tests,
             commands::listening_tests::get_listening_tests,
             commands::listening_tests::list_listening_tests,
             commands::listening_tests::create_listening_tests,
