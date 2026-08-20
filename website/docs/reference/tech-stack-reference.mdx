@@ -1,0 +1,64 @@
+---
+sidebar_position: 3
+title: Full Technology Stack Reference
+---
+
+# Full Technology Stack Reference
+
+## Core (Frontend)
+
+| Dependency | Role |
+|---|---|
+| React 19 | UI framework |
+| TypeScript (strict) | Type safety |
+| Vite + `@vitejs/plugin-react-swc` | Dev server, HMR, bundling |
+| `react-router-dom` (React Router v6 API, v7 package) | Client-side routing |
+
+## UI & Styling
+
+| Dependency | Role |
+|---|---|
+| Tailwind CSS v4 (`@tailwindcss/vite`, `@tailwindcss/typography`) | Utility-first styling |
+| shadcn/ui (Radix UI primitives: `@radix-ui/react-*`) | Accessible component primitives |
+| Framer Motion | Animations/transitions |
+| Lucide React | Icon set |
+| Recharts | Dashboard charts (band score trends) |
+| `class-variance-authority`, `clsx`, `tailwind-merge` | Class-name/variant composition |
+| `sonner`, toast components | Toast notifications |
+| `cmdk`, `vaul`, `embla-carousel-react`, `react-day-picker`, `react-resizable-panels`, `input-otp` | Assorted shadcn/ui-adjacent interaction primitives |
+
+## State & Data
+
+| Dependency | Role |
+|---|---|
+| React Context | Theme provider (`ThemeContext`); no global app-state library is used (no Zustand/Redux) |
+| `@tanstack/react-query` | Async/server state caching for Tauri command results |
+| `@tauri-apps/api` | Tauri IPC bindings (`invoke`, `convertFileSrc`, events) |
+
+## Forms & Validation
+
+| Dependency | Role |
+|---|---|
+| `react-hook-form` | Form state management |
+| `zod` + `@hookform/resolvers` | Schema validation |
+
+## Backend (Rust, `src/core/Cargo.toml`)
+
+| Crate | Version (as pinned) | Role |
+|---|---|---|
+| `tauri` | 2.11.5 (`protocol-asset`, `devtools` features) | Desktop runtime + IPC |
+| `serde` / `serde_json` | 1.0 | Serialization for IPC payloads |
+| `sqlx` | 0.9.0 (`sqlite`, `runtime-tokio`, `macros`, `migrate`) | Async, compile-time-checked SQLite access |
+| `tokio` | 1.53.1 (`full`) | Async runtime |
+| `thiserror` | 2.0.20 | `AppError` enum derivation |
+| `reqwest` | 0.13.4 (`json`, `rustls`, no default features) | HTTP client for the AI grading gateway call |
+| `zip` | 8.6.0 (`deflate`, no default features) | ZIP archive creation for test export |
+| `tauri-plugin-dialog` | 2.7.2 | Native Save-As file dialog for export |
+| `uuid` (`v4`) | 1.x | Generating ids (e.g. uploaded file names) |
+| `chrono` (`serde`) | 0.4.45 | Timestamps |
+
+Dev-only crates: `mockall`, `rstest`, `pretty_assertions`, `assert_matches` (test assertions — see [Writing New Tests](../testing/writing-new-tests.mdx)).
+
+## Language composition
+
+Per the repository's actual composition, this codebase is roughly **TypeScript ~69%, Rust ~31%**, reflecting a substantial, fully-typed frontend paired with a focused Rust backend that stays intentionally thin (commands delegate to repositories; no business-logic-heavy web framework).

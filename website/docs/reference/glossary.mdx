@@ -1,0 +1,19 @@
+---
+sidebar_position: 1
+title: Glossary of Terms
+---
+
+# Glossary of Terms
+
+Terms as used specifically in this codebase.
+
+- **Band Score** — The official IELTS 0–9 scale (in 0.5 increments) representing a candidate's proficiency. Computed per-module via a percent-correct threshold table (Reading/Listening) or AI grading (Writing). See [Reading Practice Module](../features/reading-module.mdx), [Listening Practice Module](../features/listening-module.mdx), [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx).
+- **Task Achievement / Coherence & Cohesion / Lexical Resource / Grammatical Range** — The four official IELTS Writing assessment criteria, each scored 0–9 by the AI grader; the `overallBand` is derived from these four (see `GradingCriteria` in [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)).
+- **Practice Library** — The combined browsing view merging published Reading, Writing, and Listening tests into one feed, sorted by recency. See [Practice Test Library](../features/practice-library.mdx).
+- **Test Session** — A `user_test_sessions` row tracking a candidate's attempt at a specific test: status, progress, answers, score, timestamps.
+- **Attempt Number** — `user_test_sessions.attempt_number`; increments per retake of the same test, enabling full retake history rather than overwriting prior attempts.
+- **Draft / Published status** — The `status` field on `reading_tests`/`writing_tests`/`listening_tests`. Draft tests are visible only to their creator; published tests are visible to everyone. There is no database-level `CHECK` constraint on this field's values — see [Creating & Publishing Test Content](../admin/content-management.mdx).
+- **Anon ID** — `getAnonId()` (`src/ui/lib/anonId.ts`): a `crypto.randomUUID()` generated once and persisted in `localStorage`, used as the app's `user_id` in place of a real authenticated session. See [Frontend Architecture](../architecture/frontend-architecture.mdx).
+- **Content Library** — The Admin CMS page (`/admin/content`, `ContentLibrary.tsx`) listing all created tests with Edit/Export/Delete actions.
+- **Admin CMS** — The collective set of `/admin/*` pages (Dashboard, Content Library, Create New, Import Dataset, Students) for authoring content and managing users. Currently not role-gated — see [Admin CMS Overview](../admin/overview.mdx).
+- **Export/Import round-trip** — The guarantee that a test exported to `.zip` via `export_test_to_zip` can be re-imported via Import Dataset with no manual edits, reproducing an identical test. See [Exporting Tests as ZIP Archives](../admin/export-test-to-zip.mdx).
