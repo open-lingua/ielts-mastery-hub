@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::listening_question_groups as repo;
-use crate::repositories::listening_question_groups::{
+use crate::models::listening_question_groups::{
     CreateListeningQuestionGroup, ListeningQuestionGroup, UpdateListeningQuestionGroup,
 };
 
