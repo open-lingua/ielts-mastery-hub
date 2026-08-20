@@ -1,26 +1,6 @@
-use serde::{Deserialize, Serialize};
-
 use crate::database::Db;
 use crate::error::AppError;
-
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
-pub struct UserRole {
-    pub id: String,
-    pub user_id: String,
-    pub role: String,
-    pub created_at: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateUserRole {
-    pub user_id: String,
-    pub role: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateUserRole {
-    pub role: Option<String>,
-}
+use crate::models::user_roles::{CreateUserRole, UpdateUserRole, UserRole};
 
 pub async fn find_by_id(pool: &Db, id: &str, user_id: &str) -> Result<Option<UserRole>, AppError> {
     let result = sqlx::query_as!(
