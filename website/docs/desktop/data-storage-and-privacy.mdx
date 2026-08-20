@@ -1,0 +1,31 @@
+---
+sidebar_position: 1
+title: Local Data Storage & Privacy
+---
+
+# Local Data Storage & Privacy
+
+## Everything lives locally, by default
+
+All application data — `profiles`, `user_roles`, test content, and `user_test_sessions` (including in-progress answers and AI feedback) — is stored in a single local SQLite file, `ielts.db`, in the OS-specific Tauri app data directory (see [Running the App in Development](../getting-started/running-the-app.mdx) for exact paths per OS). There is **no cloud sync** by default and no remote database.
+
+Uploaded media (writing task images, listening audio) is stored under `$HOME/.ielts-hub/<domain>/<user_id>/` (`src/core/src/commands/storage.rs`), matching the `assetProtocol.scope` configured in `src/core/tauri.conf.json`:
+
+```json
+"assetProtocol": {
+  "enable": true,
+  "scope": ["$HOME/.ielts-hub/**"]
+}
+```
+
+## The one outbound network call
+
+The **only** network request the app makes is the AI grading gateway call in `grade_writing` (`src/core/src/commands/grade_writing.rs`), which sends the Writing prompt and the candidate's response text to the URL configured in `VITE_AI_GATEWAY_URL`, authenticated with `VITE_AI_API_KEY`. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx) for the exact request/response shape.
+
+:::warning Writing submissions leave the device for AI grading
+Because Writing responses and prompts are sent to an external gateway for grading, admins configuring `VITE_AI_GATEWAY_URL`/`VITE_AI_API_KEY` should ensure the gateway endpoint and credentials are trusted and kept private — anyone with the API key can send requests through it, and the gateway operator sees the raw text of every graded submission. This is the one place candidate-authored content is not fully local.
+:::
+
+## Anonymous identity, not accounts
+
+There is no login/signup flow; `getAnonId()` (`src/ui/lib/anonId.ts`) generates a random UUID on first run and persists it in `localStorage`, used as the `user_id` for all local data scoping. See [Frontend Architecture](../architecture/frontend-architecture.mdx) for the implications of this for the Admin CMS's lack of route-level access control.

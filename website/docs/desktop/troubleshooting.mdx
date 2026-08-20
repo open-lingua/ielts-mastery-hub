@@ -1,0 +1,42 @@
+---
+sidebar_position: 3
+title: Troubleshooting Common Issues
+---
+
+# Troubleshooting Common Issues
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| App fails to start / blank window on Windows | Missing WebView2 runtime | Install the [WebView2 Evergreen Bootstrapper](https://developer.microsoft.com/microsoft-edge/webview2/) |
+| Build/run fails referencing `webkit2gtk` on Linux | Missing native GTK/WebKit packages | Install `webkit2gtk`/`libayatana-appindicator` for your distro (see [Tauri prerequisites](https://tauri.app/start/prerequisites/)) |
+| `"AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)"` | Missing `.env.local` values | Set both `VITE_AI_API_KEY` and `VITE_AI_GATEWAY_URL` — see [Installation & Local Setup](../getting-started/installation.mdx) |
+| `"AI grading failed"` | Gateway returned a non-2xx response | Check the gateway URL, API key validity, and gateway-side logs/quota |
+| `"Invalid AI response format"` | Gateway response wasn't valid `GradingResult` JSON | Check the gateway/model configuration; the model may not be honoring the requested JSON-only response format |
+| Grading hangs or times out | No network connectivity | AI grading requires network access — it does not work offline (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)) |
+| Database appears locked, corrupted, or stale | Leftover `-wal`/`-shm` files, or manual edits while the app was running | Reset the local database — see below |
+| `cargo`/Rust build failures | Rust toolchain mismatch or missing native deps | Verify `rustc --version`/`cargo --version` match [Prerequisites](../getting-started/prerequisites.mdx); reinstall via `rustup` if needed |
+| Webview devtools don't open automatically | `OPEN_DEVTOOLS` not set | Run with `OPEN_DEVTOOLS=true npm run tauri` (see [Running the App in Development](../getting-started/running-the-app.mdx)) |
+
+## Resetting the local database
+
+For a full reset (drop, recreate, re-migrate, re-seed), see `docs/database-reset.md` in the repository — summarized:
+
+```bash
+# 1. Delete the existing database (macOS path shown; see CONTRIBUTING.md for Linux/Windows)
+rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/ielts.db*
+
+# 2. Point DATABASE_URL at the same file the app uses, then re-migrate
+cd src/core
+export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+sqlx database drop -y
+sqlx database create
+sqlx migrate run --source src/database/migrations
+
+# 3. Re-apply seed data
+DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+for f in src/database/seeds/listening/*.sql src/database/seeds/reading/*.sql src/database/seeds/writing/*.sql; do
+  sqlite3 "$DB" < "$f"
+done
+```
+
+Simply deleting `ielts.db` and relaunching with `npm run tauri` also recreates the schema automatically (migrations run on startup), but seed data must still be applied manually via the loop above.

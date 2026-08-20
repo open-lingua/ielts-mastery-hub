@@ -1,0 +1,69 @@
+---
+sidebar_position: 2
+title: File System & Native Dialog Integration
+---
+
+# File System & Native Dialog Integration
+
+## `tauri-plugin-dialog` (Save-As export flow)
+
+Registered as a plugin in `src/core/src/lib.rs`:
+
+```rust
+tauri::Builder::default()
+    .plugin(tauri_plugin_dialog::init())
+```
+
+Used in `export_test_to_zip` (`src/core/src/commands/export.rs`) to prompt a native "Save As" dialog before writing the exported zip to disk:
+
+```rust
+use tauri_plugin_dialog::DialogExt;
+
+let chosen = tauri::async_runtime::spawn_blocking(move || {
+    let mut dialog = app.dialog().file().set_file_name(&file_name).add_filter("Zip Archive", &["zip"]);
+    if let Some(dir) = default_dir {
+        dialog = dialog.set_directory(dir);
+    }
+    dialog.blocking_save_file()
+})
+.await
+.map_err(|e| e.to_string())?;
+```
+
+If the admin cancels the dialog, `chosen` is `None` and the command returns `Ok(None)` rather than an error — see [Exporting Tests as ZIP Archives](../admin/export-test-to-zip.mdx).
+
+## `convertFileSrc` (serving local media into the webview)
+
+Local audio/image files can't be loaded by the webview via raw filesystem paths. `@tauri-apps/api/core`'s `convertFileSrc` converts a filesystem path into an `asset://`-scheme URL the webview is allowed to load, subject to `tauri.conf.json`'s `assetProtocol.scope`:
+
+```json
+"assetProtocol": {
+  "enable": true,
+  "scope": ["$HOME/.ielts-hub/**"]
+}
+```
+
+Two call sites in `src/ui/lib/tauri.ts` use this:
+
+- `toPlayableUrl(url)` — normalizes a `listening_sections.audio_url` value, converting it only if it looks like a raw filesystem path (vs. an already-converted URL).
+- `uploadWritingAsset()` / `uploadListeningAudio()` — convert the newly-uploaded file's returned storage path to a playable URL before handing it back to the caller.
+
+## Storage commands
+
+`upload_writing_asset` and `upload_listening_audio` (`src/core/src/commands/storage.rs`) both write uploaded bytes under `$HOME/.ielts-hub/<domain>/<user_id>/<timestamp>-<uuid>.<ext>` (domains: `writing-assets`, `listening-audio`), matching the `assetProtocol.scope` above. See [Import & Export Commands](../api-reference/import-export-commands.mdx) and [Listening Test Commands](../api-reference/listening-commands.mdx).
+
+## Tauri ACL / capabilities
+
+Tauri 2's permission model is capability-based; adding a new plugin (like `tauri-plugin-dialog`) requires regenerating the ACL/capabilities schema so the plugin's commands are actually allowed to run. `RELEASES.md` records this exact step during the export feature's development:
+
+```
+- Regenerate Tauri ACL schemas for tauri-plugin-dialog
+- Register tauri-plugin-dialog in app builder
+- Add tauri-plugin-dialog dependency for export file picker
+```
+
+The generated schema lives at `src/core/gen/schemas/capabilities.json`.
+
+:::note Never hand-edit generated ACL files
+`src/core/gen/schemas/capabilities.json` is generated output — regenerate it via Tauri's tooling when adding/changing plugin permissions rather than editing it directly (see the "Never edit generated files" rule in `docs/folder-structure.md`).
+:::
