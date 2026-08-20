@@ -2,9 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::reading_passages as repo;
-use crate::repositories::reading_passages::{
-    CreateReadingPassage, ReadingPassage, UpdateReadingPassage,
-};
+use crate::models::reading_passages::{CreateReadingPassage, ReadingPassage, UpdateReadingPassage};
 
 #[tauri::command]
 pub async fn get_reading_passages(
