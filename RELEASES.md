@@ -3,6 +3,75 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.8 / 2026.08.19
+
+- feat: add WritingTest structs to models
+- feat: add WritingTask structs to models
+- feat: add UserTestSession structs to models
+- feat: add UserRole structs to models
+- feat: add ReadingTest structs to models
+- feat: add ReadingQuestion structs to models
+- feat: add ReadingQuestionGroup structs to models
+- feat: add ReadingPassage structs to models
+- feat: add Profile structs to models
+- feat: add PracticeTestRow/PracticeTestCard structs to models
+- feat: add ListeningTest structs to models
+- feat: add ListeningSection structs to models
+- feat: add ListeningQuestion structs to models
+- feat: add ListeningQuestionGroup structs to models
+- refactor: import ReadingQuestion/ListeningQuestion from models in export_service.rs
+- refactor: remove WritingTest structs from repositories/writing_tests.rs
+- refactor: remove WritingTask structs from repositories/writing_tasks.rs
+- refactor: remove UserTestSession structs from repositories/user_test_sessions.rs
+- refactor: remove UserRole structs from repositories/user_roles.rs
+- refactor: remove ReadingTest structs from repositories/reading_tests.rs
+- refactor: remove ReadingQuestion structs from repositories/reading_questions.rs
+- refactor: remove ReadingQuestionGroup structs from repositories/reading_question_groups.rs
+- refactor: remove ReadingPassage structs from repositories/reading_passages.rs
+- refactor: remove Profile structs from repositories/profiles.rs
+- refactor: remove ListeningTest structs from repositories/listening_tests.rs
+- refactor: remove ListeningSection structs from repositories/listening_sections.rs
+- refactor: remove ListeningQuestion structs from repositories/listening_questions.rs
+- refactor: declare new model submodules in models/mod.rs
+- refactor: import WritingTest structs from models in writing_tests.rs
+- refactor: import WritingTask structs from models in writing_tasks.rs
+- refactor: import UserTestSession structs from models in user_test_sessions.rs
+- refactor: import UserRole structs from models in user_roles.rs
+- refactor: import ReadingTest structs from models in reading_tests.rs
+- refactor: import ReadingQuestion structs from models in reading_questions.rs
+- refactor: import ReadingQuestionGroup structs from models in reading_question_groups.rs
+- refactor: import ReadingPassage structs from models in reading_passages.rs
+- refactor: import Profile structs from models in profiles.rs
+- refactor: import PracticeTestCard from models in practice_library.rs
+- refactor: import ListeningTest structs from models in listening_tests.rs
+- refactor: import ListeningSection structs from models in listening_sections.rs
+- refactor: import ListeningQuestion structs from models in listening_questions.rs
+- refactor: import ListeningQuestionGroup structs from models in listening_question_groups.rs
+- fix: Fix pagination not advancing pages due to unstable setSearchParams dependency
+- Add shared pagination model (PaginationParams, PaginationMeta, PaginatedResponse)
+- Fix Unresolved filter being overwritten by module tab selection
+- fix: fix unresolved filter with newest and oldest filter
+- Handle cancelled export (null result) without error toast
+- Propagate nullable export result through exportContent
+- Update exportTestToZip to return ExportResult | null on cancel
+- Wire native Save As dialog into export_test_to_zip command
+- Split export service into build_export + default_export_dir for file picker
+- Register tauri-plugin-dialog in app builder
+- Regenerate Tauri ACL schemas for tauri-plugin-dialog
+- Add tauri-plugin-dialog dependency for export file picker
+- core: nest export zip contents inside a slug-named folder
+- docs: add export test to zip spec
+- ui: add Export action to Content Library 3-dot menu
+- ui: add exportContent helper to contentService
+- ui: add exportTestToZip invoke wrapper and ExportResult type
+- core: wire up export_test_to_zip in invoke_handler
+- core: register export command module
+- core: register export_service module
+- core: add export_test_to_zip Tauri command
+- core: add export_service to build importable test JSON and zip bundles
+- core: add zip crate dependency for test export
+- chore: add Copilot CLI instructions via symlink to AGENTS.md
+
 ### 1.0.0-beta.7 / 2026.08.18
 
 - docs(core): move testing conventions into docs/core/testing/
