@@ -1,0 +1,60 @@
+---
+sidebar_position: 5
+title: Listening Test Commands
+---
+
+# Listening Test Commands
+
+## `listening_tests`
+
+| Command | TS wrapper | Signature |
+|---|---|---|
+| `get_listening_tests` | `getListeningTest(id, userId)` | `Promise<ListeningTest \| null>` |
+| `list_listening_tests` | `listListeningTests(userId)` | `Promise<ListeningTest[]>` |
+| `create_listening_tests` | `createListeningTest(userId, { title?, difficulty?, duration?, status? })` | `Promise<string>` |
+| `update_listening_tests` | `updateListeningTest(id, userId, { title?, difficulty?, duration?, status? })` | `Promise<void>` |
+| `delete_listening_tests` | `deleteListeningTest(id, userId)` | `Promise<void>` |
+
+## `listening_sections`
+
+| Command | TS wrapper |
+|---|---|
+| `list_listening_sections` | `listListeningSections(userId)` |
+| `create_listening_sections` | `createListeningSection(userId, { test_id, section_number?, title?, transcript?, audio_url? })` |
+| `delete_listening_sections` | `deleteListeningSection(id, userId)` |
+
+## `listening_question_groups`
+
+| Command | TS wrapper |
+|---|---|
+| `list_listening_question_groups` | `listListeningQuestionGroups(userId)` |
+| `create_listening_question_groups` | `createListeningQuestionGroup(userId, input)` — same shape as `createReadingQuestionGroup` |
+| `delete_listening_question_groups` | `deleteListeningQuestionGroup(id, userId)` |
+
+## `listening_questions`
+
+| Command | TS wrapper |
+|---|---|
+| `list_listening_questions` | `listListeningQuestions(userId)` |
+| `create_listening_questions` | `createListeningQuestion(userId, input)` — same fields as reading questions, plus `timestamp?: string` (audio cue point) |
+| `delete_listening_questions` | `deleteListeningQuestion(id, userId)` |
+
+## `upload_listening_audio` (storage command)
+
+```typescript
+export async function uploadListeningAudio(userId: string, file: File): Promise<string> {
+  const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
+  const path = await invoke<string>("upload_listening_audio", {
+    userId,
+    file_name: file.name,
+    file_data: bytes,
+  });
+  return convertFileSrc(path);
+}
+```
+
+- Reads the selected `File` into a raw byte array client-side.
+- Rust (`src/core/src/commands/storage.rs`) writes the bytes to the app's local storage directory and returns the on-disk path.
+- The wrapper immediately converts that path to a webview-playable `asset://` URL via `convertFileSrc` before returning it — callers get a ready-to-use URL, not a raw filesystem path. See [File System & Native Dialog Integration](../desktop/file-system-integration.mdx).
+
+Usage notes: call this once per audio file during admin content creation, then store the returned URL on the corresponding `listening_sections.audio_url` field via `createListeningSection`/`updateListeningTest`-adjacent flows.

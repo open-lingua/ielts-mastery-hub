@@ -1,0 +1,27 @@
+---
+sidebar_position: 1
+title: Tauri Command Reference — Overview
+---
+
+# Tauri Command Reference — Overview
+
+The **only** API surface of IELTS Mastery Hub is the set of Tauri commands registered in `tauri::generate_handler![...]` inside `src/core/src/lib.rs`. There is no HTTP API or remote server.
+
+## Categorized index
+
+| Category | Commands | Reference |
+|---|---|---|
+| Profiles & Roles | `get/list/create/update/delete_profiles`, `get/list/create/update/delete_user_roles` | [Profiles & User Roles](./profiles-and-roles.mdx) |
+| Reading | `get/list/create/update/delete_reading_tests`, `_reading_passages`, `_reading_question_groups`, `_reading_questions` | [Reading Commands](./reading-commands.mdx) |
+| Writing | `get/list/create/update/delete_writing_tests`, `_writing_tasks`, `grade_writing` | [Writing Commands](./writing-commands.mdx) |
+| Listening | `get/list/create/update/delete_listening_tests`, `_listening_sections`, `_listening_question_groups`, `_listening_questions`, `upload_listening_audio` | [Listening Commands](./listening-commands.mdx) |
+| Sessions & Library | `get/list/create/update/delete_user_test_sessions`, `list_practice_tests` | [Sessions & Practice Library](./sessions-and-library.mdx) |
+| Storage | `upload_writing_asset`, `upload_listening_audio` | [Listening Commands](./listening-commands.mdx), [File System Integration](../desktop/file-system-integration.mdx) |
+| Import | `validate_import`, `import_reading_test`, `import_writing_test`, `import_listening_test` | [Import & Export Commands](./import-export-commands.mdx) |
+| Export | `export_test_to_zip` | [Import & Export Commands](./import-export-commands.mdx) |
+
+## Naming convention
+
+Every core entity follows the same 5-command pattern: `get_<entity>`, `list_<entity>`, `create_<entity>`, `update_<entity>`, `delete_<entity>` (plural entity name, e.g. `reading_tests`, `listening_sections`). Each command is a thin wrapper in `src/core/src/commands/<domain>.rs` that delegates to a repository function in `src/core/src/repositories/<domain>.rs`, which performs the actual SQL and enforces ownership (`created_by`/`user_id` scoping — see each repository's `find_by_id`/`find_all`/`update`/`delete` implementation for the exact rule).
+
+All commands return `Result<T, String>` — see [Error Handling Conventions](./error-handling.mdx) for the conversion pattern and common error strings.

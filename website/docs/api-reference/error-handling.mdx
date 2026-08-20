@@ -1,0 +1,61 @@
+---
+sidebar_position: 8
+title: Error Handling Conventions
+---
+
+# Error Handling Conventions
+
+## `AppError` → `String` conversion
+
+Every Rust command returns `Result<T, String>`. Internally, repository/service functions return `Result<T, AppError>` (`src/core/src/error.rs`), and commands convert errors to plain strings via `.map_err(Into::into)`, relying on:
+
+```rust
+impl From<AppError> for String {
+    fn from(e: AppError) -> String {
+        e.to_string()
+    }
+}
+```
+
+`AppError` variants and their `Display` output:
+
+| Variant | Message format |
+|---|---|
+| `Database(sqlx::Error)` | `database error: {0}` |
+| `Migration(sqlx::migrate::MigrateError)` | `migration error: {0}` |
+| `NotFound(String)` | `not found: {0}` |
+| `Validation(String)` | `validation error: {0}` |
+| `Serialization(serde_json::Error)` | `serialization error: {0}` |
+
+Some commands (e.g. `grade_writing`) build ad-hoc `String` errors directly rather than going through `AppError`, since they call external libraries (`reqwest`) whose errors are converted with `.map_err(|e| e.to_string())`.
+
+## How the frontend surfaces errors
+
+Tauri delivers a command's `Err` value to the frontend's `invoke()` call, which rejects the returned promise. Per `src/ui/lib/tauri.ts` conventions, callers should wrap `invoke()`-based service calls in `try/catch` and surface the caught string as a toast notification (via `sonner`/`components/ui/toaster`), rather than assuming a structured error object.
+
+## Common error strings to expect
+
+| Error string | Source |
+|---|---|
+| `"AI grading failed"` | `grade_writing` — gateway responded with a non-2xx status |
+| `"Invalid AI response format"` | `grade_writing` — gateway response wasn't valid `GradingResult` JSON |
+| `"taskType must be 'task1' or 'task2'"` | `grade_writing` — invalid `task_type` input |
+| `"userResponse must be under 10000 characters"` | `grade_writing` — response too long |
+| `"prompt must be under 5000 characters"` | `grade_writing` — prompt too long |
+| `"Unknown export kind ⟨kind⟩."` | `export_test_to_zip` — invalid `kind` argument |
+| `"Unknown import kind ⟨kind⟩."` | `validate_import` — invalid `kind` argument |
+| `not found: ...` | Various — requested id doesn't exist or isn't visible to the caller |
+| `validation error: ...` | Various — malformed input caught before a DB write |
+
+## Guidance for the frontend service layer
+
+```typescript
+try {
+  await gradeWriting({ /* ... */ });
+} catch (err) {
+  // err here is the raw string thrown by the Rust command, not an Error instance
+  toast.error(typeof err === "string" ? err : "Something went wrong");
+}
+```
+
+Because errors arrive as raw thrown values (not necessarily `Error` instances), always guard with a `typeof err === "string"` (or similar) check before displaying it, rather than assuming `err.message` exists.

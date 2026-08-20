@@ -1,0 +1,103 @@
+---
+sidebar_position: 4
+title: Writing Test Commands
+---
+
+# Writing Test Commands
+
+## `writing_tests`
+
+| Command | TS wrapper | Signature |
+|---|---|---|
+| `get_writing_tests` | `getWritingTest(id, userId)` | `Promise<WritingTest \| null>` |
+| `list_writing_tests` | `listWritingTests(userId)` | `Promise<WritingTest[]>` |
+| `create_writing_tests` | `createWritingTest(userId, { title?, status? })` | `Promise<string>` |
+| `update_writing_tests` | `updateWritingTest(id, userId, { title?, status? })` | `Promise<void>` |
+| `delete_writing_tests` | `deleteWritingTest(id, userId)` | `Promise<void>` |
+
+## `writing_tasks`
+
+| Command | TS wrapper |
+|---|---|
+| `list_writing_tasks` | `listWritingTasks(userId)` |
+| `create_writing_tasks` | `createWritingTask(userId, input)` |
+| `delete_writing_tasks` | `deleteWritingTask(id, userId)` |
+
+`createWritingTask` input:
+
+```typescript
+{
+  test_id: string;
+  task_number?: number;
+  task_type?: string;      // "task1" | "task2"
+  title?: string;
+  difficulty?: string;
+  suggested_time?: string;
+  prompt?: string;
+  min_words?: number;
+  max_words?: string;
+  image_url?: string;
+  include_model_answer?: boolean;
+  model_answer?: string;
+}
+```
+
+## `grade_writing`
+
+AI-grades a single Writing task response. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx) for the full behavior, system prompt, and gateway request shape.
+
+**Input:**
+
+```typescript
+{
+  user_id: string;
+  task_type: "task1" | "task2";
+  prompt: string;
+  user_response: string;
+  session_id?: string;
+  ai_api_key: string;
+  ai_gateway_url: string;
+}
+```
+
+**Output (`GradingResult`):**
+
+```typescript
+{
+  overallBand: number;
+  criteria: {
+    taskAchievement: number;
+    coherenceCohesion: number;
+    lexicalResource: number;
+    grammaticalRange: number;
+  };
+  feedback: {
+    strengths: string[];
+    weaknesses: string[];
+    improvements: string;
+  };
+}
+```
+
+**Constraints:**
+
+| Field | Limit |
+|---|---|
+| `user_response` | max 10,000 characters |
+| `prompt` | max 5,000 characters |
+| `task_type` | must be `"task1"` or `"task2"` |
+
+**Example call:**
+
+```typescript
+import { gradeWriting } from "@/lib/tauri";
+
+const result = await gradeWriting({
+  user_id: getAnonId(),
+  task_type: "task2",
+  prompt: essayPrompt,
+  user_response: candidateEssay,
+  ai_api_key: import.meta.env.VITE_AI_API_KEY,
+  ai_gateway_url: import.meta.env.VITE_AI_GATEWAY_URL,
+});
+```

@@ -1,0 +1,68 @@
+---
+sidebar_position: 3
+title: Reading Test Commands
+---
+
+# Reading Test Commands
+
+All Reading commands live in `src/core/src/commands/reading_tests.rs`, `reading_passages.rs`, `reading_question_groups.rs`, and `reading_questions.rs`, delegating to matching repository files.
+
+## `reading_tests`
+
+| Command | TS wrapper | Signature |
+|---|---|---|
+| `get_reading_tests` | `getReadingTest(id, userId)` | `Promise<ReadingTest \| null>` |
+| `list_reading_tests` | `listReadingTests(userId)` | `Promise<ReadingTest[]>` — includes own drafts + all published tests |
+| `create_reading_tests` | `createReadingTest(userId, input)` | `Promise<string>` (new id) |
+| `update_reading_tests` | `updateReadingTest(id, userId, input)` | `Promise<void>` |
+| `delete_reading_tests` | `deleteReadingTest(id, userId)` | `Promise<void>` |
+
+```typescript
+const id = await createReadingTest(userId, {
+  title: "Cambridge IELTS 18 – Test 3",
+  test_type: "Academic",
+  difficulty: "7",
+  duration: "60 mins",
+  status: "draft",
+});
+```
+
+## `reading_passages`
+
+| Command | TS wrapper |
+|---|---|
+| `list_reading_passages` | `listReadingPassages(userId)` |
+| `create_reading_passages` | `createReadingPassage(userId, { test_id, passage_number?, title?, content?, notes? })` |
+| `delete_reading_passages` | `deleteReadingPassage(id, userId)` |
+
+## `reading_question_groups`
+
+| Command | TS wrapper |
+|---|---|
+| `list_reading_question_groups` | `listReadingQuestionGroups(userId)` |
+| `create_reading_question_groups` | `createReadingQuestionGroup(userId, { passage_id, group_order?, question_type?, instructions?, word_limit?, has_word_bank?, word_bank?, sequential_order?, multiple_selection?, select_count? })` |
+| `delete_reading_question_groups` | `deleteReadingQuestionGroup(id, userId)` |
+
+## `reading_questions`
+
+| Command | TS wrapper |
+|---|---|
+| `list_reading_questions` | `listReadingQuestions(userId)` |
+| `create_reading_questions` | `createReadingQuestion(userId, { group_id, question_order?, text?, answer?, options?, matching_pairs?, completion_gaps?, accepted_answers? })` |
+| `delete_reading_questions` | `deleteReadingQuestion(id, userId)` |
+
+```typescript
+const groupId = await createReadingQuestionGroup(userId, {
+  passage_id: passageId,
+  question_type: "matching",
+  instructions: "Match each statement to the correct paragraph.",
+});
+
+await createReadingQuestion(userId, {
+  group_id: groupId,
+  text: "Which paragraph mentions early urban planning?",
+  matching_pairs: JSON.stringify([{ label: "A", value: "paragraph-2" }]),
+});
+```
+
+Full field definitions: [Database Schema](../architecture/database-schema.mdx). No `update`/`get`-single commands exist for passages, question groups, or questions today — only list/create/delete.

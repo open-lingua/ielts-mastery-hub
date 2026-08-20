@@ -1,0 +1,84 @@
+---
+sidebar_position: 7
+title: Import & Export Commands
+---
+
+# Import & Export Commands
+
+## Import
+
+| Command | TS wrapper | Notes |
+|---|---|---|
+| `validate_import` | `validateImport(userId, kind, json, audioMeta?)` | Dry-run validation, returns `ImportPreview`, no DB writes |
+| `import_reading_test` | `importReadingTest(userId, json)` | Validates then commits |
+| `import_writing_test` | `importWritingTest(userId, json)` | Validates then commits |
+| `import_listening_test` | `importListeningTest(userId, json, audioFiles)` | Validates, commits, and writes audio files to storage |
+
+```typescript
+export type ImportKind = "reading" | "writing" | "listening";
+
+export interface ImportPreview {
+  title: string;
+  status: string;
+  kind: string;
+  passage_or_section_or_task_count: number;
+  group_count: number;
+  question_count: number;
+  duplicate_of: string | null;
+}
+
+export interface ImportAudioMeta {
+  section_number: number;
+  file_name: string;
+  size: number;
+}
+
+export interface ImportAudioFile {
+  sectionNumber: number;
+  file: File;
+}
+```
+
+All three commit commands return the newly created test's `id` as a `string`. See [Importing Test Content (JSON + Media)](../admin/import-dataset.mdx) for the full JSON schema and audio payload conversion details.
+
+## Export
+
+| Command | TS wrapper | Notes |
+|---|---|---|
+| `export_test_to_zip` | `exportTestToZip(userId, kind, id)` | Opens a native Save-As dialog; returns `null` if cancelled |
+
+```typescript
+export interface ExportResult {
+  filePath: string;
+  fileName: string;
+  warnings: string[];
+}
+
+export async function exportTestToZip(
+  userId: string,
+  kind: ImportKind,
+  id: string
+): Promise<ExportResult | null> {
+  return invoke<ExportResult | null>("export_test_to_zip", { userId, kind, id });
+}
+```
+
+`ExportResult`'s Rust struct (`src/core/src/services/export_service.rs`) is one of the exceptions to the general snake_case-on-the-wire rule — it's explicitly annotated `#[serde(rename_all = "camelCase")]`, matching the camelCase field names above.
+
+See [Exporting Tests as ZIP Archives](../admin/export-test-to-zip.mdx) for the full zip layout, edge cases, and authorization rules.
+
+## `upload_writing_asset`
+
+```typescript
+export async function uploadWritingAsset(userId: string, file: File): Promise<string> {
+  const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
+  const path = await invoke<string>("upload_writing_asset", {
+    userId,
+    file_name: file.name,
+    file_data: bytes,
+  });
+  return convertFileSrc(path);
+}
+```
+
+Used for Writing Task 1 image prompts (`writing_tasks.image_url`) — same byte-array-upload pattern as `uploadListeningAudio` (see [Listening Test Commands](./listening-commands.mdx)), returning a webview-ready `asset://` URL via `convertFileSrc`.

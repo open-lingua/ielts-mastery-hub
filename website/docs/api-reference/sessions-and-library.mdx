@@ -1,0 +1,110 @@
+---
+sidebar_position: 6
+title: User Test Sessions & Practice Library Commands
+---
+
+# User Test Sessions & Practice Library Commands
+
+## `user_test_sessions`
+
+| Command | TS wrapper | Signature |
+|---|---|---|
+| `get_user_test_sessions` | `getUserTestSession(id, userId)` | `Promise<UserTestSession \| null>` |
+| `list_user_test_sessions` | `listUserTestSessions(userId)` | `Promise<UserTestSession[]>` |
+| `create_user_test_sessions` | `createUserTestSession(userId, { test_id, test_type, attempt_number? })` | `Promise<string>` |
+| `update_user_test_sessions` | `updateUserTestSession(id, userId, input)` | `Promise<void>` |
+| `delete_user_test_sessions` | `deleteUserTestSession(id, userId)` | `Promise<void>` |
+
+### Partial update / `COALESCE` semantics
+
+`UpdateUserTestSession` supports **partial updates** — any field left `undefined`/unset means "no change", implemented via SQL `COALESCE(?, column)` in the repository:
+
+```sql
+UPDATE user_test_sessions SET
+    status = COALESCE(?, status),
+    progress_percent = COALESCE(?, progress_percent),
+    score_band = COALESCE(?, score_band),
+    answers = COALESCE(?, answers),
+    feedback_data = COALESCE(?, feedback_data),
+    completed_at = COALESCE(?, completed_at),
+    last_active_at = COALESCE(?, last_active_at)
+WHERE id = ? AND user_id = ?
+```
+
+TS input shape:
+
+```typescript
+{
+  status?: string;
+  progress_percent?: number;
+  score_band?: number | null;
+  answers?: string | null;
+  feedback_data?: string | null;
+  completed_at?: string | null;
+  last_active_at?: string | null;
+}
+```
+
+Passing `score_band: null` explicitly clears it (SQLite `COALESCE(NULL, column)` still evaluates the bound parameter — callers should confirm the exact null-vs-omitted behavior in `src/core/src/repositories/user_test_sessions.rs` before relying on "clear" semantics for nullable fields; omitting the key entirely from the JS object is the safest way to mean "no change").
+
+Example: recording writing feedback (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)):
+
+```typescript
+await updateUserTestSession(sessionId, userId, {
+  score_band: overallBand,
+  feedback_data: JSON.stringify(feedbackData),
+});
+```
+
+## `list_practice_tests`
+
+```typescript
+export async function listPracticeTests(
+  userId: string,
+  module: string | undefined,   // "reading" | "writing" | "listening" | undefined for "All"
+  page: number,
+  pageSize: number
+): Promise<PaginatedResponse<PracticeTestCardDto>> {
+  return invoke<PaginatedResponse<PracticeTestCardDto>>("list_practice_tests", {
+    userId, module, page, pageSize,
+  });
+}
+```
+
+`PracticeTestCardDto`:
+
+```typescript
+export interface PracticeTestCardDto {
+  id: string;
+  title: string;
+  module: string;
+  difficulty: string;
+  duration: string;
+  status: string;              // session status, or "not_started"
+  progress_percent: number;
+  score_band: number | null;
+  last_active_at: string | null;
+  session_id: string | null;
+  created_at: string;
+}
+```
+
+`PaginatedResponse<T>` (`src/ui/types/pagination.ts`):
+
+```typescript
+export interface PaginationMeta {
+  page: number;
+  page_size: number;
+  total_pages: number;
+  total_items: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+```
+
+When `module` is omitted, the backend merges all three test types by `created_at DESC` before paginating — see [Practice Test Library](../features/practice-library.mdx) for why this happens in Rust rather than SQL.

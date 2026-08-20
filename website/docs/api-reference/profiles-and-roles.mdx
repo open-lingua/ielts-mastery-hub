@@ -1,0 +1,78 @@
+---
+sidebar_position: 2
+title: Profiles & User Roles Commands
+---
+
+# Profiles & User Roles Commands
+
+## Profiles
+
+| Command | Signature | Notes |
+|---|---|---|
+| `get_profiles` | `(id: string) => Promise<Profile \| null>` | `getProfile(id)` |
+| `list_profiles` | `() => Promise<Profile[]>` | `listProfiles()` — returns all profiles, no scoping |
+| `create_profiles` | not exposed via `lib/tauri.ts` today | profiles are typically created implicitly |
+| `update_profiles` | `(id, input: Partial<Profile fields>) => Promise<void>` | `updateProfile(id, input)` |
+| `delete_profiles` | `(id: string) => Promise<void>` | `deleteProfile(id)`, cascades to `user_roles` |
+
+`Profile` type (`src/ui/lib/tauri.ts`):
+
+```typescript
+export interface Profile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  plan_type: string;
+  email: string | null;
+  is_banned: boolean;
+  ban_reason: string | null;
+  banned_until: string | null;
+  updated_at: string;
+}
+```
+
+`updateProfile` input fields:
+
+```typescript
+{
+  full_name?: string | null;
+  avatar_url?: string | null;
+  plan_type?: string | null;
+  email?: string | null;
+  is_banned?: boolean | null;
+  ban_reason?: string | null;
+  banned_until?: string | null;
+}
+```
+
+## User Roles
+
+| Command | Signature | Notes |
+|---|---|---|
+| `get_user_roles` | not wrapped in `lib/tauri.ts` today | |
+| `list_user_roles` | `(userId: string) => Promise<UserRole[]>` | `listUserRoles(userId)` |
+| `create_user_roles` | `(input: { user_id, role }) => Promise<string>` | `createUserRole(input)` |
+| `update_user_roles` | not wrapped in `lib/tauri.ts` today | |
+| `delete_user_roles` | `(id: string, userId: string) => Promise<void>` | `deleteUserRole(id, userId)` |
+
+`UserRole` type:
+
+```typescript
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: string; // "student" | "super_admin"
+  created_at: string;
+}
+```
+
+## Ownership scoping behavior
+
+`user_roles::find_all(pool, user_id)` (`src/core/src/repositories/user_roles.rs`) scopes strictly by `user_id`. Per `src/core/tests/repositories/user_roles_test.rs`, requesting another user's roles doesn't error — it simply **excludes them silently**:
+
+```rust
+#[tokio::test]
+async fn it_excludes_roles_belonging_to_other_users() { /* ... */ }
+```
+
+The same pattern applies across the codebase: repository queries scope by owner/user id in the `WHERE` clause, so a caller passing a `user_id` they don't have data under gets an **empty result** (or `None`/no-op for single-row ops) rather than an authorization error. Contrast this with the export flow's stricter "not found" behavior for other users' drafts (see [Exporting Tests as ZIP Archives](../admin/export-test-to-zip.mdx)).
