@@ -3,6 +3,16 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.9 / 2026.08.20
+
+- chore(core): add dev-dependencies required for src/core test suite
+- test(core): wire up integration test entry point for src/core tests
+- test(core): add unit tests for src/core services
+- test(core): add unit tests for src/core root-level error handling
+- test(core): add unit tests for src/core repositories
+- test(core): add unit tests for src/core models
+- test(core): add shared test fixtures and data builders for src/core tests
+
 ### 1.0.0-beta.8 / 2026.08.19
 
 - feat: add WritingTest structs to models
