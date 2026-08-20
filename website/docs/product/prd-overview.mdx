@@ -1,0 +1,67 @@
+---
+sidebar_position: 1
+title: Product Requirements Overview
+---
+
+# Product Requirements Overview
+
+Summary of `docs/product.md` — the full PRD & story backlog.
+
+## Executive summary
+
+IELTS Mastery Hub provides AI-graded Writing practice alongside timed Reading and Listening simulation engines, covering all 13 official IELTS question types with real exam-format timing, storing progress locally via SQLite. The core value proposition: **exam-realistic practice with instant, AI-powered feedback** — fully offline (except AI grading itself, which requires network access).
+
+## Personas
+
+| Persona | Description |
+|---|---|
+| IELTS Student (Primary) | Self-studying candidate needing realistic timed practice, score tracking, actionable feedback |
+| Content Creator / Admin | Teacher/admin authoring and publishing tests |
+| Premium Student | Power user wanting unlimited AI grading, full mock exams, advanced analytics |
+
+## Scope
+
+| Goal | In Scope | Out of Scope |
+|---|---|---|
+| Exam-realistic modules | Writing (Task 1 & 2), Reading (3 passages, 40 Qs), Listening (4 sections, 40 Qs) | Speaking module |
+| AI Grading | Writing essays graded on 4 IELTS criteria via AI | Reading/Listening AI explanations |
+| Content Management | Admin CRUD for all test types, publish/draft workflow | Bulk CSV import |
+| Progress Tracking | Session history, band scores, streak tracking | Spaced repetition / adaptive learning |
+| Auth & Profiles | Email signup/login, profile, plan type | OAuth / SSO |
+
+:::note Auth & Profiles is aspirational, not yet built
+The PRD scopes in "Email signup/login" under Auth & Profiles, but the current implementation has **no login/signup flow at all** — identity is a `localStorage`-backed anonymous UUID (`getAnonId()`). See [Frontend Architecture](../architecture/frontend-architecture.mdx) for details.
+:::
+
+## Admin CMS stories (verbatim)
+
+**US-14: Create & Publish Tests**
+- **Story:** As an admin, I want to create reading/listening/writing tests and publish them so that students can practice.
+- **Acceptance Criteria:**
+  - Form-based creation with nested passages/sections/question groups
+  - Draft/Published toggle enforced in the Rust command layer
+  - Preview modal before publishing
+
+**US-15: User Management**
+- **Story:** As an admin, I want to view registered users and their plan types so that I can manage access.
+- **Acceptance Criteria:**
+  - Table of users with name, email, plan, last active
+  - Ability to upgrade/downgrade plan type
+  - Protected by admin-only route
+
+**TS-2: Admin Role Authorization**
+- **Story:** As the system, I need role-based access control so that only admins can access CMS routes.
+- **Acceptance Criteria:**
+  - Admin role stored in the local SQLite `profiles` table
+  - `ProtectedRoute` component checks role before rendering
+  - Non-admin users redirected to dashboard
+
+:::warning TS-2 is not yet fully implemented
+As documented in [Admin CMS Overview](../admin/overview.mdx) and [Frontend Architecture](../architecture/frontend-architecture.mdx), **no `ProtectedRoute` component exists** in the current codebase, and `/admin/*` routes are reachable by anyone regardless of `user_roles`. The `user_roles` table (`student`/`super_admin`) exists and can be populated via the User Management UI, but nothing currently reads it to gate route access. This is the clearest gap between this PRD and the shipped implementation.
+:::
+
+## See also
+
+- [Feature Spec: Export Test to ZIP](./feature-specs/export-test-to-zip-spec.mdx) — a fully-implemented feature spec, used as the template for future specs.
+- [Admin CMS Overview](../admin/overview.mdx)
+- [Frontend Architecture](../architecture/frontend-architecture.mdx)
