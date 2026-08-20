@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::writing_tasks as repo;
-use crate::repositories::writing_tasks::{CreateWritingTask, UpdateWritingTask, WritingTask};
+use crate::models::writing_tasks::{CreateWritingTask, UpdateWritingTask, WritingTask};
 
 #[tauri::command]
 pub async fn get_writing_tasks(
