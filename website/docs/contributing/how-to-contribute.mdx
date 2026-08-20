@@ -1,0 +1,90 @@
+---
+sidebar_position: 1
+title: How to Contribute
+---
+
+# How to Contribute
+
+This page mirrors and expands [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md).
+
+## Project structure
+
+- `src/ui/` — TypeScript/React frontend (Vite)
+- `src/core/` — Rust backend (Tauri commands, database, migrations)
+- `website/` — this Docusaurus documentation site
+
+See [`src/core/README.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/src/core/README.md) for backend-specific details on module layout, adding commands, and migrations.
+
+## Local setup
+
+```bash
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+cd ielts-mastery-hub
+npm install
+export DATABASE_URL=...   # only needed for sqlx CLI commands, see below
+npm run tauri
+```
+
+:::warning Do not run the Rust binary directly
+Do not run `cargo run` for the app binary — Tauri manages the build and links it with the frontend. Use `npm run tauri` (dev) / `npm run tauri:build` (release).
+:::
+
+## Making changes
+
+### Frontend (`src/ui`)
+
+```bash
+npm run lint        # check
+npm run lint:fix    # auto-fix
+npm run format       # format with Biome
+npm run check        # lint + format, write mode
+npm run test          # run tests once
+npm run test:watch    # watch mode
+```
+
+Run `npm run check` before opening a PR.
+
+### Backend (`src/core`)
+
+```bash
+cd src/core
+cargo clippy -- -D warnings
+cargo fmt
+```
+
+Fix warnings with `cargo clippy --fix` when appropriate, but understand what changed before committing.
+
+### Database migrations
+
+```bash
+cd src/core
+sqlx migrate add --source src/database/migrations <description>
+```
+
+Never rename or edit an existing migration file — add a new one instead. Migrations run automatically on app startup. See [Database Schema & Data Model](../architecture/database-schema.mdx).
+
+### Environment variables
+
+Backend secrets/config go in `src/core/.env` and are never exposed to the frontend. If you need to run `sqlx` CLI commands, set `DATABASE_URL` to the app's real SQLite file path (varies by OS — see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md) for exact paths, or [Running the App in Development](../getting-started/running-the-app.mdx)).
+
+## Branching
+
+Branch off `main`, using a descriptive prefixed name, e.g. `feature/writing-score-export` or `fix/listening-audio-sync`.
+
+## Commit messages
+
+Keep commits focused and messages in the imperative mood. This repository's actual history (`RELEASES.md`) shows two common styles side by side:
+
+- Scoped: `core: add export_test_to_zip Tauri command`, `ui: add Export action to Content Library menu`
+- Plain imperative: `Fix pagination not advancing pages due to unstable setSearchParams dependency`
+
+Either is acceptable; prefer the `area: description` scoped style for changes clearly isolated to `core`/`ui`/`docs`/`test`.
+
+## Pull requests
+
+- Open PRs against `main`.
+- Ensure `npm run check`, `npm run test`, and (if you touched Rust code) `cargo clippy -- -D warnings` and `cargo fmt` all pass before requesting review.
+- Describe what changed and why; link related issues if applicable.
+- Keep PRs scoped to a single change — avoid bundling unrelated fixes or refactors.
+
+See also [Coding Standards](./coding-standards.mdx), [Adding a New Feature End-to-End](./adding-a-new-feature.mdx), and [Release Process & Changelog](./release-process.mdx).

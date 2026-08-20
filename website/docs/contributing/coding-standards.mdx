@@ -1,0 +1,28 @@
+---
+sidebar_position: 2
+title: Coding Standards
+---
+
+# Coding Standards
+
+## Frontend (`src/ui`)
+
+- **TypeScript strict mode** is expected — avoid implicit `any` and unjustified non-null assertions.
+- **Component organization**: domain-grouped components live under `components/<module>/` (`admin/`, `dashboard/`, `listening/`, `reading/`, `writing/`, `shared/`); reusable design-system primitives live in `components/ui/` (shadcn/ui). See [Frontend Architecture](../architecture/frontend-architecture.mdx).
+- **Service-layer-only IPC access**: UI components and pages must never call `invoke()` directly — always go through a typed wrapper in `src/ui/lib/tauri.ts`, called from `src/ui/services/*`. See [Tauri IPC Contract](../architecture/ipc-contract.mdx).
+- Forms use React Hook Form + Zod validation via `@hookform/resolvers`.
+- Run `npm run check` (Biome lint + format) before committing.
+
+## Backend (`src/core`)
+
+- **Commands stay thin**: `src/core/src/commands/<domain>.rs` functions validate input and delegate — they do not contain SQL or business logic.
+- **All SQL lives in Repositories**: `src/core/src/repositories/<domain>.rs` is the only place queries are written, using `sqlx`'s compile-time-checked macros (`query!`, `query_as!`, `query_scalar!`).
+- **One file per domain** in both `commands/` and `repositories/` — don't consolidate multiple entities into a shared file.
+- **Doc comments on public functions**: functions like `merge_sessions` in `practice_library.rs` and helpers in `export_service.rs`/`user_roles.rs` carry `///` doc comments explaining non-obvious behavior (e.g. why a merge happens in Rust, or a subtle FK requirement) — follow this convention for new public functions whose behavior isn't self-evident from the signature.
+- Errors propagate via `AppError` (`src/core/src/error.rs`), converted to `String` at the command boundary — avoid `unwrap()`/`expect()` in command/repository code paths that handle user input; those belong only in test code.
+- Run `cargo clippy -- -D warnings` and `cargo fmt` before committing.
+
+## General
+
+- Keep PRs scoped to a single logical change.
+- Prefer descriptive names over abbreviations, matching the existing domain vocabulary (`reading_tests`, `attempt_number`, `progress_percent`, etc.) — see [Glossary](../reference/glossary.mdx).

@@ -1,0 +1,39 @@
+---
+sidebar_position: 3
+title: Adding a New Feature End-to-End
+---
+
+# Adding a New Feature End-to-End
+
+## The standard workflow
+
+1. Define the model struct(s) in `src/core/src/models/<domain>.rs`.
+2. Implement repository functions in `src/core/src/repositories/<domain>.rs` (all SQL + ownership checks).
+3. Add thin `#[tauri::command]` functions in `src/core/src/commands/<domain>.rs`.
+4. Register each new command in `tauri::generate_handler![...]` in `src/core/src/lib.rs`.
+5. Add typed wrapper functions in `src/ui/lib/tauri.ts` — the only place the frontend calls `invoke()`.
+6. Build UI components/pages that consume the new wrapper via the service layer (`src/ui/services/`).
+7. Add Rust integration tests (`src/core/tests/`) and, where relevant, Vitest tests (`src/ui/test/`, colocated `__tests__/`).
+
+See [Backend Architecture](../architecture/backend-architecture.mdx), [Frontend Architecture](../architecture/frontend-architecture.mdx), and [Writing New Tests](../testing/writing-new-tests.mdx) for the conventions each step should follow.
+
+## Worked example: `export_test_to_zip` (shipped in `1.0.0-beta.8`)
+
+`RELEASES.md` records the real implementation sequence for this feature, in chronological order (oldest → newest commit):
+
+1. `docs: add export test to zip spec` — the product spec (`docs/spec/export-test-to-zip.md`) landed first.
+2. `core: add zip crate dependency for test export` — added the `zip` crate to `Cargo.toml`.
+3. `core: add export_service to build importable test JSON and zip bundles` — the service layer (`src/core/src/services/export_service.rs`) that assembles JSON + collects media.
+4. `core: register export_service module` — wired the new service module into `src/core/src/services/mod.rs`.
+5. `core: register export command module` — added `commands::export` to `src/core/src/commands/mod.rs`.
+6. `core: add export_test_to_zip Tauri command` — the thin command wrapper (`src/core/src/commands/export.rs`).
+7. `core: wire up export_test_to_zip in invoke_handler` — registered in `lib.rs`'s `generate_handler!`.
+8. `ui: add exportTestToZip invoke wrapper and ExportResult type` — the typed wrapper landed in `src/ui/lib/tauri.ts`.
+9. `ui: add exportContent helper to contentService` — a service-layer helper wrapping the raw IPC call with UI-facing concerns (toasts, etc.).
+10. `ui: add Export action to Content Library 3-dot menu` — the actual UI entry point, positioned between Edit and Delete.
+11. `core: nest export zip contents inside a slug-named folder` — refined the zip layout based on early testing.
+12. `Add tauri-plugin-dialog dependency for export file picker` → `Regenerate Tauri ACL schemas for tauri-plugin-dialog` → `Register tauri-plugin-dialog in app builder` — added native Save-As dialog support, including regenerating Tauri's ACL/capabilities schema (required whenever a new plugin is added — see [File System & Native Dialog Integration](../desktop/file-system-integration.mdx)).
+13. `Split export service into build_export + default_export_dir for file picker` → `Wire native Save As dialog into export_test_to_zip command` — connected the dialog to the export flow.
+14. `Update exportTestToZip to return ExportResult | null on cancel` → `Propagate nullable export result through exportContent` → `Handle cancelled export (null result) without error toast` — handled the case where the admin cancels the save dialog, without treating cancellation as an error.
+
+This sequence is a good template for planning any new feature that spans both layers: **spec → dependency → service → command → registration → frontend wrapper → frontend UI → refinement/edge cases**. See [Exporting Tests as ZIP Archives](../admin/export-test-to-zip.mdx) for the finished feature's full behavior.

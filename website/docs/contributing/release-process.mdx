@@ -1,0 +1,34 @@
+---
+sidebar_position: 4
+title: Release Process & Changelog
+---
+
+# Release Process & Changelog
+
+## `RELEASES.md`
+
+Every release is recorded as a version heading with a flat, feature-grouped bullet list of changes, newest entries first within each version block:
+
+```markdown
+### 1.0.0-beta.9 / 2026.08.20
+
+- chore(core): add dev-dependencies required for src/core test suite
+- test(core): wire up integration test entry point for src/core tests
+...
+```
+
+Entries mix a scoped `area(scope): description` style (e.g. `test(core): add unit tests for src/core repositories`) and a plain imperative style (e.g. `Fix pagination not advancing pages...`) — both are used in this repo's actual history; see [Coding Standards](./coding-standards.mdx) for the recommended style going forward.
+
+## Versioning scheme
+
+Versions follow `MAJOR.MINOR.PATCH-beta.N` (e.g. `1.0.0-beta.9`), tracked in `package.json`'s `version` field. Note that `src/core/tauri.conf.json`'s `version` field (`0.1.0`) is currently **not** kept in sync with the npm package version — verify which one matters for your release artifact naming before assuming they match.
+
+## Binary releases
+
+Downloadable binary releases are published at `https://github.com/open-lingua/ielts-mastery-hub/releases`, per the link at the top of `RELEASES.md`.
+
+## Expectations when shipping a feature
+
+- Update `RELEASES.md` with a new bullet (or new version section) describing the change, grouped alongside other changes in the same release cycle.
+- Keep the changelog entry scoped and specific — mirror the level of detail in existing entries (e.g. naming the exact command/module added, as in `core: add export_test_to_zip Tauri command`).
+- See [Adding a New Feature End-to-End](./adding-a-new-feature.mdx) for how a full feature's changelog entries typically look across its implementation sequence.
