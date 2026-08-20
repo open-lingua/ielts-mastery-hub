@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::user_roles as repo;
-use crate::repositories::user_roles::{CreateUserRole, UpdateUserRole, UserRole};
+use crate::models::user_roles::{CreateUserRole, UpdateUserRole, UserRole};
 
 #[tauri::command]
 pub async fn get_user_roles(
