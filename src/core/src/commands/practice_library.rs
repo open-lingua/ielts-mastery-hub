@@ -3,7 +3,8 @@ use tauri::State;
 use crate::database::Db;
 use crate::error::AppError;
 use crate::models::pagination::{build_pagination, offset_for, PaginatedResponse, PaginationParams};
-use crate::repositories::practice_library::{self, PracticeTestCard};
+use crate::models::practice_library::PracticeTestCard;
+use crate::repositories::practice_library;
 
 #[tauri::command]
 pub async fn list_practice_tests(
