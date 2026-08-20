@@ -1,0 +1,57 @@
+---
+sidebar_position: 3
+title: Managing Users & Roles
+---
+
+# Managing Users & Roles
+
+`UserManagement.tsx` (`src/ui/pages/admin/`) is the Students page for managing `profiles` and their `user_roles`.
+
+## Listing users
+
+`listProfiles()` fetches all `profiles`, and for each one `listUserRoles(profileId)` fetches its assigned roles (both from `src/ui/lib/tauri.ts`).
+
+## Editable profile fields
+
+| Field | Editable via | Meaning |
+|---|---|---|
+| `full_name` | `updateProfile(id, { full_name })` | Display name |
+| `plan_type` | `updateProfile(id, { plan_type })` | `'free'` \| `'premium'` |
+| `email` | (display only in current UI) | Contact email |
+| `is_banned` | `updateProfile(id, { is_banned: true, ... })` | Ban flag |
+| `ban_reason` | `updateProfile(id, { ban_reason })` | Free-text reason shown alongside the ban |
+| `banned_until` | `updateProfile(id, { banned_until })` | ISO date the ban lifts (optional/indefinite if unset) |
+
+## Banning a user
+
+Clicking **Ban** (or **Update Ban** if already banned) calls:
+
+```typescript
+await updateProfile(selectedUser.id, {
+  is_banned: true,
+  ban_reason: banReason.trim(),
+  banned_until: bannedUntil,
+});
+```
+
+## Deleting a profile
+
+`deleteProfile(id)` removes the profile row. Because `user_roles.user_id` has `ON DELETE CASCADE` to `profiles.id`, deleting a profile also removes its role assignments.
+
+## Assigning / removing roles
+
+The `app_role` enum values are `'student'` and `'super_admin'` (enforced by a `CHECK` constraint on `user_roles.role`). The UI's role edit flow replaces existing roles rather than appending:
+
+```typescript
+const existingRoles = await listUserRoles(selectedUser.id);
+await Promise.all(existingRoles.map((r) => deleteUserRole(r.id, selectedUser.id)));
+await createUserRole({ user_id: selectedUser.id, role: editRole });
+```
+
+- `createUserRole({ user_id, role })` — inserts a new `user_roles` row.
+- `deleteUserRole(id, userId)` — removes a role assignment.
+- `listUserRoles(userId)` — lists a user's current roles.
+
+:::note Roles exist but aren't enforced anywhere yet
+Assigning `super_admin`/`student` here updates the `user_roles` table, but as noted in [Admin CMS Overview](./overview.mdx), nothing in the current frontend actually checks these roles to gate access to `/admin/*` routes or any other feature. Role assignment is effectively data-entry only today.
+:::

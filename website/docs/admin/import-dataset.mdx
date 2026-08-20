@@ -1,0 +1,71 @@
+---
+sidebar_position: 4
+title: Importing Test Content (JSON + Media)
+---
+
+# Importing Test Content (JSON + Media)
+
+`ImportDataset.tsx` (`src/ui/pages/admin/`) lets an admin paste/upload a test's JSON definition (plus any media for listening tests) and preview it before committing.
+
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `validate_import(user_id, kind, json_data, audio_meta)` | Validates the JSON against the schema for `kind`, checks for a duplicate title, and returns an `ImportPreview` without writing anything |
+| `import_reading_test(user_id, json_data)` | Validates and imports a Reading test |
+| `import_writing_test(user_id, json_data)` | Validates and imports a Writing test |
+| `import_listening_test(user_id, json_data, audio_files)` | Validates and imports a Listening test, writing any accompanying audio files to storage |
+
+`kind` is one of `"reading" | "writing" | "listening"` (`ImportKind` in `src/ui/lib/tauri.ts`).
+
+## `ImportPreview` shape
+
+```typescript
+export interface ImportPreview {
+  title: string;
+  status: string;
+  kind: string;
+  passage_or_section_or_task_count: number;
+  group_count: number;
+  question_count: number;
+  duplicate_of: string | null; // id of an existing test with the same title, if any
+}
+```
+
+## Audio payload shape (listening imports only)
+
+For `validate_import`, lightweight metadata is sent (no file bytes) so validation can check duration/size expectations without transferring large payloads:
+
+```typescript
+export interface ImportAudioMeta {
+  section_number: number;
+  file_name: string;
+  size: number;
+}
+```
+
+For the actual `import_listening_test` commit, full audio bytes are sent per file:
+
+```typescript
+export interface ImportAudioFile {
+  sectionNumber: number;
+  file: File;
+}
+
+// converted before sending to Rust:
+const audio_files = await Promise.all(
+  audioFiles.map(async ({ sectionNumber, file }) => ({
+    section_number: sectionNumber,
+    file_name: file.name,
+    file_data: Array.from(new Uint8Array(await file.arrayBuffer())),
+  }))
+);
+```
+
+`file_data` is a plain byte array (`Vec<u8>` on the Rust side) — Tauri IPC serializes binary payloads as JSON number arrays.
+
+## Validation error handling
+
+`validate_reading`/`validate_writing`/`validate_listening` (`src/core/src/services/import_service.rs`) return structured validation errors that are converted to a single string via `errors_to_string(&e)` and surfaced to the admin as a toast/inline error before any database write occurs — invalid imports fail fast during the `validate_import` preview step rather than partially committing data. See [Error Handling Conventions](../api-reference/error-handling.mdx).
+
+See also `docs/spec/admin-dataset-import.spec.md` in the repository for the original product spec this feature was built against.

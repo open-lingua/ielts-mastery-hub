@@ -1,0 +1,81 @@
+---
+sidebar_position: 5
+title: Exporting Tests as ZIP Archives
+---
+
+# Exporting Tests as ZIP Archives
+
+Based on `docs/spec/export-test-to-zip.md`. This is the canonical example used throughout this documentation (see [Adding a New Feature End-to-End](../contributing/adding-a-new-feature.mdx)) because it's a real, fully-shipped feature (per `RELEASES.md` 1.0.0-beta.8).
+
+## What it is
+
+An **Export** action in the Content Library's 3-dot menu, positioned between **Edit** and **Delete**, for Reading, Writing, and Listening tests. It downloads the test as a `.zip` containing the test's JSON definition plus any linked media (images, audio).
+
+## User journey
+
+1. Admin navigates to **Content Library**.
+2. Admin clicks the 3-dot menu (`...`) on a test row.
+3. A dropdown shows **Edit**, **Export**, **Delete** (in that order).
+4. Admin clicks **Export**.
+5. The backend `build_export` (`src/core/src/services/export_service.rs`) assembles the JSON definition and collects any linked media files referenced by that test.
+6. A native **Save As** dialog opens (via `tauri-plugin-dialog`) so the admin chooses where to save the file.
+7. The zip is written to the chosen path.
+8. `exportTestToZip()` (`src/ui/lib/tauri.ts`) returns an `ExportResult`, or `null` if the admin cancels the save dialog:
+
+```typescript
+export interface ExportResult {
+  filePath: string;
+  fileName: string;
+  warnings: string[];
+}
+
+export async function exportTestToZip(
+  userId: string,
+  kind: ImportKind,
+  id: string
+): Promise<ExportResult | null> {
+  return invoke<ExportResult | null>("export_test_to_zip", { userId, kind, id });
+}
+```
+
+## Zip layout
+
+The generated filename follows `ielts-{module}-{slug}_export.zip` (e.g. `ielts-listening-airport-chatter_export.zip`), and contents are nested **inside a matching slug-named folder**:
+
+```
+ielts-listening-airport-chatter_export/
+├── airport_chatter.json     # slug with underscores, Import Dataset-compatible schema
+└── media/
+    └── section-1.mp3        # any linked audio/image files
+```
+
+The `slugify()` helper (`src/core/src/services/export_service.rs`) lowercases the title, replaces non-alphanumeric runs with dashes, and truncates to 60 characters — falling back to `"untitled"` if the title has no alphanumeric characters at all.
+
+## Edge cases
+
+| Case | Behavior |
+|---|---|
+| No media attached | Zip contains only the JSON file — no errors, no empty `media/` folder implied as "missing" |
+| Missing/broken media reference | Export still completes; `warnings` includes an entry like `"missing.mp3"` rather than failing the whole export |
+| Large files | Should show a progress indicator in the UI while zip creation is in progress |
+| Draft vs. Published tests | Both are exportable — no status restriction |
+| Round-trip guarantee | An exported zip can be re-imported via Import Dataset with no manual edits, reproducing an identical test |
+
+## Authorization rule
+
+Exporting a **draft** test as a **non-owner** returns a "not found" error rather than leaking the draft's content — confirmed by `it_returns_not_found_when_a_non_owner_exports_a_draft_test` in `src/core/tests/services/export_service_test.rs`. This mirrors the same ownership pattern used for reading/updating test rows in general (see [Creating & Publishing Test Content](./content-management.mdx)): a row is visible if you own it, or if it's `published`.
+
+## Acceptance criteria (verbatim from `docs/spec/export-test-to-zip.md`)
+
+- [ ] A working **Export** option appears in the 3-dot menu, positioned between Edit and Delete, for every content type (Reading, Writing, Listening).
+- [ ] Clicking Export produces a downloadable `.zip` file without requiring additional user input.
+- [ ] The `.zip` always contains a valid `.json` file matching the Import Dataset schema.
+- [ ] If the test has media resources, they are included in the `.zip` and correctly referenced/linked within the JSON.
+- [ ] If the test has no media resources, the `.zip` contains only the JSON with no errors.
+- [ ] A `.zip` exported from the app can be re-imported via Import Dataset **without any manual edits**, and results in an identical test being created/restored.
+- [ ] Draft and Published tests can both be exported successfully.
+- [ ] The admin receives clear feedback on success (confirmation) and on partial issues (e.g., missing media file warnings).
+- [ ] Exporting a large test (many questions/large audio) does not crash or freeze the app; a loading/progress state is shown.
+- [ ] Filenames are safe, descriptive, and don't overwrite existing files unexpectedly.
+
+See [Feature Spec: Export Test to ZIP](../product/feature-specs/export-test-to-zip-spec.mdx) for the full original product plan (problem statement, use cases, edge cases, and future extensions).

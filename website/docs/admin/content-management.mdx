@@ -1,0 +1,38 @@
+---
+sidebar_position: 2
+title: Creating & Publishing Test Content
+---
+
+# Creating & Publishing Test Content
+
+## Creation flow
+
+`CreateContent.tsx` (`src/ui/pages/admin/`) provides form-based creation for each module's nested entity tree:
+
+- Reading: test → passages → question groups → questions
+- Writing: test → tasks
+- Listening: test → sections → question groups → questions
+
+## Draft / Published status
+
+Every test row (`reading_tests`, `writing_tests`, `listening_tests`) has a `status` column defaulting to `'draft'`. There is no database-level `CHECK` constraint restricting it to `draft`/`published` (unlike `user_test_sessions.status` or `user_roles.role`, which do have `CHECK` constraints) — it's a free-form string field, conventionally set to `'draft'` or `'published'` by the admin UI.
+
+Ownership/visibility is enforced in the repository layer's `find_by_id`/`find_all` queries, which return a row if the requester is its `created_by` owner **or** its status is `'published'`:
+
+```rust
+"SELECT ... FROM reading_tests WHERE id = ? AND (created_by = ? OR status = 'published')"
+```
+
+This means a non-owner cannot see another admin's draft test — see the export authorization note in [Exporting Tests as ZIP Archives](./export-test-to-zip.mdx) for the same pattern applied to the export flow.
+
+## Pre-publish review
+
+`TestPreviewModal` (`src/ui/components/admin/TestPreviewModal.tsx`) renders a candidate-facing preview of a test before an admin toggles it to `published`, letting them sanity-check passage/section/task content and question rendering without leaving the CMS.
+
+## Content Library menu actions
+
+Each row in `ContentLibrary.tsx` has a 3-dot menu with three actions, in this order:
+
+1. **Edit** — navigates to the edit form for that test.
+2. **Export** — downloads the test as a `.zip` (see [Exporting Tests as ZIP Archives](./export-test-to-zip.mdx)).
+3. **Delete** — prompts a confirmation dialog, then calls the corresponding `delete_*_tests` command.

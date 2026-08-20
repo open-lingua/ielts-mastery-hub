@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+title: Admin CMS Overview
+---
+
+# Admin CMS Overview
+
+The Admin CMS lets admins create, edit, publish, import, and export Reading/Writing/Listening test content, and manage student accounts — all from within the same desktop app.
+
+## Navigation (`AdminLayout`)
+
+`src/ui/components/AdminLayout.tsx` defines the admin sidebar navigation:
+
+| Label | Path | Page |
+|---|---|---|
+| Dashboard | `/admin` | `AdminDashboard` |
+| Content Library | `/admin/content` | `ContentLibrary` |
+| Create New | `/admin/create` | `CreateContent` |
+| Import Dataset | `/admin/import` | `ImportDataset` |
+| Students | `/admin/users` | `UserManagement` |
+
+(A commented-out "Settings" nav entry exists in source but is not active.)
+
+## Known limitation: no RBAC enforcement at the route layer
+
+:::warning `/admin/*` routes are not role-restricted
+The database has a `user_roles` table with `student`/`super_admin` values (see [Database Schema](../architecture/database-schema.mdx)), and `docs/product.md` describes a "TS-2 Admin Role Authorization" requirement. However, **the current frontend has no authentication or route guard at all** — there is no `<ProtectedRoute>` component, no `AuthContext`, and no login flow (see [Frontend Architecture](../architecture/frontend-architecture.mdx)). Any user running the app can navigate directly to `/admin`, `/admin/content`, `/admin/create`, `/admin/import`, or `/admin/users` regardless of their `user_roles` entries (or lack thereof). This is a known gap between the product spec and the current implementation — see [PRD Overview](../product/prd-overview.mdx) for the corresponding requirement.
+:::
+
+## What admins can do
+
+- **Create & publish tests** — see [Creating & Publishing Test Content](./content-management.mdx).
+- **Manage users & roles** — see [Managing Users & Roles](./user-management.mdx).
+- **Import test datasets (JSON + media)** — see [Importing Test Content](./import-dataset.mdx).
+- **Export tests as ZIP archives** — see [Exporting Tests as ZIP Archives](./export-test-to-zip.mdx).
