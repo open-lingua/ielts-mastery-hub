@@ -64,24 +64,24 @@ export function usePagination({
     [paramName, scrollToTop, setSearchParams]
   );
 
-  // Reset to page 1 whenever the reset key (e.g. active section/tab) changes
-  // — but not on initial mount, so a shared/reloaded URL keeps its page.
+  const latest = useRef({ setSearchParams, paramName });
+  latest.current = { setSearchParams, paramName };
+
   const isFirstRender = useRef(true);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: resetKey is the deliberate change trigger for this effect.
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
-    setSearchParams(
+    latest.current.setSearchParams(
       (prev) => {
         const params = new URLSearchParams(prev);
-        params.delete(paramName);
+        params.delete(latest.current.paramName);
         return params;
       },
       { replace: true }
     );
-  }, [resetKey, paramName, setSearchParams]);
+  }, [resetKey]);
 
   return { page, pageSize, setPage };
 }
