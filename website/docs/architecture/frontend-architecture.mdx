@@ -1,0 +1,82 @@
+---
+sidebar_position: 2
+title: Frontend Architecture
+---
+
+# Frontend Architecture
+
+## Directory structure (`src/ui/`)
+
+```
+src/ui/
+├── assets/              # Static images/fonts
+├── components/
+│   ├── ui/              # shadcn/ui base primitives
+│   ├── admin/           # Admin CMS components
+│   ├── dashboard/       # Dashboard/progress components
+│   ├── listening/       # Listening module components
+│   ├── reading/         # Reading module components
+│   ├── writing/         # Writing module components
+│   └── shared/          # Cross-module shared components
+├── contexts/            # React Context providers (currently: ThemeContext)
+├── hooks/                # Shared custom hooks (timers, pagination, autosave)
+├── lib/
+│   ├── tauri.ts         # ⚠️ single source of truth for all typed invoke() wrappers
+│   ├── anonId.ts        # Local anonymous user identifier (see below)
+│   └── utils.ts
+├── pages/               # Route-level components, incl. pages/admin/
+├── services/            # Business logic that calls lib/tauri.ts
+├── types/               # Shared TypeScript types (e.g. pagination)
+├── utils/               # Pure helpers (e.g. ieltsGrading.ts band-score math)
+└── test/                # Vitest setup and shared test utilities
+```
+
+:::note Deviation from generic templates
+Some template documentation in this repo (root/`src/ui` `AGENTS.md`) describes a `features/` and `stores/` folder layout with Zustand-style stores. The **current codebase does not use either** — there is no `features/` directory and no global store library; state is managed via React Context (`contexts/ThemeContext.tsx`), component-local state, and TanStack React Query for server/IPC data. This page documents the code as it actually exists.
+:::
+
+## Request lifecycle
+
+```
+User interaction → Page component (src/ui/pages) → Service (src/ui/services) → lib/tauri.ts wrapper → Tauri IPC → Rust command → Repository → SQLite
+```
+
+UI components and pages never call `invoke()` directly — they go through the service layer, which calls the typed wrapper functions in `lib/tauri.ts`. See [IPC Contract](./ipc-contract.mdx).
+
+## Routing table
+
+Defined in `src/ui/App.tsx` using `react-router-dom` (`BrowserRouter`):
+
+| Path | Component | Access |
+|---|---|---|
+| `/` | `LandingPage` | Public |
+| `/dashboard` | `Dashboard` | Public (no auth gate) |
+| `/writing` | `WritingSimulator` | Public |
+| `/reading` | `ReadingModule` | Public |
+| `/listening` | `ListeningModule` | Public |
+| `/tests` | `TestLibrary` | Public |
+| `/admin` | `AdminDashboard` | Public (no auth gate) |
+| `/admin/content` | `ContentLibrary` | Public (no auth gate) |
+| `/admin/create` | `CreateContent` | Public (no auth gate) |
+| `/admin/import` | `ImportDataset` | Public (no auth gate) |
+| `/admin/users` | `UserManagement` | Public (no auth gate) |
+| `*` | `NotFound` | Public |
+
+:::warning No authentication or route guard currently exists
+There is **no `<ProtectedRoute>` component, no `AuthContext`, and no login/register route** in the current codebase. Every route, including all `/admin/*` pages, is reachable by anyone running the app — there is no session hydration or auth-gating logic to document. Instead of real authentication, the app uses an **anonymous local identifier**: `getAnonId()` (`src/ui/lib/anonId.ts`) generates a `crypto.randomUUID()` on first run and persists it in `localStorage`, and this ID is passed as `user_id`/`userId` to Tauri commands for per-"user" data scoping. This is the single biggest gap between the product's `user_roles` (`student`/`super_admin`) data model and the actual frontend: roles exist in the database but nothing in the UI currently reads or enforces them. See [Admin CMS Overview](../admin/overview.mdx) and [PRD Overview — TS-2](../product/prd-overview.mdx) for the corresponding product requirement this gap violates.
+:::
+
+## State & data management
+
+- **Local/UI state** — component `useState`/`useReducer`, no global store.
+- **Theme** — `ThemeProvider` (`contexts/ThemeContext.tsx`) wraps the app in `App.tsx`.
+- **Server/IPC state** — TanStack React Query (`QueryClientProvider` in `App.tsx`) caches and manages async Tauri command results; components should not manually re-cache `invoke()` results in local state.
+- **Identity** — `getAnonId()` (localStorage-backed UUID), not a real auth session.
+
+## Forms & validation
+
+Forms use **React Hook Form** with **Zod** schemas via `@hookform/resolvers`, following the standard `useForm({ resolver: zodResolver(schema) })` pattern for admin content forms (Reading/Writing/Listening test creation) and any user-input forms.
+
+## Error boundary
+
+`App.tsx` wraps the whole tree in a class-based `ErrorBoundary` that renders a raw crash screen (message + stack) on unhandled render errors — useful during development, worth revisiting for a friendlier production experience.

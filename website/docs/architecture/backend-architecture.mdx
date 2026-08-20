@@ -1,0 +1,77 @@
+---
+sidebar_position: 3
+title: Backend Architecture (Rust / Tauri)
+---
+
+# Backend Architecture (Rust / Tauri)
+
+## Layered architecture
+
+```mermaid
+graph TB
+  FE[Frontend<br/>invoke('command_name', args)] --> IPC[Tauri IPC<br/>snake_case wire format both sides]
+  IPC --> CMD[Commands<br/>src/core/src/commands/*.rs<br/>thin validation + delegation]
+  CMD --> REPO[Repositories<br/>src/core/src/repositories/*.rs<br/>SQL + entity structs + ownership checks]
+  REPO --> DBMOD[Database<br/>src/core/src/database/<br/>pool init, migrations, seeds]
+  DBMOD --> SQLITE[(ielts.db)]
+```
+
+`src/core/src/lib.rs` wires everything together: it configures the `tauri-plugin-dialog` plugin, runs the `database::init()` setup hook (which opens the pool, runs migrations/seeds, and calls `app.manage(pool)`), and registers every command in a single `tauri::generate_handler![...]` call.
+
+## Module list
+
+From `src/core/src/models/mod.rs` and the commands/repositories registered in `lib.rs`:
+
+- `profiles`
+- `user_roles`
+- `user_test_sessions`
+- `reading_tests`, `reading_passages`, `reading_question_groups`, `reading_questions`
+- `writing_tests`, `writing_tasks`
+- `listening_tests`, `listening_sections`, `listening_question_groups`, `listening_questions`
+- `practice_library` (read-only aggregation across the three test types)
+- `import` (validation + import models shared across Reading/Writing/Listening)
+- `pagination` (shared `PaginatedResponse<T>` shape)
+
+Additional non-model modules: `commands::grade_writing` (AI grading), `commands::storage` (media uploads), `commands::export` (ZIP export).
+
+## Error handling flow
+
+`src/core/src/error.rs` defines a single `AppError` enum via `thiserror`:
+
+```rust
+#[derive(Debug, Error)]
+pub enum AppError {
+    #[error("database error: {0}")]
+    Database(#[from] sqlx::Error),
+    #[error("migration error: {0}")]
+    Migration(#[from] sqlx::migrate::MigrateError),
+    #[error("not found: {0}")]
+    NotFound(String),
+    #[error("validation error: {0}")]
+    Validation(String),
+    #[error("serialization error: {0}")]
+    Serialization(#[from] serde_json::Error),
+}
+
+impl From<AppError> for String {
+    fn from(e: AppError) -> String {
+        e.to_string()
+    }
+}
+```
+
+Commands return `Result<T, String>` (or `Result<T, AppError>` that is converted `.map_err(Into::into)` / via `?` at the command boundary), because Tauri command errors must be serializable — `String` is the simplest shape for the frontend to catch and display as a toast. See [Error Handling Conventions](../api-reference/error-handling.mdx) for the exact strings to expect.
+
+## Pattern for adding a new feature
+
+1. Define the model struct(s) in `src/core/src/models/<domain>.rs`.
+2. Implement repository functions (all SQL + ownership/auth checks) in `src/core/src/repositories/<domain>.rs`.
+3. Add thin `#[tauri::command]` functions in `src/core/src/commands/<domain>.rs` that validate input and delegate to the repository.
+4. Register each new command in the `tauri::generate_handler![...]` list in `src/core/src/lib.rs`.
+5. Add a typed wrapper function in `src/ui/lib/tauri.ts` — this is the **only** place the frontend is allowed to call `invoke()`.
+
+See [Adding a New Feature End-to-End](../contributing/adding-a-new-feature.mdx) for a full worked example using the real `export_test_to_zip` feature.
+
+:::warning Do not build Rust manually
+Do not run `cargo build`/`cargo run` to produce the app binary — Tauri tooling (`npm run tauri` / `npm run tauri:build`) handles compiling and linking Rust with the frontend automatically. Standalone `cargo test`/`cargo clippy` from `src/core/` are fine for backend-only iteration.
+:::

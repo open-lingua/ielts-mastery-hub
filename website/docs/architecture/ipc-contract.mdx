@@ -1,0 +1,87 @@
+---
+sidebar_position: 5
+title: Tauri IPC Contract & Naming Conventions
+---
+
+# Tauri IPC Contract & Naming Conventions
+
+## Field naming: snake_case end-to-end
+
+Rust structs exposed to the frontend do **not** use `#[serde(rename_all = "camelCase")]` — field names stay `snake_case` on the wire in both directions. `src/ui/lib/tauri.ts` documents this explicitly in its file header comment:
+
+```typescript
+// ── Shared response types (snake_case — no serde rename_all on Rust structs) ──
+```
+
+For example, `UserTestSession` in TypeScript mirrors the Rust struct exactly:
+
+```typescript
+export interface UserTestSession {
+  id: string;
+  user_id: string;
+  test_id: string;
+  test_type: string;
+  status: string;
+  progress_percent: number;
+  score_band: number | null;
+  attempt_number: number;
+  answers: string | null;       // JSON string
+  feedback_data: string | null; // JSON string
+  started_at: string;
+  completed_at: string | null;
+  last_active_at: string;
+  created_at: string;
+}
+```
+
+The exceptions are a handful of hand-picked fields inside the `grade_writing` response (`GradingResult`/`GradingCriteria`) which use explicit `#[serde(rename = "...")]` annotations for camelCase (`overallBand`, `taskAchievement`, etc.) and the `ExportResult`/`ImportAudioFile` shapes used by export/import — those are documented per-command below and in [Import & Export Commands](../api-reference/import-export-commands.mdx).
+
+:::note Discrepancy with template docs
+Some generic template files in this repo (`AGENTS.md` at the root and in `src/core/`/`src/ui/`) describe a blanket "Rust `snake_case` → TS `camelCase` via `serde(rename_all = "camelCase")`" convention. That is **not what the code does** for the majority of structs — verify wire format directly in `src/ui/lib/tauri.ts` and the corresponding Rust struct before assuming camelCase.
+:::
+
+## `invoke()` wrappers live only in `lib/tauri.ts`
+
+All 694 lines of typed Tauri IPC calls live in `src/ui/lib/tauri.ts`. UI components, pages, and services must **never** call `invoke()` directly — always go through a wrapper function here. This keeps every IPC call auditable in one file and lets it be the single place command names and payload shapes are kept correct.
+
+Example wrapper — `gradeWriting`:
+
+```typescript
+export async function gradeWriting(input: {
+  user_id: string;
+  task_type: "task1" | "task2";
+  prompt: string;
+  user_response: string;
+  session_id?: string;
+  ai_api_key: string;
+  ai_gateway_url: string;
+}): Promise<GradingResult> {
+  return invoke<GradingResult>("grade_writing", { input });
+}
+```
+
+Example wrapper — `exportTestToZip`:
+
+```typescript
+export async function exportTestToZip(
+  userId: string,
+  kind: ImportKind,
+  id: string
+): Promise<ExportResult | null> {
+  return invoke<ExportResult | null>("export_test_to_zip", { userId, kind, id });
+}
+```
+
+Note that `exportTestToZip`'s JS-side parameter names (`userId`, `kind`, `id`) are passed as the `invoke` payload object keys directly — Tauri's IPC layer matches Rust command argument names by their Rust identifier, so payload keys generally must match the Rust function's parameter names exactly (e.g. `json_data`, `audio_meta`, `audio_files` for import commands — see the snake_case argument names used in `validateImport`/`importListeningTest`).
+
+## Pagination pattern
+
+List endpoints that can return large result sets (e.g. `list_practice_tests`) return a shared `PaginatedResponse<T>` type (`src/ui/types/pagination.ts`), consumed as:
+
+```typescript
+export async function listPracticeTests(/* ... */): Promise<PaginatedResponse<PracticeTestCardDto>> {
+  return invoke<PaginatedResponse<PracticeTestCardDto>>("list_practice_tests", { /* ... */ });
+}
+```
+
+See [User Test Sessions & Practice Library Commands](../api-reference/sessions-and-library.mdx) for the full pagination parameter/response shape.
