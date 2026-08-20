@@ -1,0 +1,63 @@
+---
+sidebar_position: 2
+title: Running Tests Locally
+---
+
+# Running Tests Locally
+
+## Backend (Rust)
+
+```bash
+cd src/core
+cargo test
+```
+
+This runs every test under `src/core/tests/`. Each test provisions its own **fresh, isolated in-memory SQLite pool** via `test_pool()` (`src/core/tests/common/fixtures/db_test_pool.rs`) — no shared state or ordering dependency between tests, and no need to point `DATABASE_URL` at the real app database just to run tests (the in-memory pool runs the same production migrations from `src/core/src/database/migrations/`).
+
+### Foreign key seeding requirement
+
+`user_roles.user_id` has a foreign key to `profiles(id)`. Any test that creates a `user_roles` row **must** insert a matching `profiles` row first:
+
+```rust
+async fn given_profile(pool: &Db, id: &str) {
+    sqlx::query!("INSERT INTO profiles (id, plan_type, updated_at) VALUES (?, 'free', '2024-01-01T00:00:00Z')", id)
+        .execute(pool)
+        .await
+        .expect("insert profile fixture");
+}
+```
+
+### Running a single test module/function
+
+```bash
+cargo test user_roles_test          # all tests in a file/module matching this name
+cargo test it_finds_the_role_when_owner_looks_it_up   # a single test function by name
+```
+
+## Frontend (Vitest)
+
+From the repository root:
+
+```bash
+npm run test          # run once (vitest run --silent)
+npm run test:watch    # watch mode
+```
+
+Both use `src/ui/vitest.config.ts`. Shared setup lives in `src/ui/test/setup.ts`.
+
+## CI
+
+`.github/workflows/ci.yml` currently runs only the **frontend** job on push/PR to `main`:
+
+```yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version: lts/krypton
+- run: npm install
+- run: npm run test
+- run: npm run build
+```
+
+:::note Rust tests are not yet wired into CI
+There is currently no `cargo test`/`cargo clippy` job in `.github/workflows/ci.yml` — only the frontend `npm run test` + `npm run build` steps run automatically. Per [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md), contributors touching Rust code are still expected to run `cargo test`, `cargo clippy -- -D warnings`, and `cargo fmt` locally before requesting review.
+:::

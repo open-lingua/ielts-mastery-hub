@@ -1,0 +1,41 @@
+---
+sidebar_position: 3
+title: Writing New Tests (Guidelines for Contributors)
+---
+
+# Writing New Tests (Guidelines for Contributors)
+
+## Step-by-step for a new Rust entity/repository
+
+1. **Add a builder** in `src/core/tests/common/builders/` if you're testing a new entity (e.g. `<entity>_builder.rs`), following the shape of existing builders like `ReadingTestBuilder`/`UserTestSessionBuilder` — a `Create<Entity>`/`Update<Entity>` builder with sensible defaults and fluent `.with_*()` setters.
+2. **Register the builder** in `common/builders/mod.rs`.
+3. **Structure each test with Arrange / Act / Assert comments**, matching the convention used throughout the suite:
+
+```rust
+#[tokio::test]
+async fn it_finds_the_role_when_owner_looks_it_up() {
+    // Arrange
+    let pool = test_pool().await;
+    given_profile(&pool, OWNER_ID).await;
+    let input = super_admin_role_for(OWNER_ID);
+    let id = user_roles::insert(&pool, &input).await.expect("insert");
+
+    // Act
+    let found = user_roles::find_by_id(&pool, &id, OWNER_ID).await;
+
+    // Assert
+    assert_matches!(found, Ok(Some(role)) if role.role == "super_admin");
+}
+```
+
+4. **Use `assert_matches!`** (from the `assert_matches` crate) for `Result`/`Option` assertions rather than manual `matches!`/`unwrap` chains — it gives clearer failure output.
+5. **Always test the three standard authorization boundaries** for any new repository function that takes a `user_id`/`created_by` scope:
+   - Owner success (the row is found/created/updated/deleted as expected).
+   - Other-user exclusion (a different user's id returns empty/`None`, not an error).
+   - Unknown id (`None`/empty, not an error).
+6. **Seed foreign key dependencies first** — e.g. insert a `profiles` row before any `user_roles` row referencing it (see [Running Tests Locally](./running-tests.mdx)).
+7. Name test functions descriptively in the `it_<behavior>` style and group related cases in a `mod <operation> { ... }` block.
+
+## Frontend components
+
+Colocate new component tests in a `__tests__/` folder next to the component (e.g. `src/ui/components/dashboard/__tests__/NewComponent.test.tsx`), following the existing Vitest + Testing Library patterns already used across `components/*/__tests__/`.

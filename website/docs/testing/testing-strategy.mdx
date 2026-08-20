@@ -1,0 +1,59 @@
+---
+sidebar_position: 1
+title: Testing Strategy
+---
+
+# Testing Strategy
+
+IELTS Mastery Hub uses a two-tier testing approach: Rust integration tests for the backend, Vitest for the frontend.
+
+## Backend: Rust integration tests
+
+Located in `src/core/tests/`, organized by layer:
+
+```
+src/core/tests/
+├── models/         # Model-level unit tests
+├── repositories/    # Repository (SQL + ownership logic) integration tests
+├── services/        # Service-layer tests (e.g. export_service, import_service)
+├── root/             # Root-level (error handling, etc.) tests
+└── common/
+    ├── builders/     # One builder per entity for constructing test inputs
+    └── fixtures/     # Shared test fixtures, e.g. test_pool()
+```
+
+Tests use `#[tokio::test]` (async) and run against a **fresh, isolated in-memory SQLite database per test** (`test_pool()` in `common/fixtures/db_test_pool.rs`), with the real production migrations applied — not a mock/fake repository layer. This is a deliberate exception (documented in the fixture's own doc comment) because repository functions take a concrete `sqlx::SqlitePool` with compile-time-checked queries, so there's no trait to fake without changing production code.
+
+### Naming convention
+
+Test functions are named descriptively in the `it_<behavior>` style, e.g.:
+
+```rust
+#[tokio::test]
+async fn it_finds_the_role_when_owner_looks_it_up() { /* ... */ }
+
+#[tokio::test]
+async fn it_returns_none_when_looked_up_by_a_different_user() { /* ... */ }
+```
+
+Tests are grouped into `mod <operation> { ... }` blocks (e.g. `mod insert_and_find_by_id`) to namespace related cases.
+
+### Builder pattern
+
+`common/builders/` provides one builder per entity for constructing test inputs concisely, e.g. `CreateUserTestSessionBuilder`, `UpdateUserTestSessionBuilder`, `ReadingTestBuilder`, `ListeningQuestionBuilder`. Builders reduce repetition across dozens of tests that need slightly different valid entity shapes.
+
+### Authorization test patterns
+
+Because most repository functions scope queries by `user_id`/`created_by`, most repositories are tested against **three standard scenarios**:
+
+1. **Owner success** — the requesting user owns the row; the operation succeeds/returns data.
+2. **Other-user exclusion** — a different user's id is passed; the operation returns empty/`None`/no-op rather than an error (see `it_returns_none_when_looked_up_by_a_different_user`).
+3. **Unknown id** — a nonexistent id is passed; the operation returns `None`/empty rather than erroring.
+
+See [Writing New Tests](./writing-new-tests.mdx) for how to apply this pattern to new entities.
+
+## Frontend: Vitest
+
+`src/ui/test/` holds shared test setup (`setup.ts`), mock fixtures (`mockTestData.ts`), and a smoke test (`example.test.ts`). Component tests are colocated next to the component in `__tests__/` folders (e.g. `src/ui/components/dashboard/__tests__/StudyHeatmap.test.tsx`). Configuration lives in `src/ui/vitest.config.ts`.
+
+See [Running Tests Locally](./running-tests.mdx) for exact commands.
