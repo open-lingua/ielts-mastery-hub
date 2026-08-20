@@ -1,5 +1,52 @@
 ---
 sidebar_position: 1
-title: Intro
+title: Welcome to IELTS Mastery Hub
 sidebar_label: Intro
 ---
+
+# Welcome to IELTS Mastery Hub
+
+**IELTS Mastery Hub** is a native desktop IELTS preparation platform built with **Tauri 2** and **React 19**. It runs fully on the candidate's machine — a TypeScript/React frontend talks to a Rust backend over Tauri IPC, and all data is stored locally in SQLite. The only network call the app makes is to an external AI grading gateway for scoring Writing submissions.
+
+## What it does
+
+- **Reading practice** — timed passages with multiple question groups and question types, auto-scored against the official IELTS band-score conversion table.
+- **Listening practice** — timed sections with embedded audio playback, multiple-choice and fill-in-the-blank questions.
+- **Writing practice with AI grading** — Task 1 and Task 2 responses are graded in parallel by an AI gateway (Gemini-style model) against the four official IELTS writing criteria.
+- **Exam simulation mode** — combines the three modules into a single timed, realistic exam run.
+- **Admin CMS** — authenticated admins can create, publish, import, and export Reading/Writing/Listening test content, and manage student accounts.
+
+## Who this is for
+
+- **Self-study candidates** using the desktop app to practice and track progress.
+- **Teachers / admins** curating test content through the Admin CMS.
+- **Contributors** extending the frontend, backend, or documentation.
+- **AI coding agents** operating on this repository (see `AGENTS.md`).
+
+## Who should read what
+
+| Audience | Start here |
+|---|---|
+| End user (candidate) | [Getting Started](./getting-started/prerequisites.mdx), [Features](./features/reading-module.mdx) |
+| Admin / content curator | [Admin CMS](./admin/overview.mdx) |
+| Contributor | [Architecture](./architecture/overview.mdx), [Contributing](./contributing/how-to-contribute.mdx), [Testing](./testing/testing-strategy.mdx) |
+| AI agent / automation | [API Reference](./api-reference/overview.mdx), [IPC Contract](./architecture/ipc-contract.mdx) |
+
+## Documentation map
+
+| Section | What you'll find |
+|---|---|
+| [Getting Started](./getting-started/prerequisites.mdx) | Prerequisites, installation, running the app, building for production |
+| [Architecture](./architecture/overview.mdx) | System overview, frontend/backend architecture, database schema, IPC contract |
+| [Features](./features/reading-module.mdx) | Reading, Listening, Writing + AI grading, Exam Simulation, Dashboard, Practice Library |
+| [Admin CMS](./admin/overview.mdx) | Content management, user management, dataset import, ZIP export |
+| [API Reference](./api-reference/overview.mdx) | Every Tauri command, grouped by domain |
+| [Testing & Quality](./testing/testing-strategy.mdx) | Rust and frontend testing strategy and conventions |
+| [Contributing](./contributing/how-to-contribute.mdx) | Contribution workflow, coding standards, adding features, releases |
+| [Product](./product/prd-overview.mdx) | Product requirements and feature specs |
+| [Desktop Topics](./desktop/data-storage-and-privacy.mdx) | Local storage, privacy, file system integration, troubleshooting |
+| [Reference](./reference/glossary.mdx) | Glossary, environment variables, tech stack |
+
+:::note License & source
+This documentation describes the `open-lingua/ielts-mastery-hub` repository. See [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md) for the contribution workflow and [`AGENTS.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/AGENTS.md) for AI-agent-specific repository context. The project is distributed under the MIT license (see `LICENSE`).
+:::
