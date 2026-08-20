@@ -8,6 +8,8 @@ use zip::ZipWriter;
 
 use crate::database::Db;
 use crate::error::AppError;
+use crate::models::listening_questions::ListeningQuestion;
+use crate::models::reading_questions::ReadingQuestion;
 use crate::repositories::{
     listening_question_groups, listening_questions, listening_sections, listening_tests,
     reading_passages, reading_question_groups, reading_questions, reading_tests, writing_tasks,
@@ -181,7 +183,7 @@ async fn build_reading_json(db: &Db, user_id: &str, test_id: &str) -> Result<Val
     }))
 }
 
-fn question_to_json(q: reading_questions::ReadingQuestion) -> Value {
+fn question_to_json(q: ReadingQuestion) -> Value {
     serde_json::json!({
         "question_order": q.question_order,
         "text": q.text,
@@ -193,7 +195,7 @@ fn question_to_json(q: reading_questions::ReadingQuestion) -> Value {
     })
 }
 
-fn listening_question_to_json(q: listening_questions::ListeningQuestion) -> Value {
+fn listening_question_to_json(q: ListeningQuestion) -> Value {
     serde_json::json!({
         "question_order": q.question_order,
         "text": q.text,
