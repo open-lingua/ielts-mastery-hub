@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::repositories::writing_tests as repo;
-use crate::repositories::writing_tests::{CreateWritingTest, UpdateWritingTest, WritingTest};
+use crate::models::writing_tests::{CreateWritingTest, UpdateWritingTest, WritingTest};
 
 #[tauri::command]
 pub async fn get_writing_tests(
