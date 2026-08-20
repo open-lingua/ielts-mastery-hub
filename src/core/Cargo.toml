@@ -22,3 +22,10 @@ tauri-plugin-dialog = "2.7.2"
 
 [build-dependencies]
 tauri-build = { version = "2.6.3", features = [] }
+
+[dev-dependencies]
+tokio = { version = "1.53.1", features = ["macros", "rt", "test-util", "time"] }
+mockall = "0.13"
+rstest = "0.23"
+pretty_assertions = "1.4"
+assert_matches = "1.5"
