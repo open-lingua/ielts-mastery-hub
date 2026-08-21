@@ -43,21 +43,26 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "src/core -> target"
-          shared-key: "backend-${{ runner.os }}"
+          shared-key: "backend-${{ runner.os }}-${{ hashFiles('src/core/Cargo.lock') }}"
           cache-on-failure: true
-      - name: Prepare SQLite database for compile-time checked queries
+      - name: Lint Rust (clippy)
+        working-directory: src/core
+        env:
+          SQLX_OFFLINE: "true"
+        run: cargo clippy -- -D warnings
+      - name: Build test binaries
+        working-directory: src/core
+        env:
+          SQLX_OFFLINE: "true"
+        run: cargo test --no-run
+      - name: Prepare SQLite database
         working-directory: src/core
         run: |
           for f in $(ls src/database/migrations/*.sql | sort); do
             sqlite3 dev.db < "$f"
           done
-      - name: Lint Rust (clippy)
-        working-directory: src/core
-        env:
-          DATABASE_URL: sqlite:dev.db
-        run: cargo clippy -- -D warnings
       - name: Run Rust tests
         working-directory: src/core
         env:
           DATABASE_URL: sqlite:dev.db
-        run: cargo test
+        run: cargo test --no-fail-fast
