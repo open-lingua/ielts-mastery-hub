@@ -1,0 +1,104 @@
+---
+sidebar_position: 6
+title: Managing Students
+---
+
+# Managing Students
+
+Use the **Students** page to review the profiles saved in this install of the app.
+
+## What this page is for
+
+On the Students page, you can:
+
+- browse registered profiles
+- search by name or email
+- update a student's saved details
+- record or update a ban
+- delete a profile
+- assign or change a role
+
+## What you will see in the list
+
+Each row shows the student's:
+
+- name
+- email
+- role
+- plan
+- last updated time
+- current status
+
+## Editing student details
+
+From the row menu, choose **Edit**.
+
+The current edit screen lets you change:
+
+- **name**
+- **plan type**
+- **role**
+
+The student's email is shown in the list so you can identify the profile, but it is not edited in the current form.
+
+:::note Plan type is informational today
+`plan_type` is currently for record-keeping only. Changing it does not unlock or restrict features anywhere in the app today.
+:::
+
+## Banning a student
+
+From the row menu, choose **Ban** or **Update Ban**.
+
+You can record:
+
+- a ban reason
+- an optional time limit
+
+The current page offers:
+
+- **Temporary (30 days)**
+- **Permanent**
+
+What banning does today:
+
+- marks the profile as banned
+- stores the reason
+- stores an expiry date if you choose a temporary ban
+
+What banning does not currently do on its own:
+
+- it does not create a login block
+- it does not stop someone from opening the app
+- it does not stop access to the Admin Portal
+- it does not enforce feature restrictions elsewhere in the app today
+
+## Deleting a profile
+
+Choose **Delete** from the row menu if you want to permanently remove a profile.
+
+The app asks for confirmation before deletion.
+
+:::warning Deleting a profile is permanent
+Once deleted, that profile is removed from the Students page. Its saved role assignment is removed with it.
+:::
+
+## Assigning roles
+
+You can set a profile's role to:
+
+- **student**
+- **super_admin**
+
+Changing the role replaces the current role for that profile.
+
+:::note Roles are informational today
+`role` is also record-keeping only right now. There is no active role-based access control in the app today, so assigning `super_admin` does not unlock protected admin-only screens, and assigning `student` does not block them.
+:::
+
+## Suggested workflow
+
+1. Open **Students**.
+2. Search by name or email if needed.
+3. Open the row menu.
+4. Choose **Edit**, **Ban**, or **Delete**.
+5. Save your changes.

@@ -1,0 +1,78 @@
+---
+sidebar_position: 5
+title: Exporting a Test as a ZIP File
+---
+
+# Exporting a Test as a ZIP File
+
+Exporting a test is useful when you want to:
+
+- keep a backup before editing
+- share a test with another admin or instructor
+- move content from one install of the app to another
+
+## How to export a test
+
+1. Open **Content Library**.
+2. Find the test you want.
+3. Click the **3-dot menu** on that row.
+4. Choose **Export**.
+5. In the native **Save As** window, choose where to save the file.
+
+You can export both **Draft** and **Published** tests.
+
+## What gets saved
+
+The app creates a `.zip` file.
+
+Inside that ZIP, you will get:
+
+- the test's **JSON** definition
+- any linked images or audio files
+- a folder named after the test
+
+A simple example looks like this:
+
+| Inside the ZIP | What it is |
+|---|---|
+| Test folder | A folder named after the test |
+| `.json` file | The full test content |
+| `media` files | Linked images or Listening audio |
+
+## What the confirmation means
+
+After exporting, you should see a success message.
+
+Sometimes you may also see a **warning**.
+
+### Warning toast
+
+A warning usually means the ZIP was still created, but one or more linked media files could not be found. For example, an audio file may be missing.
+
+### Full failure
+
+A full failure means the export could not be completed, so no finished ZIP was created.
+
+## Re-importing exported tests
+
+Exports are designed for true round-trip use.
+
+That means you can:
+
+1. export a test
+2. go to **Import Dataset**
+3. bring that file back in again
+
+No manual edits are needed. Re-importing recreates the same test.
+
+:::note Why this matters
+This makes export especially useful for backups, sharing finished content, and moving tests between installs without rebuilding them by hand.
+:::
+
+## Quick reminder
+
+- export starts from **Content Library**
+- the action is in the **3-dot menu**
+- the app opens a native **Save As** dialog
+- both **Draft** and **Published** tests can be exported
+- warnings do not always mean failure
