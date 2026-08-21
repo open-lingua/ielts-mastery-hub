@@ -29,7 +29,7 @@ jobs:
       - name: Install system dependencies (Tauri 2 / Linux)
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
@@ -41,6 +41,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "src/core -> target"
+          shared-key: "backend-${{ runner.os }}"
+          cache-on-failure: true
       - name: Prepare SQLite database for compile-time checked queries
         working-directory: src/core
         run: |
