@@ -20,3 +20,35 @@ jobs:
       - run: npm install
       - run: npm run test
       - run: npm run build
+
+  backend:
+    name: Backend - Rust Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies (Tauri 2 / Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libxdo-dev \
+            patchelf \
+            sqlite3
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src/core -> target"
+      - name: Prepare SQLite database for compile-time checked queries
+        working-directory: src/core
+        run: |
+          for f in $(ls src/database/migrations/*.sql | sort); do
+            sqlite3 dev.db < "$f"
+          done
+      - name: Run Rust tests
+        working-directory: src/core
+        env:
+          DATABASE_URL: sqlite:dev.db
+        run: cargo test
