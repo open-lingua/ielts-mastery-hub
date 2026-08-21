@@ -38,6 +38,8 @@ jobs:
             patchelf \
             sqlite3
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "src/core -> target"
@@ -49,6 +51,11 @@ jobs:
           for f in $(ls src/database/migrations/*.sql | sort); do
             sqlite3 dev.db < "$f"
           done
+      - name: Lint Rust (clippy)
+        working-directory: src/core
+        env:
+          DATABASE_URL: sqlite:dev.db
+        run: cargo clippy -- -D warnings
       - name: Run Rust tests
         working-directory: src/core
         env:
