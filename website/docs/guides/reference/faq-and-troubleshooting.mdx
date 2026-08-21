@@ -1,0 +1,59 @@
+---
+sidebar_position: 1
+title: Frequently Asked Questions & Troubleshooting
+---
+
+# Frequently Asked Questions & Troubleshooting
+
+## Why don't I need to log in?
+
+IELTS Mastery Hub does not use normal accounts right now.
+
+Instead, the app creates an anonymous local device ID automatically the first time you use it. In the code, this is handled by `getAnonId()`. That means the app simply remembers you on this device, with no sign-up and no password.
+
+## Why did my progress disappear?
+
+Your progress is tied to this specific device and this specific app install.
+
+If you move to another computer, reinstall the app, or clear the app's saved data, your old progress does not come with you.
+
+There is currently **no student progress export or backup feature**, so progress does not transfer between devices yet.
+
+## Why does Writing grading fail or take a long time?
+
+Writing grading needs an internet connection because it sends your writing to an external AI grading gateway.
+
+This is also the **only feature in the app that requires internet**. Reading, Listening, the Dashboard, the Practice Library, and the Admin Portal work locally on the device.
+
+If Writing grading fails or feels slow, check:
+
+- your internet connection
+- whether the connection dropped during grading
+- whether the grading service is taking longer than usual to respond
+
+## Why can I access the Admin Portal without logging in?
+
+There is currently no separate admin login.
+
+Anyone using this install of the app can open the Admin Portal. That is why the Admin features are best suited to single-user or small trusted-team setups today.
+
+## My Import failed — what do I check first?
+
+Start with these checks:
+
+- did you choose the correct test type?
+- is the file valid JSON?
+- does the JSON structure match that test type?
+- if it is a Listening import, did you attach **exactly 4** audio files?
+- for Listening, are those files in **MP3** or **WAV** format?
+
+If one section is missing its audio file, the Listening import will not complete.
+
+## What do Draft vs Published mean?
+
+| Status | What it means |
+|---|---|
+| Draft | Still private to the app identity that created it; used for work in progress |
+| Published | Visible in the Practice Library for everyone using this install |
+
+A draft is useful while you are still editing. Publishing is the step that makes the test available for practice.
