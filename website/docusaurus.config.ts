@@ -65,7 +65,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/app-banner.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -78,7 +78,7 @@ const config: Config = {
       title: 'IELTS Mastery Hub',
       logo: {
         alt: 'IELTS Mastery Hub Logo',
-        src: 'img/logo.svg',
+        src: 'img/app-logo.png',
         style: { borderRadius: '50%', background: '#fff', boxShadow: '0 0 0 1px rgba(27,42,94,.15)', padding: '2px' },
       },
       items: [
