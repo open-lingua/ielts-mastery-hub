@@ -33,7 +33,6 @@ describe("AdminLayout", () => {
     expect(screen.getByText("Content Library")).toBeInTheDocument();
     expect(screen.getByText("Create New")).toBeInTheDocument();
     expect(screen.getByText("Import Dataset")).toBeInTheDocument();
-    expect(screen.getByText("Students")).toBeInTheDocument();
   });
 
   it("renders the brand label", () => {

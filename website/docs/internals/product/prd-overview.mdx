@@ -42,23 +42,12 @@ The PRD scopes in "Email signup/login" under Auth & Profiles, but the current im
   - Draft/Published toggle enforced in the Rust command layer
   - Preview modal before publishing
 
-**US-15: User Management**
-- **Story:** As an admin, I want to view registered users and their plan types so that I can manage access.
-- **Acceptance Criteria:**
-  - Table of users with name, email, plan, last active
-  - Ability to upgrade/downgrade plan type
-  - Protected by admin-only route
-
 **TS-2: Admin Role Authorization**
 - **Story:** As the system, I need role-based access control so that only admins can access CMS routes.
 - **Acceptance Criteria:**
   - Admin role stored in the local SQLite `profiles` table
   - `ProtectedRoute` component checks role before rendering
   - Non-admin users redirected to dashboard
-
-:::warning TS-2 is not yet fully implemented
-As documented in [Admin CMS Overview](../admin/overview.mdx) and [Frontend Architecture](../architecture/frontend-architecture.mdx), **no `ProtectedRoute` component exists** in the current codebase, and `/admin/*` routes are reachable by anyone regardless of `user_roles`. The `user_roles` table (`student`/`super_admin`) exists and can be populated via the User Management UI, but nothing currently reads it to gate route access. This is the clearest gap between this PRD and the shipped implementation.
-:::
 
 ## See also
 

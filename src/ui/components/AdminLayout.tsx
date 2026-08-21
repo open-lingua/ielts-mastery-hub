@@ -9,7 +9,6 @@ import {
   Moon,
   PlusCircle,
   Sun,
-  Users,
 } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
@@ -24,7 +23,6 @@ const navItems = [
   { label: "Content Library", icon: Library, path: "/admin/content" },
   { label: "Create New", icon: PlusCircle, path: "/admin/create" },
   { label: "Import Dataset", icon: FileJson, path: "/admin/import" },
-  { label: "Students", icon: Users, path: "/admin/users" },
   //  { label: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 

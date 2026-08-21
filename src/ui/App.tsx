@@ -29,7 +29,6 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ContentLibrary from "./pages/admin/ContentLibrary";
 import CreateContent from "./pages/admin/CreateContent";
 import ImportDataset from "./pages/admin/ImportDataset";
-import UserManagement from "./pages/admin/UserManagement";
 import Dashboard from "./pages/Dashboard";
 import ListeningModule from "./pages/ListeningModule";
 import NotFound from "./pages/NotFound";
@@ -58,7 +57,6 @@ const App = () => (
               <Route path="/admin/content" element={<ContentLibrary />} />
               <Route path="/admin/create" element={<CreateContent />} />
               <Route path="/admin/import" element={<ImportDataset />} />
-              <Route path="/admin/users" element={<UserManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

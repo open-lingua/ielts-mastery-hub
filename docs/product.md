@@ -185,13 +185,6 @@ IELTS Mastery Hub is a desktop IELTS preparation platform built with Tauri + Rea
   - Draft/Published toggle enforced in the Rust command layer
   - Preview modal before publishing
 
-**US-15: User Management**
-- **Story:** As an admin, I want to view registered users and their plan types so that I can manage access.
-- **Acceptance Criteria:**
-  - Table of users with name, email, plan, last active
-  - Ability to upgrade/downgrade plan type
-  - Protected by admin-only route
-
 **TS-2: Admin Role Authorization**
 - **Story:** As the system, I need role-based access control so that only admins can access CMS routes.
 - **Acceptance Criteria:**

@@ -158,13 +158,6 @@ export interface Profile {
   updated_at: string;
 }
 
-export interface UserRole {
-  id: string;
-  user_id: string;
-  role: string;
-  created_at: string;
-}
-
 export interface GradingResult {
   overallBand: number;
   criteria: {
@@ -536,39 +529,6 @@ export async function listProfiles(): Promise<Profile[]> {
 
 export async function getProfile(id: string): Promise<Profile | null> {
   return invoke<Profile | null>("get_profiles", { id });
-}
-
-export async function updateProfile(
-  id: string,
-  input: {
-    full_name?: string | null;
-    avatar_url?: string | null;
-    plan_type?: string | null;
-    email?: string | null;
-    is_banned?: boolean | null;
-    ban_reason?: string | null;
-    banned_until?: string | null;
-  }
-): Promise<void> {
-  return invoke<void>("update_profiles", { id, input });
-}
-
-export async function deleteProfile(id: string): Promise<void> {
-  return invoke<void>("delete_profiles", { id });
-}
-
-// ── user_roles ─────────────────────────────────────────────────────────────
-
-export async function listUserRoles(userId: string): Promise<UserRole[]> {
-  return invoke<UserRole[]>("list_user_roles", { userId });
-}
-
-export async function createUserRole(input: { user_id: string; role: string }): Promise<string> {
-  return invoke<string>("create_user_roles", { input });
-}
-
-export async function deleteUserRole(id: string, userId: string): Promise<void> {
-  return invoke<void>("delete_user_roles", { id, userId });
 }
 
 // ── storage ────────────────────────────────────────────────────────────────
