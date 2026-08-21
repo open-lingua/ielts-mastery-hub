@@ -31,7 +31,6 @@ import CreateContent from "./pages/admin/CreateContent";
 import ImportDataset from "./pages/admin/ImportDataset";
 import UserManagement from "./pages/admin/UserManagement";
 import Dashboard from "./pages/Dashboard";
-import LandingPage from "./pages/LandingPage";
 import ListeningModule from "./pages/ListeningModule";
 import NotFound from "./pages/NotFound";
 import ReadingModule from "./pages/ReadingModule";
@@ -49,7 +48,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/writing" element={<WritingSimulator />} />
               <Route path="/reading" element={<ReadingModule />} />
