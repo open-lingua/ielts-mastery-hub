@@ -69,6 +69,11 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    docs: {
+      sidebar: {
+        autoCollapseCategories: false,
+      },
+    },
     navbar: {
       title: 'IELTS Mastery Hub',
       logo: {
