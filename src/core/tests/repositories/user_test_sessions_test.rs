@@ -1,7 +1,9 @@
 use app_lib::repositories::user_test_sessions;
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateUserTestSessionBuilder, UpdateUserTestSessionBuilder, default_user_test_session};
+use crate::common::builders::{
+    default_user_test_session, CreateUserTestSessionBuilder, UpdateUserTestSessionBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -15,8 +17,12 @@ mod insert_and_find_by_id {
     async fn it_finds_the_session_when_owner_looks_it_up() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateUserTestSessionBuilder::default().with_test_type("listening").build();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateUserTestSessionBuilder::default()
+            .with_test_type("listening")
+            .build();
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID).await;
@@ -42,7 +48,9 @@ mod insert_and_find_by_id {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = user_test_sessions::find_by_id(&pool, &id, OTHER_USER_ID).await;
@@ -56,10 +64,15 @@ mod insert_and_find_by_id {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.attempt_number, 1);
@@ -86,10 +99,14 @@ mod find_all {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        user_test_sessions::insert(&pool, &input, OTHER_USER_ID).await.expect("insert");
+        user_test_sessions::insert(&pool, &input, OTHER_USER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        let all = user_test_sessions::find_all(&pool, OWNER_ID).await.expect("find_all");
+        let all = user_test_sessions::find_all(&pool, OWNER_ID)
+            .await
+            .expect("find_all");
 
         // Assert
         assert!(all.is_empty());
@@ -104,12 +121,21 @@ mod update {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateUserTestSessionBuilder::default().with_status("completed").build();
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateUserTestSessionBuilder::default()
+            .with_status("completed")
+            .build();
 
         // Act
-        user_test_sessions::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        user_test_sessions::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.status, "completed");
@@ -120,12 +146,21 @@ mod update {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateUserTestSessionBuilder::default().with_status("completed").build();
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateUserTestSessionBuilder::default()
+            .with_status("completed")
+            .build();
 
         // Act
-        user_test_sessions::update(&pool, &id, OTHER_USER_ID, &update).await.expect("update");
-        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        user_test_sessions::update(&pool, &id, OTHER_USER_ID, &update)
+            .await
+            .expect("update");
+        let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.status, "in_progress");
@@ -140,10 +175,14 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let input = default_user_test_session();
-        let id = user_test_sessions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = user_test_sessions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        user_test_sessions::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        user_test_sessions::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = user_test_sessions::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

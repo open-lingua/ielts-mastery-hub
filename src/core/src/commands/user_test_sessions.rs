@@ -1,10 +1,10 @@
 use tauri::State;
 
 use crate::database::Db;
-use crate::repositories::user_test_sessions as repo;
 use crate::models::user_test_sessions::{
     CreateUserTestSession, UpdateUserTestSession, UserTestSession,
 };
+use crate::repositories::user_test_sessions as repo;
 
 #[tauri::command]
 pub async fn get_user_test_sessions(

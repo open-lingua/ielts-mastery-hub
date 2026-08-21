@@ -1,7 +1,9 @@
 use app_lib::repositories::listening_tests;
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateListeningTestBuilder, UpdateListeningTestBuilder, default_listening_test};
+use crate::common::builders::{
+    default_listening_test, CreateListeningTestBuilder, UpdateListeningTestBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -15,8 +17,12 @@ mod insert_and_find_by_id {
     async fn it_finds_the_test_when_owner_looks_it_up() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_title("Airport Announcements").build();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningTestBuilder::default()
+            .with_title("Airport Announcements")
+            .build();
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = listening_tests::find_by_id(&pool, &id, OWNER_ID).await;
@@ -41,8 +47,12 @@ mod insert_and_find_by_id {
     async fn it_finds_a_published_test_when_looked_up_by_a_non_owner() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_status("published").build();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningTestBuilder::default()
+            .with_status("published")
+            .build();
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = listening_tests::find_by_id(&pool, &id, OTHER_USER_ID).await;
@@ -55,8 +65,12 @@ mod insert_and_find_by_id {
     async fn it_returns_none_when_a_draft_test_is_looked_up_by_a_non_owner() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_status("draft").build();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningTestBuilder::default()
+            .with_status("draft")
+            .build();
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = listening_tests::find_by_id(&pool, &id, OTHER_USER_ID).await;
@@ -85,11 +99,17 @@ mod find_all {
     async fn it_excludes_other_users_drafts() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_status("draft").build();
-        listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningTestBuilder::default()
+            .with_status("draft")
+            .build();
+        listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        let all = listening_tests::find_all(&pool, OTHER_USER_ID).await.expect("find_all");
+        let all = listening_tests::find_all(&pool, OTHER_USER_ID)
+            .await
+            .expect("find_all");
 
         // Assert
         assert!(all.is_empty());
@@ -103,13 +123,24 @@ mod update {
     async fn it_updates_only_the_provided_field() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_title("Original Title").build();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateListeningTestBuilder::default().with_status("published").build();
+        let input = CreateListeningTestBuilder::default()
+            .with_title("Original Title")
+            .build();
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateListeningTestBuilder::default()
+            .with_status("published")
+            .build();
 
         // Act
-        listening_tests::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = listening_tests::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        listening_tests::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = listening_tests::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.title, "Original Title");
@@ -120,13 +151,24 @@ mod update {
     async fn it_does_not_update_a_test_owned_by_another_user() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateListeningTestBuilder::default().with_title("Original Title").build();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateListeningTestBuilder::default().with_title("Hijacked Title").build();
+        let input = CreateListeningTestBuilder::default()
+            .with_title("Original Title")
+            .build();
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateListeningTestBuilder::default()
+            .with_title("Hijacked Title")
+            .build();
 
         // Act
-        listening_tests::update(&pool, &id, OTHER_USER_ID, &update).await.expect("update");
-        let found = listening_tests::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        listening_tests::update(&pool, &id, OTHER_USER_ID, &update)
+            .await
+            .expect("update");
+        let found = listening_tests::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.title, "Original Title");
@@ -141,10 +183,14 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let input = default_listening_test();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        listening_tests::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        listening_tests::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = listening_tests::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert
@@ -156,10 +202,14 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let input = default_listening_test();
-        let id = listening_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = listening_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        listening_tests::delete(&pool, &id, OTHER_USER_ID).await.expect("delete");
+        listening_tests::delete(&pool, &id, OTHER_USER_ID)
+            .await
+            .expect("delete");
         let found = listening_tests::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

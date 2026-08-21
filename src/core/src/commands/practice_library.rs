@@ -2,7 +2,9 @@ use tauri::State;
 
 use crate::database::Db;
 use crate::error::AppError;
-use crate::models::pagination::{build_pagination, offset_for, PaginatedResponse, PaginationParams};
+use crate::models::pagination::{
+    build_pagination, offset_for, PaginatedResponse, PaginationParams,
+};
 use crate::models::practice_library::PracticeTestCard;
 use crate::repositories::practice_library;
 

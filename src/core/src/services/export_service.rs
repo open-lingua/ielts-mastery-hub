@@ -41,7 +41,12 @@ struct MediaFile {
 /// Assembles the Import-schema-compatible JSON for `id`, bundles any linked media, and zips
 /// everything up in memory. Does not touch the filesystem beyond reading source media files —
 /// callers decide where (and whether) to persist the resulting bytes.
-pub async fn build_export(db: &Db, user_id: &str, kind: &str, id: &str) -> Result<BuiltExport, AppError> {
+pub async fn build_export(
+    db: &Db,
+    user_id: &str,
+    kind: &str,
+    id: &str,
+) -> Result<BuiltExport, AppError> {
     let mut warnings: Vec<String> = Vec::new();
     let mut media: Vec<MediaFile> = Vec::new();
 
@@ -58,17 +63,34 @@ pub async fn build_export(db: &Db, user_id: &str, kind: &str, id: &str) -> Resul
             let json = build_listening_json(db, user_id, id, &mut media, &mut warnings).await?;
             (json_title(&json), "listening", json)
         }
-        other => return Err(AppError::Validation(format!("Unknown export kind `{other}`."))),
+        other => {
+            return Err(AppError::Validation(format!(
+                "Unknown export kind `{other}`."
+            )))
+        }
     };
 
     let file_name = format!("ielts-{module}-{}_export.zip", slugify(&title));
-    let folder_name = file_name.strip_suffix(".zip").unwrap_or(&file_name).to_string();
+    let folder_name = file_name
+        .strip_suffix(".zip")
+        .unwrap_or(&file_name)
+        .to_string();
     let json_file_name = format!("{}.json", slugify(&title).replace('-', "_"));
     let json_bytes = serde_json::to_vec_pretty(&json)?;
 
-    let zip_bytes = build_zip(&folder_name, &json_file_name, &json_bytes, &media, &mut warnings)?;
+    let zip_bytes = build_zip(
+        &folder_name,
+        &json_file_name,
+        &json_bytes,
+        &media,
+        &mut warnings,
+    )?;
 
-    Ok(BuiltExport { file_name, zip_bytes, warnings })
+    Ok(BuiltExport {
+        file_name,
+        zip_bytes,
+        warnings,
+    })
 }
 
 fn json_title(json: &Value) -> String {
@@ -112,13 +134,18 @@ fn build_zip(
                 Err(_) => {
                     warnings.push(format!(
                         "Missing media file: {}",
-                        file.source_path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+                        file.source_path
+                            .file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_default()
                     ));
                 }
             }
         }
 
-        writer.finish().map_err(|e| AppError::Validation(e.to_string()))?;
+        writer
+            .finish()
+            .map_err(|e| AppError::Validation(e.to_string()))?;
     }
     Ok(cursor.into_inner())
 }
@@ -134,21 +161,32 @@ async fn build_reading_json(db: &Db, user_id: &str, test_id: &str) -> Result<Val
     let all_groups = reading_question_groups::find_all(db, user_id).await?;
     let all_questions = reading_questions::find_all(db, user_id).await?;
 
-    let mut passages: Vec<_> = all_passages.into_iter().filter(|p| p.test_id == test_id).collect();
+    let mut passages: Vec<_> = all_passages
+        .into_iter()
+        .filter(|p| p.test_id == test_id)
+        .collect();
     passages.sort_by_key(|p| p.passage_number);
 
     let passages_json: Vec<Value> = passages
         .into_iter()
         .map(|p| {
-            let mut groups: Vec<_> = all_groups.iter().filter(|g| g.passage_id == p.id).cloned().collect();
+            let mut groups: Vec<_> = all_groups
+                .iter()
+                .filter(|g| g.passage_id == p.id)
+                .cloned()
+                .collect();
             groups.sort_by_key(|g| g.group_order);
             let groups_json: Vec<Value> = groups
                 .into_iter()
                 .map(|g| {
-                    let mut questions: Vec<_> =
-                        all_questions.iter().filter(|q| q.group_id == g.id).cloned().collect();
+                    let mut questions: Vec<_> = all_questions
+                        .iter()
+                        .filter(|q| q.group_id == g.id)
+                        .cloned()
+                        .collect();
                     questions.sort_by_key(|q| q.question_order);
-                    let questions_json: Vec<Value> = questions.into_iter().map(question_to_json).collect();
+                    let questions_json: Vec<Value> =
+                        questions.into_iter().map(question_to_json).collect();
                     serde_json::json!({
                         "group_order": g.group_order,
                         "question_type": g.question_type,
@@ -221,7 +259,10 @@ async fn build_writing_json(
         .ok_or_else(|| AppError::NotFound(format!("Writing test `{test_id}` not found.")))?;
 
     let all_tasks = writing_tasks::find_all(db, user_id).await?;
-    let mut tasks: Vec<_> = all_tasks.into_iter().filter(|t| t.test_id == test_id).collect();
+    let mut tasks: Vec<_> = all_tasks
+        .into_iter()
+        .filter(|t| t.test_id == test_id)
+        .collect();
     tasks.sort_by_key(|t| t.task_number);
 
     let tasks_json: Vec<Value> = tasks
@@ -236,7 +277,10 @@ async fn build_writing_json(
                     warnings.push(format!(
                         "Missing image file for Task {}: {}",
                         t.task_number,
-                        source.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+                        source
+                            .file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_default()
                     ));
                     return None;
                 }
@@ -289,7 +333,10 @@ async fn build_listening_json(
     let all_groups = listening_question_groups::find_all(db, user_id).await?;
     let all_questions = listening_questions::find_all(db, user_id).await?;
 
-    let mut sections: Vec<_> = all_sections.into_iter().filter(|s| s.test_id == test_id).collect();
+    let mut sections: Vec<_> = all_sections
+        .into_iter()
+        .filter(|s| s.test_id == test_id)
+        .collect();
     sections.sort_by_key(|s| s.section_number);
 
     let sections_json: Vec<Value> = sections
@@ -304,7 +351,10 @@ async fn build_listening_json(
                     warnings.push(format!(
                         "Missing audio file for Section {}: {}",
                         s.section_number,
-                        source.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+                        source
+                            .file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_default()
                     ));
                     return None;
                 }
@@ -317,15 +367,25 @@ async fn build_listening_json(
                 Some(format!("./{archive_path}"))
             });
 
-            let mut groups: Vec<_> = all_groups.iter().filter(|g| g.section_id == s.id).cloned().collect();
+            let mut groups: Vec<_> = all_groups
+                .iter()
+                .filter(|g| g.section_id == s.id)
+                .cloned()
+                .collect();
             groups.sort_by_key(|g| g.group_order);
             let groups_json: Vec<Value> = groups
                 .into_iter()
                 .map(|g| {
-                    let mut questions: Vec<_> =
-                        all_questions.iter().filter(|q| q.group_id == g.id).cloned().collect();
+                    let mut questions: Vec<_> = all_questions
+                        .iter()
+                        .filter(|q| q.group_id == g.id)
+                        .cloned()
+                        .collect();
                     questions.sort_by_key(|q| q.question_order);
-                    let questions_json: Vec<Value> = questions.into_iter().map(listening_question_to_json).collect();
+                    let questions_json: Vec<Value> = questions
+                        .into_iter()
+                        .map(listening_question_to_json)
+                        .collect();
                     serde_json::json!({
                         "group_order": g.group_order,
                         "question_type": g.question_type,
@@ -379,7 +439,10 @@ fn rename_keys_in_str(raw: &str, renames: &[(&str, &str)]) -> Value {
             if let Value::Object(map) = item {
                 let mut new_map = serde_json::Map::new();
                 for (k, v) in map {
-                    let renamed_key = renames.iter().find(|(from, _)| *from == k).map(|(_, to)| *to);
+                    let renamed_key = renames
+                        .iter()
+                        .find(|(from, _)| *from == k)
+                        .map(|(_, to)| *to);
                     new_map.insert(renamed_key.unwrap_or(&k).to_string(), v);
                 }
                 Value::Object(new_map)
@@ -421,12 +484,17 @@ pub fn default_export_dir() -> Option<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::services::import_service::{validate_listening, validate_reading, validate_writing, AudioMeta};
+    use crate::services::import_service::{
+        validate_listening, validate_reading, validate_writing, AudioMeta,
+    };
     use sqlx::sqlite::SqlitePoolOptions;
 
     #[test]
     fn slugify_lowercases_and_dashes_special_chars() {
-        assert_eq!(slugify("Carbon Capture: The Process!"), "carbon-capture-the-process");
+        assert_eq!(
+            slugify("Carbon Capture: The Process!"),
+            "carbon-capture-the-process"
+        );
     }
 
     #[test]
@@ -456,7 +524,10 @@ mod tests {
     #[test]
     fn parse_or_falls_back_on_invalid_json() {
         assert_eq!(parse_or("nope", Value::Array(vec![])), Value::Array(vec![]));
-        assert_eq!(parse_or("[1,2]", Value::Array(vec![])), serde_json::json!([1, 2]));
+        assert_eq!(
+            parse_or("[1,2]", Value::Array(vec![])),
+            serde_json::json!([1, 2])
+        );
     }
 
     #[test]
@@ -466,16 +537,23 @@ mod tests {
             archive_path: "media/missing.mp3".to_string(),
             source_path: PathBuf::from("/nonexistent/path/missing.mp3"),
         }];
-        let zip_bytes =
-            build_zip("ielts-reading-sample_export", "test.json", b"{\"title\":\"t\"}", &media, &mut warnings)
-                .unwrap();
+        let zip_bytes = build_zip(
+            "ielts-reading-sample_export",
+            "test.json",
+            b"{\"title\":\"t\"}",
+            &media,
+            &mut warnings,
+        )
+        .unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("missing.mp3"));
 
         let mut archive = zip::ZipArchive::new(Cursor::new(zip_bytes)).unwrap();
         assert_eq!(archive.len(), 1);
-        let mut file = archive.by_name("ielts-reading-sample_export/test.json").unwrap();
+        let mut file = archive
+            .by_name("ielts-reading-sample_export/test.json")
+            .unwrap();
         let mut contents = String::new();
         std::io::Read::read_to_string(&mut file, &mut contents).unwrap();
         assert_eq!(contents, "{\"title\":\"t\"}");
@@ -493,19 +571,37 @@ mod tests {
             archive_path: "media/section-1.mp3".to_string(),
             source_path: audio_path,
         }];
-        let zip_bytes = build_zip("ielts-listening-sample_export", "test.json", b"{}", &media, &mut warnings).unwrap();
+        let zip_bytes = build_zip(
+            "ielts-listening-sample_export",
+            "test.json",
+            b"{}",
+            &media,
+            &mut warnings,
+        )
+        .unwrap();
 
         assert!(warnings.is_empty());
         let mut archive = zip::ZipArchive::new(Cursor::new(zip_bytes)).unwrap();
-        assert!(archive.by_name("ielts-listening-sample_export/test.json").is_ok());
-        assert!(archive.by_name("ielts-listening-sample_export/media/section-1.mp3").is_ok());
+        assert!(archive
+            .by_name("ielts-listening-sample_export/test.json")
+            .is_ok());
+        assert!(archive
+            .by_name("ielts-listening-sample_export/media/section-1.mp3")
+            .is_ok());
 
         std::fs::remove_dir_all(&dir).unwrap();
     }
 
     async fn test_pool() -> Db {
-        let pool = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
-        sqlx::migrate!("./src/database/migrations").run(&pool).await.unwrap();
+        let pool = SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+        sqlx::migrate!("./src/database/migrations")
+            .run(&pool)
+            .await
+            .unwrap();
         pool
     }
 
@@ -565,7 +661,10 @@ mod tests {
         let json = build_reading_json(&pool, user_id, test_id).await.unwrap();
         assert_eq!(json["title"], "Sample Reading Test");
         assert_eq!(json["passages"].as_array().unwrap().len(), 3);
-        assert_eq!(json["passages"][0]["question_groups"][0]["questions"][0]["answer"], "TRUE");
+        assert_eq!(
+            json["passages"][0]["question_groups"][0]["questions"][0]["answer"],
+            "TRUE"
+        );
 
         validate_reading(&json).expect("exported reading JSON should re-validate as importable");
     }
@@ -585,15 +684,29 @@ mod tests {
         .await
         .unwrap();
 
-        for (n, image) in [(1i64, Some("/nonexistent/chart.png".to_string())), (2i64, None)] {
+        for (n, image) in [
+            (1i64, Some("/nonexistent/chart.png".to_string())),
+            (2i64, None),
+        ] {
             sqlx::query!(
                 "INSERT INTO writing_tasks
                  (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt,
                   min_words, max_words, image_url, include_model_answer, model_answer, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                format!("task-{n}"), test_id, n, if n == 2 { "task2" } else { "task1" }, "Task title", "7",
-                "20 mins", "Describe the chart.", 150i64, Option::<String>::None, image, false,
-                Option::<String>::None, now
+                format!("task-{n}"),
+                test_id,
+                n,
+                if n == 2 { "task2" } else { "task1" },
+                "Task title",
+                "7",
+                "20 mins",
+                "Describe the chart.",
+                150i64,
+                Option::<String>::None,
+                image,
+                false,
+                Option::<String>::None,
+                now
             )
             .execute(&pool)
             .await
@@ -602,7 +715,9 @@ mod tests {
 
         let mut media = Vec::new();
         let mut warnings = Vec::new();
-        let json = build_writing_json(&pool, user_id, test_id, &mut media, &mut warnings).await.unwrap();
+        let json = build_writing_json(&pool, user_id, test_id, &mut media, &mut warnings)
+            .await
+            .unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("chart.png"));
@@ -632,14 +747,22 @@ mod tests {
         let audio_dir = std::env::temp_dir().join(format!("export-audio-{}", uuid::Uuid::new_v4()));
         tokio::fs::create_dir_all(&audio_dir).await.unwrap();
         for n in 1..=4i64 {
-            tokio::fs::write(audio_dir.join(format!("section-{n}.mp3")), b"fake audio bytes")
-                .await
-                .unwrap();
+            tokio::fs::write(
+                audio_dir.join(format!("section-{n}.mp3")),
+                b"fake audio bytes",
+            )
+            .await
+            .unwrap();
         }
 
         for n in 1..=4i64 {
             let section_id = format!("section-{n}");
-            let audio_url = Some(audio_dir.join(format!("section-{n}.mp3")).to_string_lossy().into_owned());
+            let audio_url = Some(
+                audio_dir
+                    .join(format!("section-{n}.mp3"))
+                    .to_string_lossy()
+                    .into_owned(),
+            );
             sqlx::query!(
                 "INSERT INTO listening_sections (id, test_id, section_number, title, transcript, audio_url, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -652,7 +775,9 @@ mod tests {
 
         let mut media = Vec::new();
         let mut warnings = Vec::new();
-        let json = build_listening_json(&pool, user_id, test_id, &mut media, &mut warnings).await.unwrap();
+        let json = build_listening_json(&pool, user_id, test_id, &mut media, &mut warnings)
+            .await
+            .unwrap();
 
         assert!(warnings.is_empty());
         assert_eq!(media.len(), 4);
@@ -660,9 +785,14 @@ mod tests {
         assert_eq!(json["sections"][0]["audio_url"], "./media/section-1.mp3");
 
         let audio_meta: Vec<AudioMeta> = (1..=4)
-            .map(|n| AudioMeta { section_number: n, file_name: format!("section-{n}.mp3"), size: 17 })
+            .map(|n| AudioMeta {
+                section_number: n,
+                file_name: format!("section-{n}.mp3"),
+                size: 17,
+            })
             .collect();
-        validate_listening(&json, &audio_meta).expect("exported listening JSON should re-validate as importable");
+        validate_listening(&json, &audio_meta)
+            .expect("exported listening JSON should re-validate as importable");
 
         tokio::fs::remove_dir_all(&audio_dir).await.unwrap();
     }
@@ -685,7 +815,11 @@ mod tests {
 
         for n in 1..=4i64 {
             let section_id = format!("section-{n}");
-            let audio_url = if n == 1 { Some("/nonexistent/section-1.mp3".to_string()) } else { None };
+            let audio_url = if n == 1 {
+                Some("/nonexistent/section-1.mp3".to_string())
+            } else {
+                None
+            };
             sqlx::query!(
                 "INSERT INTO listening_sections (id, test_id, section_number, title, transcript, audio_url, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -698,7 +832,9 @@ mod tests {
 
         let mut media = Vec::new();
         let mut warnings = Vec::new();
-        let json = build_listening_json(&pool, user_id, test_id, &mut media, &mut warnings).await.unwrap();
+        let json = build_listening_json(&pool, user_id, test_id, &mut media, &mut warnings)
+            .await
+            .unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("Section 1"));

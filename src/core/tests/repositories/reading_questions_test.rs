@@ -1,10 +1,12 @@
 use app_lib::database::Db;
-use app_lib::repositories::{reading_passages, reading_question_groups, reading_questions, reading_tests};
+use app_lib::repositories::{
+    reading_passages, reading_question_groups, reading_questions, reading_tests,
+};
 use assert_matches::assert_matches;
 
 use crate::common::builders::{
-    CreateReadingPassageBuilder, CreateReadingQuestionBuilder, CreateReadingQuestionGroupBuilder,
-    UpdateReadingQuestionBuilder, default_reading_test,
+    default_reading_test, CreateReadingPassageBuilder, CreateReadingQuestionBuilder,
+    CreateReadingQuestionGroupBuilder, UpdateReadingQuestionBuilder,
 };
 use crate::common::fixtures::test_pool;
 
@@ -17,11 +19,21 @@ const UNKNOWN_ID: &str = "unknown-id";
 /// question in these tests.
 async fn given_owned_group(pool: &Db) -> String {
     let test_input = default_reading_test();
-    let test_id = reading_tests::insert(pool, &test_input, OWNER_ID).await.expect("insert test");
-    let passage_input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
-    let passage_id = reading_passages::insert(pool, &passage_input, OWNER_ID).await.expect("insert passage");
-    let group_input = CreateReadingQuestionGroupBuilder::default().with_passage_id(&passage_id).build();
-    reading_question_groups::insert(pool, &group_input, OWNER_ID).await.expect("insert group")
+    let test_id = reading_tests::insert(pool, &test_input, OWNER_ID)
+        .await
+        .expect("insert test");
+    let passage_input = CreateReadingPassageBuilder::default()
+        .with_test_id(&test_id)
+        .build();
+    let passage_id = reading_passages::insert(pool, &passage_input, OWNER_ID)
+        .await
+        .expect("insert passage");
+    let group_input = CreateReadingQuestionGroupBuilder::default()
+        .with_passage_id(&passage_id)
+        .build();
+    reading_question_groups::insert(pool, &group_input, OWNER_ID)
+        .await
+        .expect("insert group")
 }
 
 mod insert {
@@ -32,7 +44,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let group_id = given_owned_group(&pool).await;
-        let input = CreateReadingQuestionBuilder::default().with_group_id(&group_id).build();
+        let input = CreateReadingQuestionBuilder::default()
+            .with_group_id(&group_id)
+            .build();
 
         // Act
         let result = reading_questions::insert(&pool, &input, OWNER_ID).await;
@@ -46,7 +60,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let group_id = given_owned_group(&pool).await;
-        let input = CreateReadingQuestionBuilder::default().with_group_id(&group_id).build();
+        let input = CreateReadingQuestionBuilder::default()
+            .with_group_id(&group_id)
+            .build();
 
         // Act
         let result = reading_questions::insert(&pool, &input, OTHER_USER_ID).await;
@@ -64,8 +80,13 @@ mod find_by_id {
         // Arrange
         let pool = test_pool().await;
         let group_id = given_owned_group(&pool).await;
-        let input = CreateReadingQuestionBuilder::default().with_group_id(&group_id).with_text("What is the theme?").build();
-        let id = reading_questions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingQuestionBuilder::default()
+            .with_group_id(&group_id)
+            .with_text("What is the theme?")
+            .build();
+        let id = reading_questions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = reading_questions::find_by_id(&pool, &id, OWNER_ID).await;
@@ -115,12 +136,21 @@ mod update {
             .with_group_id(&group_id)
             .with_text("Original text?")
             .build();
-        let id = reading_questions::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateReadingQuestionBuilder::default().with_answer("42").build();
+        let id = reading_questions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateReadingQuestionBuilder::default()
+            .with_answer("42")
+            .build();
 
         // Act
-        reading_questions::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = reading_questions::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        reading_questions::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = reading_questions::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.text, "Original text?");
@@ -136,11 +166,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let group_id = given_owned_group(&pool).await;
-        let input = CreateReadingQuestionBuilder::default().with_group_id(&group_id).build();
-        let id = reading_questions::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingQuestionBuilder::default()
+            .with_group_id(&group_id)
+            .build();
+        let id = reading_questions::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        reading_questions::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        reading_questions::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = reading_questions::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

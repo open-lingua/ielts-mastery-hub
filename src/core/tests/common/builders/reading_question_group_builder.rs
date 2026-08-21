@@ -1,4 +1,6 @@
-use app_lib::models::reading_question_groups::{CreateReadingQuestionGroup, UpdateReadingQuestionGroup};
+use app_lib::models::reading_question_groups::{
+    CreateReadingQuestionGroup, UpdateReadingQuestionGroup,
+};
 
 const DEFAULT_GROUP_ORDER: i64 = 0;
 const DEFAULT_QUESTION_TYPE: &str = "multiple-choice";

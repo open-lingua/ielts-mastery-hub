@@ -3,8 +3,8 @@ use app_lib::repositories::{reading_passages, reading_question_groups, reading_t
 use assert_matches::assert_matches;
 
 use crate::common::builders::{
-    CreateReadingPassageBuilder, CreateReadingQuestionGroupBuilder,
-    UpdateReadingQuestionGroupBuilder, default_reading_test,
+    default_reading_test, CreateReadingPassageBuilder, CreateReadingQuestionGroupBuilder,
+    UpdateReadingQuestionGroupBuilder,
 };
 use crate::common::fixtures::test_pool;
 
@@ -16,9 +16,15 @@ const UNKNOWN_ID: &str = "unknown-id";
 /// passage id — the required parent row for every question group here.
 async fn given_owned_passage(pool: &Db) -> String {
     let test_input = default_reading_test();
-    let test_id = reading_tests::insert(pool, &test_input, OWNER_ID).await.expect("insert test");
-    let passage_input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
-    reading_passages::insert(pool, &passage_input, OWNER_ID).await.expect("insert passage")
+    let test_id = reading_tests::insert(pool, &test_input, OWNER_ID)
+        .await
+        .expect("insert test");
+    let passage_input = CreateReadingPassageBuilder::default()
+        .with_test_id(&test_id)
+        .build();
+    reading_passages::insert(pool, &passage_input, OWNER_ID)
+        .await
+        .expect("insert passage")
 }
 
 mod insert {
@@ -29,7 +35,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let passage_id = given_owned_passage(&pool).await;
-        let input = CreateReadingQuestionGroupBuilder::default().with_passage_id(&passage_id).build();
+        let input = CreateReadingQuestionGroupBuilder::default()
+            .with_passage_id(&passage_id)
+            .build();
 
         // Act
         let result = reading_question_groups::insert(&pool, &input, OWNER_ID).await;
@@ -43,7 +51,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let passage_id = given_owned_passage(&pool).await;
-        let input = CreateReadingQuestionGroupBuilder::default().with_passage_id(&passage_id).build();
+        let input = CreateReadingQuestionGroupBuilder::default()
+            .with_passage_id(&passage_id)
+            .build();
 
         // Act
         let result = reading_question_groups::insert(&pool, &input, OTHER_USER_ID).await;
@@ -65,7 +75,9 @@ mod find_by_id {
             .with_passage_id(&passage_id)
             .with_question_type("matching-headings")
             .build();
-        let id = reading_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = reading_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = reading_question_groups::find_by_id(&pool, &id, OWNER_ID).await;
@@ -115,11 +127,17 @@ mod update {
             .with_passage_id(&passage_id)
             .with_question_type("multiple-choice")
             .build();
-        let id = reading_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateReadingQuestionGroupBuilder::default().with_group_order(3).build();
+        let id = reading_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateReadingQuestionGroupBuilder::default()
+            .with_group_order(3)
+            .build();
 
         // Act
-        reading_question_groups::update(&pool, &id, OWNER_ID, &update).await.expect("update");
+        reading_question_groups::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
         let found = reading_question_groups::find_by_id(&pool, &id, OWNER_ID)
             .await
             .expect("find")
@@ -139,11 +157,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let passage_id = given_owned_passage(&pool).await;
-        let input = CreateReadingQuestionGroupBuilder::default().with_passage_id(&passage_id).build();
-        let id = reading_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingQuestionGroupBuilder::default()
+            .with_passage_id(&passage_id)
+            .build();
+        let id = reading_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        reading_question_groups::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        reading_question_groups::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = reading_question_groups::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

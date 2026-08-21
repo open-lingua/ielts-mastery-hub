@@ -2,9 +2,7 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::database::Db;
-use crate::services::import_service::{
-    self, errors_to_string, AudioAssignment, AudioMeta,
-};
+use crate::services::import_service::{self, errors_to_string, AudioAssignment, AudioMeta};
 
 #[derive(Debug, Deserialize)]
 pub struct AudioMetaInput {
@@ -72,7 +70,8 @@ pub async fn validate_import(
 
     match kind.as_str() {
         "reading" => {
-            let data = import_service::validate_reading(&json_data).map_err(|e| errors_to_string(&e))?;
+            let data =
+                import_service::validate_reading(&json_data).map_err(|e| errors_to_string(&e))?;
             let title = data.title.clone().unwrap_or_default();
             let duplicate_of = import_service::find_duplicate_reading_title(&db, &user_id, &title)
                 .await
@@ -89,7 +88,8 @@ pub async fn validate_import(
             })
         }
         "writing" => {
-            let data = import_service::validate_writing(&json_data).map_err(|e| errors_to_string(&e))?;
+            let data =
+                import_service::validate_writing(&json_data).map_err(|e| errors_to_string(&e))?;
             let title = data.title.clone().unwrap_or_default();
             let duplicate_of = import_service::find_duplicate_writing_title(&db, &user_id, &title)
                 .await
@@ -105,11 +105,13 @@ pub async fn validate_import(
             })
         }
         "listening" => {
-            let data = import_service::validate_listening(&json_data, &audio_meta).map_err(|e| errors_to_string(&e))?;
+            let data = import_service::validate_listening(&json_data, &audio_meta)
+                .map_err(|e| errors_to_string(&e))?;
             let title = data.title.clone().unwrap_or_default();
-            let duplicate_of = import_service::find_duplicate_listening_title(&db, &user_id, &title)
-                .await
-                .map_err(String::from)?;
+            let duplicate_of =
+                import_service::find_duplicate_listening_title(&db, &user_id, &title)
+                    .await
+                    .map_err(String::from)?;
             let (children, groups, questions) = count_listening(&data);
             Ok(ImportPreview {
                 title,
@@ -132,7 +134,9 @@ pub async fn import_reading_test(
     json_data: serde_json::Value,
 ) -> Result<String, String> {
     let data = import_service::validate_reading(&json_data).map_err(|e| errors_to_string(&e))?;
-    import_service::import_reading(&db, &user_id, data).await.map_err(Into::into)
+    import_service::import_reading(&db, &user_id, data)
+        .await
+        .map_err(Into::into)
 }
 
 #[tauri::command]
@@ -142,7 +146,9 @@ pub async fn import_writing_test(
     json_data: serde_json::Value,
 ) -> Result<String, String> {
     let data = import_service::validate_writing(&json_data).map_err(|e| errors_to_string(&e))?;
-    import_service::import_writing(&db, &user_id, data).await.map_err(Into::into)
+    import_service::import_writing(&db, &user_id, data)
+        .await
+        .map_err(Into::into)
 }
 
 #[tauri::command]
@@ -162,7 +168,8 @@ pub async fn import_listening_test(
         .collect();
     let audio_meta: Vec<AudioMeta> = assignments.iter().map(AudioAssignment::to_meta).collect();
 
-    let data = import_service::validate_listening(&json_data, &audio_meta).map_err(|e| errors_to_string(&e))?;
+    let data = import_service::validate_listening(&json_data, &audio_meta)
+        .map_err(|e| errors_to_string(&e))?;
     import_service::import_listening(&db, &user_id, data, assignments)
         .await
         .map_err(Into::into)

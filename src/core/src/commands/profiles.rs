@@ -1,8 +1,8 @@
 use tauri::State;
 
 use crate::database::Db;
-use crate::repositories::profiles as repo;
 use crate::models::profiles::{CreateProfile, Profile, UpdateProfile};
+use crate::repositories::profiles as repo;
 
 #[tauri::command]
 pub async fn get_profiles(db: State<'_, Db>, id: String) -> Result<Option<Profile>, String> {

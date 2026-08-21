@@ -145,7 +145,11 @@ mod offset {
     #[case(1, 10, 0)]
     #[case(2, 10, 10)]
     #[case(3, 25, 50)]
-    fn it_computes_the_sql_offset(#[case] page: i64, #[case] page_size: i64, #[case] expected: i64) {
+    fn it_computes_the_sql_offset(
+        #[case] page: i64,
+        #[case] page_size: i64,
+        #[case] expected: i64,
+    ) {
         // Arrange & Act
         let offset = offset_for(page, page_size);
 

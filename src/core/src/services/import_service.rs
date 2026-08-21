@@ -87,7 +87,12 @@ pub struct AudioMeta {
 
 // ── shared helpers ──────────────────────────────────────────────────────────
 
-fn find_duplicate_ids(value: &Value, path: &str, seen: &mut HashMap<String, String>, errors: &mut Vec<ImportError>) {
+fn find_duplicate_ids(
+    value: &Value,
+    path: &str,
+    seen: &mut HashMap<String, String>,
+    errors: &mut Vec<ImportError>,
+) {
     match value {
         Value::Object(map) => {
             if let Some(Value::String(id)) = map.get("id") {
@@ -175,7 +180,9 @@ fn validate_question_group(group: &QuestionGroupImport, path: &str, errors: &mut
 }
 
 fn json_or_default(v: &Option<Value>, default: &str) -> String {
-    v.as_ref().map(|x| x.to_string()).unwrap_or_else(|| default.to_string())
+    v.as_ref()
+        .map(|x| x.to_string())
+        .unwrap_or_else(|| default.to_string())
 }
 
 fn normalize_accepted_answers(v: &Option<Value>) -> String {
@@ -210,7 +217,10 @@ fn rename_keys(v: &Option<Value>, renames: &[(&str, &str)]) -> String {
             if let Value::Object(map) = item {
                 let mut new_map = serde_json::Map::new();
                 for (k, val) in map {
-                    let renamed = renames.iter().find(|(from, _)| *from == k).map(|(_, to)| *to);
+                    let renamed = renames
+                        .iter()
+                        .find(|(from, _)| *from == k)
+                        .map(|(_, to)| *to);
                     new_map.insert(renamed.unwrap_or(&k).to_string(), val);
                 }
                 Value::Object(new_map)
@@ -255,24 +265,38 @@ pub fn validate_reading(raw: &Value) -> Result<ReadingImport, Vec<ImportError>> 
         }
     }
 
-    let data: ReadingImport = serde_json::from_value(raw.clone())
-        .map_err(|e| vec![ImportError::new("$", format!("The selected file is not valid JSON: {e}"))])?;
+    let data: ReadingImport = serde_json::from_value(raw.clone()).map_err(|e| {
+        vec![ImportError::new(
+            "$",
+            format!("The selected file is not valid JSON: {e}"),
+        )]
+    })?;
 
     let mut errors = Vec::new();
     let mut seen_ids = HashMap::new();
     find_duplicate_ids(raw, "$", &mut seen_ids, &mut errors);
 
     if data.title.as_deref().unwrap_or("").trim().is_empty() {
-        errors.push(ImportError::new("title", "Missing required field `title` at document root."));
+        errors.push(ImportError::new(
+            "title",
+            "Missing required field `title` at document root.",
+        ));
     }
     if data.passages.len() != 3 {
         errors.push(ImportError::new(
             "passages",
-            format!("Reading tests must contain exactly 3 passages; found {}.", data.passages.len()),
+            format!(
+                "Reading tests must contain exactly 3 passages; found {}.",
+                data.passages.len()
+            ),
         ));
     }
     validate_ordering(
-        &data.passages.iter().map(|p| p.passage_number.unwrap_or(0)).collect::<Vec<_>>(),
+        &data
+            .passages
+            .iter()
+            .map(|p| p.passage_number.unwrap_or(0))
+            .collect::<Vec<_>>(),
         "passage_number",
         "passages",
         &mut errors,
@@ -282,7 +306,10 @@ pub fn validate_reading(raw: &Value) -> Result<ReadingImport, Vec<ImportError>> 
     for (pi, passage) in data.passages.iter().enumerate() {
         let path = format!("passages[{pi}]");
         if passage.title.as_deref().unwrap_or("").trim().is_empty() {
-            errors.push(ImportError::new(format!("{path}.title"), "Field cannot be empty."));
+            errors.push(ImportError::new(
+                format!("{path}.title"),
+                "Field cannot be empty.",
+            ));
         }
         for (gi, group) in passage.question_groups.iter().enumerate() {
             let group_path = format!("{path}.question_groups[{gi}]");
@@ -292,7 +319,12 @@ pub fn validate_reading(raw: &Value) -> Result<ReadingImport, Vec<ImportError>> 
             }
         }
     }
-    validate_ordering(&all_question_orders, "question_order", "the test", &mut errors);
+    validate_ordering(
+        &all_question_orders,
+        "question_order",
+        "the test",
+        &mut errors,
+    );
 
     if errors.is_empty() {
         Ok(data)
@@ -317,24 +349,38 @@ pub fn validate_writing(raw: &Value) -> Result<WritingImport, Vec<ImportError>> 
         }
     }
 
-    let data: WritingImport = serde_json::from_value(raw.clone())
-        .map_err(|e| vec![ImportError::new("$", format!("The selected file is not valid JSON: {e}"))])?;
+    let data: WritingImport = serde_json::from_value(raw.clone()).map_err(|e| {
+        vec![ImportError::new(
+            "$",
+            format!("The selected file is not valid JSON: {e}"),
+        )]
+    })?;
 
     let mut errors = Vec::new();
     let mut seen_ids = HashMap::new();
     find_duplicate_ids(raw, "$", &mut seen_ids, &mut errors);
 
     if data.title.as_deref().unwrap_or("").trim().is_empty() {
-        errors.push(ImportError::new("title", "Missing required field `title` at document root."));
+        errors.push(ImportError::new(
+            "title",
+            "Missing required field `title` at document root.",
+        ));
     }
     if data.tasks.len() != 2 {
         errors.push(ImportError::new(
             "tasks",
-            format!("Writing tests must contain exactly 2 tasks; found {}.", data.tasks.len()),
+            format!(
+                "Writing tests must contain exactly 2 tasks; found {}.",
+                data.tasks.len()
+            ),
         ));
     }
     validate_ordering(
-        &data.tasks.iter().map(|t| t.task_number.unwrap_or(0)).collect::<Vec<_>>(),
+        &data
+            .tasks
+            .iter()
+            .map(|t| t.task_number.unwrap_or(0))
+            .collect::<Vec<_>>(),
         "task_number",
         "tasks",
         &mut errors,
@@ -342,10 +388,16 @@ pub fn validate_writing(raw: &Value) -> Result<WritingImport, Vec<ImportError>> 
     for (ti, task) in data.tasks.iter().enumerate() {
         let path = format!("tasks[{ti}]");
         if task.title.as_deref().unwrap_or("").trim().is_empty() {
-            errors.push(ImportError::new(format!("{path}.title"), "Field cannot be empty."));
+            errors.push(ImportError::new(
+                format!("{path}.title"),
+                "Field cannot be empty.",
+            ));
         }
         if task.prompt.as_deref().unwrap_or("").trim().is_empty() {
-            errors.push(ImportError::new(format!("{path}.prompt"), "Field cannot be empty."));
+            errors.push(ImportError::new(
+                format!("{path}.prompt"),
+                "Field cannot be empty.",
+            ));
         }
     }
 
@@ -356,7 +408,10 @@ pub fn validate_writing(raw: &Value) -> Result<WritingImport, Vec<ImportError>> 
     }
 }
 
-pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<ListeningImport, Vec<ImportError>> {
+pub fn validate_listening(
+    raw: &Value,
+    audios: &[AudioMeta],
+) -> Result<ListeningImport, Vec<ImportError>> {
     if raw.get("sections").is_none() {
         if raw.get("passages").is_some() {
             return Err(vec![ImportError::new(
@@ -372,24 +427,38 @@ pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<Listening
         }
     }
 
-    let data: ListeningImport = serde_json::from_value(raw.clone())
-        .map_err(|e| vec![ImportError::new("$", format!("The selected file is not valid JSON: {e}"))])?;
+    let data: ListeningImport = serde_json::from_value(raw.clone()).map_err(|e| {
+        vec![ImportError::new(
+            "$",
+            format!("The selected file is not valid JSON: {e}"),
+        )]
+    })?;
 
     let mut errors = Vec::new();
     let mut seen_ids = HashMap::new();
     find_duplicate_ids(raw, "$", &mut seen_ids, &mut errors);
 
     if data.title.as_deref().unwrap_or("").trim().is_empty() {
-        errors.push(ImportError::new("title", "Missing required field `title` at document root."));
+        errors.push(ImportError::new(
+            "title",
+            "Missing required field `title` at document root.",
+        ));
     }
     if data.sections.len() != 4 {
         errors.push(ImportError::new(
             "sections",
-            format!("Listening tests must have exactly 4 sections; found {}.", data.sections.len()),
+            format!(
+                "Listening tests must have exactly 4 sections; found {}.",
+                data.sections.len()
+            ),
         ));
     }
     validate_ordering(
-        &data.sections.iter().map(|s| s.section_number.unwrap_or(0)).collect::<Vec<_>>(),
+        &data
+            .sections
+            .iter()
+            .map(|s| s.section_number.unwrap_or(0))
+            .collect::<Vec<_>>(),
         "section_number",
         "sections",
         &mut errors,
@@ -398,17 +467,24 @@ pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<Listening
     if audios.len() != 4 {
         errors.push(ImportError::new(
             "audio_files",
-            format!("Expected exactly 4 audio files (one per section); received {}.", audios.len()),
+            format!(
+                "Expected exactly 4 audio files (one per section); received {}.",
+                audios.len()
+            ),
         ));
     }
-    let audio_sections: HashMap<i64, &AudioMeta> = audios.iter().map(|a| (a.section_number, a)).collect();
+    let audio_sections: HashMap<i64, &AudioMeta> =
+        audios.iter().map(|a| (a.section_number, a)).collect();
 
     let mut all_question_orders = Vec::new();
     for (si, section) in data.sections.iter().enumerate() {
         let path = format!("sections[{si}]");
         let section_number = section.section_number.unwrap_or((si + 1) as i64);
         if section.title.as_deref().unwrap_or("").trim().is_empty() {
-            errors.push(ImportError::new(format!("{path}.title"), "Field cannot be empty."));
+            errors.push(ImportError::new(
+                format!("{path}.title"),
+                "Field cannot be empty.",
+            ));
         }
         match audio_sections.get(&section_number) {
             None => {
@@ -418,7 +494,12 @@ pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<Listening
                 ));
             }
             Some(audio) => {
-                let ext = audio.file_name.rsplit('.').next().unwrap_or("").to_lowercase();
+                let ext = audio
+                    .file_name
+                    .rsplit('.')
+                    .next()
+                    .unwrap_or("")
+                    .to_lowercase();
                 if !ALLOWED_AUDIO_EXTS.contains(&ext.as_str()) {
                     errors.push(ImportError::new(
                         format!("{path}.audio"),
@@ -443,7 +524,12 @@ pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<Listening
             }
         }
     }
-    validate_ordering(&all_question_orders, "question_order", "the test", &mut errors);
+    validate_ordering(
+        &all_question_orders,
+        "question_order",
+        "the test",
+        &mut errors,
+    );
 
     if errors.is_empty() {
         Ok(data)
@@ -454,7 +540,11 @@ pub fn validate_listening(raw: &Value, audios: &[AudioMeta]) -> Result<Listening
 
 // ── duplicate title lookup ───────────────────────────────────────────────────
 
-pub async fn find_duplicate_reading_title(pool: &Db, user_id: &str, title: &str) -> Result<Option<String>, AppError> {
+pub async fn find_duplicate_reading_title(
+    pool: &Db,
+    user_id: &str,
+    title: &str,
+) -> Result<Option<String>, AppError> {
     Ok(sqlx::query_scalar!(
         "SELECT id FROM reading_tests WHERE title = ? AND created_by = ?",
         title,
@@ -464,7 +554,11 @@ pub async fn find_duplicate_reading_title(pool: &Db, user_id: &str, title: &str)
     .await?)
 }
 
-pub async fn find_duplicate_writing_title(pool: &Db, user_id: &str, title: &str) -> Result<Option<String>, AppError> {
+pub async fn find_duplicate_writing_title(
+    pool: &Db,
+    user_id: &str,
+    title: &str,
+) -> Result<Option<String>, AppError> {
     Ok(sqlx::query_scalar!(
         "SELECT id FROM writing_tests WHERE title = ? AND created_by = ?",
         title,
@@ -474,7 +568,11 @@ pub async fn find_duplicate_writing_title(pool: &Db, user_id: &str, title: &str)
     .await?)
 }
 
-pub async fn find_duplicate_listening_title(pool: &Db, user_id: &str, title: &str) -> Result<Option<String>, AppError> {
+pub async fn find_duplicate_listening_title(
+    pool: &Db,
+    user_id: &str,
+    title: &str,
+) -> Result<Option<String>, AppError> {
     Ok(sqlx::query_scalar!(
         "SELECT id FROM listening_tests WHERE title = ? AND created_by = ?",
         title,
@@ -486,7 +584,11 @@ pub async fn find_duplicate_listening_title(pool: &Db, user_id: &str, title: &st
 
 // ── insert (transactional) ──────────────────────────────────────────────────
 
-pub async fn import_reading(pool: &Db, user_id: &str, data: ReadingImport) -> Result<String, AppError> {
+pub async fn import_reading(
+    pool: &Db,
+    user_id: &str,
+    data: ReadingImport,
+) -> Result<String, AppError> {
     let mut tx = pool.begin().await?;
     let test_id = Uuid::new_v4().to_string();
     let now = Utc::now().to_rfc3339();
@@ -560,7 +662,10 @@ async fn insert_question_group_reading(
 ) -> Result<(), AppError> {
     let group_id = Uuid::new_v4().to_string();
     let group_order = group.group_order.unwrap_or(0);
-    let question_type = group.question_type.clone().unwrap_or_else(|| "multiple-choice".to_string());
+    let question_type = group
+        .question_type
+        .clone()
+        .unwrap_or_else(|| "multiple-choice".to_string());
     let instructions = group.instructions.clone().unwrap_or_default();
     let word_bank = json_or_default(&group.word_bank, "[]");
     let has_word_bank = group.has_word_bank.unwrap_or(false) as i64;
@@ -619,7 +724,11 @@ async fn insert_question_group_reading(
     Ok(())
 }
 
-pub async fn import_writing(pool: &Db, user_id: &str, data: WritingImport) -> Result<String, AppError> {
+pub async fn import_writing(
+    pool: &Db,
+    user_id: &str,
+    data: WritingImport,
+) -> Result<String, AppError> {
     let mut tx = pool.begin().await?;
     let test_id = Uuid::new_v4().to_string();
     let now = Utc::now().to_rfc3339();
@@ -655,18 +764,26 @@ async fn insert_writing_task(
 ) -> Result<(), AppError> {
     let task_id = Uuid::new_v4().to_string();
     let task_number = task.task_number.unwrap_or(1);
-    let task_type = task
-        .task_type
-        .clone()
-        .unwrap_or_else(|| if task_number == 2 { "task2".to_string() } else { "task1".to_string() });
+    let task_type = task.task_type.clone().unwrap_or_else(|| {
+        if task_number == 2 {
+            "task2".to_string()
+        } else {
+            "task1".to_string()
+        }
+    });
     let title = task.title.clone().unwrap_or_default();
     let difficulty = task.difficulty.clone().unwrap_or_else(|| "7".to_string());
-    let suggested_time = task
-        .suggested_time
-        .clone()
-        .unwrap_or_else(|| if task_number == 2 { "40 mins".to_string() } else { "20 mins".to_string() });
+    let suggested_time = task.suggested_time.clone().unwrap_or_else(|| {
+        if task_number == 2 {
+            "40 mins".to_string()
+        } else {
+            "20 mins".to_string()
+        }
+    });
     let prompt = task.prompt.clone().unwrap_or_default();
-    let min_words = task.min_words.unwrap_or(if task_number == 2 { 250 } else { 150 });
+    let min_words = task
+        .min_words
+        .unwrap_or(if task_number == 2 { 250 } else { 150 });
     let include_model_answer = task.include_model_answer.unwrap_or(false) as i64;
 
     sqlx::query!(
@@ -715,7 +832,10 @@ pub async fn import_listening(
 
     let title = data.title.clone().unwrap_or_default();
     let difficulty = data.difficulty.clone().unwrap_or_else(|| "7".to_string());
-    let duration = data.duration.clone().unwrap_or_else(|| "40 mins".to_string());
+    let duration = data
+        .duration
+        .clone()
+        .unwrap_or_else(|| "40 mins".to_string());
     let status = data.status.clone().unwrap_or_else(|| "draft".to_string());
 
     sqlx::query!(
@@ -734,10 +854,20 @@ pub async fn import_listening(
     .await?;
 
     let dir = build_listening_test_dir(&test_id, &title)?;
-    let audio_by_section: HashMap<i64, &AudioAssignment> = audios.iter().map(|a| (a.section_number, a)).collect();
+    let audio_by_section: HashMap<i64, &AudioAssignment> =
+        audios.iter().map(|a| (a.section_number, a)).collect();
     let mut written_files: Vec<PathBuf> = Vec::new();
 
-    let result = insert_listening_children(&mut tx, &test_id, &data, &audio_by_section, &dir, &mut written_files, &now).await;
+    let result = insert_listening_children(
+        &mut tx,
+        &test_id,
+        &data,
+        &audio_by_section,
+        &dir,
+        &mut written_files,
+        &now,
+    )
+    .await;
 
     match result {
         Ok(()) => {
@@ -814,7 +944,10 @@ async fn insert_question_group_listening(
 ) -> Result<(), AppError> {
     let group_id = Uuid::new_v4().to_string();
     let group_order = group.group_order.unwrap_or(0);
-    let question_type = group.question_type.clone().unwrap_or_else(|| "multiple-choice".to_string());
+    let question_type = group
+        .question_type
+        .clone()
+        .unwrap_or_else(|| "multiple-choice".to_string());
     let instructions = group.instructions.clone().unwrap_or_default();
     let word_bank = json_or_default(&group.word_bank, "[]");
     let has_word_bank = group.has_word_bank.unwrap_or(false) as i64;
@@ -926,7 +1059,9 @@ mod tests {
         let mut raw = good_reading_json();
         raw["passages"].as_array_mut().unwrap().pop();
         let errors = validate_reading(&raw).unwrap_err();
-        assert!(errors.iter().any(|e| e.message.contains("exactly 3 passages")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("exactly 3 passages")));
     }
 
     #[test]
@@ -941,9 +1076,21 @@ mod tests {
             ]
         });
         let audios = vec![
-            AudioMeta { section_number: 1, file_name: "a.mp3".into(), size: 0 },
-            AudioMeta { section_number: 2, file_name: "b.mp3".into(), size: 0 },
-            AudioMeta { section_number: 3, file_name: "c.mp3".into(), size: 0 },
+            AudioMeta {
+                section_number: 1,
+                file_name: "a.mp3".into(),
+                size: 0,
+            },
+            AudioMeta {
+                section_number: 2,
+                file_name: "b.mp3".into(),
+                size: 0,
+            },
+            AudioMeta {
+                section_number: 3,
+                file_name: "c.mp3".into(),
+                size: 0,
+            },
         ];
         let errors = validate_listening(&raw, &audios).unwrap_err();
         assert!(errors.iter().any(|e| e.message.contains("received 3")));

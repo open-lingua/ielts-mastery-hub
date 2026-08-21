@@ -1,7 +1,9 @@
 use app_lib::repositories::reading_passages;
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateReadingPassageBuilder, UpdateReadingPassageBuilder, default_reading_test};
+use crate::common::builders::{
+    default_reading_test, CreateReadingPassageBuilder, UpdateReadingPassageBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -25,7 +27,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
+        let input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = reading_passages::insert(&pool, &input, OWNER_ID).await;
@@ -39,7 +43,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
+        let input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = reading_passages::insert(&pool, &input, OTHER_USER_ID).await;
@@ -57,8 +63,13 @@ mod find_by_id {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateReadingPassageBuilder::default().with_test_id(&test_id).with_title("Ocean Currents").build();
-        let id = reading_passages::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .with_title("Ocean Currents")
+            .build();
+        let id = reading_passages::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = reading_passages::find_by_id(&pool, &id, OWNER_ID).await;
@@ -108,12 +119,21 @@ mod update {
             .with_test_id(&test_id)
             .with_title("Original Title")
             .build();
-        let id = reading_passages::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateReadingPassageBuilder::default().with_content("New content").build();
+        let id = reading_passages::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateReadingPassageBuilder::default()
+            .with_content("New content")
+            .build();
 
         // Act
-        reading_passages::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = reading_passages::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        reading_passages::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = reading_passages::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.title, "Original Title");
@@ -129,11 +149,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
-        let id = reading_passages::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        let id = reading_passages::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        reading_passages::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        reading_passages::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = reading_passages::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

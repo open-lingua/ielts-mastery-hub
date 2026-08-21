@@ -1,25 +1,45 @@
 use app_lib::database::Db;
-use app_lib::repositories::{listening_tests, practice_library, reading_tests, user_test_sessions, writing_tests};
 use app_lib::models::practice_library::PracticeTestRow;
+use app_lib::repositories::{
+    listening_tests, practice_library, reading_tests, user_test_sessions, writing_tests,
+};
 
-use crate::common::builders::{CreateListeningTestBuilder, CreateReadingTestBuilder, CreateUserTestSessionBuilder, CreateWritingTestBuilder};
+use crate::common::builders::{
+    CreateListeningTestBuilder, CreateReadingTestBuilder, CreateUserTestSessionBuilder,
+    CreateWritingTestBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
 
 async fn given_published_reading_test(pool: &Db, title: &str) -> String {
-    let input = CreateReadingTestBuilder::default().with_title(title).with_status("published").build();
-    reading_tests::insert(pool, &input, OWNER_ID).await.expect("insert reading test")
+    let input = CreateReadingTestBuilder::default()
+        .with_title(title)
+        .with_status("published")
+        .build();
+    reading_tests::insert(pool, &input, OWNER_ID)
+        .await
+        .expect("insert reading test")
 }
 
 async fn given_published_writing_test(pool: &Db, title: &str) -> String {
-    let input = CreateWritingTestBuilder::default().with_title(title).with_status("published").build();
-    writing_tests::insert(pool, &input, OWNER_ID).await.expect("insert writing test")
+    let input = CreateWritingTestBuilder::default()
+        .with_title(title)
+        .with_status("published")
+        .build();
+    writing_tests::insert(pool, &input, OWNER_ID)
+        .await
+        .expect("insert writing test")
 }
 
 async fn given_published_listening_test(pool: &Db, title: &str) -> String {
-    let input = CreateListeningTestBuilder::default().with_title(title).with_status("published").build();
-    listening_tests::insert(pool, &input, OWNER_ID).await.expect("insert listening test")
+    let input = CreateListeningTestBuilder::default()
+        .with_title(title)
+        .with_status("published")
+        .build();
+    listening_tests::insert(pool, &input, OWNER_ID)
+        .await
+        .expect("insert listening test")
 }
 
 mod count_published {
@@ -30,8 +50,12 @@ mod count_published {
         // Arrange
         let pool = test_pool().await;
         given_published_reading_test(&pool, "Published One").await;
-        let draft = CreateReadingTestBuilder::default().with_status("draft").build();
-        reading_tests::insert(&pool, &draft, OWNER_ID).await.expect("insert draft");
+        let draft = CreateReadingTestBuilder::default()
+            .with_status("draft")
+            .build();
+        reading_tests::insert(&pool, &draft, OWNER_ID)
+            .await
+            .expect("insert draft");
 
         // Act
         let count = practice_library::count_reading_published(&pool).await;
@@ -75,7 +99,9 @@ mod find_all_page {
         let pool = test_pool().await;
 
         // Act
-        let (page, total) = practice_library::find_all_page(&pool, 0, 10).await.expect("find_all_page");
+        let (page, total) = practice_library::find_all_page(&pool, 0, 10)
+            .await
+            .expect("find_all_page");
 
         // Assert
         assert!(page.is_empty());
@@ -91,7 +117,9 @@ mod find_all_page {
         given_published_listening_test(&pool, "Listening Test").await;
 
         // Act
-        let (page, total) = practice_library::find_all_page(&pool, 0, 10).await.expect("find_all_page");
+        let (page, total) = practice_library::find_all_page(&pool, 0, 10)
+            .await
+            .expect("find_all_page");
 
         // Assert
         assert_eq!(total, 3);
@@ -107,7 +135,9 @@ mod find_all_page {
         given_published_listening_test(&pool, "Third").await;
 
         // Act
-        let (page, total) = practice_library::find_all_page(&pool, 2, 10).await.expect("find_all_page");
+        let (page, total) = practice_library::find_all_page(&pool, 2, 10)
+            .await
+            .expect("find_all_page");
 
         // Assert
         assert_eq!(total, 3);
@@ -121,7 +151,9 @@ mod find_all_page {
         given_published_reading_test(&pool, "Only Test").await;
 
         // Act
-        let (page, total) = practice_library::find_all_page(&pool, 10, 10).await.expect("find_all_page");
+        let (page, total) = practice_library::find_all_page(&pool, 10, 10)
+            .await
+            .expect("find_all_page");
 
         // Assert
         assert_eq!(total, 1);
@@ -150,7 +182,9 @@ mod merge_sessions {
         let rows = vec![row("test-1", "reading")];
 
         // Act
-        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows).await.expect("merge_sessions");
+        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows)
+            .await
+            .expect("merge_sessions");
 
         // Assert
         assert_eq!(cards[0].status, "not_started");
@@ -166,7 +200,9 @@ mod merge_sessions {
             .with_test_id("test-1")
             .with_test_type("reading")
             .build();
-        let session_id = user_test_sessions::insert(&pool, &session_input, OWNER_ID).await.expect("insert session");
+        let session_id = user_test_sessions::insert(&pool, &session_input, OWNER_ID)
+            .await
+            .expect("insert session");
         let update = app_lib::models::user_test_sessions::UpdateUserTestSession {
             status: Some("completed".to_string()),
             progress_percent: Some(100),
@@ -176,11 +212,15 @@ mod merge_sessions {
             completed_at: None,
             last_active_at: None,
         };
-        user_test_sessions::update(&pool, &session_id, OWNER_ID, &update).await.expect("update session");
+        user_test_sessions::update(&pool, &session_id, OWNER_ID, &update)
+            .await
+            .expect("update session");
         let rows = vec![row("test-1", "reading")];
 
         // Act
-        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows).await.expect("merge_sessions");
+        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows)
+            .await
+            .expect("merge_sessions");
 
         // Assert
         assert_eq!(cards[0].status, "completed");
@@ -197,18 +237,24 @@ mod merge_sessions {
             .with_test_type("reading")
             .with_attempt_number(1)
             .build();
-        user_test_sessions::insert(&pool, &first, OWNER_ID).await.expect("insert first");
+        user_test_sessions::insert(&pool, &first, OWNER_ID)
+            .await
+            .expect("insert first");
 
         let second = CreateUserTestSessionBuilder::default()
             .with_test_id("test-1")
             .with_test_type("reading")
             .with_attempt_number(2)
             .build();
-        let latest_id = user_test_sessions::insert(&pool, &second, OWNER_ID).await.expect("insert second");
+        let latest_id = user_test_sessions::insert(&pool, &second, OWNER_ID)
+            .await
+            .expect("insert second");
         let rows = vec![row("test-1", "reading")];
 
         // Act
-        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows).await.expect("merge_sessions");
+        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows)
+            .await
+            .expect("merge_sessions");
 
         // Assert
         assert_eq!(cards[0].session_id, Some(latest_id));
@@ -222,11 +268,15 @@ mod merge_sessions {
             .with_test_id("test-1")
             .with_test_type("listening")
             .build();
-        user_test_sessions::insert(&pool, &other_module_session, OWNER_ID).await.expect("insert");
+        user_test_sessions::insert(&pool, &other_module_session, OWNER_ID)
+            .await
+            .expect("insert");
         let rows = vec![row("test-1", "reading")];
 
         // Act
-        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows).await.expect("merge_sessions");
+        let cards = practice_library::merge_sessions(&pool, OWNER_ID, rows)
+            .await
+            .expect("merge_sessions");
 
         // Assert
         assert_eq!(cards[0].status, "not_started");

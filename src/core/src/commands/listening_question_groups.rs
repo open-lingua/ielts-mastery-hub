@@ -1,10 +1,10 @@
 use tauri::State;
 
 use crate::database::Db;
-use crate::repositories::listening_question_groups as repo;
 use crate::models::listening_question_groups::{
     CreateListeningQuestionGroup, ListeningQuestionGroup, UpdateListeningQuestionGroup,
 };
+use crate::repositories::listening_question_groups as repo;
 
 #[tauri::command]
 pub async fn get_listening_question_groups(

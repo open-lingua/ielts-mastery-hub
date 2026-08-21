@@ -1,10 +1,10 @@
 use tauri::State;
 
 use crate::database::Db;
-use crate::repositories::listening_sections as repo;
 use crate::models::listening_sections::{
     CreateListeningSection, ListeningSection, UpdateListeningSection,
 };
+use crate::repositories::listening_sections as repo;
 
 #[tauri::command]
 pub async fn get_listening_sections(

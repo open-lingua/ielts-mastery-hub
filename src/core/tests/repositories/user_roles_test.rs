@@ -91,10 +91,14 @@ mod find_all {
         // Arrange
         let pool = test_pool().await;
         given_profile(&pool, OTHER_USER_ID).await;
-        user_roles::insert(&pool, &super_admin_role_for(OTHER_USER_ID)).await.expect("insert");
+        user_roles::insert(&pool, &super_admin_role_for(OTHER_USER_ID))
+            .await
+            .expect("insert");
 
         // Act
-        let all = user_roles::find_all(&pool, OWNER_ID).await.expect("find_all");
+        let all = user_roles::find_all(&pool, OWNER_ID)
+            .await
+            .expect("find_all");
 
         // Assert
         assert!(all.is_empty());
@@ -109,12 +113,21 @@ mod update {
         // Arrange
         let pool = test_pool().await;
         given_profile(&pool, OWNER_ID).await;
-        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID)).await.expect("insert");
-        let update = UpdateUserRole { role: Some("student".to_string()) };
+        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID))
+            .await
+            .expect("insert");
+        let update = UpdateUserRole {
+            role: Some("student".to_string()),
+        };
 
         // Act
-        user_roles::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = user_roles::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        user_roles::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = user_roles::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.role, "student");
@@ -125,12 +138,21 @@ mod update {
         // Arrange
         let pool = test_pool().await;
         given_profile(&pool, OWNER_ID).await;
-        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID)).await.expect("insert");
-        let update = UpdateUserRole { role: Some("student".to_string()) };
+        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID))
+            .await
+            .expect("insert");
+        let update = UpdateUserRole {
+            role: Some("student".to_string()),
+        };
 
         // Act
-        user_roles::update(&pool, &id, OTHER_USER_ID, &update).await.expect("update");
-        let found = user_roles::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        user_roles::update(&pool, &id, OTHER_USER_ID, &update)
+            .await
+            .expect("update");
+        let found = user_roles::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.role, "super_admin");
@@ -145,10 +167,14 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         given_profile(&pool, OWNER_ID).await;
-        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID)).await.expect("insert");
+        let id = user_roles::insert(&pool, &super_admin_role_for(OWNER_ID))
+            .await
+            .expect("insert");
 
         // Act
-        user_roles::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        user_roles::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = user_roles::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

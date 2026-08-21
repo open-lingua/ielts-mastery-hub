@@ -1,8 +1,9 @@
 use app_lib::repositories::{reading_tests, writing_tests};
 use app_lib::services::import_service::{
-    errors_to_string, find_duplicate_listening_title, find_duplicate_reading_title, find_duplicate_writing_title,
-    import_listening, import_reading, import_writing, validate_listening, validate_reading, validate_writing,
-    AudioAssignment, AudioMeta, ImportError,
+    errors_to_string, find_duplicate_listening_title, find_duplicate_reading_title,
+    find_duplicate_writing_title, import_listening, import_reading, import_writing,
+    validate_listening, validate_reading, validate_writing, AudioAssignment, AudioMeta,
+    ImportError,
 };
 use serde_json::json;
 
@@ -47,7 +48,13 @@ fn good_listening_sections() -> Vec<serde_json::Value> {
 }
 
 fn good_listening_audios() -> Vec<AudioMeta> {
-    (1..=4).map(|n| AudioMeta { section_number: n, file_name: "a.mp3".to_string(), size: 0 }).collect()
+    (1..=4)
+        .map(|n| AudioMeta {
+            section_number: n,
+            file_name: "a.mp3".to_string(),
+            size: 0,
+        })
+        .collect()
 }
 
 mod errors_to_string_fn {
@@ -57,15 +64,24 @@ mod errors_to_string_fn {
     fn it_joins_each_errors_message_onto_its_own_line() {
         // Arrange
         let errors = vec![
-            ImportError { path: "title".to_string(), message: "Field cannot be empty.".to_string() },
-            ImportError { path: "tasks".to_string(), message: "Must contain exactly 2 tasks.".to_string() },
+            ImportError {
+                path: "title".to_string(),
+                message: "Field cannot be empty.".to_string(),
+            },
+            ImportError {
+                path: "tasks".to_string(),
+                message: "Must contain exactly 2 tasks.".to_string(),
+            },
         ];
 
         // Act
         let joined = errors_to_string(&errors);
 
         // Assert
-        assert_eq!(joined, "Field cannot be empty. (at `title`)\nMust contain exactly 2 tasks. (at `tasks`)");
+        assert_eq!(
+            joined,
+            "Field cannot be empty. (at `title`)\nMust contain exactly 2 tasks. (at `tasks`)"
+        );
     }
 
     #[test]
@@ -95,7 +111,9 @@ mod validate_reading_edge_cases {
         let errors = validate_reading(&raw).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("Duplicate id `shared-id`")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("Duplicate id `shared-id`")));
     }
 
     #[test]
@@ -108,7 +126,9 @@ mod validate_reading_edge_cases {
         let errors = validate_reading(&raw).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.path.ends_with("question_type") && e.message.contains("Unknown")));
+        assert!(errors
+            .iter()
+            .any(|e| e.path.ends_with("question_type") && e.message.contains("Unknown")));
     }
 
     #[test]
@@ -121,7 +141,9 @@ mod validate_reading_edge_cases {
         let errors = validate_reading(&raw).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("must be contiguous starting at 1")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("must be contiguous starting at 1")));
     }
 
     #[test]
@@ -133,7 +155,9 @@ mod validate_reading_edge_cases {
         let errors = validate_reading(&raw).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("Did you mean to import as Writing")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("Did you mean to import as Writing")));
     }
 }
 
@@ -188,7 +212,9 @@ mod validate_writing_edge_cases {
         let errors = validate_writing(&raw).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("Duplicate `task_number` value")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("Duplicate `task_number` value")));
     }
 }
 
@@ -198,7 +224,8 @@ mod validate_listening_edge_cases {
     #[test]
     fn it_validates_a_well_formed_listening_test_with_matching_audio() {
         // Arrange
-        let raw = json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
+        let raw =
+            json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
         let audios = good_listening_audios();
 
         // Act
@@ -211,20 +238,27 @@ mod validate_listening_edge_cases {
     #[test]
     fn it_rejects_a_section_missing_its_audio_assignment() {
         // Arrange
-        let raw = json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
-        let audios: Vec<AudioMeta> = good_listening_audios().into_iter().filter(|a| a.section_number != 2).collect();
+        let raw =
+            json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
+        let audios: Vec<AudioMeta> = good_listening_audios()
+            .into_iter()
+            .filter(|a| a.section_number != 2)
+            .collect();
 
         // Act
         let errors = validate_listening(&raw, &audios).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("No audio file was assigned to Section 2")));
+        assert!(errors.iter().any(|e| e
+            .message
+            .contains("No audio file was assigned to Section 2")));
     }
 
     #[test]
     fn it_rejects_an_unsupported_audio_extension() {
         // Arrange
-        let raw = json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
+        let raw =
+            json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
         let mut audios = good_listening_audios();
         audios[0].file_name = "a.exe".to_string();
 
@@ -232,13 +266,16 @@ mod validate_listening_edge_cases {
         let errors = validate_listening(&raw, &audios).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("Unsupported audio format")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("Unsupported audio format")));
     }
 
     #[test]
     fn it_rejects_an_audio_file_over_the_size_limit() {
         // Arrange
-        let raw = json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
+        let raw =
+            json!({ "title": "Sample Listening Test", "sections": good_listening_sections() });
         let mut audios = good_listening_audios();
         audios[0].size = 51 * 1024 * 1024;
 
@@ -246,7 +283,9 @@ mod validate_listening_edge_cases {
         let errors = validate_listening(&raw, &audios).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("exceeds the 50MB limit")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("exceeds the 50MB limit")));
     }
 
     #[test]
@@ -261,7 +300,9 @@ mod validate_listening_edge_cases {
         let errors = validate_listening(&raw, &audios).unwrap_err();
 
         // Assert
-        assert!(errors.iter().any(|e| e.message.contains("exactly 4 sections")));
+        assert!(errors
+            .iter()
+            .any(|e| e.message.contains("exactly 4 sections")));
     }
 }
 
@@ -272,8 +313,12 @@ mod find_duplicate_title {
     async fn it_finds_the_id_of_an_existing_reading_test_with_the_same_title_and_owner() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateReadingTestBuilder::default().with_title("Duplicate Title").build();
-        let existing_id = reading_tests::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateReadingTestBuilder::default()
+            .with_title("Duplicate Title")
+            .build();
+        let existing_id = reading_tests::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = find_duplicate_reading_title(&pool, OWNER_ID, "Duplicate Title").await;
@@ -298,8 +343,12 @@ mod find_duplicate_title {
     async fn it_ignores_a_matching_title_owned_by_a_different_user() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateWritingTestBuilder::default().with_title("Shared Title").build();
-        writing_tests::insert(&pool, &input, "someone-else").await.expect("insert");
+        let input = CreateWritingTestBuilder::default()
+            .with_title("Shared Title")
+            .build();
+        writing_tests::insert(&pool, &input, "someone-else")
+            .await
+            .expect("insert");
 
         // Act
         let found = find_duplicate_writing_title(&pool, OWNER_ID, "Shared Title").await;
@@ -331,10 +380,15 @@ mod import_reading_fn {
         let data = validate_reading(&good_reading_json()).expect("valid fixture");
 
         // Act
-        let test_id = import_reading(&pool, OWNER_ID, data).await.expect("import_reading");
+        let test_id = import_reading(&pool, OWNER_ID, data)
+            .await
+            .expect("import_reading");
 
         // Assert
-        let found = reading_tests::find_by_id(&pool, &test_id, OWNER_ID).await.expect("find").expect("present");
+        let found = reading_tests::find_by_id(&pool, &test_id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
         assert_eq!(found.title, "Sample Reading Test");
     }
 
@@ -343,7 +397,9 @@ mod import_reading_fn {
         // Arrange
         let pool = test_pool().await;
         let data = validate_reading(&good_reading_json()).expect("valid fixture");
-        let test_id = import_reading(&pool, OWNER_ID, data).await.expect("import_reading");
+        let test_id = import_reading(&pool, OWNER_ID, data)
+            .await
+            .expect("import_reading");
 
         // Act
         let passages = app_lib::repositories::reading_passages::find_all(&pool, OWNER_ID)
@@ -368,10 +424,15 @@ mod import_writing_fn {
         let data = validate_writing(&good_writing_json()).expect("valid fixture");
 
         // Act
-        let test_id = import_writing(&pool, OWNER_ID, data).await.expect("import_writing");
+        let test_id = import_writing(&pool, OWNER_ID, data)
+            .await
+            .expect("import_writing");
 
         // Assert
-        let found = writing_tests::find_by_id(&pool, &test_id, OWNER_ID).await.expect("find").expect("present");
+        let found = writing_tests::find_by_id(&pool, &test_id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
         assert_eq!(found.title, "Sample Writing Test");
     }
 }
@@ -390,20 +451,31 @@ mod import_listening_fn {
         let audios_meta = good_listening_audios();
         let data = validate_listening(&raw, &audios_meta).expect("valid fixture");
         let assignments: Vec<AudioAssignment> = (1..=4)
-            .map(|n| AudioAssignment { section_number: n, file_name: "a.mp3".to_string(), data: vec![1, 2, 3] })
+            .map(|n| AudioAssignment {
+                section_number: n,
+                file_name: "a.mp3".to_string(),
+                data: vec![1, 2, 3],
+            })
             .collect();
 
         // Act
-        let test_id = import_listening(&pool, OWNER_ID, data, assignments).await.expect("import_listening");
+        let test_id = import_listening(&pool, OWNER_ID, data, assignments)
+            .await
+            .expect("import_listening");
 
         // Assert
         let home = std::env::var("HOME").expect("HOME must be set");
-        let dir = std::path::Path::new(&home).join(".ielts-hub").join("listening-tests");
+        let dir = std::path::Path::new(&home)
+            .join(".ielts-hub")
+            .join("listening-tests");
         let entry = std::fs::read_dir(&dir)
             .expect("read test dir")
             .filter_map(|e| e.ok())
             .find(|e| e.file_name().to_string_lossy().starts_with(&test_id));
-        assert!(entry.is_some(), "expected a directory for the imported test's audio files");
+        assert!(
+            entry.is_some(),
+            "expected a directory for the imported test's audio files"
+        );
 
         // Cleanup: remove the directory this test created so no real-disk artifacts remain.
         if let Some(entry) = entry {

@@ -1,7 +1,7 @@
 use app_lib::repositories::profiles;
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateProfileBuilder, UpdateProfileBuilder, default_profile};
+use crate::common::builders::{default_profile, CreateProfileBuilder, UpdateProfileBuilder};
 use crate::common::fixtures::test_pool;
 
 const UNKNOWN_ID: &str = "unknown-id";
@@ -13,7 +13,9 @@ mod insert_and_find_by_id {
     async fn it_finds_the_profile_when_looked_up_by_its_id() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateProfileBuilder::default().with_full_name("Grace Hopper").build();
+        let input = CreateProfileBuilder::default()
+            .with_full_name("Grace Hopper")
+            .build();
         let id = profiles::insert(&pool, &input).await.expect("insert");
 
         // Act
@@ -43,7 +45,10 @@ mod insert_and_find_by_id {
         let id = profiles::insert(&pool, &input).await.expect("insert");
 
         // Act
-        let found = profiles::find_by_id(&pool, &id).await.expect("find").expect("present");
+        let found = profiles::find_by_id(&pool, &id)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.plan_type, "free");
@@ -69,8 +74,12 @@ mod find_all {
     async fn it_returns_every_profile_that_exists() {
         // Arrange
         let pool = test_pool().await;
-        profiles::insert(&pool, &default_profile()).await.expect("insert 1");
-        profiles::insert(&pool, &default_profile()).await.expect("insert 2");
+        profiles::insert(&pool, &default_profile())
+            .await
+            .expect("insert 1");
+        profiles::insert(&pool, &default_profile())
+            .await
+            .expect("insert 2");
 
         // Act
         let all = profiles::find_all(&pool).await.expect("find_all");
@@ -87,13 +96,18 @@ mod update {
     async fn it_updates_only_the_provided_field() {
         // Arrange
         let pool = test_pool().await;
-        let input = CreateProfileBuilder::default().with_full_name("Original Name").build();
+        let input = CreateProfileBuilder::default()
+            .with_full_name("Original Name")
+            .build();
         let id = profiles::insert(&pool, &input).await.expect("insert");
         let update = UpdateProfileBuilder::default().with_is_banned(true).build();
 
         // Act
         profiles::update(&pool, &id, &update).await.expect("update");
-        let found = profiles::find_by_id(&pool, &id).await.expect("find").expect("present");
+        let found = profiles::find_by_id(&pool, &id)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.full_name, Some("Original Name".to_string()));

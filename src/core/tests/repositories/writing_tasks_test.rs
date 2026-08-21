@@ -2,7 +2,9 @@ use app_lib::database::Db;
 use app_lib::repositories::{writing_tasks, writing_tests};
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateWritingTaskBuilder, UpdateWritingTaskBuilder, default_writing_test};
+use crate::common::builders::{
+    default_writing_test, CreateWritingTaskBuilder, UpdateWritingTaskBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -11,7 +13,9 @@ const UNKNOWN_ID: &str = "unknown-id";
 
 async fn given_owned_test(pool: &Db) -> String {
     let input = default_writing_test();
-    writing_tests::insert(pool, &input, OWNER_ID).await.expect("insert parent test")
+    writing_tests::insert(pool, &input, OWNER_ID)
+        .await
+        .expect("insert parent test")
 }
 
 mod insert {
@@ -22,7 +26,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateWritingTaskBuilder::default().with_test_id(&test_id).build();
+        let input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = writing_tasks::insert(&pool, &input, OWNER_ID).await;
@@ -36,7 +42,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateWritingTaskBuilder::default().with_test_id(&test_id).build();
+        let input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = writing_tasks::insert(&pool, &input, OTHER_USER_ID).await;
@@ -54,8 +62,13 @@ mod find_by_id {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateWritingTaskBuilder::default().with_test_id(&test_id).with_title("Bar Chart Task").build();
-        let id = writing_tasks::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .with_title("Bar Chart Task")
+            .build();
+        let id = writing_tasks::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = writing_tasks::find_by_id(&pool, &id, OWNER_ID).await;
@@ -105,12 +118,21 @@ mod update {
             .with_test_id(&test_id)
             .with_title("Original Title")
             .build();
-        let id = writing_tasks::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateWritingTaskBuilder::default().with_min_words(200).build();
+        let id = writing_tasks::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateWritingTaskBuilder::default()
+            .with_min_words(200)
+            .build();
 
         // Act
-        writing_tasks::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = writing_tasks::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        writing_tasks::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = writing_tasks::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.title, "Original Title");
@@ -126,11 +148,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateWritingTaskBuilder::default().with_test_id(&test_id).build();
-        let id = writing_tasks::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        let id = writing_tasks::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        writing_tasks::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        writing_tasks::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = writing_tasks::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

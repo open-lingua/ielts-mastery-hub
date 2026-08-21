@@ -4,7 +4,10 @@ use app_lib::services::export_service;
 use assert_matches::assert_matches;
 use zip::ZipArchive;
 
-use crate::common::builders::{CreateReadingPassageBuilder, CreateReadingTestBuilder, CreateWritingTaskBuilder, CreateWritingTestBuilder, default_reading_test};
+use crate::common::builders::{
+    default_reading_test, CreateReadingPassageBuilder, CreateReadingTestBuilder,
+    CreateWritingTaskBuilder, CreateWritingTestBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -18,10 +21,18 @@ mod build_export {
     async fn it_builds_a_zip_for_a_reading_test() {
         // Arrange
         let pool = test_pool().await;
-        let test_input = CreateReadingTestBuilder::default().with_title("Ocean Life").build();
-        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID).await.expect("insert test");
-        let passage_input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
-        reading_passages::insert(&pool, &passage_input, OWNER_ID).await.expect("insert passage");
+        let test_input = CreateReadingTestBuilder::default()
+            .with_title("Ocean Life")
+            .build();
+        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID)
+            .await
+            .expect("insert test");
+        let passage_input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        reading_passages::insert(&pool, &passage_input, OWNER_ID)
+            .await
+            .expect("insert passage");
 
         // Act
         let built = export_service::build_export(&pool, OWNER_ID, "reading", &test_id).await;
@@ -35,11 +46,21 @@ mod build_export {
     async fn it_builds_a_zip_whose_archive_contains_the_export_json() {
         // Arrange
         let pool = test_pool().await;
-        let test_input = CreateReadingTestBuilder::default().with_title("Ocean Life").build();
-        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID).await.expect("insert test");
-        let passage_input = CreateReadingPassageBuilder::default().with_test_id(&test_id).build();
-        reading_passages::insert(&pool, &passage_input, OWNER_ID).await.expect("insert passage");
-        let built = export_service::build_export(&pool, OWNER_ID, "reading", &test_id).await.expect("build_export");
+        let test_input = CreateReadingTestBuilder::default()
+            .with_title("Ocean Life")
+            .build();
+        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID)
+            .await
+            .expect("insert test");
+        let passage_input = CreateReadingPassageBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        reading_passages::insert(&pool, &passage_input, OWNER_ID)
+            .await
+            .expect("insert passage");
+        let built = export_service::build_export(&pool, OWNER_ID, "reading", &test_id)
+            .await
+            .expect("build_export");
 
         // Act
         let mut archive = ZipArchive::new(std::io::Cursor::new(built.zip_bytes)).expect("open zip");
@@ -52,17 +73,27 @@ mod build_export {
     async fn it_builds_a_zip_for_a_writing_test() {
         // Arrange
         let pool = test_pool().await;
-        let test_input = CreateWritingTestBuilder::default().with_title("Bar Chart Essays").build();
-        let test_id = writing_tests::insert(&pool, &test_input, OWNER_ID).await.expect("insert test");
-        let task_input = CreateWritingTaskBuilder::default().with_test_id(&test_id).build();
-        writing_tasks::insert(&pool, &task_input, OWNER_ID).await.expect("insert task");
+        let test_input = CreateWritingTestBuilder::default()
+            .with_title("Bar Chart Essays")
+            .build();
+        let test_id = writing_tests::insert(&pool, &test_input, OWNER_ID)
+            .await
+            .expect("insert test");
+        let task_input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        writing_tasks::insert(&pool, &task_input, OWNER_ID)
+            .await
+            .expect("insert task");
 
         // Act
         let built = export_service::build_export(&pool, OWNER_ID, "writing", &test_id).await;
 
         // Assert
         let built = built.expect("build_export should succeed");
-        assert!(built.file_name.starts_with("ielts-writing-bar-chart-essays"));
+        assert!(built
+            .file_name
+            .starts_with("ielts-writing-bar-chart-essays"));
     }
 
     #[tokio::test]
@@ -84,7 +115,9 @@ mod build_export {
 
         // Assert
         let built = built.expect("build_export should succeed");
-        assert!(built.file_name.starts_with("ielts-listening-airport-chatter"));
+        assert!(built
+            .file_name
+            .starts_with("ielts-listening-airport-chatter"));
     }
 
     #[tokio::test]
@@ -92,7 +125,9 @@ mod build_export {
         // Arrange
         let pool = test_pool().await;
         let test_input = default_reading_test();
-        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID).await.expect("insert test");
+        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID)
+            .await
+            .expect("insert test");
 
         // Act
         let result = export_service::build_export(&pool, OWNER_ID, "speaking", &test_id).await;
@@ -117,8 +152,12 @@ mod build_export {
     async fn it_returns_not_found_when_a_non_owner_exports_a_draft_test() {
         // Arrange
         let pool = test_pool().await;
-        let test_input = CreateReadingTestBuilder::default().with_status("draft").build();
-        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID).await.expect("insert test");
+        let test_input = CreateReadingTestBuilder::default()
+            .with_status("draft")
+            .build();
+        let test_id = reading_tests::insert(&pool, &test_input, OWNER_ID)
+            .await
+            .expect("insert test");
 
         // Act
         let result = export_service::build_export(&pool, OTHER_USER_ID, "reading", &test_id).await;

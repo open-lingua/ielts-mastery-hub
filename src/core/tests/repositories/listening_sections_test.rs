@@ -2,7 +2,9 @@ use app_lib::database::Db;
 use app_lib::repositories::{listening_sections, listening_tests};
 use assert_matches::assert_matches;
 
-use crate::common::builders::{CreateListeningSectionBuilder, UpdateListeningSectionBuilder, default_listening_test};
+use crate::common::builders::{
+    default_listening_test, CreateListeningSectionBuilder, UpdateListeningSectionBuilder,
+};
 use crate::common::fixtures::test_pool;
 
 const OWNER_ID: &str = "owner-1";
@@ -11,7 +13,9 @@ const UNKNOWN_ID: &str = "unknown-id";
 
 async fn given_owned_test(pool: &Db) -> String {
     let input = default_listening_test();
-    listening_tests::insert(pool, &input, OWNER_ID).await.expect("insert parent test")
+    listening_tests::insert(pool, &input, OWNER_ID)
+        .await
+        .expect("insert parent test")
 }
 
 mod insert {
@@ -22,7 +26,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateListeningSectionBuilder::default().with_test_id(&test_id).build();
+        let input = CreateListeningSectionBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = listening_sections::insert(&pool, &input, OWNER_ID).await;
@@ -36,7 +42,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateListeningSectionBuilder::default().with_test_id(&test_id).build();
+        let input = CreateListeningSectionBuilder::default()
+            .with_test_id(&test_id)
+            .build();
 
         // Act
         let result = listening_sections::insert(&pool, &input, OTHER_USER_ID).await;
@@ -54,8 +62,13 @@ mod find_by_id {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateListeningSectionBuilder::default().with_test_id(&test_id).with_title("Section One").build();
-        let id = listening_sections::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningSectionBuilder::default()
+            .with_test_id(&test_id)
+            .with_title("Section One")
+            .build();
+        let id = listening_sections::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = listening_sections::find_by_id(&pool, &id, OWNER_ID).await;
@@ -105,16 +118,28 @@ mod update {
             .with_test_id(&test_id)
             .with_title("Original Title")
             .build();
-        let id = listening_sections::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateListeningSectionBuilder::default().with_audio_url("https://example.com/audio.mp3").build();
+        let id = listening_sections::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateListeningSectionBuilder::default()
+            .with_audio_url("https://example.com/audio.mp3")
+            .build();
 
         // Act
-        listening_sections::update(&pool, &id, OWNER_ID, &update).await.expect("update");
-        let found = listening_sections::find_by_id(&pool, &id, OWNER_ID).await.expect("find").expect("present");
+        listening_sections::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
+        let found = listening_sections::find_by_id(&pool, &id, OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
 
         // Assert
         assert_eq!(found.title, "Original Title");
-        assert_eq!(found.audio_url, Some("https://example.com/audio.mp3".to_string()));
+        assert_eq!(
+            found.audio_url,
+            Some("https://example.com/audio.mp3".to_string())
+        );
     }
 }
 
@@ -126,11 +151,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let test_id = given_owned_test(&pool).await;
-        let input = CreateListeningSectionBuilder::default().with_test_id(&test_id).build();
-        let id = listening_sections::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningSectionBuilder::default()
+            .with_test_id(&test_id)
+            .build();
+        let id = listening_sections::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        listening_sections::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        listening_sections::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = listening_sections::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

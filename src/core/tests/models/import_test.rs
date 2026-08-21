@@ -1,6 +1,6 @@
 use app_lib::models::import::{
-    ListeningImport, PassageImport, QuestionGroupImport, QuestionImport, ReadingImport, SectionImport,
-    TaskImport, WritingImport,
+    ListeningImport, PassageImport, QuestionGroupImport, QuestionImport, ReadingImport,
+    SectionImport, TaskImport, WritingImport,
 };
 use serde_json::json;
 
@@ -37,7 +37,10 @@ mod reading_import {
         let parsed: ReadingImport = serde_json::from_value(payload).expect("deserialize");
 
         // Assert
-        assert_eq!(parsed.passages[0].question_groups[0].questions[0].text, Some("What year?".to_string()));
+        assert_eq!(
+            parsed.passages[0].question_groups[0].questions[0].text,
+            Some("What year?".to_string())
+        );
     }
 }
 

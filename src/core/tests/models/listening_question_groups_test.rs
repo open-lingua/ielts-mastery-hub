@@ -1,4 +1,6 @@
-use app_lib::models::listening_question_groups::{CreateListeningQuestionGroup, UpdateListeningQuestionGroup};
+use app_lib::models::listening_question_groups::{
+    CreateListeningQuestionGroup, UpdateListeningQuestionGroup,
+};
 use serde_json::json;
 
 mod create_listening_question_groups {
@@ -10,7 +12,8 @@ mod create_listening_question_groups {
         let payload = json!({ "section_id": "section-1" });
 
         // Act
-        let parsed: CreateListeningQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: CreateListeningQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.group_order, None);
@@ -42,7 +45,8 @@ mod create_listening_question_groups {
         let payload = json!({ "section_id": "section-1", "question_type": "note-completion" });
 
         // Act
-        let parsed: CreateListeningQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: CreateListeningQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.question_type, Some("note-completion".to_string()));
@@ -58,7 +62,8 @@ mod update_listening_question_groups {
         let payload = json!({});
 
         // Act
-        let parsed: UpdateListeningQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: UpdateListeningQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.group_order, None);
@@ -78,7 +83,8 @@ mod update_listening_question_groups {
         let payload = json!({ "question_type": "note-completion" });
 
         // Act
-        let parsed: UpdateListeningQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: UpdateListeningQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.question_type, Some("note-completion".to_string()));

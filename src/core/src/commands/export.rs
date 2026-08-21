@@ -22,7 +22,11 @@ pub async fn export_test_to_zip(
     let default_dir = export_service::default_export_dir();
 
     let chosen = tauri::async_runtime::spawn_blocking(move || {
-        let mut dialog = app.dialog().file().set_file_name(&file_name).add_filter("Zip Archive", &["zip"]);
+        let mut dialog = app
+            .dialog()
+            .file()
+            .set_file_name(&file_name)
+            .add_filter("Zip Archive", &["zip"]);
         if let Some(dir) = default_dir {
             dialog = dialog.set_directory(dir);
         }
@@ -37,9 +41,13 @@ pub async fn export_test_to_zip(
     let path = file_path.into_path().map_err(|e| e.to_string())?;
 
     if let Some(parent) = path.parent() {
-        tokio::fs::create_dir_all(parent).await.map_err(|e| e.to_string())?;
+        tokio::fs::create_dir_all(parent)
+            .await
+            .map_err(|e| e.to_string())?;
     }
-    tokio::fs::write(&path, &built.zip_bytes).await.map_err(|e| e.to_string())?;
+    tokio::fs::write(&path, &built.zip_bytes)
+        .await
+        .map_err(|e| e.to_string())?;
 
     Ok(Some(ExportResult {
         file_path: path.to_string_lossy().into_owned(),

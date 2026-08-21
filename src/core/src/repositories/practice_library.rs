@@ -5,23 +5,26 @@ use crate::models::user_test_sessions::UserTestSession;
 use crate::repositories::user_test_sessions;
 
 pub async fn count_reading_published(pool: &Db) -> Result<i64, AppError> {
-    let count = sqlx::query_scalar!("SELECT COUNT(*) FROM reading_tests WHERE status = 'published'")
-        .fetch_one(pool)
-        .await?;
+    let count =
+        sqlx::query_scalar!("SELECT COUNT(*) FROM reading_tests WHERE status = 'published'")
+            .fetch_one(pool)
+            .await?;
     Ok(count)
 }
 
 pub async fn count_writing_published(pool: &Db) -> Result<i64, AppError> {
-    let count = sqlx::query_scalar!("SELECT COUNT(*) FROM writing_tests WHERE status = 'published'")
-        .fetch_one(pool)
-        .await?;
+    let count =
+        sqlx::query_scalar!("SELECT COUNT(*) FROM writing_tests WHERE status = 'published'")
+            .fetch_one(pool)
+            .await?;
     Ok(count)
 }
 
 pub async fn count_listening_published(pool: &Db) -> Result<i64, AppError> {
-    let count = sqlx::query_scalar!("SELECT COUNT(*) FROM listening_tests WHERE status = 'published'")
-        .fetch_one(pool)
-        .await?;
+    let count =
+        sqlx::query_scalar!("SELECT COUNT(*) FROM listening_tests WHERE status = 'published'")
+            .fetch_one(pool)
+            .await?;
     Ok(count)
 }
 
@@ -117,7 +120,8 @@ pub async fn find_all_page(
     let writing = find_writing_page(pool, 0, i64::MAX).await?;
     let listening = find_listening_page(pool, 0, i64::MAX).await?;
 
-    let mut all: Vec<PracticeTestRow> = Vec::with_capacity(reading.len() + writing.len() + listening.len());
+    let mut all: Vec<PracticeTestRow> =
+        Vec::with_capacity(reading.len() + writing.len() + listening.len());
     all.extend(reading);
     all.extend(writing);
     all.extend(listening);

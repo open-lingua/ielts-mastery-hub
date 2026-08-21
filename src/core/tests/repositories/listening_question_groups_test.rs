@@ -1,10 +1,10 @@
 use app_lib::database::Db;
-use app_lib::repositories::{listening_sections, listening_question_groups, listening_tests};
+use app_lib::repositories::{listening_question_groups, listening_sections, listening_tests};
 use assert_matches::assert_matches;
 
 use crate::common::builders::{
-    CreateListeningQuestionGroupBuilder, CreateListeningSectionBuilder,
-    UpdateListeningQuestionGroupBuilder, default_listening_test,
+    default_listening_test, CreateListeningQuestionGroupBuilder, CreateListeningSectionBuilder,
+    UpdateListeningQuestionGroupBuilder,
 };
 use crate::common::fixtures::test_pool;
 
@@ -14,9 +14,15 @@ const UNKNOWN_ID: &str = "unknown-id";
 
 async fn given_owned_section(pool: &Db) -> String {
     let test_input = default_listening_test();
-    let test_id = listening_tests::insert(pool, &test_input, OWNER_ID).await.expect("insert test");
-    let section_input = CreateListeningSectionBuilder::default().with_test_id(&test_id).build();
-    listening_sections::insert(pool, &section_input, OWNER_ID).await.expect("insert section")
+    let test_id = listening_tests::insert(pool, &test_input, OWNER_ID)
+        .await
+        .expect("insert test");
+    let section_input = CreateListeningSectionBuilder::default()
+        .with_test_id(&test_id)
+        .build();
+    listening_sections::insert(pool, &section_input, OWNER_ID)
+        .await
+        .expect("insert section")
 }
 
 mod insert {
@@ -27,7 +33,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let section_id = given_owned_section(&pool).await;
-        let input = CreateListeningQuestionGroupBuilder::default().with_section_id(&section_id).build();
+        let input = CreateListeningQuestionGroupBuilder::default()
+            .with_section_id(&section_id)
+            .build();
 
         // Act
         let result = listening_question_groups::insert(&pool, &input, OWNER_ID).await;
@@ -41,7 +49,9 @@ mod insert {
         // Arrange
         let pool = test_pool().await;
         let section_id = given_owned_section(&pool).await;
-        let input = CreateListeningQuestionGroupBuilder::default().with_section_id(&section_id).build();
+        let input = CreateListeningQuestionGroupBuilder::default()
+            .with_section_id(&section_id)
+            .build();
 
         // Act
         let result = listening_question_groups::insert(&pool, &input, OTHER_USER_ID).await;
@@ -63,7 +73,9 @@ mod find_by_id {
             .with_section_id(&section_id)
             .with_question_type("matching")
             .build();
-        let id = listening_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let id = listening_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
         let found = listening_question_groups::find_by_id(&pool, &id, OWNER_ID).await;
@@ -113,11 +125,17 @@ mod update {
             .with_section_id(&section_id)
             .with_question_type("multiple-choice")
             .build();
-        let id = listening_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
-        let update = UpdateListeningQuestionGroupBuilder::default().with_group_order(4).build();
+        let id = listening_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
+        let update = UpdateListeningQuestionGroupBuilder::default()
+            .with_group_order(4)
+            .build();
 
         // Act
-        listening_question_groups::update(&pool, &id, OWNER_ID, &update).await.expect("update");
+        listening_question_groups::update(&pool, &id, OWNER_ID, &update)
+            .await
+            .expect("update");
         let found = listening_question_groups::find_by_id(&pool, &id, OWNER_ID)
             .await
             .expect("find")
@@ -137,11 +155,17 @@ mod delete {
         // Arrange
         let pool = test_pool().await;
         let section_id = given_owned_section(&pool).await;
-        let input = CreateListeningQuestionGroupBuilder::default().with_section_id(&section_id).build();
-        let id = listening_question_groups::insert(&pool, &input, OWNER_ID).await.expect("insert");
+        let input = CreateListeningQuestionGroupBuilder::default()
+            .with_section_id(&section_id)
+            .build();
+        let id = listening_question_groups::insert(&pool, &input, OWNER_ID)
+            .await
+            .expect("insert");
 
         // Act
-        listening_question_groups::delete(&pool, &id, OWNER_ID).await.expect("delete");
+        listening_question_groups::delete(&pool, &id, OWNER_ID)
+            .await
+            .expect("delete");
         let found = listening_question_groups::find_by_id(&pool, &id, OWNER_ID).await;
 
         // Assert

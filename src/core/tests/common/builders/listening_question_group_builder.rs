@@ -1,4 +1,6 @@
-use app_lib::models::listening_question_groups::{CreateListeningQuestionGroup, UpdateListeningQuestionGroup};
+use app_lib::models::listening_question_groups::{
+    CreateListeningQuestionGroup, UpdateListeningQuestionGroup,
+};
 
 const DEFAULT_GROUP_ORDER: i64 = 0;
 const DEFAULT_QUESTION_TYPE: &str = "multiple-choice";

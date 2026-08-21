@@ -1,8 +1,8 @@
 use tauri::State;
 
 use crate::database::Db;
-use crate::repositories::reading_tests as repo;
 use crate::models::reading_tests::{CreateReadingTest, ReadingTest, UpdateReadingTest};
+use crate::repositories::reading_tests as repo;
 
 #[tauri::command]
 pub async fn get_reading_tests(

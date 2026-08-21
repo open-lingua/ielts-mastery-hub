@@ -1,4 +1,6 @@
-use app_lib::models::reading_question_groups::{CreateReadingQuestionGroup, UpdateReadingQuestionGroup};
+use app_lib::models::reading_question_groups::{
+    CreateReadingQuestionGroup, UpdateReadingQuestionGroup,
+};
 use serde_json::json;
 
 mod create_reading_question_groups {
@@ -10,7 +12,8 @@ mod create_reading_question_groups {
         let payload = json!({ "passage_id": "passage-1" });
 
         // Act
-        let parsed: CreateReadingQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: CreateReadingQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.group_order, None);
@@ -42,7 +45,8 @@ mod create_reading_question_groups {
         let payload = json!({ "passage_id": "passage-1", "question_type": "matching-headings" });
 
         // Act
-        let parsed: CreateReadingQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: CreateReadingQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.question_type, Some("matching-headings".to_string()));
@@ -58,7 +62,8 @@ mod update_reading_question_groups {
         let payload = json!({});
 
         // Act
-        let parsed: UpdateReadingQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: UpdateReadingQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.group_order, None);
@@ -78,7 +83,8 @@ mod update_reading_question_groups {
         let payload = json!({ "question_type": "matching-headings" });
 
         // Act
-        let parsed: UpdateReadingQuestionGroup = serde_json::from_value(payload).expect("deserialize");
+        let parsed: UpdateReadingQuestionGroup =
+            serde_json::from_value(payload).expect("deserialize");
 
         // Assert
         assert_eq!(parsed.question_type, Some("matching-headings".to_string()));

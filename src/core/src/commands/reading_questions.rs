@@ -1,8 +1,10 @@
 use tauri::State;
 
 use crate::database::Db;
+use crate::models::reading_questions::{
+    CreateReadingQuestion, ReadingQuestion, UpdateReadingQuestion,
+};
 use crate::repositories::reading_questions as repo;
-use crate::models::reading_questions::{CreateReadingQuestion, ReadingQuestion, UpdateReadingQuestion};
 
 #[tauri::command]
 pub async fn get_reading_questions(
