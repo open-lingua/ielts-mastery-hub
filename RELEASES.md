@@ -3,6 +3,19 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.11 / 2026.08.21
+
+- docs: disable sidebar autoCollapseCategories to keep both sections open
+- docs: expand Technical Docs sidebar category by default
+- docs: expand Usage Guides sidebar category by default
+- docs: add Technical Docs sidebar category for internals
+- docs: fix broken relative links in intro.mdx to point into internals/
+- docs: add Usage Guides sidebar category for guides
+- docs: add FAQ and troubleshooting reference guide
+- docs: add admin portal user guides (overview, creating tests, content library, import/export, students)
+- docs: add tracking-progress user guides (dashboard, band score)
+- docs: add getting-started user guides (welcome, progress saving)
+
 ### 1.0.0-beta.10 / 2026.08.20
 
 - docs: reorganize all docs under internals/ subdirectory
