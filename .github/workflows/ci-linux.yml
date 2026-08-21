@@ -1,4 +1,4 @@
-name: CI
+name: CI (Linux)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    name: Frontend - Test & Build
+    name: Frontend (Linux) - Lint, Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - run: npm run build
 
   backend:
-    name: Backend - Rust Tests
+    name: Backend (Linux) - Rust Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
