@@ -3,6 +3,22 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+### 1.0.0-beta.10 / 2026.08.20
+
+- docs: reorganize all docs under internals/ subdirectory
+- docs: add intro doc
+- docs: add reference docs
+- docs: add desktop docs
+- docs: add product docs
+- docs: add contributing docs
+- docs: add testing docs
+- docs: add api-reference docs
+- docs: add admin docs
+- docs: add features docs
+- docs: add architecture docs
+- docs: add getting-started docs
+- docs: remove unused info in intro
+
 ### 1.0.0-beta.9 / 2026.08.20
 
 - chore(core): add dev-dependencies required for src/core test suite
