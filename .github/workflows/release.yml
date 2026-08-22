@@ -7,12 +7,12 @@ name: Release
 # runners. On private repositories these require a GitHub plan that grants
 # access to ARM64-hosted runners (e.g. Team/Enterprise); on public repos or
 # accounts with access they work out of the box with no extra configuration.
-# on:
-#   release:
-#     types: [published]
+on:
+  release:
+    types: [published]
 
-# permissions:
-#   contents: write
+permissions:
+  contents: write
 
 jobs:
   build:
