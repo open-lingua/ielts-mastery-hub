@@ -31,6 +31,29 @@ The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically b
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+### 1.0.0-beta.12 / 2026.08.22
+
+- ci: enable release workflow trigger and permissions
+- chore: remove Supabase secrets requirement and patch website deps
+- chore: remove Supabase legacy code and references
+- docs: consolidate DATABASE_URL setup instructions into backend_architecture.md
+- refactor: move tests to integration suite and expose db path helpers
+- feat: resolve DATABASE_URL from OS default paths at runtime
+- ci: add cross-platform release workflow for macOS, Linux, and Windows
+- ci: add frontend lint step and simplify job names
+- ci: replace SQLX_OFFLINE with DATABASE_URL for clippy and build steps
+- ci: optimize backend job with sqlx offline mode and stable cargo cache
+- ci: add clippy lint step to backend job
+- chore: apply cargo fmt formatting
+- ci: optimize Rust cache and apt install on Linux
+- ci: rename ci.yml to ci-linux.yml
+- ci: add Rust/Tauri test job to CI workflow
+- feat: remove User Management feature from admin portal
+- feat: remove landing page and boot directly into dashboard
+- feat: add local search plugin to docs site
+- chore: replace default Docusaurus branding with app assets
+- docs: add missing _category_.json files for Docusaurus sidebar structure
+
 ### 1.0.0-beta.11 / 2026.08.21
 
 - docs: disable sidebar autoCollapseCategories to keep both sections open
