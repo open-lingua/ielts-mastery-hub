@@ -8,6 +8,7 @@
 //! source file (see `docs/core/testing/01-01-folder-structure.md`).
 
 mod common;
+mod database;
 mod models;
 mod repositories;
 mod root;

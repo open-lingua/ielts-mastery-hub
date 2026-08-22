@@ -8,7 +8,7 @@ pub type Db = sqlx::SqlitePool;
 
 /// Bundle identifier used to namespace the app's data directory, matching
 /// `identifier` in `tauri.conf.json`.
-const APP_IDENTIFIER: &str = "com.openlingua.ieltsmasteryhub";
+pub const APP_IDENTIFIER: &str = "com.openlingua.ieltsmasteryhub";
 
 /// Resolves the SQLite connection URL to use at runtime.
 ///
@@ -33,7 +33,7 @@ pub fn resolve_database_url() -> Result<String, AppError> {
 /// Builds the default database file path for the given OS identifier
 /// (as returned by `std::env::consts::OS`), reading the appropriate
 /// home/user directory environment variable.
-fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
+pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
     match os {
         "macos" => {
             let home = std::env::var("HOME").map_err(|_| {
@@ -93,125 +93,4 @@ pub async fn init(_app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .run(&pool)
         .await?;
     Ok(pool)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::sync::Mutex;
-
-    // `std::env::var`/`set_var` are process-global, and Rust runs tests in
-    // parallel threads by default. Serialize access to the env vars this
-    // module touches so tests don't stomp on each other.
-    static ENV_LOCK: Mutex<()> = Mutex::new(());
-
-    #[test]
-    fn resolve_database_url_returns_override_verbatim_when_set() {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let previous = std::env::var("DATABASE_URL").ok();
-        std::env::set_var("DATABASE_URL", "sqlite://custom/path.db?mode=rwc");
-
-        let result = resolve_database_url();
-
-        match previous {
-            Some(v) => std::env::set_var("DATABASE_URL", v),
-            None => std::env::remove_var("DATABASE_URL"),
-        }
-
-        assert_eq!(result.unwrap(), "sqlite://custom/path.db?mode=rwc");
-    }
-
-    #[test]
-    fn resolve_database_url_ignores_empty_override() {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let previous_url = std::env::var("DATABASE_URL").ok();
-        let previous_home = std::env::var("HOME").ok();
-        std::env::set_var("DATABASE_URL", "");
-        std::env::set_var("HOME", "/tmp/test-home");
-
-        let result = resolve_database_url();
-
-        match previous_url {
-            Some(v) => std::env::set_var("DATABASE_URL", v),
-            None => std::env::remove_var("DATABASE_URL"),
-        }
-        match previous_home {
-            Some(v) => std::env::set_var("HOME", v),
-            None => std::env::remove_var("HOME"),
-        }
-
-        let url = result.unwrap();
-        assert!(url.contains(APP_IDENTIFIER));
-        assert!(url.contains("ielts.db"));
-    }
-
-    #[test]
-    fn default_db_path_builds_macos_path_under_application_support() {
-        let path = default_db_path_with_home("macos", "/Users/alice").unwrap();
-        assert_eq!(
-            path,
-            PathBuf::from(
-                "/Users/alice/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
-            )
-        );
-    }
-
-    #[test]
-    fn default_db_path_builds_linux_path_under_xdg_data_home() {
-        let path = default_db_path_with_home("linux", "/home/bob").unwrap();
-        assert_eq!(
-            path,
-            PathBuf::from(
-                "/home/bob/.local/share/com.openlingua.ieltsmasteryhub/ielts.db"
-            )
-        );
-    }
-
-    #[test]
-    fn default_db_path_returns_validation_error_when_home_missing() {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let previous = std::env::var("HOME").ok();
-        std::env::remove_var("HOME");
-
-        let result = default_db_path("linux");
-
-        if let Some(v) = previous {
-            std::env::set_var("HOME", v);
-        }
-
-        assert!(matches!(result, Err(AppError::Validation(_))));
-    }
-
-    #[test]
-    fn default_db_path_returns_validation_error_when_appdata_missing() {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let previous = std::env::var("APPDATA").ok();
-        std::env::remove_var("APPDATA");
-
-        let result = default_db_path("windows");
-
-        if let Some(v) = previous {
-            std::env::set_var("APPDATA", v);
-        }
-
-        assert!(matches!(result, Err(AppError::Validation(_))));
-    }
-
-    /// Test helper: builds the default path for `os` using an explicit home
-    /// directory rather than reading `$HOME` directly, avoiding env
-    /// mutation for the common-case assertions above.
-    fn default_db_path_with_home(os: &str, home: &str) -> Result<PathBuf, AppError> {
-        let _guard = ENV_LOCK.lock().unwrap();
-        let var = if os == "windows" { "APPDATA" } else { "HOME" };
-        let previous = std::env::var(var).ok();
-        std::env::set_var(var, home);
-
-        let result = default_db_path(os);
-
-        match previous {
-            Some(v) => std::env::set_var(var, v),
-            None => std::env::remove_var(var),
-        }
-        result
-    }
 }

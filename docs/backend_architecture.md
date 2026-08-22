@@ -13,8 +13,29 @@ Repos     (src/core/src/repositories/) — all SQL, entity structs, auth checks
               ↓ sqlx
 Database  (src/core/src/database/)    — pool init, migrations, seeds
               ↓
-         ielts.db  (app_data_dir)
+         ielts.db  (OS default dir, or DATABASE_URL override)
 ```
+
+## Database Path Resolution
+
+`database::resolve_database_url()` picks the SQLite connection URL at
+runtime:
+
+1. If `DATABASE_URL` is set (non-empty) in the environment, it's used
+   verbatim — this overrides everything below.
+2. Otherwise, a default path is derived per OS via `database::default_db_path()`
+   using only `std::env` (no `dirs`/`directories` crate):
+
+| OS | Default path |
+|---|---|
+| macOS | `$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db` |
+| Linux | `$HOME/.local/share/com.openlingua.ieltsmasteryhub/ielts.db` |
+| Windows | `%APPDATA%\com.openlingua.ieltsmasteryhub\ielts.db` |
+
+The identifier segment matches `identifier` in `tauri.conf.json`. If the
+required env var (`HOME` on macOS/Linux, `APPDATA` on Windows) is missing,
+resolution fails with `AppError::Validation`. `database::init()` creates the
+parent directory (`create_dir_all`) before opening the pool.
 
 ## Key Rules
 

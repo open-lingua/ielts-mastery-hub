@@ -27,7 +27,6 @@ rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/ielts.db*
 
 # 2. Point DATABASE_URL at the same file the app uses, then re-migrate
 cd src/core
-export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
 sqlx database drop -y
 sqlx database create
 sqlx migrate run --source src/database/migrations
