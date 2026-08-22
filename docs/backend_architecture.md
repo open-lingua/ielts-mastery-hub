@@ -37,6 +37,24 @@ required env var (`HOME` on macOS/Linux, `APPDATA` on Windows) is missing,
 resolution fails with `AppError::Validation`. `database::init()` creates the
 parent directory (`create_dir_all`) before opening the pool.
 
+If you need to run `sqlx` CLI commands (e.g. `sqlx migrate run`), set
+`DATABASE_URL` to point to the app's SQLite file:
+
+**macOS**
+```bash
+export DATABASE_URL="sqlite:///Users/$(whoami)/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+```
+
+**Linux**
+```bash
+export DATABASE_URL="sqlite:///home/$(whoami)/.local/share/com.openlingua.ieltsmasteryhub/ielts.db"
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:DATABASE_URL = "sqlite:///$env:APPDATA\com.openlingua.ieltsmasteryhub\ielts.db"
+```
+
 ## Key Rules
 
 | | |
