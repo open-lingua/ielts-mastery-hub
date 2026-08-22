@@ -260,8 +260,8 @@ const QuestionPreview: React.FC<{
 
       {group.hasWordBank && group.wordBank.length > 0 && (
         <div className="flex flex-wrap gap-1 p-2 rounded-lg border border-border bg-secondary/50">
-          {group.wordBank.map((w, i) => (
-            <Badge key={i} variant="secondary" className="text-[10px]">
+          {group.wordBank.map((w) => (
+            <Badge key={w} variant="secondary" className="text-[10px]">
               {w}
             </Badge>
           ))}
@@ -303,6 +303,7 @@ const QuestionPreview: React.FC<{
               <div className={cn("flex flex-wrap gap-1.5", compact ? "ml-2" : "ml-4")}>
                 {tfngOptions.map((opt) => (
                   <button
+                    type="button"
                     key={opt}
                     className={cn(
                       "rounded-lg border border-border font-medium text-muted-foreground hover:bg-secondary transition-colors",
@@ -398,6 +399,7 @@ const PaneToggle: React.FC<{
 }> = ({ activePane, onToggle, contentLabel, questionCount }) => (
   <div className="flex bg-muted rounded-lg p-0.5 mb-3">
     <button
+      type="button"
       onClick={() => onToggle("content")}
       className={cn(
         "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
@@ -407,6 +409,7 @@ const PaneToggle: React.FC<{
       {contentLabel}
     </button>
     <button
+      type="button"
       onClick={() => onToggle("questions")}
       className={cn(
         "flex-1 text-xs font-medium py-1.5 rounded-md transition-all text-center",
@@ -450,6 +453,7 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
       {data.passages.map((p, i) => (
         <button
           key={p.id}
+          type="button"
           onClick={() => {
             setActivePassage(i);
             setActivePane("content");
@@ -480,9 +484,9 @@ const ReadingPreviewContent: React.FC<{ data: PreviewReadingState; split: boolea
         </h2>
       )}
       {currentPassage?.content ? (
-        currentPassage.content.split("\n\n").map((para, i) => (
+        currentPassage.content.split("\n\n").map((para) => (
           <p
-            key={i}
+            key={para}
             className={cn(
               "font-serif text-foreground/90 mb-3",
               split ? "text-sm leading-[1.8]" : "text-xs leading-[1.7]"
@@ -552,6 +556,7 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
       {data.sections.map((s, i) => (
         <button
           key={s.id}
+          type="button"
           onClick={() => {
             setPreviewSection(i);
             setActivePane("content");
@@ -600,8 +605,8 @@ const ListeningPreviewContent: React.FC<{ data: PreviewListeningState; split: bo
         <div className="space-y-1">
           <p className="text-xs font-semibold text-muted-foreground">Transcript</p>
           <div className="rounded-lg border border-border bg-background p-3">
-            {currentSection.transcript.split("\n\n").map((para, i) => (
-              <p key={i} className="text-xs text-foreground/90 mb-2">
+            {currentSection.transcript.split("\n\n").map((para) => (
+              <p key={para} className="text-xs text-foreground/90 mb-2">
                 {para}
               </p>
             ))}
@@ -672,8 +677,8 @@ const WritingPreviewContent: React.FC<{ data: PreviewWritingState; split: boolea
       )}
       {data.prompt && (
         <div className="rounded-lg border border-border bg-background p-3 overflow-hidden">
-          {data.prompt.split("\n").map((line, i) => (
-            <p key={i} className="text-xs text-foreground/90 mb-1 break-words">
+          {data.prompt.split("\n").map((line) => (
+            <p key={line} className="text-xs text-foreground/90 mb-1 break-words">
               {line || <br />}
             </p>
           ))}
@@ -788,6 +793,7 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
                 return (
                   <button
                     key={type}
+                    type="button"
                     onClick={() => {
                       setDevice(type);
                       setLandscape(false);
@@ -809,6 +815,7 @@ export const TestPreviewModal: React.FC<PreviewProps> = ({
             {/* Rotate (tablet/mobile only) */}
             {device !== "desktop" && (
               <button
+                type="button"
                 onClick={() => setLandscape((p) => !p)}
                 title={landscape ? "Portrait" : "Landscape"}
                 className={cn(

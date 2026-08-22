@@ -76,6 +76,7 @@ const ImageViewer: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
       <div className="relative group rounded-xl overflow-hidden border border-border bg-secondary">
         <img src={src} alt={alt} className="w-full h-auto object-contain" />
         <button
+          type="button"
           onClick={() => setZoomed(true)}
           className="absolute top-2 right-2 rounded-lg bg-card/80 backdrop-blur-sm p-1.5 opacity-0 group-hover:opacity-100 transition-opacity border border-border"
         >
@@ -83,13 +84,17 @@ const ImageViewer: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
         </button>
       </div>
       {zoomed && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-md p-8"
-          onClick={() => setZoomed(false)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-8">
+          <button
+            type="button"
+            aria-label="Close image preview"
+            onClick={() => setZoomed(false)}
+            className="absolute inset-0 bg-foreground/30 backdrop-blur-md"
+          />
+          <div className="relative max-w-4xl max-h-[90vh]">
             <img src={src} alt={alt} className="w-full h-auto rounded-xl border border-border shadow-2xl" />
             <button
+              type="button"
               onClick={() => setZoomed(false)}
               className="absolute top-3 right-3 rounded-full bg-card p-2 border border-border hover:bg-secondary transition-colors"
             >
@@ -238,8 +243,9 @@ const WritingSimulator: React.FC = () => {
             }
           }
         }
-      } catch (err: any) {
-        setFetchError(err.message || "Failed to load writing test");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load writing test";
+        setFetchError(message);
         toast.error("Failed to load writing test");
       } finally {
         setIsLoading(false);
@@ -277,11 +283,14 @@ const WritingSimulator: React.FC = () => {
     }
   }, [testId]);
 
-  const countWords = (text: string) =>
-    text
-      .trim()
-      .split(/\s+/)
-      .filter((w) => w.length > 0).length;
+  const countWords = useCallback(
+    (text: string) =>
+      text
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w.length > 0).length,
+    []
+  );
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -486,6 +495,7 @@ const WritingSimulator: React.FC = () => {
                 return (
                   <button
                     key={task.id}
+                    type="button"
                     onClick={() => setActiveTask(idx)}
                     className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border ${
                       isActiveTask
@@ -672,6 +682,7 @@ const WritingSimulator: React.FC = () => {
                     <div className="flex items-center gap-2">
                       {activeTask === 0 ? (
                         <button
+                          type="button"
                           onClick={() => setActiveTask(1)}
                           className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
                         >
@@ -679,6 +690,7 @@ const WritingSimulator: React.FC = () => {
                         </button>
                       ) : (
                         <button
+                          type="button"
                           onClick={() => setActiveTask(0)}
                           className="rounded-xl bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
                         >
@@ -689,6 +701,7 @@ const WritingSimulator: React.FC = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
+                              type="button"
                               onClick={handleSubmit}
                               disabled={!bothAttempted}
                               className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
@@ -744,18 +757,21 @@ const WritingSimulator: React.FC = () => {
             </p>
             <div className="flex justify-center gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => navigate("/tests")}
                 className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 ← Practice Library
               </button>
               <button
+                type="button"
                 onClick={() => setShowResults(false)}
                 className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Review Essays
               </button>
               <button
+                type="button"
                 onClick={handleReset}
                 className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >

@@ -27,10 +27,10 @@ export async function submitListeningTest(
 
 function mapDBQuestionToListening(q: TauriListeningQuestion, group: TauriListeningGroup): ListeningQuestion {
   const options: Array<{ id: string; text: string; isCorrect: boolean }> = q.options
-    ? (JSON.parse(q.options) as any[])
+    ? (JSON.parse(q.options) as Array<{ id: string; text: string; isCorrect: boolean }>)
     : [];
   const matchingPairs: Array<{ id: string; left: string; right: string }> = q.matching_pairs
-    ? (JSON.parse(q.matching_pairs) as any[])
+    ? (JSON.parse(q.matching_pairs) as Array<{ id: string; left: string; right: string }>)
     : [];
 
   if (group.question_type === "multiple-choice") {

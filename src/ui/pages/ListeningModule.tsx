@@ -224,9 +224,9 @@ const ListeningModule: React.FC = () => {
     setCompletedSections(Array(test.sections.length).fill(true));
     setTestFinished(true);
     // Persist on time-up too
-    if (testId) {
+    if (testId && sessionId) {
       try {
-        await submitListeningTest(sessionId!, test, answers);
+        await submitListeningTest(sessionId, test, answers);
       } catch (err) {
         console.error("Failed to save results on time-up:", err);
       }

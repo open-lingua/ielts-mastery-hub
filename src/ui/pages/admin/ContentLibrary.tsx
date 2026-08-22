@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AdminLayout } from "@/components/AdminLayout";
 import {
@@ -68,7 +68,7 @@ const ContentLibrary: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [exportingId, setExportingId] = useState<string | null>(null);
 
-  const loadContent = async () => {
+  const loadContent = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchAllContent();
@@ -78,12 +78,11 @@ const ContentLibrary: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadContent();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadContent]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -168,6 +167,7 @@ const ContentLibrary: React.FC = () => {
             {tabs.map((t) => (
               <button
                 key={t}
+                type="button"
                 onClick={() => setFilterModule(t)}
                 className={cn(
                   "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
@@ -197,8 +197,8 @@ const ContentLibrary: React.FC = () => {
               </div>
 
               {loading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+                ["sk-1", "sk-2", "sk-3", "sk-4"].map((skKey) => (
+                  <div key={skKey} className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
                     <div className="col-span-5 flex items-center gap-3">
                       <Skeleton className="h-4 w-4 rounded" />
                       <div className="space-y-1.5 flex-1">

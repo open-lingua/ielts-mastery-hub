@@ -23,6 +23,7 @@ import {
   tfngQuestions as defaultTfng,
   ynngQuestions as defaultYnng,
 } from "@/data/readingTestData";
+import type { FlatMCQuestion } from "@/services/readingPracticeService";
 import { cn } from "@/lib/utils";
 
 // ─── Types ──────────────────────────────────────────
@@ -35,7 +36,7 @@ interface SectionProps {
   onAnswer: (key: string, value: string) => void;
   submitted: boolean;
   tfngOverride?: typeof defaultTfng;
-  mcOverride?: typeof defaultMc;
+  mcOverride?: FlatMCQuestion[];
   ynngOverride?: typeof defaultYnng;
 }
 
@@ -68,6 +69,7 @@ const TFNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, tf
               {options.map((opt) => (
                 <button
                   key={opt}
+                  type="button"
                   onClick={() => !submitted && onAnswer(q.id, opt)}
                   disabled={submitted}
                   className={cn(
@@ -121,6 +123,7 @@ const YNNGRenderer: React.FC<SectionProps> = ({ answers, onAnswer, submitted, yn
               {options.map((opt) => (
                 <button
                   key={opt}
+                  type="button"
                   onClick={() => !submitted && onAnswer(q.id, opt)}
                   disabled={submitted}
                   className={cn(
@@ -264,8 +267,8 @@ const MatchingHeadingsRenderer: React.FC<SectionProps> = ({ data, answers, onAns
       <div className="rounded-lg border border-border bg-secondary/50 p-3 mb-4">
         <p className="text-xs font-semibold text-muted-foreground mb-2">List of Headings</p>
         <div className="space-y-1">
-          {d.headings.map((h, i) => (
-            <p key={i} className="text-xs text-foreground">
+          {d.headings.map((h) => (
+            <p key={h} className="text-xs text-foreground">
               {h}
             </p>
           ))}
@@ -318,8 +321,8 @@ const MatchingFeaturesRenderer: React.FC<SectionProps> = ({ data, answers, onAns
     <div className="space-y-2">
       <div className="rounded-lg border border-border bg-secondary/50 p-3 mb-4">
         <p className="text-xs font-semibold text-muted-foreground mb-2">List of Researchers</p>
-        {d.entities.map((e, i) => (
-          <p key={i} className="text-xs text-foreground">
+        {d.entities.map((e) => (
+          <p key={e} className="text-xs text-foreground">
             {e}
           </p>
         ))}
@@ -473,7 +476,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
 
   const renderSummary = () => {
     const parts = d.summaryText.split(/(\{\{[^}]+\}\})/);
-    return parts.map((part, i) => {
+    return parts.map((part) => {
       const match = part.match(/\{\{([^}]+)\}\}/);
       if (match) {
         const gapId = match[1];
@@ -485,7 +488,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
 
         if (d.useWordBank && d.wordBank) {
           return (
-            <Select key={i} value={val} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
+            <Select key={gapId} value={val} onValueChange={(v) => !submitted && onAnswer(key, v)} disabled={submitted}>
               <SelectTrigger
                 className={cn(
                   "inline-flex w-40 h-8 text-xs mx-1",
@@ -510,7 +513,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
 
         return (
           <Input
-            key={i}
+            key={gapId}
             value={val}
             onChange={(e) => !submitted && onAnswer(key, e.target.value)}
             disabled={submitted}
@@ -524,7 +527,7 @@ const SummaryCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAn
         );
       }
       return (
-        <span key={i} className="text-sm text-foreground">
+        <span key={part} className="text-sm text-foreground">
           {part}
         </span>
       );
@@ -640,39 +643,47 @@ const TableCompletionRenderer: React.FC<SectionProps> = ({ data, answers, onAnsw
             </tr>
           </thead>
           <tbody>
-            {d.rows.map((row, ri) => (
-              <tr key={ri} className="border-t border-border">
-                {row.cells.map((cell, ci) => (
-                  <td key={ci} className="px-4 py-2.5">
-                    {typeof cell === "string" ? (
-                      <span className="text-foreground">{cell}</span>
-                    ) : (
-                      (() => {
-                        const key = `tc_${cell.gap}`;
-                        const val = (answers[key] as string) || "";
-                        const isCorrect = val.toLowerCase().trim() === cell.answer.toLowerCase();
-                        return (
-                          <div className="space-y-1">
-                            <Input
-                              value={val}
-                              onChange={(e) => !submitted && onAnswer(key, e.target.value)}
-                              disabled={submitted}
-                              placeholder="..."
-                              className={cn(
-                                "h-8 text-sm w-full",
-                                submitted && isCorrect && "border-success bg-success/10",
-                                submitted && !isCorrect && val && "border-destructive bg-destructive/10"
-                              )}
-                            />
-                            {submitted && !isCorrect && <span className="text-xs text-destructive">{cell.answer}</span>}
-                          </div>
-                        );
-                      })()
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {d.rows.map((row) => {
+              const rowKey = row.cells.map((c) => (typeof c === "string" ? c : c.gap)).join("|");
+              return (
+                <tr key={rowKey} className="border-t border-border">
+                  {row.cells.map((cell) => {
+                    const cellKey = typeof cell === "string" ? cell : cell.gap;
+                    return (
+                      <td key={cellKey} className="px-4 py-2.5">
+                        {typeof cell === "string" ? (
+                          <span className="text-foreground">{cell}</span>
+                        ) : (
+                          (() => {
+                            const key = `tc_${cell.gap}`;
+                            const val = (answers[key] as string) || "";
+                            const isCorrect = val.toLowerCase().trim() === cell.answer.toLowerCase();
+                            return (
+                              <div className="space-y-1">
+                                <Input
+                                  value={val}
+                                  onChange={(e) => !submitted && onAnswer(key, e.target.value)}
+                                  disabled={submitted}
+                                  placeholder="..."
+                                  className={cn(
+                                    "h-8 text-sm w-full",
+                                    submitted && isCorrect && "border-success bg-success/10",
+                                    submitted && !isCorrect && val && "border-destructive bg-destructive/10"
+                                  )}
+                                />
+                                {submitted && !isCorrect && (
+                                  <span className="text-xs text-destructive">{cell.answer}</span>
+                                )}
+                              </div>
+                            );
+                          })()
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -693,8 +704,9 @@ const FlowchartCompletionRenderer: React.FC<SectionProps> = ({ data, answers, on
       <div className="space-y-0">
         {d.steps.map((step, i) => {
           const hasGap = !!step.gap;
+          const stepKey = step.gap ?? step.text;
           return (
-            <div key={i}>
+            <div key={stepKey}>
               <div className="rounded-lg border border-border bg-card p-4 flex flex-wrap items-center gap-1 text-sm text-foreground">
                 {hasGap ? (
                   (() => {
@@ -774,7 +786,11 @@ const ShortAnswerRenderer: React.FC<SectionProps> = ({ data, answers, onAnswer, 
                 )}
               />
               {val && !submitted && (
-                <button onClick={() => onAnswer(key, "")} className="text-muted-foreground hover:text-foreground">
+                <button
+                  type="button"
+                  onClick={() => onAnswer(key, "")}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="h-4 w-4" />
                 </button>
               )}
@@ -806,7 +822,7 @@ interface QuestionRendererProps {
   onAnswer: (key: string, value: string) => void;
   submitted: boolean;
   tfngOverride?: typeof defaultTfng;
-  mcOverride?: typeof defaultMc;
+  mcOverride?: FlatMCQuestion[];
   ynngOverride?: typeof defaultYnng;
 }
 

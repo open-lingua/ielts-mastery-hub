@@ -131,6 +131,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ sectionIndex, audioUrl, onEnd
     >
       {/* Hidden audio element for real playback */}
       {audioUrl && (
+        // biome-ignore lint/a11y/useMediaCaption: this component only receives a raw audio URL, no WebVTT caption track is produced by the content pipeline to attach here; the section transcript (when available) is rendered separately in the surrounding UI.
         <audio
           ref={audioRef}
           src={audioUrl}

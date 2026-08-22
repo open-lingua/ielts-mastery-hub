@@ -190,8 +190,8 @@ const AdminDashboard: React.FC = () => {
           <CardContent className="p-0">
             <div className="divide-y divide-border">
               {isLoading
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-between px-6 py-4">
+                ? ["sk-1", "sk-2", "sk-3", "sk-4"].map((skKey) => (
+                    <div key={skKey} className="flex items-center justify-between px-6 py-4">
                       <div className="flex items-center gap-4">
                         <Skeleton className="h-9 w-9 rounded-lg" />
                         <div className="space-y-1.5">

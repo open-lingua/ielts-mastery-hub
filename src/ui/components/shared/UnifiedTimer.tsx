@@ -124,6 +124,7 @@ const UnifiedTimer: React.FC<UnifiedTimerProps> = ({
           <span className={cn("font-mono text-lg font-bold tabular-nums", timerColor)}>{formattedTime}</span>
         </motion.div>
         <button
+          type="button"
           onClick={() => setMinimized(true)}
           className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-secondary"
           title="Minimize timer"
@@ -162,6 +163,7 @@ export const TimeUpOverlay: React.FC<{
             Your answers have been automatically submitted. You can now review your results.
           </p>
           <button
+            type="button"
             onClick={onDismiss}
             className="w-full rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >

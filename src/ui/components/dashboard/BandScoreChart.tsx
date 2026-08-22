@@ -35,8 +35,11 @@ const BandScoreChart: React.FC = () => {
     listUserTestSessions(userId)
       .then((all) => {
         const filtered = all
-          .filter((s) => s.status === "completed" && s.score_band !== null && s.completed_at !== null)
-          .sort((a, b) => new Date(a.completed_at!).getTime() - new Date(b.completed_at!).getTime())
+          .filter(
+            (s): s is typeof s & { score_band: number; completed_at: string } =>
+              s.status === "completed" && s.score_band !== null && s.completed_at !== null
+          )
+          .sort((a, b) => new Date(a.completed_at).getTime() - new Date(b.completed_at).getTime())
           .map((s) => ({
             test_type: s.test_type,
             score_band: s.score_band !== null ? Number(s.score_band) : null,

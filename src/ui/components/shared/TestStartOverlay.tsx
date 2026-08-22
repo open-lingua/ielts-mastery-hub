@@ -125,8 +125,8 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
                     Instructions
                   </h3>
                   <ul className="space-y-1.5">
-                    {rules.map((rule, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    {rules.map((rule) => (
+                      <li key={rule} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary/50 shrink-0" />
                         {rule}
                       </li>

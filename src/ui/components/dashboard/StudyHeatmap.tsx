@@ -11,6 +11,7 @@ import { listUserTestSessions } from "@/lib/tauri";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 const INTENSITY_CLASSES: Record<number, string> = {
   0: "bg-secondary",
@@ -175,11 +176,11 @@ const StudyHeatmap: React.FC = () => {
               ))}
               <TooltipProvider delayDuration={100}>
                 {loading
-                  ? Array.from({ length: 53 }).map((_, i) => (
-                      <div key={i} className="flex flex-col gap-[3px]">
-                        {Array.from({ length: 7 }).map((_, j) => (
+                  ? Array.from({ length: 53 }, (_, i) => `col-${i}`).map((colKey, i) => (
+                      <div key={colKey} className="flex flex-col gap-[3px]">
+                        {Array.from({ length: 7 }, (_, j) => `row-${j}`).map((rowKey, j) => (
                           <Skeleton
-                            key={j}
+                            key={rowKey}
                             className="w-[10px] h-[10px] rounded-sm"
                             style={{ animationDelay: `${(i * 7 + j) * 5}ms` }}
                           />
@@ -188,14 +189,17 @@ const StudyHeatmap: React.FC = () => {
                     ))
                   : weeks.map((week, weekIndex) => (
                       <motion.div
-                        key={weekIndex}
+                        key={week[0]?.dateString ?? week.find((d) => d)?.dateString ?? `week-${weekIndex}`}
                         initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: weekIndex * 0.008 }}
                         className="flex flex-col gap-[3px]"
                       >
                         {week.map((day, dayIndex) => {
-                          if (!day) return <div key={`empty-${dayIndex}`} className="w-[10px] h-[10px]" />;
+                          if (!day) {
+                            const weekdayKey = WEEKDAY_KEYS[dayIndex];
+                            return <div key={`empty-${weekdayKey}`} className="w-[10px] h-[10px]" />;
+                          }
                           return (
                             <Tooltip key={day.dateString}>
                               <TooltipTrigger asChild>

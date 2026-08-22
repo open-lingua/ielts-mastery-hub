@@ -69,8 +69,8 @@ const TaskFeedback: React.FC<{ label: string; result: WritingGradingResult }> = 
           <CheckCircle className="h-3.5 w-3.5" /> Strengths
         </h4>
         <ul className="space-y-1">
-          {result.feedback.strengths.map((s, i) => (
-            <li key={i} className="text-sm text-muted-foreground flex gap-2">
+          {result.feedback.strengths.map((s) => (
+            <li key={s} className="text-sm text-muted-foreground flex gap-2">
               <CheckCircle className="h-3.5 w-3.5 mt-0.5 text-success shrink-0" />
               {s}
             </li>
@@ -84,8 +84,8 @@ const TaskFeedback: React.FC<{ label: string; result: WritingGradingResult }> = 
           <AlertTriangle className="h-3.5 w-3.5" /> Areas for Improvement
         </h4>
         <ul className="space-y-1">
-          {result.feedback.weaknesses.map((w, i) => (
-            <li key={i} className="text-sm text-muted-foreground flex gap-2">
+          {result.feedback.weaknesses.map((w) => (
+            <li key={w} className="text-sm text-muted-foreground flex gap-2">
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 text-warning shrink-0" />
               {w}
             </li>
@@ -132,6 +132,7 @@ const WritingResultsDashboard: React.FC<Props> = ({
             <p className="text-primary-foreground/70 text-sm mt-1">{testTitle} · Powered by AI</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-full bg-primary-foreground/10 p-2 hover:bg-primary-foreground/20 transition-colors"
           >
@@ -159,7 +160,7 @@ const WritingResultsDashboard: React.FC<Props> = ({
           {/* Overall band */}
           <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col items-center gap-2">
             <motion.div variants={fadeUp} className="relative h-32 w-32">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -197,18 +198,21 @@ const WritingResultsDashboard: React.FC<Props> = ({
         {/* Footer */}
         <div className="border-t border-border bg-secondary/50 p-4 flex justify-end gap-3 shrink-0">
           <button
+            type="button"
             onClick={onBackToLibrary}
             className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Practice Library
           </button>
           <button
+            type="button"
             onClick={onClose}
             className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Review Essays
           </button>
           <button
+            type="button"
             onClick={onReset}
             className="px-5 py-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >

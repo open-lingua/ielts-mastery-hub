@@ -19,6 +19,6 @@ window.ResizeObserver = class {
   observe() {}
   unobserve() {}
   disconnect() {}
-} as any;
+} as unknown as typeof ResizeObserver;
 
 Element.prototype.scrollIntoView = () => {};

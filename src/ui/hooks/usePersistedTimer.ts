@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface UsePersistedTimerOptions {
   /** Total allowed time in seconds */
@@ -28,13 +28,13 @@ export function usePersistedTimer({
   onTimeUp,
   isFinished = false,
 }: UsePersistedTimerOptions): UsePersistedTimerReturn {
-  const calcRemaining = () => {
+  const calcRemaining = useCallback(() => {
     if (!startedAt) return totalSeconds;
     const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
     return Math.max(0, totalSeconds - elapsed);
-  };
+  }, [startedAt, totalSeconds]);
 
-  const initialRemaining = useMemo(calcRemaining, [startedAt, totalSeconds]);
+  const initialRemaining = useMemo(calcRemaining, [calcRemaining]);
   const [remainingSeconds, setRemainingSeconds] = useState(initialRemaining);
   const expiredOnLoad = useMemo(() => !!startedAt && initialRemaining <= 0, [startedAt, initialRemaining]);
   const firedRef = useRef(false);

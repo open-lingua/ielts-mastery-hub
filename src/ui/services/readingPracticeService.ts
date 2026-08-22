@@ -566,44 +566,44 @@ export function extractCorrectAnswers(
           }
         }
       }
-      if ("sentences" in d && Array.isArray((d as any).sentences)) {
-        for (const s of (d as any).sentences) {
+      if ("sentences" in d && Array.isArray(d.sentences)) {
+        for (const s of d.sentences) {
           if (s.gap && s.answer) {
             results.push({ key: s.gap, answer: s.answer });
           }
         }
       }
-      if ("gaps" in d && Array.isArray((d as any).gaps)) {
-        for (const g of (d as any).gaps) {
+      if ("gaps" in d && Array.isArray(d.gaps)) {
+        for (const g of d.gaps) {
           if (g.id && g.answer) {
             results.push({ key: g.id, answer: g.answer });
           }
         }
       }
-      if ("notes" in d && Array.isArray((d as any).notes)) {
-        for (const n of (d as any).notes) {
+      if ("notes" in d && Array.isArray(d.notes)) {
+        for (const n of d.notes) {
           if (n.gap && n.answer) {
             results.push({ key: n.gap, answer: n.answer });
           }
         }
       }
-      if ("steps" in d && Array.isArray((d as any).steps)) {
-        for (const s of (d as any).steps) {
+      if ("steps" in d && Array.isArray(d.steps)) {
+        for (const s of d.steps) {
           if (s.gap && s.answer) {
             results.push({ key: s.gap, answer: s.answer });
           }
         }
       }
-      if ("questions" in d && Array.isArray((d as any).questions)) {
-        for (const q of (d as any).questions) {
+      if ("questions" in d && Array.isArray(d.questions)) {
+        for (const q of d.questions) {
           if (q.label && q.answer) {
             results.push({ key: q.label, answer: q.answer, acceptedAnswers: q.acceptedAnswers });
           }
         }
       }
       // Table completion
-      if ("rows" in d && Array.isArray((d as any).rows)) {
-        for (const row of (d as any).rows) {
+      if ("rows" in d && Array.isArray(d.rows)) {
+        for (const row of d.rows) {
           if (row.cells) {
             for (const cell of row.cells) {
               if (typeof cell === "object" && cell.gap && cell.answer) {

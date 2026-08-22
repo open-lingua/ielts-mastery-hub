@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { PreviewProps } from "../TestPreviewModal";
 
@@ -6,12 +7,15 @@ import type { PreviewProps } from "../TestPreviewModal";
 // For a minimal smoke test, we verify the module can be imported without error
 
 // TestPreviewModal is a named export, not default
-let TestPreviewModal: any;
+let TestPreviewModal: React.ComponentType<PreviewProps>;
 
 beforeAll(async () => {
-  const mod = await import("../TestPreviewModal");
+  const mod = (await import("../TestPreviewModal")) as {
+    default?: React.ComponentType<PreviewProps>;
+    TestPreviewModal?: React.ComponentType<PreviewProps>;
+  };
   // It could be either default or named — grab whichever exists
-  TestPreviewModal = (mod as any).default || (mod as any).TestPreviewModal;
+  TestPreviewModal = (mod.default || mod.TestPreviewModal) as React.ComponentType<PreviewProps>;
 });
 
 describe("TestPreviewModal", () => {

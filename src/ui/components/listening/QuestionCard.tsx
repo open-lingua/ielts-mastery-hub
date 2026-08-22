@@ -52,6 +52,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, index, answer, on
         <div className="space-y-2">
           {question.options?.map((opt) => (
             <button
+              type="button"
               key={opt}
               onClick={() => !submitted && onAnswer(opt)}
               disabled={submitted}
@@ -76,6 +77,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, index, answer, on
           <div className="space-y-2">
             {question.matchOptions.right.map((opt) => (
               <button
+                type="button"
                 key={opt}
                 onClick={() => {
                   if (submitted) return;

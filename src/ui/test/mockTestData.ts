@@ -8,13 +8,13 @@ export const mockStudentUser = {
   id: "user-student-001",
   email: "student@test.com",
   user_metadata: { full_name: "Jane Doe" },
-} as any;
+};
 
 export const mockAdminUser = {
   id: "user-admin-001",
   email: "admin@test.com",
   user_metadata: { full_name: "Admin Smith" },
-} as any;
+};
 
 export const mockProfile = {
   full_name: "Jane Doe",

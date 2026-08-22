@@ -81,6 +81,8 @@ export function usePagination({
       },
       { replace: true }
     );
+    // resetKey itself isn't read above; it's only a trigger to re-run this effect (and thus reset the page) whenever it changes.
+    void resetKey;
   }, [resetKey]);
 
   return { page, pageSize, setPage };

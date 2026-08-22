@@ -39,6 +39,7 @@ const ExamSandbox: React.FC<ExamSandboxProps> = ({ children, className, enabled 
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: this wrapper only intercepts browser default context-menu/copy behavior for exam security, it introduces no user-facing interactive widget, so no ARIA role applies.
     <div
       ref={ref}
       className={className}

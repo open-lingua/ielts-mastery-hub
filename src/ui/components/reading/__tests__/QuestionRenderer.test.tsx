@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import type { QuestionSection } from "@/data/readingTestData";
 
 vi.mock("@/data/readingTestData", () => ({
   tfngQuestions: [{ id: "tfng1", label: "1", text: "The sky is blue.", answer: "TRUE" }],
@@ -21,13 +22,13 @@ import { QuestionRenderer } from "../QuestionRenderer";
 const tfngSection = {
   title: "Questions 1",
   instructions: "Do the following statements agree?",
-  data: { id: "s1", type: "TRUE_FALSE_NOT_GIVEN" } as any,
+  data: { id: "s1", type: "TRUE_FALSE_NOT_GIVEN" } as QuestionSection,
 };
 
 const ynngSection = {
   title: "Questions 10",
   instructions: "Do the following statements agree?",
-  data: { id: "s2", type: "YES_NO_NOT_GIVEN" } as any,
+  data: { id: "s2", type: "YES_NO_NOT_GIVEN" } as QuestionSection,
 };
 
 describe("QuestionRenderer (TFNG)", () => {

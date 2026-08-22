@@ -149,8 +149,9 @@ const ReadingModule: React.FC = () => {
             }
           }
         }
-      } catch (err: any) {
-        setFetchError(err.message || "Failed to load reading test");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load reading test";
+        setFetchError(message);
         toast.error("Failed to load reading test");
       } finally {
         setIsLoading(false);
@@ -329,6 +330,7 @@ const ReadingModule: React.FC = () => {
                   {passages.map((p, idx) => (
                     <button
                       key={p.id}
+                      type="button"
                       onClick={() => handlePassageChange(idx)}
                       className={cn(
                         "flex items-center gap-1.5 flex-1 justify-center rounded-md px-3 py-1.5 text-xs font-medium transition-all",
@@ -473,8 +475,8 @@ const ReadingModule: React.FC = () => {
                         </Badge>
                       </div>
                       <h2 className="text-2xl font-serif font-bold text-foreground mb-6">{currentPassage.title}</h2>
-                      {currentPassage.passage.split("\n\n").map((para, i) => (
-                        <p key={i} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">
+                      {currentPassage.passage.split("\n\n").map((para) => (
+                        <p key={para} className="text-base font-serif leading-[1.9] text-foreground/90 mb-6">
                           {para}
                         </p>
                       ))}
@@ -507,7 +509,7 @@ const ReadingModule: React.FC = () => {
                       className="space-y-6"
                     >
                       {currentPassage.sections.map((section, i) => (
-                        <React.Fragment key={i}>
+                        <React.Fragment key={section.data.id}>
                           {i > 0 && <Separator className="my-2" />}
                           <QuestionRenderer
                             section={section}
@@ -516,7 +518,7 @@ const ReadingModule: React.FC = () => {
                             submitted={submitted}
                             tfngOverride={passageOverrides[activePassage]?.tfng}
                             ynngOverride={passageOverrides[activePassage]?.ynng}
-                            mcOverride={passageOverrides[activePassage]?.mc as any}
+                            mcOverride={passageOverrides[activePassage]?.mc}
                           />
                         </React.Fragment>
                       ))}
@@ -534,6 +536,7 @@ const ReadingModule: React.FC = () => {
                         <Tooltip key={qNum}>
                           <TooltipTrigger asChild>
                             <button
+                              type="button"
                               onClick={() => handlePassageChange(passageIdx)}
                               className={cn(
                                 "h-6 w-6 rounded text-[10px] font-bold transition-all",

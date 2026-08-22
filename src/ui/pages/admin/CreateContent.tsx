@@ -1110,7 +1110,7 @@ const ReadingCreator: React.FC<{
               const status = getPassageStatus(p);
               const qCount = p.questionGroups.reduce((a, g) => a + g.questions.length, 0);
               return (
-                <Badge key={idx} variant="outline" className="text-[10px] gap-1">
+                <Badge key={p.id} variant="outline" className="text-[10px] gap-1">
                   <span
                     className={cn(
                       "h-1.5 w-1.5 rounded-full inline-block",
@@ -1133,6 +1133,7 @@ const ReadingCreator: React.FC<{
             return (
               <button
                 key={meta.id}
+                type="button"
                 onClick={() => setActivePassage(idx)}
                 className={cn(
                   "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all flex-1 justify-center min-w-0",
@@ -1301,6 +1302,7 @@ const ListeningSectionEditor: React.FC<{
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{section.audioFileName}</p>
+                  {/* biome-ignore lint/a11y/useMediaCaption: this is an admin-side preview of a just-uploaded raw audio file, no transcript/caption track exists yet at this stage of content creation. */}
                   <audio src={section.audioPreviewUrl} controls className="w-full mt-1 h-8" />
                 </div>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive shrink-0" onClick={clearAudio}>
@@ -1309,14 +1311,15 @@ const ListeningSectionEditor: React.FC<{
               </div>
             </div>
           ) : (
-            <div
-              className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+            <button
+              type="button"
+              className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer w-full"
               onClick={() => audioInputRef.current?.click()}
             >
               <Upload className="h-6 w-6 text-muted-foreground" />
               <p className="text-xs text-muted-foreground text-center">Drag & drop audio or click to browse</p>
               <p className="text-[10px] text-muted-foreground">MP3, WAV up to 50MB</p>
-            </div>
+            </button>
           )}
         </CardContent>
       </Card>
@@ -1461,6 +1464,7 @@ const ListeningCreator: React.FC<{
             return (
               <button
                 key={meta.id}
+                type="button"
                 onClick={() => setActiveSection(idx)}
                 className={cn(
                   "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all flex-1 justify-center min-w-0",
@@ -1580,6 +1584,7 @@ const WritingCreator: React.FC<{
         <Label className="text-sm font-semibold">Task Type</Label>
         <div className="inline-flex items-center rounded-lg bg-muted p-1">
           <button
+            type="button"
             onClick={() => setActiveIndex(0)}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
@@ -1589,6 +1594,7 @@ const WritingCreator: React.FC<{
             Task 1 – Visual
           </button>
           <button
+            type="button"
             onClick={() => setActiveIndex(1)}
             className={cn(
               "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
@@ -1677,14 +1683,15 @@ const WritingCreator: React.FC<{
                       </Button>
                     </div>
                   ) : (
-                    <div
-                      className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                    <button
+                      type="button"
+                      className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer w-full"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <ImageIcon className="h-8 w-8 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">Upload chart, graph, or diagram</p>
                       <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
-                    </div>
+                    </button>
                   )}
                 </div>
               )}
@@ -1970,10 +1977,10 @@ const CreateContent: React.FC = () => {
       if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Failed to save test",
-        description: err?.message || "An unexpected error occurred.",
+        description: err instanceof Error ? err.message : "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -2022,10 +2029,10 @@ const CreateContent: React.FC = () => {
       if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Failed to save writing test",
-        description: err?.message || "An unexpected error occurred.",
+        description: err instanceof Error ? err.message : "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -2070,10 +2077,10 @@ const CreateContent: React.FC = () => {
       if (status === "published" || effectiveEditId) {
         navigate("/admin/content");
       }
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Failed to save listening test",
-        description: err?.message || "An unexpected error occurred.",
+        description: err instanceof Error ? err.message : "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -2111,6 +2118,7 @@ const CreateContent: React.FC = () => {
             return (
               <button
                 key={tab}
+                type="button"
                 onClick={() => handleTabChange(tab)}
                 className={cn(
                   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-all capitalize",

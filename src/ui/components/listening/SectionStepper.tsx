@@ -20,13 +20,13 @@ const SectionStepper: React.FC<SectionStepperProps> = ({
 }) => {
   return (
     <div className="flex items-center gap-1 w-full">
-      {Array.from({ length: totalSections }).map((_, i) => {
+      {Array.from({ length: totalSections }, (_, i) => `section-${i}`).map((sectionKey, i) => {
         const isCompleted = completedSections[i];
         const isActive = activeSection === i;
         const isUnlocked = unlockedSections[i];
 
         return (
-          <React.Fragment key={i}>
+          <React.Fragment key={sectionKey}>
             {i > 0 && (
               <div
                 className={cn(

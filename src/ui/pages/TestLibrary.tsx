@@ -319,6 +319,7 @@ const TestLibrary: React.FC = () => {
             {tabs.map((tab) => (
               <button
                 key={tab}
+                type="button"
                 onClick={() => setActiveTab(tab)}
                 className={cn(
                   "inline-flex items-center justify-center whitespace-nowrap rounded-md px-5 py-1.5 text-sm font-medium transition-all",
@@ -334,6 +335,7 @@ const TestLibrary: React.FC = () => {
 
           {/* Unresolved Filter */}
           <button
+            type="button"
             onClick={() => setUnresolvedOnly((prev) => !prev)}
             className={cn(
               "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all",
@@ -367,8 +369,8 @@ const TestLibrary: React.FC = () => {
         {/* Timeline */}
         <div ref={listTopRef} className="relative ml-4 md:ml-6 border-l-2 border-border space-y-8 pb-10">
           {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="relative pl-8 md:pl-10">
+            ["sk-1", "sk-2", "sk-3", "sk-4"].map((skKey) => (
+              <div key={skKey} className="relative pl-8 md:pl-10">
                 <div className="absolute -left-[9px] top-8 h-4 w-4 rounded-full bg-muted" />
                 <TestCardSkeleton />
               </div>

@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    name: Frontend (Linux) - Lint, Test & Build
+    name: Frontend - Lint, Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,11 +18,12 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm install
+      - run: npm run lint
       - run: npm run test
       - run: npm run build
 
   backend:
-    name: Backend (Linux) - Rust Tests
+    name: Backend - Rust Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

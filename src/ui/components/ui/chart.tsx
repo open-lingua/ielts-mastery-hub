@@ -67,6 +67,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: generates a <style> tag from typed, developer-provided chart config (CSS custom properties only, no user-supplied HTML/script), which is the only way to inject raw CSS text via React.
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
