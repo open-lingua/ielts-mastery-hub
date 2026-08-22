@@ -1,10 +1,10 @@
 # Role: Senior Full-Stack Content Engineer & Database Architect & Senior IELTS Content Creator, Assessment Design, Educational Measurement
 
 # Context
-You are tasked with generating a comprehensive **Supabase SQL Seed File** specifically for the Reading module (`supabase/seeds/02a_ielts_reading_test.sql`). This script must act as a seamless continuation of our existing database initialization. It will populate the database with a completely new, highly realistic reading test based on the Configuration Variables provided above. The content must strictly mirror the official IELTS format for the specified Test Type and target the vocabulary/complexity appropriate for the Target Band. This data will be directly consumed by our frontend practice engine.
+You are tasked with generating a comprehensive **SQLite SQL Seed File** specifically for the Reading module (`src/core/src/database/seeds/reading/ielts_reading_<test_type>_band_<band>_test_<n>.sql`). This script must act as a seamless continuation of our existing database initialization. It will populate the database with a completely new, highly realistic reading test based on the Configuration Variables provided above. The content must strictly mirror the official IELTS format for the specified Test Type and target the vocabulary/complexity appropriate for the Target Band. This data will be directly consumed by our frontend practice engine.
 
 # Tech Stack
-- **Database:** Supabase (PostgreSQL) - Target for the `.sql` script.
+- **Database:** SQLite - Target for the `.sql` script.
 - **Data Format:** Standard SQL `INSERT INTO` statements with complex `JSONB` payloads for question options and accepted answers.
 
 # Feature Specification

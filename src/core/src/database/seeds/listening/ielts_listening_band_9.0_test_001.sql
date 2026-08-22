@@ -1,6 +1,6 @@
 -- ============================================================
--- Supabase Seed: IELTS Listening Test (Band 9)
--- Target: supabase/seeds/02b_ielts_listening_test.sql
+-- IELTS Practice Platform – Seed Data
+-- Target: Listening Module (Band 9 Difficulty)
 -- Description: Expert-level listening test featuring dense 
 -- academic vocabulary, rapid corrections, and subtle implications.
 -- ============================================================

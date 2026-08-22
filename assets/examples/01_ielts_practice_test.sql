@@ -1,9 +1,10 @@
 -- ============================================================
 -- IELTS Practice Platform – Comprehensive Seed Data
--- Run: supabase db reset   (applies migrations then this seed)
+-- Run: sqlite3 <db-path> < 01_ielts_practice_test.sql   (after applying migrations)
 -- ============================================================
 -- NOTE: `created_by` uses a placeholder UUID. After seeding,
--- update it to a real user's auth.uid() so RLS allows access:
+-- update it to a real user id so the app associates this content
+-- with the correct user:
 --   UPDATE reading_tests  SET created_by = '<your-uid>';
 --   UPDATE listening_tests SET created_by = '<your-uid>';
 --   UPDATE writing_tests  SET created_by = '<your-uid>';

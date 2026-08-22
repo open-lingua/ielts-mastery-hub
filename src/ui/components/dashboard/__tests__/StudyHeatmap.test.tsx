@@ -5,21 +5,6 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),
 }));
 
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          order: () => Promise.resolve({ data: [] }),
-          gte: () => ({
-            lte: () => Promise.resolve({ data: [] }),
-          }),
-        }),
-      }),
-    }),
-  },
-}));
-
 import StudyHeatmap from "../StudyHeatmap";
 
 describe("StudyHeatmap", () => {

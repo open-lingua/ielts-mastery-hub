@@ -1,10 +1,7 @@
 name: Release
 
 # Builds and publishes cross-platform desktop binaries whenever a GitHub
-# Release is published. Requires the following repository secrets to be
-# configured (see RELEASES.md for details):
-#   - VITE_SUPABASE_URL
-#   - VITE_SUPABASE_PUBLISHABLE_KEY
+# Release is published. See RELEASES.md for details.
 #
 # NOTE: ubuntu-22.04-arm / windows-11-arm are native GitHub-hosted ARM64
 # runners. On private repositories these require a GitHub plan that grants
@@ -89,8 +86,6 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           DATABASE_URL: sqlite:dev.db
         with:
           projectPath: src/core

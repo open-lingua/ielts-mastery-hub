@@ -23,13 +23,12 @@ Tauri@2 + React@19 desktop IELTS prep app. Rust backend (`src/core`), TypeScript
 │       │   ├── ui/                  # Base design-system primitives (shadcn)
 │       │   └── {feature}/           # admin, dashboard, listening, reading, writing, shared
 │       ├── pages/                   # Route-level components
-│       ├── services/                # Business logic + Tauri/Supabase calls
+│       ├── services/                # Business logic + Tauri IPC calls
 │       ├── hooks/                   # Shared custom hooks
 │       ├── lib/
 │       │   ├── tauri.ts             # ⚠️ ONLY place to call invoke()
 │       │   └── utils.ts
-│       ├── contexts/                # React context providers
-│       └── integrations/supabase/   # Supabase client & generated types
+│       └── contexts/                # React context providers
 └── website/                         # Docusaurus public site (independent)
 ```
 

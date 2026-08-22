@@ -5,24 +5,6 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),
 }));
 
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          eq: () => ({
-            not: () => ({
-              not: () => ({
-                order: () => Promise.resolve({ data: [] }),
-              }),
-            }),
-          }),
-        }),
-      }),
-    }),
-  },
-}));
-
 import BandScoreChart from "../BandScoreChart";
 
 describe("BandScoreChart", () => {

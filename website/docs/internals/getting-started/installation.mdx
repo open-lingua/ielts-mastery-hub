@@ -41,7 +41,7 @@ AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL
 ```
 
 :::warning Never commit real API keys
-Use `.env.local` (already gitignored) rather than committing secrets into `.env` or source-controlled config. The repository's tracked `.env.example` currently only documents legacy Supabase-related variables (`VITE_SUPABASE_*`) inherited from an earlier integration — the AI grading variables above are the ones actually consumed by the Writing module today.
+Use `.env.local` (already gitignored) rather than committing secrets into `.env` or source-controlled config.
 :::
 
 Backend-only secrets (if any are introduced) belong in `src/core/.env` and must never be exposed to the frontend — see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md).

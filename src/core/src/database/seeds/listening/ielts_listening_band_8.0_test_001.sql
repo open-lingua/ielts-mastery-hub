@@ -1,6 +1,6 @@
 -- ============================================================
--- Supabase Seed: IELTS Listening Test (Band 8)
--- Target: supabase/seeds/02b_ielts_listening_test.sql
+-- IELTS Practice Platform – Seed Data
+-- Target: Listening Module (Band 8 Difficulty)
 -- Description: Advanced listening test featuring complex 
 -- paraphrasing, rapid speech patterns, and technical vocabulary.
 -- ============================================================

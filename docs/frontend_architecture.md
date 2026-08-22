@@ -111,8 +111,8 @@ src/
 │   ├── ListeningModule.tsx   # Listening practice engine
 │   ├── TestLibrary.tsx       # Browse available tests
 │   └── NotFound.tsx          # 404 fallback
-├── services/                # Data access layer (Supabase queries)
-│   ├── aiGradingService.ts           # Edge Function calls for AI grading
+├── services/                # Data access layer (Tauri IPC calls)
+│   ├── aiGradingService.ts           # Calls Tauri command for AI grading
 │   ├── contentService.ts             # Admin CRUD for test content
 │   ├── practiceLibraryService.ts     # Fetch published tests for library
 │   ├── listeningService.ts           # Listening test CRUD

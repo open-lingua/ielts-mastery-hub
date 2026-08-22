@@ -1,10 +1,10 @@
 # Role: Senior Full-Stack Content Engineer & Database Architect & Senior IELTS Content Creator, Assessment Design, Educational Measurement
 
 # Context
-You are tasked with generating a comprehensive **Supabase SQL Seed File** specifically for the Writing module (`supabase/seeds/02c_ielts_writing_test.sql`). It will populate the database with a completely new writing test based on the Configuration Variables. The prompts generated must accurately reflect the distinction between Academic and General Training, and the complexity of the task should align with the Target Band.
+You are tasked with generating a comprehensive **SQLite SQL Seed File** specifically for the Writing module (`src/core/src/database/seeds/writing/ielts_writing_<test_type>_band_<band>_test_<n>.sql`). It will populate the database with a completely new writing test based on the Configuration Variables. The prompts generated must accurately reflect the distinction between Academic and General Training, and the complexity of the task should align with the Target Band.
 
 # Tech Stack
-- **Database:** Supabase (PostgreSQL) - Target for the `.sql` script.
+- **Database:** SQLite - Target for the `.sql` script.
 - **Data Format:** Standard SQL `INSERT INTO` statements.
 
 # Feature Specification
