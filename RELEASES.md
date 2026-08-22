@@ -16,13 +16,20 @@ release.
 > (`ubuntu-22.04-arm`, `windows-11-arm`). On private repositories, access to these runners
 > requires a GitHub plan that supports ARM64-hosted runners (e.g. Team/Enterprise).
 
-The workflow requires these repository secrets (**Settings → Secrets and variables → Actions**)
-to be configured so the frontend build embeds working Supabase credentials:
+The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically by GitHub Actions)
+— no additional repository secrets need to be configured.
 
-| Secret                          | Purpose                                   |
-|----------------------------------|--------------------------------------------|
-| `VITE_SUPABASE_URL`               | Supabase project URL, baked into the build |
-| `VITE_SUPABASE_PUBLISHABLE_KEY`   | Supabase publishable/anon key, baked into the build |
+## Known issues / accepted risks
+
+- **`image-size` DoS advisories in the `website/` docs site (GHSA-w3rx-r6r6-pgpr, GHSA-5p2g-fcmc-qvqq):**
+  `@docusaurus/mdx-loader` depends on `image-size@2.0.2` (the latest published version), which has
+  two open infinite-loop DoS advisories with no patched release available upstream as of this
+  writing. This cascades into most first-party Docusaurus packages being flagged by `npm audit`
+  (`@docusaurus/core`, `preset-classic`, theme/plugin packages, `@easyops-cn/docusaurus-search-local`,
+  etc.), but none of those packages have independent vulnerabilities of their own. `image-size` is
+  only invoked at **build time** against **repo-controlled** markdown/image assets, not
+  attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
+  Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
 ### 1.0.0-beta.11 / 2026.08.21
 
