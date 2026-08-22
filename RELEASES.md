@@ -3,6 +3,27 @@
 Binary releases can be downloaded manually at:
 https://github.com/open-lingua/ielts-mastery-hub/releases
 
+## Release automation
+
+Publishing a GitHub Release (`release: published`) triggers
+[`.github/workflows/release.yml`](.github/workflows/release.yml), which builds the desktop app
+for macOS (Apple Silicon + Intel), Linux (x64 + ARM64), and Windows (x64 + ARM64) in parallel and
+uploads the resulting installers (`.dmg`, `.deb`, `.rpm`, `.AppImage`, `.msi`, NSIS `-setup.exe`)
+as assets on that release automatically — no manual steps required beyond tagging/publishing the
+release.
+
+> **Note:** Linux ARM64 and Windows ARM64 builds run on native GitHub-hosted ARM64 runners
+> (`ubuntu-22.04-arm`, `windows-11-arm`). On private repositories, access to these runners
+> requires a GitHub plan that supports ARM64-hosted runners (e.g. Team/Enterprise).
+
+The workflow requires these repository secrets (**Settings → Secrets and variables → Actions**)
+to be configured so the frontend build embeds working Supabase credentials:
+
+| Secret                          | Purpose                                   |
+|----------------------------------|--------------------------------------------|
+| `VITE_SUPABASE_URL`               | Supabase project URL, baked into the build |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`   | Supabase publishable/anon key, baked into the build |
+
 ### 1.0.0-beta.11 / 2026.08.21
 
 - docs: disable sidebar autoCollapseCategories to keep both sections open

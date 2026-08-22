@@ -1,0 +1,98 @@
+name: Release
+
+# Builds and publishes cross-platform desktop binaries whenever a GitHub
+# Release is published. Requires the following repository secrets to be
+# configured (see RELEASES.md for details):
+#   - VITE_SUPABASE_URL
+#   - VITE_SUPABASE_PUBLISHABLE_KEY
+#
+# NOTE: ubuntu-22.04-arm / windows-11-arm are native GitHub-hosted ARM64
+# runners. On private repositories these require a GitHub plan that grants
+# access to ARM64-hosted runners (e.g. Team/Enterprise); on public repos or
+# accounts with access they work out of the box with no extra configuration.
+# on:
+#   release:
+#     types: [published]
+
+# permissions:
+#   contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - platform: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+          - platform: windows-11-arm
+            target: aarch64-pc-windows-msvc
+
+    runs-on: ${{ matrix.platform }}
+    name: Build (${{ matrix.target }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/krypton
+
+      - name: Install system dependencies (Tauri 2 / Linux)
+        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libxdo-dev \
+            patchelf \
+            sqlite3
+
+      - name: Install sqlite3 CLI (Windows)
+        if: matrix.platform == 'windows-latest' || matrix.platform == 'windows-11-arm'
+        run: choco install sqlite --no-progress -y
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src/core -> target"
+          shared-key: "release-${{ matrix.target }}-${{ hashFiles('src/core/Cargo.lock') }}"
+          cache-on-failure: true
+
+      - name: Install frontend dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Prepare SQLite database (for sqlx compile-time macros)
+        working-directory: src/core
+        shell: bash
+        run: |
+          for f in $(ls src/database/migrations/*.sql | sort); do
+            sqlite3 dev.db < "$f"
+          done
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          DATABASE_URL: sqlite:dev.db
+        with:
+          projectPath: src/core
+          releaseId: ${{ github.event.release.id }}
+          args: --target ${{ matrix.target }}
