@@ -39,7 +39,7 @@ export function useVersionCheck(): VersionCheckResult {
   const currentVersion = __APP_VERSION__;
 
   // Hardcoded placeholders until the real LTS-check API is wired up.
-  const hasUpdate = true;
+  const hasUpdate = false;
   const latestVersion = "1.1.0";
 
   const onUpdate = () => {
