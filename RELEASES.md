@@ -73,6 +73,35 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.16](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.15...1.0.0-beta.16) (2026-08-23)
+
+
+### Features
+
+* add IELTS academic reading seed — Band 6.0 test 001 ([89dc0d5](https://github.com/open-lingua/ielts-mastery-hub/commit/89dc0d58165604c95adb518cb716ccbf213e9bfa))
+* add IELTS academic reading seed — Band 6.0 test 002 ([dc56666](https://github.com/open-lingua/ielts-mastery-hub/commit/dc56666005ad23084cbc7fcd7818fa3e99d1045a))
+* add IELTS academic reading seed — Band 7.0 test 002 ([b41f3e5](https://github.com/open-lingua/ielts-mastery-hub/commit/b41f3e54ee0bd0f6540f37c1e918c35474909329))
+* add IELTS academic reading seed — Band 7.0 test 003 ([628e6db](https://github.com/open-lingua/ielts-mastery-hub/commit/628e6db6e673fedbfefc42355caef3e305451213))
+* add IELTS academic reading seed — Band 8.0 test 002 ([0aa4419](https://github.com/open-lingua/ielts-mastery-hub/commit/0aa44194453210259aa0573ec6b76e71fb29f90f))
+* add IELTS academic reading seed — Band 8.0 test 003 ([688c365](https://github.com/open-lingua/ielts-mastery-hub/commit/688c365d6c4a59c6081d3db23e3e3b39c4a6bbb7))
+* add IELTS academic reading seed — Band 9.0 test 002 ([d7932de](https://github.com/open-lingua/ielts-mastery-hub/commit/d7932ded13d8747766e4279a8f5ccf8250ef6578))
+* add IELTS general training reading seed — Band 6.0 test 001 ([87eaed4](https://github.com/open-lingua/ielts-mastery-hub/commit/87eaed45ba6425ed62cb16530691e8755815e1bf))
+* add IELTS general training reading seed — Band 6.0 test 002 ([0be9649](https://github.com/open-lingua/ielts-mastery-hub/commit/0be9649b7ed0dde72f25a0bb5d24f9ab4a0de1d0))
+* add IELTS general training reading seed — Band 7.0 test 001 ([958a23e](https://github.com/open-lingua/ielts-mastery-hub/commit/958a23ee3e1696960a266b5746e0b9d0e8ad0ae3))
+* add IELTS general training reading seed — Band 7.0 test 002 ([4e2c817](https://github.com/open-lingua/ielts-mastery-hub/commit/4e2c8171682bd77939c7c0e48f2e8d82667793ec))
+* add IELTS general training reading seed — Band 7.0 test 003 ([075795d](https://github.com/open-lingua/ielts-mastery-hub/commit/075795d414a79ba911078ea9910c5cd28407b9a5))
+* add IELTS general training reading seed — Band 8.0 test 001 ([ee35993](https://github.com/open-lingua/ielts-mastery-hub/commit/ee3599315e181e215aeca42d14dd09c14c877532))
+* add IELTS general training reading seed — Band 8.0 test 002 ([2a3ec08](https://github.com/open-lingua/ielts-mastery-hub/commit/2a3ec0842082d14d2a8cda95d8c6fa329caf02bb))
+* add IELTS general training reading seed — Band 8.0 test 003 ([1b72358](https://github.com/open-lingua/ielts-mastery-hub/commit/1b72358361cc4efa119c835e720491cc33df7cfb))
+* add IELTS general training reading seed — Band 9.0 test 001 ([37aa8f5](https://github.com/open-lingua/ielts-mastery-hub/commit/37aa8f57eaf21c17bf407083e77bbc82d45d7f86))
+* add IELTS general training reading seed — Band 9.0 test 002 ([64bc1c3](https://github.com/open-lingua/ielts-mastery-hub/commit/64bc1c35158147c1c287a439f48590ba5f2613b1))
+
+
+### Chores
+
+* mark scripts directory as linguist-generated ([faea49a](https://github.com/open-lingua/ielts-mastery-hub/commit/faea49a2f7488574bce6bb5f2d53d0a9a961d9ea))
+* resolve merge conflict in useVersionCheck ([10a5609](https://github.com/open-lingua/ielts-mastery-hub/commit/10a56092147505d65eed9a4f363addba2f207c34))
+
 ## [1.0.0-beta.15](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.14...1.0.0-beta.15) (2026-08-23)
 
 
