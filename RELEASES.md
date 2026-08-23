@@ -19,6 +19,48 @@ release.
 The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically by GitHub Actions)
 — no additional repository secrets need to be configured.
 
+## Version bumping & changelog generation
+
+> **This section (and the version headings below it) are now generated content.** Do not hand-edit
+> past entries, and do not manually bump `package.json` / `src/core/Cargo.toml` /
+> `src/core/tauri.conf.json` versions — see below for the one supported way to cut a release.
+
+Versions used to be bumped by hand across three files (`package.json`, `src/core/Cargo.toml`,
+`src/core/tauri.conf.json`), which caused real drift in production (see the
+`1.0.0-beta.13` / "fix: sync tauri.conf.json version with Cargo.toml" entry below). This is now
+fully automated with [release-please](https://github.com/googleapis/release-please):
+
+1. Merge PRs to `main` with a [Conventional Commits](https://www.conventionalcommits.org/)-style
+   title (e.g. `feat: ...`, `fix(core): ...`, `chore: ...`) — this is enforced by
+   [`.github/workflows/pr-title-lint.yml`](.github/workflows/pr-title-lint.yml), since squash-merge
+   makes the PR title the commit message that release-please parses.
+2. [`.github/workflows/release-please.yml`](.github/workflows/release-please.yml) runs on every
+   push to `main`. It maintains a standing "Release PR" that:
+   - Computes the next `X.Y.Z-beta.N` version from the accumulated conventional commits.
+   - Updates `package.json`, `src/core/Cargo.toml`, and `src/core/tauri.conf.json` to the same
+     version, in the same commit (config: [`release-please-config.json`](release-please-config.json),
+     seeded version: [`.release-please-manifest.json`](.release-please-manifest.json)).
+   - Prepends a new dated section to this file (`RELEASES.md`), grouped by commit type
+     (Features/Bug Fixes/Chores/etc.), from the commits since the last release.
+   - Refreshes `src/core/Cargo.lock`'s core-crate version entry via a follow-up job
+     (`cargo generate-lockfile`) and pushes that onto the same PR branch.
+3. Merging that Release PR tags the release as `X.Y.Z-beta.N` (no `v`/component prefix, matching
+   this repo's existing tag history) and publishes the GitHub Release — which is what triggers
+   `release.yml` above, unchanged.
+4. A `version-consistency` CI job ([`.github/workflows/ci-linux.yml`](.github/workflows/ci-linux.yml),
+   backed by `scripts/check-version-consistency.mjs`) fails any PR where the three version-bearing
+   files disagree, as defense in depth against manual edits reintroducing drift.
+
+**Note:** release-please must authenticate with a fine-grained Personal Access Token stored as the
+`RELEASE_PLEASE_TOKEN` repository secret, not the default `GITHUB_TOKEN`. This is a hard GitHub
+Actions platform constraint — actions performed with the default `GITHUB_TOKEN` never re-trigger
+other workflows (to prevent recursive runs), which would otherwise silently prevent the GitHub
+Release from triggering `release.yml`. This is the one exception to "no additional secrets."
+
+See
+[`website/docs/internals/contributing/release-process.mdx`](website/docs/internals/contributing/release-process.mdx)
+for more detail on the changelog format and versioning scheme.
+
 ## Known issues / accepted risks
 
 - **`image-size` DoS advisories in the `website/` docs site (GHSA-w3rx-r6r6-pgpr, GHSA-5p2g-fcmc-qvqq):**
@@ -30,6 +72,7 @@ The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically b
   only invoked at **build time** against **repo-controlled** markdown/image assets, not
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
+
 ### 1.0.0-beta.13 / 2026.08.22
 
 - fix: sync tauri.conf.json version with Cargo.toml

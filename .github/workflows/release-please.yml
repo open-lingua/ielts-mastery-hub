@@ -1,0 +1,72 @@
+name: release-please
+
+# Orchestrates version bumps + changelog generation from Conventional Commits.
+# See RELEASES.md for the full release process (this workflow replaces manual
+# edits to package.json / src/core/Cargo.toml / src/core/tauri.conf.json /
+# RELEASES.md).
+#
+# NOTE on RELEASE_PLEASE_TOKEN: GitHub Actions never lets a workflow step
+# authenticated with the default GITHUB_TOKEN re-trigger another workflow
+# (this prevents infinite workflow loops). Since publishing the GitHub
+# Release must continue to trigger release.yml's `release: published`
+# trigger unmodified, release-please must authenticate with a fine-grained
+# Personal Access Token (repo secret `RELEASE_PLEASE_TOKEN`, scoped to
+# `contents: write` + `pull-requests: write` on this repo) instead of
+# GITHUB_TOKEN. This is the one documented exception to "no additional
+# secrets" — it is a hard GitHub platform constraint, not a design choice.
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
+      pr: ${{ steps.release.outputs.pr }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  refresh-cargo-lock:
+    name: Refresh Cargo.lock on the release-please PR
+    needs: release-please
+    if: needs.release-please.outputs.prs_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          ref: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Refresh Cargo.lock for the bumped core crate version
+        # Only resolves the dependency graph (no compilation needed), so this
+        # doesn't require the Tauri/webkit2gtk system dependencies that a full
+        # `cargo check`/`cargo build` would.
+        working-directory: src/core
+        run: cargo generate-lockfile
+
+      - name: Commit and push Cargo.lock if it changed
+        run: |
+          if ! git diff --quiet -- src/core/Cargo.lock; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add src/core/Cargo.lock
+            git commit -m "chore: refresh Cargo.lock for release"
+            git push
+          else
+            echo "Cargo.lock already up to date, nothing to push."
+          fi

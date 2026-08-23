@@ -15,7 +15,8 @@
     "test": "vitest run --silent --config src/ui/vitest.config.ts",
     "test:watch": "vitest --config src/ui/vitest.config.ts",
     "tauri": "tauri dev --config src/core/tauri.conf.json",
-    "tauri:build": "tauri build --config src/core/tauri.conf.json"
+    "tauri:build": "tauri build --config src/core/tauri.conf.json",
+    "check:versions": "node scripts/check-version-consistency.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",
