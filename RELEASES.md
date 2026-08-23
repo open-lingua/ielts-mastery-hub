@@ -73,6 +73,18 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.15](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.14...1.0.0-beta.15) (2026-08-23)
+
+
+### Features
+
+* display app version in sidebar with LTS update badge ([cf01419](https://github.com/open-lingua/ielts-mastery-hub/commit/cf01419ba84d9dde26acd016098b6d72cedc4f7d))
+
+
+### Chores
+
+* reformat check-version-consistency.mjs to 2-space indent ([37dca10](https://github.com/open-lingua/ielts-mastery-hub/commit/37dca1018601a8711d9f980bbbd9d6c722c0bea4))
+
 ## [1.0.0-beta.14](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.13...1.0.0-beta.14) (2026-08-23)
 
 
