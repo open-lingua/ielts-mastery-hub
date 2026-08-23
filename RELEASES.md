@@ -30,6 +30,9 @@ The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically b
   only invoked at **build time** against **repo-controlled** markdown/image assets, not
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
+### 1.0.0-beta.13 / 2026.08.22
+
+- fix: sync tauri.conf.json version with Cargo.toml
 
 ### 1.0.0-beta.12 / 2026.08.22
 
