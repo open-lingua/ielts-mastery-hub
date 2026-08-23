@@ -21,6 +21,9 @@ package-lock.json linguist-generated
 # Build dist
 dist/**/* linguist-generated
 
+# Script Files
+scripts/**/* linguist-generated
+
 # Generated JSON schemas
 src/core/gen/**/* linguist-generated
 
