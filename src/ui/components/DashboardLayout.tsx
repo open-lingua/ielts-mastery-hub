@@ -14,6 +14,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { SidebarVersionInfo } from "@/components/SidebarVersionInfo";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
@@ -104,6 +105,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             })}
           </nav>
         </TooltipProvider>
+
+        <div className={cn("border-t border-border px-2 py-2", collapsed && "px-0")}>
+          <SidebarVersionInfo collapsed={collapsed} />
+        </div>
 
         <div className={cn("hidden md:flex border-t border-border p-3", collapsed ? "justify-center" : "justify-end")}>
           <button

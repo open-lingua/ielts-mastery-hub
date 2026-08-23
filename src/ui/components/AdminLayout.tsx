@@ -13,6 +13,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { SidebarVersionInfo } from "@/components/SidebarVersionInfo";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -90,6 +91,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
 
         {/* Footer */}
         <div className="border-t border-border p-2 space-y-1 shrink-0">
+          <SidebarVersionInfo collapsed={collapsed} />
           <Button
             variant="ghost"
             size="sm"

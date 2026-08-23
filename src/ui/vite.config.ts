@@ -1,12 +1,20 @@
+import { createRequire } from "node:module";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
+
+const require = createRequire(import.meta.url);
+const { version: appVersion } = require("../../package.json") as { version: string };
+
 export default defineConfig(({ mode: _mode }) => ({
   root: __dirname,
   envDir: path.resolve(__dirname, "../.."),
   clearScreen: false,
   envPrefix: ["VITE_", "TAURI_ENV_"],
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   server: {
     host: process.env.TAURI_DEV_HOST || "localhost",
     port: 8080,
