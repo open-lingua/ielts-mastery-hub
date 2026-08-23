@@ -73,6 +73,23 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.14](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.13...1.0.0-beta.14) (2026-08-23)
+
+
+### Documentation
+
+* automate release process with release-please ([1ff96d3](https://github.com/open-lingua/ielts-mastery-hub/commit/1ff96d3ee332bebd03d14123feafd4462aac64a6))
+
+
+### CI/CD
+
+* fallback to GITHUB_TOKEN when RELEASE_PLEASE_TOKEN is unset ([cf99b7d](https://github.com/open-lingua/ielts-mastery-hub/commit/cf99b7d8dbc77aec75144262a61422aecc95e9c0))
+
+
+### Chores
+
+* mark release-please config as prerelease ([64743fc](https://github.com/open-lingua/ielts-mastery-hub/commit/64743fcf97c9cc555b2f98ec67765ad9874fa765))
+
 ### 1.0.0-beta.13 / 2026.08.22
 
 - fix: sync tauri.conf.json version with Cargo.toml
