@@ -24,6 +24,37 @@ You are tasked with generating a comprehensive **SQLite SQL Seed File** specific
 - **Section 4 (Academic Monologue):** Include a clear **Title** and a full **Audio Transcript** (e.g., a university lecture).
   - Q31-40: Note/Summary Completion.
 
+## 3. Transcript Technical Specifications (MANDATORY per Section)
+*Note to AI: Each `transcript` field MUST comply with the technical parameters below. These parameters are non-negotiable and are designed to replicate the pacing, length, and linguistic complexity of authentic IELTS audio recordings. Respect the target word count strictly, as it directly determines the realistic audio duration.*
+
+- **Section 1 — Everyday conversation**
+  - Speakers: **2 people** (typically customer service + customer, or similar)
+  - Audio duration: **~4 to 5 minutes**
+  - Transcript word count: **~600 to 750 words** (real average: 674)
+  - Context: hotel booking, course enrollment, travel information, etc.
+  - Level: easiest, slow speech with natural pauses
+
+- **Section 2 — Everyday monologue**
+  - Speakers: **1 person** (sometimes with a brief initial exchange with a radio host)
+  - Audio duration: **~4 to 5 minutes**
+  - Transcript word count: **~600 to 750 words** (real average: 665)
+  - Context: guide to a place, informative talk, radio announcement, facility presentation
+  - Level: lower-intermediate
+
+- **Section 3 — Academic discussion**
+  - Speakers: **2 to 4 people** (most commonly 2-3, typically students + tutor)
+  - Audio duration: **~5 to 6 minutes** (the longest one)
+  - Transcript word count: **~700 to 850 words** (real average: 788)
+  - Context: discussion about an academic assignment, tutoring session, project planning
+  - Level: high, faster pace and academic vocabulary
+
+- **Section 4 — Academic lecture**
+  - Speakers: **1 person** (a professor/expert)
+  - Audio duration: **~5 to 6 minutes** (no break in the middle)
+  - Transcript word count: **~600 to 750 words** (real average: 683)
+  - Context: university lecture on an academic topic
+  - Level: the hardest, high density of Academic Word List (AWL ~5.85%)
+
 # Data Handling: Output Requirements
 - Provide the **complete, exact SQL script**.
 - Ensure the `audio_transcript` fields contain the full conversational text formatted with speaker labels.
