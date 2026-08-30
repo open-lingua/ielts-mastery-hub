@@ -52,7 +52,13 @@ export async function validate(
     file_name: a.file.name,
     size: a.file.size,
   }));
-  return validateImport(userId, kind, json, audioMeta);
+  try {
+    const result = await validateImport(userId, kind, json, audioMeta);
+    return result;
+  } catch (e) {
+    console.error("[importService] validate: failed", { kind }, e);
+    throw e;
+  }
 }
 
 export async function runImport(
@@ -61,7 +67,14 @@ export async function runImport(
   audioFiles: ImportAudioFile[] = []
 ): Promise<string> {
   const userId = getAnonId();
-  if (kind === "reading") return importReadingTest(userId, json);
-  if (kind === "writing") return importWritingTest(userId, json);
-  return importListeningTest(userId, json, audioFiles);
+  try {
+    let testId: string;
+    if (kind === "reading") testId = await importReadingTest(userId, json);
+    else if (kind === "writing") testId = await importWritingTest(userId, json);
+    else testId = await importListeningTest(userId, json, audioFiles);
+    return testId;
+  } catch (e) {
+    console.error("[importService] runImport: failed", { kind }, e);
+    throw e;
+  }
 }
