@@ -262,6 +262,7 @@ const ImportDataset: React.FC = () => {
       const result = await validate(kind, json, kind === "listening" ? resolvedAudioFiles() : []);
       setPreview(result);
     } catch (e) {
+      console.error("[ImportDataset] handleValidate: failed", { kind }, e);
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setIsValidating(false);
@@ -279,6 +280,7 @@ const ImportDataset: React.FC = () => {
       });
       navigate("/admin/content");
     } catch (e) {
+      console.error("[ImportDataset] doImport: failed", { kind }, e);
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setIsImporting(false);

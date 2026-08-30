@@ -592,20 +592,38 @@ export async function validateImport(
   json: unknown,
   audioMeta: ImportAudioMeta[] = []
 ): Promise<ImportPreview> {
-  return invoke<ImportPreview>("validate_import", {
-    userId,
-    kind,
-    json_data: json,
-    audio_meta: audioMeta,
-  });
+  try {
+    const result = await invoke<ImportPreview>("validate_import", {
+      userId,
+      kind,
+      jsonData: json,
+      audioMeta,
+    });
+    return result;
+  } catch (e) {
+    console.error("[tauri] validate_import: failed", { kind }, e);
+    throw e;
+  }
 }
 
 export async function importReadingTest(userId: string, json: unknown): Promise<string> {
-  return invoke<string>("import_reading_test", { userId, json_data: json });
+  try {
+    const result = await invoke<string>("import_reading_test", { userId, jsonData: json });
+    return result;
+  } catch (e) {
+    console.error("[tauri] import_reading_test: failed", e);
+    throw e;
+  }
 }
 
 export async function importWritingTest(userId: string, json: unknown): Promise<string> {
-  return invoke<string>("import_writing_test", { userId, json_data: json });
+  try {
+    const result = await invoke<string>("import_writing_test", { userId, jsonData: json });
+    return result;
+  } catch (e) {
+    console.error("[tauri] import_writing_test: failed", e);
+    throw e;
+  }
 }
 
 export async function importListeningTest(
@@ -620,7 +638,17 @@ export async function importListeningTest(
       file_data: Array.from(new Uint8Array(await file.arrayBuffer())),
     }))
   );
-  return invoke<string>("import_listening_test", { userId, json_data: json, audio_files });
+  try {
+    const result = await invoke<string>("import_listening_test", {
+      userId,
+      jsonData: json,
+      audioFiles: audio_files,
+    });
+    return result;
+  } catch (e) {
+    console.error("[tauri] import_listening_test: failed", e);
+    throw e;
+  }
 }
 
 // ── export ─────────────────────────────────────────────────────────────────
