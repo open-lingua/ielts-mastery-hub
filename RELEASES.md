@@ -73,6 +73,30 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.17](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.16...1.0.0-beta.17) (2026-08-31)
+
+
+### Features
+
+* **db:** add band 6.0 test 001 listening seed ([620c1d9](https://github.com/open-lingua/ielts-mastery-hub/commit/620c1d9a5e931831301280df31ec2d28860d18e4))
+* **db:** add band 6.0 test 002 listening seed ([c143f84](https://github.com/open-lingua/ielts-mastery-hub/commit/c143f84d902a283ea760a5d64eb19746ebb0f9a3))
+* **db:** add band 7.0 test 001 listening seed ([8a13dfd](https://github.com/open-lingua/ielts-mastery-hub/commit/8a13dfd4d16a476a6677a7704a1ebc4d4e85505c))
+* **db:** add band 7.0 test 002 listening seed ([27f80c7](https://github.com/open-lingua/ielts-mastery-hub/commit/27f80c7ff7a083317f1deedab186046465a44bcf))
+* **db:** add band 8.0 test 002 listening seed ([78632d3](https://github.com/open-lingua/ielts-mastery-hub/commit/78632d3e093a873da7862c6396f2811b25228923))
+* **db:** add band 9.0 test 002 listening seed ([a591aaa](https://github.com/open-lingua/ielts-mastery-hub/commit/a591aaa20857bf049fe240314e0541d27304130c))
+* **db:** update band 8.0 test 001 seed – freight shipping, airport layout, marine biology & supply chains ([c6bbbeb](https://github.com/open-lingua/ielts-mastery-hub/commit/c6bbbebd537db5e4bfb1af94ba990b434f03379b))
+* **db:** update band 9.0 test 001 listening seed ([9e83d7e](https://github.com/open-lingua/ielts-mastery-hub/commit/9e83d7e7624c0c17e46c7b2693d412c15f47e039))
+
+
+### Bug Fixes
+
+* **ui:** rename invoke params to camelCase and add error logging to import pipeline ([dff027b](https://github.com/open-lingua/ielts-mastery-hub/commit/dff027b030756594a2f860364c3f06574d0c7f94))
+
+
+### Documentation
+
+* **prompts:** add transcript technical specs per section to DB seed generator ([3442064](https://github.com/open-lingua/ielts-mastery-hub/commit/34420644acb10b51891a9a6a46e62b01c66838e5))
+
 ## [1.0.0-beta.16](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.15...1.0.0-beta.16) (2026-08-23)
 
 
