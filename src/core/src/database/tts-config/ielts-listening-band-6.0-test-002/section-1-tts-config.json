@@ -1,0 +1,147 @@
+{
+  "scenario_id": "ielts_s1_driving_school_booking",
+  "title": "Driving School Booking",
+  "ielts_section": 1,
+  "difficulty": "easy",
+  "temperature": 0.7,
+  "scene": "Everyday transaction over the telephone between a driving school receptionist and a parent booking lessons.",
+  "sample_context": "The receptionist takes booking details for driving lessons, navigating scheduling, package pricing, and explaining the driving school's rules and requirements.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Receptionist",
+      "voice_name": "Aoede",
+      "audio_profile": "Female receptionist with a polite, helpful, and professional tone.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal; clear read-backs of customer information"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Caller",
+      "voice_name": "Puck",
+      "audio_profile": "Male parent calling to arrange driving lessons for his son.",
+      "director_note": {
+        "style": "Conversational, natural",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear",
+        "disfluencies": "Minimal"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, Safe Start Driving School. How can I help you today?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Hello there. I’m calling because I’d like to book some driving lessons for my son. He just turned seventeen and got his provisional licence."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s wonderful. We have a few different instructors available. Before we get to that, can I take his full name, please?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, it’s Daniel Faraday."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Could you spell the surname for me?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sure, it’s F-A-R-A-D-A-Y."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Thank you. And what is your home address? We need that because our instructors pick the students up directly from their house."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We live at 42 Pine Avenue, in the Greenfield area."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "42 Pine Avenue, Greenfield. Got it. Now, has Daniel had any driving experience before? Some parents take their children to empty car parks to practice the basics."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "No, none at all. He is a complete beginner. He’s never even sat in the driver’s seat."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s absolutely fine. Our instructors are very used to teaching complete beginners. Now, the next thing we need to decide is the type of car. We offer lessons in both manual and automatic cars. Which one would he prefer?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I think learning in an automatic is much easier these days, so we’ll go with that."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Automatic it is. Now, let’s talk about scheduling. When is he available to take his lessons?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "He is still in college during the week, so weekends are best. Usually, Saturday mornings are ideal, perhaps around 10:00 AM?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me check the system... I’m afraid our automatic instructor is fully booked on Saturday mornings. We do have a slot available on Saturday afternoon at 3:00 PM, or we have Sunday morning at 9:00 AM."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Saturday afternoon at 3:00 PM sounds perfect. He usually plays football on Sundays, so we’ll take the Saturday afternoon slot."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Great. Now, for the pricing. A single hour-long lesson is £30. However, most beginners buy our starter package, which gives you ten lessons for £250. It saves you quite a bit of money."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Oh, that is a good discount. We’ll definitely take the ten-lesson package for £250. Does that include the cost of the practical driving test at the end?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "No, the practical test fee is separate and has to be paid directly to the government testing centre. But our package does include a free textbook to help him study for his theory test."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "A free textbook? That’s very helpful, thank you. What about payment? Do I need to pay for the whole package now over the phone?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "You can pay a deposit of £50 now to secure the booking, and then you just pay the balance to the instructor on the first lesson. But you need to make sure you pay the balance in cash, as our instructors don’t carry card machines in their cars."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I’ll pay the £50 deposit by card now, and I’ll make sure he has the cash for the first lesson. Are there any other rules or things he needs to bring?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The most important thing is that he must have his provisional licence with him on every single lesson. If he forgets it, the instructor cannot legally let him drive, and you will still be charged for the lesson."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I will make sure he keeps it in his wallet at all times. Also, should he wear any specific shoes?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Just comfortable, flat shoes. No heavy boots or sandals. Finally, if you ever need to cancel a lesson, you must give us 48 hours’ notice. Otherwise, there is a cancellation fee."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "48 hours’ notice, understood. Can I just give you my card details now for the deposit?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, of course, go ahead when you’re ready."
+    }
+  ]
+}
