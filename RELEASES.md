@@ -73,6 +73,13 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.18](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.17...1.0.0-beta.18) (2026-09-01)
+
+
+### Refactors
+
+* move test-001 TTS configs into per-test subfolder ([68a67ee](https://github.com/open-lingua/ielts-mastery-hub/commit/68a67ee1562a1db42d42265875f20a8195ed5057))
+
 ## [1.0.0-beta.17](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.16...1.0.0-beta.17) (2026-08-31)
 
 
