@@ -1,0 +1,66 @@
+{
+  "scenario_id": "ielts_s2_library_orientation",
+  "title": "Westford Central Library Orientation",
+  "ielts_section": 2,
+  "difficulty": "medium",
+  "temperature": 0.8,
+  "scene": "A brief orientation monologue by a head librarian at a newly renovated public library.",
+  "sample_context": "Warm, informative, semi-formal monologue with strong signposting and orientation language for map directions.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Librarian",
+      "voice_name": "Kore",
+      "audio_profile": "Warm, engaging female head librarian giving a public orientation to new visitors.",
+      "director_note": {
+        "style": "Warm, informative, engaging",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear",
+        "disfluencies": "Light, natural"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, everyone, and welcome to the newly renovated Westford Central Library. My name is Margaret, and I’m the head librarian here. It’s wonderful to see so many new faces. I know that since the reopening, a few of you have had questions about how the new membership system works and where everything is located, so I’m going to give you a brief orientation."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "First, regarding your library cards. In the past, your card only allowed you to borrow physical books. With the new system, your card now grants you free access to our digital archive, which includes e-books, audiobooks, and international magazines. You do need to set up a PIN online to use this feature, which only takes a minute. Also, we’ve completely done away with late fees. That’s right, if you bring a book back a few days late, there’s no financial penalty anymore. However, if a book is overdue by more than thirty days, your account will be temporarily frozen until it is returned."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Another major update is our opening hours. We used to be closed on Sundays, but owing to community feedback, we are now open seven days a week. On weekdays, our doors are open from 9 AM to 8 PM. On weekends, however, we have slightly reduced hours, operating from 10 AM to 4 PM."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, let’s take a look at the layout of the ground floor. I know it looks quite different from before! We are currently standing in the Main Foyer, just inside the entrance."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If you look straight ahead, you will see a large circular desk right in the middle of the room. That is the Help Desk, where our staff can assist you with any research queries."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Behind the Help Desk, right at the back wall of the library, there is a large rectangular room with glass walls. That is the Quiet Study Area. We ask that absolutely no talking takes place in there, as it’s designed for focused work."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, if you go back to the entrance where we are standing, and walk towards your right, you’ll see a corridor. The first room you come to on the left side of that corridor is the Children’s Section. It’s painted bright yellow, so you really can’t miss it."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Just past the Children’s Section, at the very end of that same corridor, is the Multimedia Room. This is where you can access the public computers and our collection of DVDs."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Finally, if you need a break, we have a lovely new cafe. From the main entrance, turn to your left. Walk past the staircase, and the cafe is tucked into the corner at the far left of the building. It’s a great spot to read a magazine with a cup of coffee."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Alright, if you’ll follow me, we will head upstairs to look at the fiction collections..."
+    }
+  ]
+}
