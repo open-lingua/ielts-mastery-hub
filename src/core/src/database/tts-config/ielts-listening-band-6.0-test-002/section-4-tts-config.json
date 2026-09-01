@@ -1,0 +1,62 @@
+{
+  "scenario_id": "ielts_s4_history_of_chocolate",
+  "title": "History of Chocolate Lecture",
+  "ielts_section": 4,
+  "difficulty": "expert",
+  "temperature": 0.85,
+  "scene": "A university lecture theatre where a professor is giving an academic talk on the history, production, and ethics of chocolate.",
+  "sample_context": "The professor outlines the evolution of chocolate from an ancient Mesoamerican drink to a mass-produced solid snack, before discussing the agricultural and ethical challenges facing the modern global industry.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Professor",
+      "voice_name": "Charon",
+      "audio_profile": "Male university professor with a deep, calm, and authoritative voice.",
+      "director_note": {
+        "style": "Formal, authoritative academic",
+        "pace": "Natural, measured",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Precise",
+        "disfluencies": "Minimal; only reframing"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, everyone. Today, we are going to explore the history of a food that almost everyone loves: chocolate. But as you will see, chocolate hasn’t always been the sweet, solid candy bar that we know today. Its history spans thousands of years and crosses multiple continents."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The story of chocolate begins in Mesoamerica, which is modern-day Mexico and Central America. The ancient Mayan and Aztec civilizations were the first to discover the secrets of the cacao tree. However, they did not eat chocolate; they drank it. They took the cacao beans, roasted them, and ground them into a paste. They mixed this paste with water, cornmeal, and chili peppers to create a bitter, spicy drink. It was highly valued and was often consumed during religious ceremonies. In fact, cacao beans were considered so valuable that the Aztecs actually used them as a form of currency, just like coins."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Chocolate remained a regional secret until the early 1500s when Spanish explorers arrived in the Americas. When they returned to Europe, they brought the cacao beans with them. At first, the bitter drink was not very popular in Spain. But then, someone had the brilliant idea of removing the chili peppers and adding sugar and vanilla instead. This new, sweet version of the drink became a massive hit. It quickly became a status symbol, enjoyed exclusively by royalty and the very wealthy across Europe because sugar was incredibly expensive at the time."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "For hundreds of years, chocolate remained a drink for the rich. The major turning point came in the 19th century during the Industrial Revolution. In 1828, a Dutch chemist named Coenraad Johannes van Houten invented a machine called a cocoa press. This machine could squeeze the fatty cocoa butter out of the roasted beans, leaving behind a fine powder. We now know this as cocoa powder. This powder could be easily mixed with milk or water, making chocolate much cheaper to produce and easier to consume."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "But the biggest breakthrough happened in 1847 in England. A company named J.S. Fry & Sons discovered a way to mix cocoa powder, sugar, and melted cocoa butter together to create a paste that could be poured into a mould. When it cooled, it became the world’s first solid chocolate bar. Shortly after that, in 1875, a Swiss chocolatier named Daniel Peter had the idea of adding powdered milk to the mixture, creating the very first milk chocolate, which was smoother and sweeter than anything made before."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The invention of the solid chocolate bar transformed the industry. Chocolate was no longer just a luxury drink for the rich; it was a cheap, portable snack that ordinary working people could afford. Factories were built across Europe and North America, producing millions of chocolate bars."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Today, chocolate is a multi-billion dollar global industry. However, it still relies on the same basic ingredient: the cacao bean. Growing cacao is very difficult. The trees only grow in a narrow band around the equator, in places like West Africa and South America. They require a hot, humid climate and are very sensitive to changes in weather."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Furthermore, the modern chocolate industry faces significant ethical challenges. A large percentage of the world’s cocoa is grown on small family farms in West Africa. Unfortunately, many of these farmers live in poverty. Because the global price of cocoa fluctuates wildly, farmers often struggle to make a living. This has led to serious issues with unfair labour practices, and in some areas, the use of child labour to harvest the beans."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "In recent years, there has been a growing movement towards \"Fair Trade\" chocolate. This certification ensures that farmers are paid a guaranteed minimum price for their cocoa beans, protecting them from market crashes. It also requires strict environmental standards and completely bans child labour. So, the next time you buy a chocolate bar, it is worth looking for the Fair Trade logo on the wrapper."
+    }
+  ]
+}

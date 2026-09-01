@@ -1,0 +1,135 @@
+{
+  "scenario_id": "ielts_s3_healthy_eating_presentation",
+  "title": "Healthy Eating in Schools Presentation Planning",
+  "ielts_section": 3,
+  "difficulty": "hard",
+  "temperature": 0.9,
+  "scene": "An academic discussion in a university library between two students planning a presentation.",
+  "sample_context": "Mark and Sarah discuss their research on healthy eating in schools, comparing case studies on school lunches and dividing up tasks for their final presentation.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Student (Mark)",
+      "voice_name": "Puck",
+      "audio_profile": "Male university student, engaged and analytical.",
+      "director_note": {
+        "style": "Academic, collegial, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Student (Sarah)",
+      "voice_name": "Leda",
+      "audio_profile": "Female university student, organized and insightful.",
+      "director_note": {
+        "style": "Academic, collegial, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Hi Sarah, thanks for meeting me in the library. We really need to finalize the structure for our presentation on healthy eating in schools."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Hi Mark, no problem. I’ve been looking through all the data we collected from the local primary schools, and honestly, the results are quite interesting. I thought the biggest problem was going to be the vending machines selling chocolate and crisps."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Me too! But our survey showed that almost all the schools have already removed them. For me, the most surprising thing was how many children skip breakfast entirely before coming to school. It was nearly 30% of the students we surveyed."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Exactly. It makes it very hard for them to concentrate in morning classes. I think we should make that the main focus of our introduction."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Good idea. Now, our tutor said we need to discuss the main challenge schools face when trying to improve school lunches. What did the school catering managers say?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The general assumption is that children simply refuse to eat vegetables. But when I interviewed the catering managers, they said the main challenge was actually the budget. They only have about £1.50 per child per day to spend on ingredients. It’s almost impossible to provide fresh, high-quality meals on that budget."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That is definitely a critical point. We should include a slide showing the cost breakdown. Next, we need to compare two specific schools that have tried different approaches. We chose Oakwood Academy and Riverdale Primary, right?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes. Oakwood Academy tried a completely new approach. Instead of just changing the menu, they started a school garden. The students actually grow their own vegetables and then the kitchen cooks them."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "And what was the result?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It worked brilliantly! The teachers reported that the children are much more willing to try healthy food if they have grown it themselves. It completely changed their attitude towards vegetables."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s a great success story. But Riverdale Primary had a different strategy. They decided to ban all packed lunches brought from home. They argued that parents were packing too many sugary snacks and unhealthy sandwiches."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Did it improve the students’ diets?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Well, yes and no. The meals provided by the school were definitely healthier, but a lot of parents complained about the lack of choice. Some parents even threatened to move their children to a different school. So, it was very controversial."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Okay, so we have one positive case study and one controversial one. That gives us a really good balance for the presentation. Now, let’s divide up the remaining tasks before Friday. Who is going to write the final conclusion?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I don’t mind doing that. I’ve got some good ideas for summarizing the main points."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Okay, Mark, you write the conclusion. What about creating the slides? We need to make them look professional."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I’m not very good with design software. Would you mind doing the slides?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sure, I enjoy doing that. I’ll make sure the layout is clear and easy to read. But we also need to create a handout for the class with our main references on it."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Why don’t we do the handout together? We both need to make sure all the books and articles we read are formatted correctly."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "That’s fair. We’ll meet on Thursday afternoon to finish the handout together. What about practicing the presentation?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We should definitely practice it out loud to check our timing. The tutor is very strict about not going over the ten-minute limit."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Let’s practice it together on Thursday after we finish the handout. Finally, one of us needs to email the completed slides to the tutor before Friday morning."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I’ll do that. I’ll send it off on Thursday evening once you’ve finished the design."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Perfect. I think we have a solid plan!"
+    }
+  ]
+}
