@@ -1,0 +1,74 @@
+{
+  "scenario_id": "ielts_s2_botanical_gardens_tour",
+  "title": "City Botanical Gardens Orientation",
+  "ielts_section": 2,
+  "difficulty": "medium",
+  "temperature": 0.8,
+  "scene": "A brief orientation monologue by a tour guide at a botanical garden.",
+  "sample_context": "Warm, informative, semi-formal monologue with strong signposting and orientation language for map directions.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Guide",
+      "voice_name": "Kore",
+      "audio_profile": "Warm, engaging female guide giving a public orientation to a group of visitors.",
+      "director_note": {
+        "style": "Warm, informative, engaging",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear",
+        "disfluencies": "Light, natural"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Hello, everyone, and welcome to the City Botanical Gardens. I’m Sarah, and I’ll be giving you a brief orientation before you head off to explore the grounds on your own."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "First of all, I want to mention a few recent changes. If you’ve visited us in previous years, you’ll remember our famous outdoor rose collection. While that is still beautiful, our biggest addition this spring is the new tropical Glasshouse. We’ve finally finished construction, and it houses over 500 species of rainforest plants. It’s incredibly warm inside, so be prepared to take your jackets off!"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Running a massive garden like this isn’t cheap. We do receive a small subsidy from the city council, and ticket sales help a lot, but the vast majority of our funding actually comes from sponsorships by local businesses. They’ve been incredibly generous in helping us maintain the pathways and sponsor new plant collections."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, we want everyone to enjoy their visit, but we do have a few strict rules to protect the plants. You are more than welcome to bring a picnic and sit on the lawns, and taking photographs is highly encouraged. However, we have a strict rule that bicycles are not permitted anywhere past the main gates. We’ve had too many accidents with people riding too fast along the footpaths, so you’ll need to leave them at the racks outside."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If you have children with you today, we have some special activities. Over at the education centre, instead of just drawing pictures of flowers, the kids can actually participate in a hands-on workshop. Today, they are planting sunflower seeds in little pots which they can take home and watch grow. It’s always very popular."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Before I explain the map, I’d like to remind you about our membership program. If you buy a souvenir today, you pay full price, and meals at the cafe are standard price too. However, if you sign up for an annual membership, you get a 20% discount on all gardening workshops held throughout the year, which is a fantastic deal for amateur gardeners."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Right, let’s look at your maps to help you get your bearings. We are currently standing at the Main Entrance at the bottom of your map."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If you walk straight ahead from the entrance along the central path, the first large circular area you come to on your left is the Rose Garden. It is in full bloom right now and smells wonderful."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Keep walking straight along the central path, and right at the very end, directly facing you, is the Cafe. It has a lovely outdoor seating area where you can relax."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, if you want to buy souvenirs, the Gift Shop is very easy to find. From the Main Entrance, just take the first path on the right. The Gift Shop is the building immediately on your left along that side path."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "For those wanting a bit of adventure, I highly recommend the Canopy Tree Walk. To get there, go back to the central path, walk past the Rose Garden, and you’ll see a path branching off to the right. Take that path, and the Tree Walk is at the very end, elevated up in the branches."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Finally, if you’re looking for a quiet spot, you should visit the Lily Pond. From the Main Entrance, take the path that goes off to the far left. Follow it as it curves around, and nestled in the top left corner of the gardens is the Pond. It’s very peaceful there. Enjoy your visit, everyone!"
+    }
+  ]
+}
