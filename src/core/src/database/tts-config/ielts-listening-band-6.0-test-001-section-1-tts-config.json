@@ -1,0 +1,151 @@
+{
+  "scenario_id": "ielts-listening-band-6.0-test-001-section-1",
+  "title": "Walking Tour Booking",
+  "ielts_section": 1,
+  "difficulty": "easy",
+  "temperature": 0.7,
+  "scene": "Everyday transaction over the telephone between a tourist office agent and a customer booking a guided walk.",
+  "sample_context": "The agent helps the customer select a tour, calculates ticket prices based on ages, and explains the meeting point, what to bring, and the cash-only payment method.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Tourist Office Agent",
+      "voice_name": "Aoede",
+      "audio_profile": "Female agent with a polite, helpful, and professional tone.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal; clear and direct delivery of practical information"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Customer",
+      "voice_name": "Puck",
+      "audio_profile": "Male customer making enquiries and providing booking details.",
+      "director_note": {
+        "style": "Conversational, natural",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear",
+        "disfluencies": "Minimal; brief pauses when checking calendar or calculating"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, City Walks Tourist Office. How can I help you today?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Hello. I’m looking to book a guided walking tour of the city for myself and my family. We are visiting for a few days and want to see the main sights."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Wonderful. We offer a few different tours. There is the Historic City Centre tour, the Ghost Tour in the evening, and our very popular Riverside tour, which focuses on the bridges and the old docks."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The ghost tour sounds fun, but we have young children, so it might be a bit scary for them. I think the Riverside tour would be the best option for us."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent choice. The Riverside tour is very scenic. What date were you hoping to take the tour?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We’d like to go this coming Saturday. Let me just check my calendar... that’s the 14th of August."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me check availability for the 14th. Yes, we have plenty of spaces left. How many people will be in your group?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "There will be four of us in total. Two adults and two children."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Okay. The standard price for an adult is £15, and for children under twelve, it is £10. Are your children under twelve?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Actually, my son is ten, but my daughter is fifteen."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Ah, in that case, your daughter doesn’t qualify for the child ticket. However, if she is in full-time education, she can get a student ticket, which is £12."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, she is in high school, so she has her student card. We will take one student ticket, one child ticket, and two adult tickets then."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Perfect. Now, the tour starts at 10:00 AM from the main square. But please make sure you don’t go to the old meeting point near the town hall. We have recently changed our starting location to the statue in front of the castle."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The statue in front of the castle. I know exactly where that is. How long does the tour usually take?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "It usually takes about an hour and fifteen minutes. So, you can expect to finish by 11:15."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "11:15. That’s perfect. It gives us plenty of time before lunch. Are there any specific things we should bring?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The most important thing is to wear comfortable shoes. We will be walking over some old cobblestone streets, and they can be quite uneven."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Comfortable shoes, absolutely. We’ve brought our walking boots."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Great. Also, looking at the weather forecast for Saturday, there is a strong chance of rain in the morning. I highly recommend you bring umbrellas or waterproof jackets."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Good to know. We’ll definitely pack our raincoats. Oh, one more thing. Does the tour finish near any good restaurants?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, the tour concludes near the harbour. There are many fantastic seafood restaurants there, so it’s the perfect spot to stop and have lunch."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Wonderful, we will plan to have lunch there. Now, how do I go about paying for the tickets?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I can make the reservation for you now. I just need a contact number for the booking."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sure, my mobile number is 07745 322 199."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "07745 322 199. Thank you. And for the payment, you don’t need to pay in advance. You can pay the tour guide directly on the day. However, they do not carry a card reader, so you must bring cash."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We have to pay in cash. Okay, I will make sure we go to an ATM before we meet the guide."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s everything booked for you. Enjoy your tour on Saturday!"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Thank you very much for your help."
+    }
+  ]
+}
