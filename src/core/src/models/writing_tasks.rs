@@ -15,6 +15,7 @@ pub struct WritingTask {
     pub image_url: Option<String>,
     pub include_model_answer: bool,
     pub model_answer: Option<String>,
+    pub figure_description: Option<String>,
     pub created_at: String,
 }
 
@@ -32,6 +33,7 @@ pub struct CreateWritingTask {
     pub image_url: Option<String>,
     pub include_model_answer: Option<bool>,
     pub model_answer: Option<String>,
+    pub figure_description: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,4 +49,5 @@ pub struct UpdateWritingTask {
     pub image_url: Option<String>,
     pub include_model_answer: Option<bool>,
     pub model_answer: Option<String>,
+    pub figure_description: Option<String>,
 }

@@ -11,7 +11,8 @@ pub async fn find_by_id(
         WritingTask,
         r#"SELECT wt.id, wt.test_id, wt.task_number, wt.task_type, wt.title, wt.difficulty,
            wt.suggested_time, wt.prompt, wt.min_words, wt.max_words, wt.image_url,
-           wt.include_model_answer AS "include_model_answer: bool", wt.model_answer, wt.created_at
+           wt.include_model_answer AS "include_model_answer: bool", wt.model_answer,
+           wt.figure_description, wt.created_at
            FROM writing_tasks wt JOIN writing_tests t ON t.id = wt.test_id
            WHERE wt.id = ? AND (t.created_by = ? OR t.status = 'published')"#,
         id,
@@ -27,7 +28,8 @@ pub async fn find_all(pool: &Db, user_id: &str) -> Result<Vec<WritingTask>, AppE
         WritingTask,
         r#"SELECT wt.id, wt.test_id, wt.task_number, wt.task_type, wt.title, wt.difficulty,
            wt.suggested_time, wt.prompt, wt.min_words, wt.max_words, wt.image_url,
-           wt.include_model_answer AS "include_model_answer: bool", wt.model_answer, wt.created_at
+           wt.include_model_answer AS "include_model_answer: bool", wt.model_answer,
+           wt.figure_description, wt.created_at
            FROM writing_tasks wt JOIN writing_tests t ON t.id = wt.test_id
            WHERE t.created_by = ? OR t.status = 'published'"#,
         user_id
@@ -65,8 +67,9 @@ pub async fn insert(
     sqlx::query!(
         "INSERT INTO writing_tasks
          (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt,
-          min_words, max_words, image_url, include_model_answer, model_answer, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          min_words, max_words, image_url, include_model_answer, model_answer,
+          figure_description, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         id,
         input.test_id,
         task_number,
@@ -80,6 +83,7 @@ pub async fn insert(
         input.image_url,
         include_model_answer,
         input.model_answer,
+        input.figure_description,
         now
     )
     .execute(pool)
@@ -106,7 +110,8 @@ pub async fn update(
          max_words = COALESCE(?, max_words),
          image_url = COALESCE(?, image_url),
          include_model_answer = COALESCE(?, include_model_answer),
-         model_answer = COALESCE(?, model_answer)
+         model_answer = COALESCE(?, model_answer),
+         figure_description = COALESCE(?, figure_description)
          WHERE id = ? AND EXISTS (
            SELECT 1 FROM writing_tests t WHERE t.id = test_id AND t.created_by = ?
          )",
@@ -121,6 +126,7 @@ pub async fn update(
         input.image_url,
         include_model_answer,
         input.model_answer,
+        input.figure_description,
         id,
         user_id
     )

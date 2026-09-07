@@ -305,6 +305,7 @@ async fn build_writing_json(
                 "image_url": image_url,
                 "include_model_answer": t.include_model_answer,
                 "model_answer": t.model_answer,
+                "figure_description": t.figure_description,
             })
         })
         .collect();
@@ -691,8 +692,9 @@ mod tests {
             sqlx::query!(
                 "INSERT INTO writing_tasks
                  (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt,
-                  min_words, max_words, image_url, include_model_answer, model_answer, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                  min_words, max_words, image_url, include_model_answer, model_answer,
+                  figure_description, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 format!("task-{n}"),
                 test_id,
                 n,
@@ -705,6 +707,7 @@ mod tests {
                 Option::<String>::None,
                 image,
                 false,
+                Option::<String>::None,
                 Option::<String>::None,
                 now
             )
@@ -724,6 +727,7 @@ mod tests {
         assert!(media.is_empty());
         assert_eq!(json["tasks"].as_array().unwrap().len(), 2);
         assert!(json["tasks"][0]["image_url"].is_null());
+        assert!(json["tasks"][0]["figure_description"].is_null());
 
         validate_writing(&json).expect("exported writing JSON should re-validate as importable");
     }

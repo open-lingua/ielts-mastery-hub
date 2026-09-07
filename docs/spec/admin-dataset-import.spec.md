@@ -118,6 +118,7 @@ All three types share:
 | `tasks[].min_words` | int | required (150 for task1, 250 for task2 by convention) |
 | `tasks[].max_words` | string | optional |
 | `tasks[].image_url` | string | optional (Task 1 chart/graph image; out of scope for this import unless a 5th "task image" upload slot is added — see Open Questions) |
+| `tasks[].figure_description` | string | optional, nullable, default `null` (text description of the Task 1 chart/diagram, e.g. for accessibility or when no image is provided) |
 | `difficulty` | string | optional, default `"7"` (present in DB schema, absent from writing example — default applied) |
 
 #### Listening (`ListeningImport`)
@@ -148,7 +149,7 @@ Using the real tables from `20260811000000_initial_schema.sql`:
 
 **Writing**
 - `title, status, created_by` → `writing_tests`
-- `tasks[]` → `writing_tasks` (`id` generated, `test_id`, `task_number`, `task_type`, `title`, `difficulty`, `suggested_time`, `prompt`, `min_words`, `max_words`, `image_url`, `include_model_answer` default 0, `model_answer` default '')
+- `tasks[]` → `writing_tasks` (`id` generated, `test_id`, `task_number`, `task_type`, `title`, `difficulty`, `suggested_time`, `prompt`, `min_words`, `max_words`, `image_url`, `include_model_answer` default 0, `model_answer` default '', `figure_description` default `null`)
 
 **Listening**
 - `title, duration, status, created_by` → `listening_tests` (`difficulty` defaults `'7'`)

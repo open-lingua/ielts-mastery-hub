@@ -57,7 +57,7 @@ Indexed on `user_id` and on `(user_id, test_id, test_type, attempt_number)` for 
 
 ### Writing: `writing_tests` → `writing_tasks`
 - `writing_tests`: `id`, `created_by`, `title`, `status`, timestamps.
-- `writing_tasks`: FK `test_id → writing_tests.id` (cascade delete), `task_number`, `task_type` (`task1`/`task2`), `title`, `difficulty`, `suggested_time`, `prompt`, `min_words`, `max_words`, `image_url`, `include_model_answer`, `model_answer`.
+- `writing_tasks`: FK `test_id → writing_tests.id` (cascade delete), `task_number`, `task_type` (`task1`/`task2`), `title`, `difficulty`, `suggested_time`, `prompt`, `min_words`, `max_words`, `image_url`, `include_model_answer`, `model_answer`, `figure_description`.
 
 ### Listening: `listening_tests` → `listening_sections` → `listening_question_groups` → `listening_questions`
 - `listening_tests`: `id`, `created_by`, `title`, `difficulty`, `duration`, `status`, timestamps.
@@ -84,7 +84,7 @@ Note: `user_test_sessions.user_id`/`test_id` are plain TEXT columns, **not** dec
 
 ## Migrations & compile-time query checking
 
-Migrations live in `src/core/src/database/migrations/` and run automatically via `sqlx::migrate!(...)` in `database::init()` at app startup — there is currently a single migration file (`20260811000000_initial_schema.sql`). `sqlx`'s macros (`query!`, `query_as!`, `query_scalar!`) type-check SQL against the live schema at compile time, which is why the schema and Rust code must stay in sync; the `DATABASE_URL` env var must point at a real `ielts.db` (see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md)) for `cargo build`/`cargo check` to succeed.
+Migrations live in `src/core/src/database/migrations/` and run automatically via `sqlx::migrate!(...)` in `database::init()` at app startup — there are currently two migration files (`20260811000000_initial_schema.sql` and `20260907000000_add_figure_description_to_writing_tasks.sql`). `sqlx`'s macros (`query!`, `query_as!`, `query_scalar!`) type-check SQL against the live schema at compile time, which is why the schema and Rust code must stay in sync; the `DATABASE_URL` env var must point at a real `ielts.db` (see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md)) for `cargo build`/`cargo check` to succeed.
 
 ## Why Practice Library merges results in Rust, not SQL `UNION`
 
