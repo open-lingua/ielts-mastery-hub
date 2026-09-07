@@ -38,6 +38,23 @@ mod insert {
     }
 
     #[tokio::test]
+    async fn it_uses_the_provided_id_when_present() {
+        // Arrange
+        let pool = test_pool().await;
+        let test_id = given_owned_test(&pool).await;
+        let input = CreateWritingTaskBuilder::default()
+            .with_test_id(&test_id)
+            .with_id("explicit-task-id")
+            .build();
+
+        // Act
+        let result = writing_tasks::insert(&pool, &input, OWNER_ID).await;
+
+        // Assert
+        assert_matches!(result, Ok(id) if id == "explicit-task-id");
+    }
+
+    #[tokio::test]
     async fn it_rejects_the_insert_when_the_user_does_not_own_the_parent_test() {
         // Arrange
         let pool = test_pool().await;

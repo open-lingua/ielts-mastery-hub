@@ -447,6 +447,27 @@ mod import_writing_fn {
             Some("A line graph showing rainfall over 12 months.")
         );
     }
+
+    #[tokio::test]
+    async fn it_uses_the_provided_task_id_when_present() {
+        // Arrange
+        let pool = test_pool().await;
+        let mut json = good_writing_json();
+        json["tasks"][0]["id"] = json!("explicit-task-id");
+        let data = validate_writing(&json).expect("valid fixture");
+
+        // Act
+        let test_id = import_writing(&pool, OWNER_ID, data)
+            .await
+            .expect("import_writing");
+
+        // Assert
+        let task = writing_tasks::find_by_id(&pool, "explicit-task-id", OWNER_ID)
+            .await
+            .expect("find")
+            .expect("present");
+        assert_eq!(task.test_id, test_id);
+    }
 }
 
 mod import_listening_fn {

@@ -11,6 +11,7 @@ const DEFAULT_INCLUDE_MODEL_ANSWER: bool = false;
 
 /// Builder for `CreateWritingTask`.
 pub struct CreateWritingTaskBuilder {
+    id: Option<String>,
     test_id: String,
     task_number: Option<i64>,
     task_type: Option<String>,
@@ -29,6 +30,7 @@ pub struct CreateWritingTaskBuilder {
 impl Default for CreateWritingTaskBuilder {
     fn default() -> Self {
         Self {
+            id: None,
             test_id: "placeholder-test-id".to_string(),
             task_number: Some(DEFAULT_TASK_NUMBER),
             task_type: Some(DEFAULT_TASK_TYPE.to_string()),
@@ -47,6 +49,11 @@ impl Default for CreateWritingTaskBuilder {
 }
 
 impl CreateWritingTaskBuilder {
+    pub fn with_id(mut self, id: &str) -> Self {
+        self.id = Some(id.to_string());
+        self
+    }
+
     pub fn with_test_id(mut self, test_id: &str) -> Self {
         self.test_id = test_id.to_string();
         self
@@ -114,6 +121,7 @@ impl CreateWritingTaskBuilder {
 
     pub fn build(self) -> CreateWritingTask {
         CreateWritingTask {
+            id: self.id,
             test_id: self.test_id,
             task_number: self.task_number,
             task_type: self.task_type,

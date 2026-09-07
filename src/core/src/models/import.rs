@@ -32,6 +32,7 @@ pub struct WritingImport {
 
 #[derive(Debug, Deserialize)]
 pub struct TaskImport {
+    pub id: Option<String>,
     pub task_number: Option<i64>,
     pub task_type: Option<String>,
     pub title: Option<String>,

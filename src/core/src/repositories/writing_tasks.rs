@@ -54,7 +54,10 @@ pub async fn insert(
     if owned == 0 {
         return Err(AppError::Validation("not authorized".to_string()));
     }
-    let id = uuid::Uuid::new_v4().to_string();
+    let id = input
+        .id
+        .clone()
+        .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let now = chrono::Utc::now().to_rfc3339();
     let task_number = input.task_number.unwrap_or(1);
     let task_type = input.task_type.as_deref().unwrap_or("task1");

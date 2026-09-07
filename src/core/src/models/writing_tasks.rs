@@ -21,6 +21,7 @@ pub struct WritingTask {
 
 #[derive(Debug, Deserialize)]
 pub struct CreateWritingTask {
+    pub id: Option<String>,
     pub test_id: String,
     pub task_number: Option<i64>,
     pub task_type: Option<String>,

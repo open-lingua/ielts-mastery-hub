@@ -762,7 +762,10 @@ async fn insert_writing_task(
     task: &TaskImport,
     now: &str,
 ) -> Result<(), AppError> {
-    let task_id = Uuid::new_v4().to_string();
+    let task_id = task
+        .id
+        .clone()
+        .unwrap_or_else(|| Uuid::new_v4().to_string());
     let task_number = task.task_number.unwrap_or(1);
     let task_type = task.task_type.clone().unwrap_or_else(|| {
         if task_number == 2 {
