@@ -92,13 +92,13 @@ export async function resolveWritingTaskImage(json: unknown, imageFile: File): P
     throw new Error("The writing JSON has no tasks to attach a Task 1 image to.");
   }
 
-  const userId = getAnonId();
-  const imageUrl = await uploadWritingAsset(userId, imageFile);
+  const taskId = crypto.randomUUID();
+  const imageUrl = await uploadWritingAsset(taskId, imageFile);
 
   const tasks = source.tasks.map((t) => ({ ...t }));
   const task1Index = tasks.findIndex((t) => t.task_type === "task1");
   const targetIndex = task1Index !== -1 ? task1Index : 0;
-  tasks[targetIndex] = { ...tasks[targetIndex], image_url: imageUrl };
+  tasks[targetIndex] = { ...tasks[targetIndex], id: taskId, image_url: imageUrl };
 
   return { ...source, tasks };
 }

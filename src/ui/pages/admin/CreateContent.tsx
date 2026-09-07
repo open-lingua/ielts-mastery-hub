@@ -1523,6 +1523,7 @@ const ListeningCreator: React.FC<{
 
 // ─── Writing Task State ───────────────────────
 interface WritingTaskState {
+  id?: string;
   taskType: "task1" | "task2";
   title: string;
   difficulty: string;
@@ -1858,6 +1859,7 @@ const CreateContent: React.FC = () => {
           data.tasks.forEach((t, i) => {
             if (i < 2) {
               newTasks[i] = {
+                id: t.id,
                 taskType: t.taskType,
                 title: t.title,
                 difficulty: t.difficulty,
@@ -1993,6 +1995,7 @@ const CreateContent: React.FC = () => {
     const taskPayload: Parameters<typeof saveWritingTest>[0]["tasks"] = writingTasks
       .filter((t) => t.title.trim() || t.prompt.trim())
       .map((t) => ({
+        id: t.id,
         taskType: t.taskType,
         title: t.title,
         difficulty: t.difficulty,

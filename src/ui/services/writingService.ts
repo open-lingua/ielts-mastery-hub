@@ -10,6 +10,7 @@ import {
 } from "@/lib/tauri";
 
 interface WritingTaskData {
+  id?: string;
   taskType: "task1" | "task2";
   title: string;
   difficulty: string;
@@ -37,25 +38,27 @@ interface UpdateWritingTestParams {
   tasks: WritingTaskData[];
 }
 
-async function resolveTasks(userId: string, tasks: WritingTaskData[]) {
-  const resolved: Array<WritingTaskData & { resolvedImageUrl: string }> = [];
+async function resolveTasks(tasks: WritingTaskData[]) {
+  const resolved: Array<WritingTaskData & { id: string; resolvedImageUrl: string }> = [];
   for (const task of tasks) {
+    const taskId = task.id || crypto.randomUUID();
     let resolvedImageUrl = task.imageUrl || "";
     if (task.imageFile) {
-      resolvedImageUrl = await uploadWritingAsset(userId, task.imageFile);
+      resolvedImageUrl = await uploadWritingAsset(taskId, task.imageFile);
     }
-    resolved.push({ ...task, resolvedImageUrl });
+    resolved.push({ ...task, id: taskId, resolvedImageUrl });
   }
   return resolved;
 }
 
 export async function saveWritingTest(params: SaveWritingTestParams): Promise<{ testId: string }> {
   const { userId, title, status, tasks } = params;
-  const resolvedTasks = await resolveTasks(userId, tasks);
+  const resolvedTasks = await resolveTasks(tasks);
   const testId = await createWritingTest(userId, { title, status });
   await Promise.all(
     resolvedTasks.map((t, idx) =>
       createWritingTask(userId, {
+        id: t.id,
         test_id: testId,
         task_number: idx + 1,
         task_type: t.taskType,
@@ -77,7 +80,7 @@ export async function saveWritingTest(params: SaveWritingTestParams): Promise<{ 
 export async function updateWritingTest(params: UpdateWritingTestParams): Promise<void> {
   const { testId, title, status, tasks } = params;
   const userId = getAnonId();
-  const resolvedTasks = await resolveTasks(userId, tasks);
+  const resolvedTasks = await resolveTasks(tasks);
 
   await tauriUpdateWritingTest(testId, userId, { title, status });
 
@@ -87,6 +90,7 @@ export async function updateWritingTest(params: UpdateWritingTestParams): Promis
   await Promise.all(
     resolvedTasks.map((t, idx) =>
       createWritingTask(userId, {
+        id: t.id,
         test_id: testId,
         task_number: idx + 1,
         task_type: t.taskType,
@@ -116,6 +120,7 @@ export async function fetchWritingTest(testId: string) {
     title: test.title,
     status: test.status,
     tasks: tasks.map((t) => ({
+      id: t.id,
       taskType: t.task_type as "task1" | "task2",
       title: t.title,
       difficulty: t.difficulty,
