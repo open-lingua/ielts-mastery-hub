@@ -537,8 +537,8 @@ export async function uploadWritingAsset(userId: string, file: File): Promise<st
   const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
   const path = await invoke<string>("upload_writing_asset", {
     userId,
-    file_name: file.name,
-    file_data: bytes,
+    fileName: file.name,
+    fileData: bytes,
   });
   return convertFileSrc(path);
 }
@@ -547,8 +547,8 @@ export async function uploadListeningAudio(userId: string, file: File): Promise<
   const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
   const path = await invoke<string>("upload_listening_audio", {
     userId,
-    file_name: file.name,
-    file_data: bytes,
+    fileName: file.name,
+    fileData: bytes,
   });
   return convertFileSrc(path);
 }
