@@ -394,6 +394,7 @@ export async function listWritingTasks(userId: string): Promise<WritingTask[]> {
 export async function createWritingTask(
   userId: string,
   input: {
+    id?: string;
     test_id: string;
     task_number?: number;
     task_type?: string;
@@ -535,10 +536,10 @@ export async function getProfile(id: string): Promise<Profile | null> {
 
 // ── storage ────────────────────────────────────────────────────────────────
 
-export async function uploadWritingAsset(userId: string, file: File): Promise<string> {
+export async function uploadWritingAsset(taskId: string, file: File): Promise<string> {
   const bytes = Array.from(new Uint8Array(await file.arrayBuffer()));
   const path = await invoke<string>("upload_writing_asset", {
-    userId,
+    taskId,
     fileName: file.name,
     fileData: bytes,
   });
