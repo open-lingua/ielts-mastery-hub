@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   ArrowUpToLine,
@@ -6,6 +6,7 @@ import {
   CircleDot,
   Copy,
   FileJson,
+  Image as ImageIcon,
   Loader2,
   Music4,
   ShieldCheck,
@@ -28,7 +29,16 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import type { ImportAudioFile, ImportKind, ImportPreview } from "@/lib/tauri";
 import { cn } from "@/lib/utils";
-import { parseImportFile, runImport, validate, validateListeningAudioSlots } from "@/services/importService";
+import {
+  parseImportFile,
+  resolveWritingTaskImage,
+  runImport,
+  validate,
+  validateListeningAudioSlots,
+} from "@/services/importService";
+
+const MAX_TASK1_IMAGE_BYTES = 10 * 1024 * 1024;
+const TASK1_IMAGE_ACCEPT = "image/png,image/jpeg,image/webp,image/svg+xml";
 
 const SECTION_SLOTS = [1, 2, 3, 4] as const;
 const TEST_TYPES: { id: ImportKind; label: string }[] = [
@@ -152,6 +162,139 @@ function DropZone({ label, hint, accept, file, onFile, compact = false, icon: Ic
   );
 }
 
+interface ImageDropZoneProps {
+  file: File | null;
+  onFile: (f: File | null) => void;
+}
+
+function ImageDropZone({ file, onFile }: ImageDropZoneProps) {
+  const [dragging, setDragging] = useState(false);
+  const [sizeError, setSizeError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+
+  const acceptFile = useCallback(
+    (f: File | null) => {
+      if (!f) {
+        setSizeError(null);
+        onFile(null);
+        return;
+      }
+      if (f.size > MAX_TASK1_IMAGE_BYTES) {
+        setSizeError(`"${f.name}" is ${fmtBytes(f.size)} — the max size is 10 MB.`);
+        return;
+      }
+      setSizeError(null);
+      onFile(f);
+    },
+    [onFile]
+  );
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      const f = e.dataTransfer.files?.[0];
+      if (f) acceptFile(f);
+    },
+    [acceptFile]
+  );
+
+  return (
+    <div className="w-full">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="h-px flex-1 bg-border" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          Task 1 asset · Optional
+        </span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-[13px] font-medium text-foreground">Task 1 image</span>
+        <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Optional</span>
+      </div>
+
+      {file && previewUrl ? (
+        <div className="relative flex items-center gap-3 rounded-xl border border-violet-200 bg-violet-50/40 px-4 py-3 dark:border-violet-800 dark:bg-violet-900/20">
+          <img
+            src={previewUrl}
+            alt="Task 1 preview"
+            className="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-border"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-medium text-foreground">{file.name}</div>
+            <div className="mt-0.5 text-[11px] text-muted-foreground">{fmtBytes(file.size)} · Ready to upload</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => acceptFile(null)}
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
+            aria-label="Remove image"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ) : (
+        <label
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={cn(
+            "group relative flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-5 transition-all duration-200",
+            dragging
+              ? "border-violet-500 bg-violet-50 ring-4 ring-violet-100 dark:bg-violet-900/30 dark:ring-violet-900/50"
+              : "border-dashed border-border bg-muted/30 hover:border-violet-300 hover:bg-violet-50/30 dark:bg-muted/20 dark:hover:border-violet-700 dark:hover:bg-violet-900/10"
+          )}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept={TASK1_IMAGE_ACCEPT}
+            className="sr-only"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) acceptFile(f);
+              e.target.value = "";
+            }}
+          />
+
+          <div
+            className={cn(
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors",
+              dragging
+                ? "bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-400"
+                : "bg-card text-muted-foreground ring-1 ring-border group-hover:text-violet-500"
+            )}
+          >
+            <ImageIcon size={18} />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="text-[13px] font-medium text-foreground">
+              {dragging ? "Release to attach" : "Drop image or click to browse"}
+            </div>
+            <div className="mt-0.5 text-[11px] text-muted-foreground">png · jpg · webp · svg</div>
+          </div>
+
+          <span className="hidden shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground ring-1 ring-border group-hover:text-violet-700 dark:group-hover:text-violet-400 sm:inline">
+            Browse
+          </span>
+        </label>
+      )}
+
+      {sizeError && <p className="mt-2 text-[11px] text-destructive">{sizeError}</p>}
+
+      <p className="mt-2 text-[12px] text-muted-foreground">
+        Attach the chart, diagram, or map that candidates will describe in Task 1. Leave empty if the prompt is
+        text-only.
+      </p>
+    </div>
+  );
+}
+
 function TestTypeSegmented({ value, onChange }: { value: ImportKind; onChange: (v: ImportKind) => void }) {
   const idx = TEST_TYPES.findIndex((t) => t.id === value);
   return (
@@ -221,6 +364,7 @@ const ImportDataset: React.FC = () => {
   const [kind, setKind] = useState<ImportKind>("reading");
   const [jsonFile, setJsonFile] = useState<File | null>(null);
   const [audioFiles, setAudioFiles] = useState<Record<number, File | null>>({ 1: null, 2: null, 3: null, 4: null });
+  const [task1Image, setTask1Image] = useState<File | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -240,6 +384,7 @@ const ImportDataset: React.FC = () => {
     setKind(value);
     setJsonFile(null);
     setAudioFiles({ 1: null, 2: null, 3: null, 4: null });
+    setTask1Image(null);
     resetOutcome();
   };
 
@@ -273,7 +418,9 @@ const ImportDataset: React.FC = () => {
     setIsImporting(true);
     setError(null);
     try {
-      const testId = await runImport(kind, parsedJson, kind === "listening" ? resolvedAudioFiles() : []);
+      const jsonToImport =
+        kind === "writing" && task1Image ? await resolveWritingTaskImage(parsedJson, task1Image) : parsedJson;
+      const testId = await runImport(kind, jsonToImport, kind === "listening" ? resolvedAudioFiles() : []);
       toast({
         title: "Import successful",
         description: `"${preview?.title}" imported (id ${testId}).`,
@@ -362,6 +509,15 @@ const ImportDataset: React.FC = () => {
                 onFile={(f) => { setJsonFile(f); resetOutcome(); }}
                 icon={FileJson}
               />
+
+              <div
+                className="grid overflow-hidden transition-[grid-template-rows,margin] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                style={{ gridTemplateRows: kind === "writing" ? "1fr" : "0fr", marginTop: kind === "writing" ? 20 : 0 }}
+              >
+                <div className="min-h-0">
+                  <ImageDropZone file={task1Image} onFile={setTask1Image} />
+                </div>
+              </div>
 
               <div
                 className="grid overflow-hidden transition-[grid-template-rows,margin] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"

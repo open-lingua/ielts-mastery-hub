@@ -3,6 +3,7 @@ import {
   importListeningTest,
   importReadingTest,
   importWritingTest,
+  uploadWritingAsset,
   validateImport,
   type ImportAudioFile,
   type ImportKind,
@@ -77,4 +78,27 @@ export async function runImport(
     console.error("[importService] runImport: failed", { kind }, e);
     throw e;
   }
+}
+
+// Uploads a Task 1 image asset and returns a copy of the parsed writing JSON with
+// `image_url` set on the task tagged `task_type: "task1"` (falling back to the first task
+// when no task is explicitly tagged as task1).
+export async function resolveWritingTaskImage(json: unknown, imageFile: File): Promise<unknown> {
+  if (typeof json !== "object" || json === null || !Array.isArray((json as { tasks?: unknown }).tasks)) {
+    throw new Error("The writing JSON must include a `tasks` array to attach a Task 1 image.");
+  }
+  const source = json as { tasks: Array<Record<string, unknown>> };
+  if (source.tasks.length === 0) {
+    throw new Error("The writing JSON has no tasks to attach a Task 1 image to.");
+  }
+
+  const userId = getAnonId();
+  const imageUrl = await uploadWritingAsset(userId, imageFile);
+
+  const tasks = source.tasks.map((t) => ({ ...t }));
+  const task1Index = tasks.findIndex((t) => t.task_type === "task1");
+  const targetIndex = task1Index !== -1 ? task1Index : 0;
+  tasks[targetIndex] = { ...tasks[targetIndex], image_url: imageUrl };
+
+  return { ...source, tasks };
 }
