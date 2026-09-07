@@ -17,8 +17,10 @@ You are tasked with generating a comprehensive **SQLite SQL Seed File** specific
 - **Test Record:** Create 1 entry in `writing_tests` using the Test Title and `[TEST_TYPE]`.
 - **Task 1:** Create a prompt (`task_type: 'task1'`, `min_words: 150`). Include a descriptive **Title**.
   - *Logic Check:* If `[TEST_TYPE]` is Academic, the prompt must describe a graph, chart, table, or diagram. If `[TEST_TYPE]` is General Training, the prompt must be a letter describing a situation or requesting information.
+  - *`figure_description` column:* string (Academic Task 1 ONLY: a highly detailed visual description of the chart/graph/table/diagram, precise enough that an AI image-generation model could reconstruct the original figure. Include layout, titles, axes, labels, units, colors, series, trends, and key values. Leave as an empty string `""` for General Training or when no figure applies.)
 - **Task 2:** Create a prompt (`task_type: 'task2'`, `min_words: 250`). Include a descriptive **Title**.
   - *Logic Check:* The prompt must be a discursive essay question (e.g., agree/disagree, causes/solutions) appropriate for the chosen `[TEST_TYPE]`.
+  - *`figure_description` column:* always an empty string `""` — Task 2 never has an accompanying figure.
 
 # Data Handling: Output Requirements
 - Provide the **complete, exact SQL script**.
