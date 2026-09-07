@@ -133,3 +133,72 @@ mod default_db_path_test {
         assert!(matches!(result, Err(app_lib::error::AppError::Validation(_))));
     }
 }
+
+mod split_task_id_and_ext_test {
+    use app_lib::database::split_task_id_and_ext;
+
+    #[test]
+    fn it_splits_a_uuid_filename_with_a_jpeg_extension_into_task_id_and_ext() {
+        // Act
+        let result = split_task_id_and_ext("0ae6b9c7-5bd8-49a6-a22c-5114ce53173e.jpeg");
+
+        // Assert
+        assert_eq!(
+            result,
+            Some(("0ae6b9c7-5bd8-49a6-a22c-5114ce53173e", "jpeg"))
+        );
+    }
+
+    #[test]
+    fn it_returns_none_for_a_filename_with_no_extension() {
+        // Act
+        let result = split_task_id_and_ext("no-extension-here");
+
+        // Assert
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn it_splits_on_the_last_dot_when_the_filename_has_multiple_dots() {
+        // Act
+        let result = split_task_id_and_ext("archive.tar.gz");
+
+        // Assert
+        assert_eq!(result, Some(("archive.tar", "gz")));
+    }
+
+    #[test]
+    fn it_returns_none_for_a_filename_that_is_only_a_dotfile() {
+        // Act
+        let result = split_task_id_and_ext(".gitkeep");
+
+        // Assert
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn it_returns_none_for_a_filename_ending_in_a_dot() {
+        // Act
+        let result = split_task_id_and_ext("trailing-dot.");
+
+        // Assert
+        assert_eq!(result, None);
+    }
+}
+
+mod writing_asset_seed_dest_path_test {
+    use app_lib::database::writing_asset_seed_dest_path;
+    use std::path::PathBuf;
+
+    #[test]
+    fn it_builds_the_ielts_hub_writing_assets_path_under_the_given_home() {
+        // Act
+        let result = writing_asset_seed_dest_path("/Users/alice", "task-123", "jpeg");
+
+        // Assert
+        assert_eq!(
+            result,
+            PathBuf::from("/Users/alice/.ielts-hub/writing-assets/task-123.jpeg")
+        );
+    }
+}
