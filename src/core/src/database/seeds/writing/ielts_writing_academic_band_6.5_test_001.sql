@@ -2,7 +2,7 @@
 -- IELTS Practice Platform – Writing Test Seed Data
 -- Test Type: Academic
 -- Target Band: 6.5
--- Description: Sports Participation (Task 1) & City Life (Task 2)
+-- Description: Water Consumption (Task 1) & Remote Work (Task 2)
 -- ============================================================
 
 -- NOTE: `created_by` uses a placeholder UUID. After seeding,
@@ -14,30 +14,30 @@
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO writing_tests (id, created_by, title, status) VALUES
-('f2c32a8c-ecc9-415f-80b0-b3dc6dccd668', 'fe38ed89-f1fe-4b88-9609-8736be47f61e',
- 'IELTS Academic Writing: Sports Participation & Challenges of City Life (Band 6.5)', 'published');
+('b49499a8-d846-483e-8231-40bacb92aab1', '75f9fcf6-5617-4b05-92ca-794630d32041',
+ 'IELTS Academic Writing: Water Consumption & Remote Work (Band 6.5)', 'published');
 
--- ── Task 1: Academic Data Analysis (Bar Chart) ──────────────
+-- ── Task 1: Academic Data Analysis (Line Graph) ────────
 
-INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url) VALUES
-('5f2a310e-4d25-4fb3-8c2d-01549ca2cdcf', 'f2c32a8c-ecc9-415f-80b0-b3dc6dccd668', 1,
- 'task1', 'Writing Task 1: Sports Participation by Age', '6.5', '20 mins',
- 'The bar chart below shows the percentage of people in three different age groups (15-24, 25-44, and 45-64) who participated in five different sports in a European country in 2022.
+INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url, figure_description) VALUES
+('629da1fd-518b-4333-aa71-79d58178e86b', 'b49499a8-d846-483e-8231-40bacb92aab1', 1,
+ 'task1', 'Writing Task 1: Sectoral Water Consumption', '6.5', '20 mins',
+ 'The line graph below shows the water consumption (in millions of cubic meters) for agriculture, industry, and domestic use in a particular country from 2000 to 2020.
 
 Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
- 150, '', '');
+ 150, '', '', 'A line graph titled ''Water Consumption by Sector (2000-2020)''. The x-axis represents years in 5-year intervals (2000, 2005, 2010, 2015, 2020). The y-axis represents water consumption in millions of cubic meters, ranging from 0 to 500 in increments of 100. There are three line series: ''Agriculture'' (green line) starting at 300 in 2000, rising steadily to 450 in 2020. ''Industry'' (blue line) starting at 100 in 2000, dipping to 80 in 2005, then rising sharply to 250 in 2020. ''Domestic'' (red line) starting at 50 in 2000, increasing slowly but steadily to reach 120 in 2020. The chart includes a legend at the top right and gridlines for readability.');
 
--- ── Task 2: Discursive Essay (Causes and Solutions) ──────────
+-- ── Task 2: Discursive Essay (Advantages / Disadvantages) ────────────────
 
-INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url) VALUES
-('4cf29f91-5f59-42d2-8fda-b6f9255a2833', 'f2c32a8c-ecc9-415f-80b0-b3dc6dccd668', 2,
- 'task2', 'Writing Task 2: The Challenges of Urbanization', '6.5', '40 mins',
- 'More and more people are migrating to cities in search of a better life, but city life can be extremely difficult. 
+INSERT INTO writing_tasks (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt, min_words, max_words, image_url, figure_description) VALUES
+('7614ff9b-de0e-4258-8ac3-e283759ef418', 'b49499a8-d846-483e-8231-40bacb92aab1', 2,
+ 'task2', 'Writing Task 2: Remote Work Advantages and Disadvantages', '6.5', '40 mins',
+ 'More and more people are choosing to work remotely rather than commuting to a traditional office environment. 
 
-Explain some of the main difficulties of living in a city. How can governments make urban life better for everyone?
+Do the advantages of this trend outweigh the disadvantages?
 
 Give reasons for your answer and include any relevant examples from your own knowledge or experience.',
- 250, '', '');
+ 250, '', '', '');
 
 -- ============================================================
 -- End of Seed Script
