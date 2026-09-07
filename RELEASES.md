@@ -73,6 +73,30 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.18](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.17...1.0.0-beta.18) (2026-09-07)
+
+
+### Features
+
+* persist figure_description across full stack for writing tasks ([4911bc1](https://github.com/open-lingua/ielts-mastery-hub/commit/4911bc17b9cd4a2deadfdf77d57b05ca0b7175b8))
+* **seeds:** replace band 6 academic seed with university enrollment & free education test ([d293db8](https://github.com/open-lingua/ielts-mastery-hub/commit/d293db82fe43c354ef7e941ce935d46d819a2cb4))
+* **seeds:** replace band 6.5 academic seed with water consumption & remote work test ([aea5add](https://github.com/open-lingua/ielts-mastery-hub/commit/aea5add0ed75186e035ab01ea44b588d9fb2db6e))
+* **seeds:** replace band 7 academic seed with geothermal energy & space exploration test ([d30a51b](https://github.com/open-lingua/ielts-mastery-hub/commit/d30a51b2393d35b64ea17442aa33763fb3b6d319))
+* **seeds:** replace band 7.5 academic seed with student enrollment & AI in professions test ([9bad2f2](https://github.com/open-lingua/ielts-mastery-hub/commit/9bad2f24e2e8d481531449ba85540ff65eb833f9))
+* **seeds:** replace band 8 academic seed with government expenditure & family structures test ([0c23af7](https://github.com/open-lingua/ielts-mastery-hub/commit/0c23af7703be41d8d04811d86620646a01e29e4a))
+* **seeds:** replace band 9 academic seed with global energy transition & cognitive delegation test ([5aa2d07](https://github.com/open-lingua/ielts-mastery-hub/commit/5aa2d071434343509281c4a57da5b2e86d49229e))
+* **ui:** add Task 1 image upload to writing dataset import ([cf0d447](https://github.com/open-lingua/ielts-mastery-hub/commit/cf0d4479bec5dc21ea446d0353129f1bce158e7a))
+
+
+### Refactors
+
+* move test-001 TTS configs into per-test subfolder ([68a67ee](https://github.com/open-lingua/ielts-mastery-hub/commit/68a67ee1562a1db42d42265875f20a8195ed5057))
+
+
+### Documentation
+
+* **prompts:** add figure_description rules to DB seed generator prompt ([2a72840](https://github.com/open-lingua/ielts-mastery-hub/commit/2a72840c72ff3f9c55137338561c0e8d658dad75))
+
 ## [1.0.0-beta.17](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.16...1.0.0-beta.17) (2026-08-31)
 
 
