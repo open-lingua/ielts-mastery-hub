@@ -24,6 +24,7 @@ mod create_writing_tasks {
         assert_eq!(parsed.image_url, None);
         assert_eq!(parsed.include_model_answer, None);
         assert_eq!(parsed.model_answer, None);
+        assert_eq!(parsed.figure_description, None);
     }
 
     #[test]
@@ -74,6 +75,7 @@ mod update_writing_tasks {
         assert_eq!(parsed.image_url, None);
         assert_eq!(parsed.include_model_answer, None);
         assert_eq!(parsed.model_answer, None);
+        assert_eq!(parsed.figure_description, None);
     }
 
     #[test]

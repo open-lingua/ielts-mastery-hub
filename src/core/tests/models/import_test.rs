@@ -102,6 +102,7 @@ mod task_import {
         // Assert
         assert_eq!(parsed.task_type, None);
         assert_eq!(parsed.include_model_answer, None);
+        assert_eq!(parsed.figure_description, None);
     }
 }
 

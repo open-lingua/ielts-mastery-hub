@@ -23,6 +23,7 @@ pub struct CreateWritingTaskBuilder {
     image_url: Option<String>,
     include_model_answer: Option<bool>,
     model_answer: Option<String>,
+    figure_description: Option<String>,
 }
 
 impl Default for CreateWritingTaskBuilder {
@@ -40,6 +41,7 @@ impl Default for CreateWritingTaskBuilder {
             image_url: None,
             include_model_answer: Some(DEFAULT_INCLUDE_MODEL_ANSWER),
             model_answer: None,
+            figure_description: None,
         }
     }
 }
@@ -105,6 +107,11 @@ impl CreateWritingTaskBuilder {
         self
     }
 
+    pub fn with_figure_description(mut self, figure_description: &str) -> Self {
+        self.figure_description = Some(figure_description.to_string());
+        self
+    }
+
     pub fn build(self) -> CreateWritingTask {
         CreateWritingTask {
             test_id: self.test_id,
@@ -119,6 +126,7 @@ impl CreateWritingTaskBuilder {
             image_url: self.image_url,
             include_model_answer: self.include_model_answer,
             model_answer: self.model_answer,
+            figure_description: self.figure_description,
         }
     }
 }
@@ -143,6 +151,7 @@ pub struct UpdateWritingTaskBuilder {
     image_url: Option<String>,
     include_model_answer: Option<bool>,
     model_answer: Option<String>,
+    figure_description: Option<String>,
 }
 
 impl UpdateWritingTaskBuilder {
@@ -201,6 +210,11 @@ impl UpdateWritingTaskBuilder {
         self
     }
 
+    pub fn with_figure_description(mut self, figure_description: &str) -> Self {
+        self.figure_description = Some(figure_description.to_string());
+        self
+    }
+
     pub fn build(self) -> UpdateWritingTask {
         UpdateWritingTask {
             task_number: self.task_number,
@@ -214,6 +228,7 @@ impl UpdateWritingTaskBuilder {
             image_url: self.image_url,
             include_model_answer: self.include_model_answer,
             model_answer: self.model_answer,
+            figure_description: self.figure_description,
         }
     }
 }

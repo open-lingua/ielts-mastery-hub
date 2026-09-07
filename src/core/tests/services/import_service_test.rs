@@ -1,4 +1,4 @@
-use app_lib::repositories::{reading_tests, writing_tests};
+use app_lib::repositories::{reading_tests, writing_tasks, writing_tests};
 use app_lib::services::import_service::{
     errors_to_string, find_duplicate_listening_title, find_duplicate_reading_title,
     find_duplicate_writing_title, import_listening, import_reading, import_writing,
@@ -35,7 +35,7 @@ fn good_writing_json() -> serde_json::Value {
     json!({
         "title": "Sample Writing Test",
         "tasks": [
-            { "task_number": 1, "title": "Task One", "prompt": "Describe the chart." },
+            { "task_number": 1, "title": "Task One", "prompt": "Describe the chart.", "figure_description": "A line graph showing rainfall over 12 months." },
             { "task_number": 2, "title": "Task Two", "prompt": "Give your opinion." }
         ]
     })
@@ -434,6 +434,18 @@ mod import_writing_fn {
             .expect("find")
             .expect("present");
         assert_eq!(found.title, "Sample Writing Test");
+
+        let tasks = writing_tasks::find_all(&pool, OWNER_ID)
+            .await
+            .expect("find tasks");
+        let task_one = tasks
+            .iter()
+            .find(|t| t.test_id == test_id && t.task_number == 1)
+            .expect("task one present");
+        assert_eq!(
+            task_one.figure_description.as_deref(),
+            Some("A line graph showing rainfall over 12 months.")
+        );
     }
 }
 

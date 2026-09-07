@@ -93,6 +93,7 @@ export interface WritingTask {
   image_url: string | null;
   include_model_answer: boolean;
   model_answer: string | null;
+  figure_description: string | null;
   created_at: string;
 }
 
@@ -405,6 +406,7 @@ export async function createWritingTask(
     image_url?: string;
     include_model_answer?: boolean;
     model_answer?: string;
+    figure_description?: string;
   }
 ): Promise<string> {
   return invoke<string>("create_writing_tasks", { userId, input });

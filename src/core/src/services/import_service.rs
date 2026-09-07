@@ -789,8 +789,9 @@ async fn insert_writing_task(
     sqlx::query!(
         "INSERT INTO writing_tasks
          (id, test_id, task_number, task_type, title, difficulty, suggested_time, prompt,
-          min_words, max_words, image_url, include_model_answer, model_answer, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          min_words, max_words, image_url, include_model_answer, model_answer,
+          figure_description, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         task_id,
         test_id,
         task_number,
@@ -804,6 +805,7 @@ async fn insert_writing_task(
         task.image_url,
         include_model_answer,
         task.model_answer,
+        task.figure_description,
         now
     )
     .execute(&mut **tx)

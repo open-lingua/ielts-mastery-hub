@@ -43,6 +43,7 @@ pub struct TaskImport {
     pub image_url: Option<String>,
     pub include_model_answer: Option<bool>,
     pub model_answer: Option<String>,
+    pub figure_description: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
