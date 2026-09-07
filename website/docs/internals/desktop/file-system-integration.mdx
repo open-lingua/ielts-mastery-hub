@@ -50,7 +50,11 @@ Two call sites in `src/ui/lib/tauri.ts` use this:
 
 ## Storage commands
 
-`upload_writing_asset` and `upload_listening_audio` (`src/core/src/commands/storage.rs`) both write uploaded bytes under `$HOME/.ielts-hub/<domain>/<user_id>/<timestamp>-<uuid>.<ext>` (domains: `writing-assets`, `listening-audio`), matching the `assetProtocol.scope` above. See [Import & Export Commands](../api-reference/import-export-commands.mdx) and [Listening Test Commands](../api-reference/listening-commands.mdx).
+`upload_writing_asset` and `upload_listening_audio` (`src/core/src/commands/storage.rs`) write uploaded bytes under `$HOME/.ielts-hub/<domain>/...` (matching the `assetProtocol.scope` above), but use different naming schemes per domain:
+- `upload_writing_asset` (domain `writing-assets`) stores the file as `$HOME/.ielts-hub/writing-assets/<writing_task_id>.<ext>` — no per-user subfolder; the filename is the `writing_task` id (generated client-side before upload so it can be threaded through to `create_writing_tasks`/`import_writing_test`). Re-uploading for the same task id overwrites the file.
+- `upload_listening_audio` (domain `listening-audio`) stores the file as `$HOME/.ielts-hub/listening-audio/<user_id>/<timestamp>-<uuid>.<ext>`.
+
+See [Import & Export Commands](../api-reference/import-export-commands.mdx) and [Listening Test Commands](../api-reference/listening-commands.mdx).
 
 ## Tauri ACL / capabilities
 
