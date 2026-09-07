@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use sqlx::sqlite::SqlitePoolOptions;
 
@@ -9,6 +9,20 @@ pub type Db = sqlx::SqlitePool;
 /// Bundle identifier used to namespace the app's data directory, matching
 /// `identifier` in `tauri.conf.json`.
 pub const APP_IDENTIFIER: &str = "com.openlingua.ieltsmasteryhub";
+
+/// Directory bundling seed images for Writing Task 1 prompts, whose
+/// filenames (stem) are `writing_tasks.id` values. Resolved at compile time
+/// relative to this crate, mirroring the crate-relative style used by
+/// `sqlx::migrate!("./src/database/seeds")` above.
+///
+/// Caveat: unlike `sqlx::migrate!` (which embeds file *contents* into the
+/// binary at compile time), this only embeds the *path* to the source tree.
+/// It only resolves correctly when the running binary can still reach that
+/// path on disk (e.g. dev builds / running from a repo checkout) — a
+/// distributed production bundle would need a different mechanism (e.g.
+/// Tauri bundled resources or `include_bytes!` via a build script).
+const SEED_WRITING_ASSETS_DIR: &str =
+    concat!(env!("CARGO_MANIFEST_DIR"), "/src/database/seeds/writing/writing-assets");
 
 /// Resolves the SQLite connection URL to use at runtime.
 ///
@@ -92,5 +106,177 @@ pub async fn init(_app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .set_ignore_missing(true)
         .run(&pool)
         .await?;
+    sync_writing_assets_to_local_storage(&pool).await?;
     Ok(pool)
+}
+
+/// Splits a seed asset filename (e.g. `"<uuid>.jpeg"`) into its
+/// `(task_id, ext)` stem/extension pair, splitting on the last `.`. Returns
+/// `None` when the filename has no extension.
+pub fn split_task_id_and_ext(file_name: &str) -> Option<(&str, &str)> {
+    let dot_index = file_name.rfind('.')?;
+    if dot_index == 0 || dot_index == file_name.len() - 1 {
+        return None;
+    }
+    Some((&file_name[..dot_index], &file_name[dot_index + 1..]))
+}
+
+/// Builds the local-storage destination path for a writing asset,
+/// mirroring `commands::storage::upload_writing_asset`'s
+/// `$HOME/.ielts-hub/writing-assets/<task_id>.<ext>` convention.
+pub fn writing_asset_seed_dest_path(home: &str, task_id: &str, ext: &str) -> PathBuf {
+    Path::new(home)
+        .join(".ielts-hub")
+        .join("writing-assets")
+        .join(format!("{task_id}.{ext}"))
+}
+
+/// Copies bundled seed images for Writing Task 1 prompts
+/// (`SEED_WRITING_ASSETS_DIR`) into the user's local
+/// `$HOME/.ielts-hub/writing-assets/` storage, backfilling each matching
+/// `writing_tasks.image_url` to point at the copied file.
+///
+/// Idempotent: a task is skipped entirely once its destination file already
+/// exists on disk, so re-running this on every app startup is a cheap no-op
+/// once assets are seeded, and it never clobbers an `image_url` a user has
+/// since intentionally changed away from the seeded value.
+///
+/// Individual per-file problems (an asset filename that doesn't parse, a
+/// `task_id` with no matching `writing_tasks` row, a copy/IO error, or a
+/// failed `UPDATE`) are logged with `eprintln!` and skipped — they never
+/// abort the sync or block app startup. Only a failure to read the seed
+/// directory itself, or a missing `$HOME`, is propagated as `Err`.
+pub async fn sync_writing_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
+    let home = std::env::var("HOME").map_err(|_| {
+        AppError::Validation("HOME environment variable is not set".to_string())
+    })?;
+    sync_writing_assets_from_dir(pool, Path::new(SEED_WRITING_ASSETS_DIR), &home).await
+}
+
+/// Internal implementation of [`sync_writing_assets_to_local_storage`],
+/// parameterized on the source directory and home directory so it can be
+/// exercised end-to-end in tests without touching the real seed assets or
+/// `$HOME`. `pub` (rather than crate-private) solely so integration tests in
+/// `tests/database/mod_test.rs` can call it directly.
+pub async fn sync_writing_assets_from_dir(
+    pool: &Db,
+    source_dir: &Path,
+    home: &str,
+) -> Result<(), AppError> {
+    let mut entries = tokio::fs::read_dir(source_dir).await.map_err(|e| {
+        AppError::Validation(format!(
+            "failed to read writing asset seed directory {}: {e}",
+            source_dir.display()
+        ))
+    })?;
+
+    loop {
+        let entry = match entries.next_entry().await {
+            Ok(Some(entry)) => entry,
+            Ok(None) => break,
+            Err(e) => {
+                eprintln!("[sync_writing_assets_to_local_storage] failed to read a directory entry: {e}");
+                continue;
+            }
+        };
+
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let Some(file_name) = path.file_name().and_then(|n| n.to_str()) else {
+            eprintln!(
+                "[sync_writing_assets_to_local_storage] skipping non-UTF-8 file name at {}",
+                path.display()
+            );
+            continue;
+        };
+
+        let Some((task_id, ext)) = split_task_id_and_ext(file_name) else {
+            eprintln!(
+                "[sync_writing_assets_to_local_storage] could not parse a task id from filename `{file_name}`, skipping"
+            );
+            continue;
+        };
+
+        let dest = writing_asset_seed_dest_path(home, task_id, ext);
+
+        // Idempotent skip: once the file exists at its destination, never
+        // touch this task again (also protects a user-edited `image_url`).
+        if tokio::fs::metadata(&dest).await.is_ok() {
+            continue;
+        }
+
+        let dest_str = dest.to_string_lossy().into_owned();
+
+        let existing_image_url: Option<String> = match sqlx::query_scalar!(
+            "SELECT image_url FROM writing_tasks WHERE id = ?",
+            task_id
+        )
+        .fetch_optional(pool)
+        .await
+        {
+            Ok(Some(row)) => row,
+            Ok(None) => {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] seed writing asset {task_id} has no matching writing_tasks row, skipping"
+                );
+                continue;
+            }
+            Err(e) => {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] failed to look up writing_tasks row {task_id}: {e}"
+                );
+                continue;
+            }
+        };
+
+        if existing_image_url.as_deref() == Some(dest_str.as_str()) {
+            continue;
+        }
+
+        if let Some(parent) = dest.parent() {
+            if let Err(e) = tokio::fs::create_dir_all(parent).await {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] failed to create directory {}: {e}",
+                    parent.display()
+                );
+                continue;
+            }
+        }
+
+        let bytes = match tokio::fs::read(&path).await {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] failed to read seed asset {}: {e}",
+                    path.display()
+                );
+                continue;
+            }
+        };
+
+        if let Err(e) = tokio::fs::write(&dest, bytes).await {
+            eprintln!(
+                "[sync_writing_assets_to_local_storage] failed to write {}: {e}",
+                dest.display()
+            );
+            continue;
+        }
+
+        if let Err(e) = sqlx::query!(
+            "UPDATE writing_tasks SET image_url = ? WHERE id = ?",
+            dest_str,
+            task_id
+        )
+        .execute(pool)
+        .await
+        {
+            eprintln!(
+                "[sync_writing_assets_to_local_storage] failed to update image_url for writing_tasks {task_id}: {e}"
+            );
+        }
+    }
+
+    Ok(())
 }
