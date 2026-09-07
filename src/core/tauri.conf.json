@@ -1,6 +1,6 @@
 {
   "productName": "ielts-mastery-hub",
-  "version": "1.0.0-beta.18",
+  "version": "1.0.0-beta.19",
   "identifier": "com.openlingua.ieltsmasteryhub",
   "build": {
     "frontendDist": "../ui/dist",
