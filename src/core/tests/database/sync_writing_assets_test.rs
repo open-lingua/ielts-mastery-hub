@@ -28,7 +28,7 @@ async fn given_task(pool: &Db, task_id: &str) -> String {
 
 fn unique_temp_dir(label: &str) -> std::path::PathBuf {
     std::env::temp_dir().join(format!(
-        "ielts-hub-test-{label}-{}-{}",
+        "imh-test-{label}-{}-{}",
         std::process::id(),
         uuid::Uuid::new_v4()
     ))
@@ -54,7 +54,7 @@ async fn it_copies_the_seed_asset_and_updates_image_url() {
     // Assert
     assert!(result.is_ok());
     let dest = home_dir
-        .join(".ielts-hub")
+        .join(".imh")
         .join("writing-assets")
         .join(format!("{task_id}.jpeg"));
     let copied = tokio::fs::read(&dest).await.expect("destination file should exist");
@@ -90,7 +90,7 @@ async fn it_is_a_no_op_on_a_second_run_once_the_destination_file_exists() {
         .expect("first run");
 
     let dest = home_dir
-        .join(".ielts-hub")
+        .join(".imh")
         .join("writing-assets")
         .join(format!("{task_id}.jpeg"));
 
@@ -164,7 +164,7 @@ async fn it_skips_a_seed_asset_with_no_matching_writing_tasks_row() {
 
     // Assert
     assert!(result.is_ok());
-    let dest_dir = home_dir.join(".ielts-hub").join("writing-assets");
+    let dest_dir = home_dir.join(".imh").join("writing-assets");
     assert!(
         tokio::fs::metadata(&dest_dir).await.is_err(),
         "no destination directory should be created for an orphaned seed asset"

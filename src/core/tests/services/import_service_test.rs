@@ -473,7 +473,7 @@ mod import_writing_fn {
 mod import_listening_fn {
     use super::*;
 
-    /// `import_listening` persists audio to a real `$HOME/.ielts-hub/...`
+    /// `import_listening` persists audio to a real `$HOME/.imh/...`
     /// directory (there is no injectable filesystem seam). This test cleans
     /// up everything it writes so no artifacts are left behind.
     #[tokio::test]
@@ -499,7 +499,7 @@ mod import_listening_fn {
         // Assert
         let home = std::env::var("HOME").expect("HOME must be set");
         let dir = std::path::Path::new(&home)
-            .join(".ielts-hub")
+            .join(".imh")
             .join("listening-tests");
         let entry = std::fs::read_dir(&dir)
             .expect("read test dir")

@@ -820,7 +820,7 @@ fn build_listening_test_dir(test_id: &str, title: &str) -> Result<PathBuf, AppEr
     let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
     let slug = slugify(title);
     Ok(Path::new(&home)
-        .join(".ielts-hub")
+        .join(".imh")
         .join("listening-tests")
         .join(format!("{test_id}-{slug}")))
 }

@@ -123,10 +123,10 @@ pub fn split_task_id_and_ext(file_name: &str) -> Option<(&str, &str)> {
 
 /// Builds the local-storage destination path for a writing asset,
 /// mirroring `commands::storage::upload_writing_asset`'s
-/// `$HOME/.ielts-hub/writing-assets/<task_id>.<ext>` convention.
+/// `$HOME/.imh/writing-assets/<task_id>.<ext>` convention.
 pub fn writing_asset_seed_dest_path(home: &str, task_id: &str, ext: &str) -> PathBuf {
     Path::new(home)
-        .join(".ielts-hub")
+        .join(".imh")
         .join("writing-assets")
         .join(format!("{task_id}.{ext}"))
 }
@@ -162,7 +162,7 @@ pub fn to_asset_url(path: &Path) -> String {
 
 /// Copies bundled seed images for Writing Task 1 prompts
 /// (`SEED_WRITING_ASSETS_DIR`) into the user's local
-/// `$HOME/.ielts-hub/writing-assets/` storage, backfilling each matching
+/// `$HOME/.imh/writing-assets/` storage, backfilling each matching
 /// `writing_tasks.image_url` to point at the copied file.
 ///
 /// Idempotent: a task is skipped entirely once its destination file already
