@@ -131,6 +131,35 @@ pub fn writing_asset_seed_dest_path(home: &str, task_id: &str, ext: &str) -> Pat
         .join(format!("{task_id}.{ext}"))
 }
 
+/// Percent-encodes a string exactly like JavaScript's `encodeURIComponent`:
+/// every byte is escaped as `%XX` (uppercase hex) except ASCII letters,
+/// digits, and the literal characters `- _ . ! ~ * ' ( )`. This must match
+/// `@tauri-apps/api`'s `convertFileSrc` (see `tauri`'s bundled
+/// `scripts/core.js`, which calls `encodeURIComponent(filePath)`) so the
+/// frontend and this startup sync agree on `writing_tasks.image_url`.
+fn encode_uri_component(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    for byte in input.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'!' | b'~' | b'*'
+            | b'\'' | b'(' | b')' => out.push(byte as char),
+            _ => out.push_str(&format!("%{byte:02X}")),
+        }
+    }
+    out
+}
+
+/// Builds the Tauri asset-protocol URL for a local file path, matching what
+/// the frontend's `convertFileSrc(path)` (from `@tauri-apps/api/core`, used
+/// in `src/ui/lib/tauri.ts`) produces on macOS/Linux:
+/// `asset://localhost/<url-encoded-absolute-path>`.
+pub fn to_asset_url(path: &Path) -> String {
+    format!(
+        "asset://localhost/{}",
+        encode_uri_component(&path.to_string_lossy())
+    )
+}
+
 /// Copies bundled seed images for Writing Task 1 prompts
 /// (`SEED_WRITING_ASSETS_DIR`) into the user's local
 /// `$HOME/.ielts-hub/writing-assets/` storage, backfilling each matching
@@ -207,7 +236,7 @@ pub async fn sync_writing_assets_from_dir(
             continue;
         }
 
-        let dest_str = dest.to_string_lossy().into_owned();
+        let asset_url = to_asset_url(&dest);
 
         let existing_image_url: Option<String> = match sqlx::query_scalar!(
             "SELECT image_url FROM writing_tasks WHERE id = ?",
@@ -231,7 +260,7 @@ pub async fn sync_writing_assets_from_dir(
             }
         };
 
-        if existing_image_url.as_deref() == Some(dest_str.as_str()) {
+        if existing_image_url.as_deref() == Some(asset_url.as_str()) {
             continue;
         }
 
@@ -266,7 +295,7 @@ pub async fn sync_writing_assets_from_dir(
 
         if let Err(e) = sqlx::query!(
             "UPDATE writing_tasks SET image_url = ? WHERE id = ?",
-            dest_str,
+            asset_url,
             task_id
         )
         .execute(pool)

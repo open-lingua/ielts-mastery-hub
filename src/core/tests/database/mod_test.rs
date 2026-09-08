@@ -202,3 +202,31 @@ mod writing_asset_seed_dest_path_test {
         );
     }
 }
+
+mod to_asset_url_test {
+    use app_lib::database::to_asset_url;
+    use std::path::Path;
+
+    #[test]
+    fn it_percent_encodes_forward_slashes_and_prepends_the_asset_protocol() {
+        // Act
+        let result = to_asset_url(Path::new(
+            "/Users/lucho/.ielts-hub/writing-assets/2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg",
+        ));
+
+        // Assert
+        assert_eq!(
+            result,
+            "asset://localhost/%2FUsers%2Flucho%2F.ielts-hub%2Fwriting-assets%2F2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg"
+        );
+    }
+
+    #[test]
+    fn it_leaves_unreserved_characters_like_dot_and_hyphen_unescaped() {
+        // Act
+        let result = to_asset_url(Path::new("/home/uuid-with-dashes.png"));
+
+        // Assert
+        assert_eq!(result, "asset://localhost/%2Fhome%2Fuuid-with-dashes.png");
+    }
+}

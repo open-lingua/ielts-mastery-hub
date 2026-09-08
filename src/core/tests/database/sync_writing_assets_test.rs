@@ -4,6 +4,7 @@
 //! run against temp directories instead of the real seed assets/`$HOME`.
 
 use app_lib::database::sync_writing_assets_from_dir;
+use app_lib::database::to_asset_url;
 use app_lib::database::Db;
 use app_lib::repositories::{writing_tasks, writing_tests};
 
@@ -63,7 +64,7 @@ async fn it_copies_the_seed_asset_and_updates_image_url() {
         .await
         .expect("find")
         .expect("present");
-    assert_eq!(task.image_url.as_deref(), Some(dest.to_string_lossy().as_ref()));
+    assert_eq!(task.image_url.as_deref(), Some(to_asset_url(&dest).as_str()));
 
     // Cleanup
     let _ = tokio::fs::remove_dir_all(&source_dir).await;
