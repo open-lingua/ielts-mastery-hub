@@ -44,7 +44,9 @@ async fn it_copies_the_seed_asset_and_updates_image_url() {
     let source_dir = unique_temp_dir("source");
     let home_dir = unique_temp_dir("home");
     tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
-    tokio::fs::write(source_dir.join(format!("{task_id}.jpeg")), b"fake-image-bytes")
+    let task_dir = source_dir.join(task_id);
+    tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+    tokio::fs::write(task_dir.join("figure.jpeg"), b"fake-image-bytes")
         .await
         .expect("write seed asset");
 
@@ -56,7 +58,8 @@ async fn it_copies_the_seed_asset_and_updates_image_url() {
     let dest = home_dir
         .join(".imh")
         .join("writing-assets")
-        .join(format!("{task_id}.jpeg"));
+        .join(task_id)
+        .join("figure.jpeg");
     let copied = tokio::fs::read(&dest).await.expect("destination file should exist");
     assert_eq!(copied, b"fake-image-bytes");
 
@@ -81,7 +84,9 @@ async fn it_is_a_no_op_on_a_second_run_once_the_destination_file_exists() {
     let source_dir = unique_temp_dir("source-idempotent");
     let home_dir = unique_temp_dir("home-idempotent");
     tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
-    tokio::fs::write(source_dir.join(format!("{task_id}.jpeg")), b"original-bytes")
+    let task_dir = source_dir.join(task_id);
+    tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+    tokio::fs::write(task_dir.join("figure.jpeg"), b"original-bytes")
         .await
         .expect("write seed asset");
 
@@ -92,7 +97,8 @@ async fn it_is_a_no_op_on_a_second_run_once_the_destination_file_exists() {
     let dest = home_dir
         .join(".imh")
         .join("writing-assets")
-        .join(format!("{task_id}.jpeg"));
+        .join(task_id)
+        .join("figure.jpeg");
 
     // Simulate a user having since edited image_url away from the seeded path.
     writing_tasks::update(
@@ -118,7 +124,7 @@ async fn it_is_a_no_op_on_a_second_run_once_the_destination_file_exists() {
     .expect("simulate user edit");
 
     // Overwrite the seed source file to prove a second run doesn't re-copy it.
-    tokio::fs::write(source_dir.join(format!("{task_id}.jpeg")), b"changed-bytes")
+    tokio::fs::write(task_dir.join("figure.jpeg"), b"changed-bytes")
         .await
         .expect("rewrite seed asset");
 
@@ -152,12 +158,11 @@ async fn it_skips_a_seed_asset_with_no_matching_writing_tasks_row() {
     let source_dir = unique_temp_dir("source-orphan");
     let home_dir = unique_temp_dir("home-orphan");
     tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
-    tokio::fs::write(
-        source_dir.join("99999999-9999-9999-9999-999999999999.jpeg"),
-        b"orphan-bytes",
-    )
-    .await
-    .expect("write seed asset");
+    let task_dir = source_dir.join("99999999-9999-9999-9999-999999999999");
+    tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+    tokio::fs::write(task_dir.join("figure.jpeg"), b"orphan-bytes")
+        .await
+        .expect("write seed asset");
 
     // Act
     let result = sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;

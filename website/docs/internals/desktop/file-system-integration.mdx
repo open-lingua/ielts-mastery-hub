@@ -51,7 +51,7 @@ Two call sites in `src/ui/lib/tauri.ts` use this:
 ## Storage commands
 
 `upload_writing_asset` and `upload_listening_audio` (`src/core/src/commands/storage.rs`) write uploaded bytes under `$HOME/.imh/<domain>/...` (matching the `assetProtocol.scope` above), but use different naming schemes per domain:
-- `upload_writing_asset` (domain `writing-assets`) stores the file as `$HOME/.imh/writing-assets/<writing_task_id>.<ext>` — no per-user subfolder; the filename is the `writing_task` id (generated client-side before upload so it can be threaded through to `create_writing_tasks`/`import_writing_test`). Re-uploading for the same task id overwrites the file.
+- `upload_writing_asset` (domain `writing-assets`) stores the file as `$HOME/.imh/writing-assets/<writing_task_id>/figure.<ext>` — no per-user subfolder, but a per-task subfolder named after the `writing_task` id (generated client-side before upload so it can be threaded through to `create_writing_tasks`/`import_writing_test`), with a fixed `figure.<ext>` filename inside it. Re-uploading for the same task id overwrites the file.
 - `upload_listening_audio` (domain `listening-audio`) stores the file as `$HOME/.imh/listening-audio/<user_id>/<timestamp>-<uuid>.<ext>`.
 
 See [Import & Export Commands](../api-reference/import-export-commands.mdx) and [Listening Test Commands](../api-reference/listening-commands.mdx).
