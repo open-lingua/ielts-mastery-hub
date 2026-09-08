@@ -443,7 +443,7 @@ for more detail on the changelog format and versioning scheme.
 - refactor(ui): replace Supabase audio upload with Tauri command in listeningService
 - refactor(ui): replace Supabase image upload with Tauri command in writingService
 - feat(ui): add uploadWritingAsset and uploadListeningAudio typed wrappers
-- feat(core): enable asset protocol for ~/.ielts-hub
+- feat(core): enable asset protocol for ~/.imh
 - feat(core): wire storage commands into invoke handler
 - feat(core): register storage module
 - feat(core): add upload_writing_asset and upload_listening_audio commands

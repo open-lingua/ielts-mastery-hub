@@ -2,7 +2,7 @@
 
 ## 1. Summary and Objective
 
-Add a new **Admin → Import Dataset** feature that lets an admin upload a JSON file (Reading, Writing, or Listening) matching the app's existing content schemas, validate it, and persist it into the local SQLite database in one atomic operation — without going through the manual multi-step `CreateContent` form. For Listening imports, the four section audio files must also be copied into a well-organized, discoverable folder structure under `~/.ielts-hub` and their paths recorded as `audio_url` on the corresponding `listening_sections` rows.
+Add a new **Admin → Import Dataset** feature that lets an admin upload a JSON file (Reading, Writing, or Listening) matching the app's existing content schemas, validate it, and persist it into the local SQLite database in one atomic operation — without going through the manual multi-step `CreateContent` form. For Listening imports, the four section audio files must also be copied into a well-organized, discoverable folder structure under `~/.imh` and their paths recorded as `audio_url` on the corresponding `listening_sections` rows.
 
 This is a superset of user story **US-14** (admin creation) that adds a **bulk JSON import** path, filling the "Bulk CSV/JSON import" gap explicitly marked "Out of Scope" in `docs/product.md` — this spec brings it into scope for JSON.
 
@@ -56,7 +56,7 @@ This is a superset of user story **US-14** (admin creation) that adds a **bulk J
 | Duplicate `id` values within the same JSON (e.g. two questions share an id) | Reject: "Duplicate id `<uuid>` found at `<path1>` and `<path2>`." |
 | `id` in JSON collides with an existing DB row from a different test | Treat JSON ids as **advisory only** — see §3.3, new UUIDs are always generated server-side; no collision possible. |
 | Same test re-imported (same `title` + `created_by`, or same source JSON hash) | Detect via a title+creator match prompt: "A test with this title already exists (id `<existing_id>`). Import as a new copy?" Admin confirms to proceed (creates a new test with new ids) or cancels. |
-| `~/.ielts-hub` or subfolders missing | Created automatically and silently (`create_dir_all`), same as `commands::storage::save_file` already does. |
+| `~/.imh` or subfolders missing | Created automatically and silently (`create_dir_all`), same as `commands::storage::save_file` already does. |
 | Disk write fails mid-copy (e.g. disk full) | Whole import fails; any files already written for this import are deleted; DB transaction rolled back/never committed. |
 | Audio file extension unsupported | Reject: "Unsupported audio format `.<ext>` for Section `<n>`; expected mp3, wav, m4a, or ogg." |
 | Large JSON/audio (no explicit limit today) | Recommend a soft warning above e.g. 100MB total audio, non-blocking. |
@@ -251,12 +251,12 @@ And a new `src/ui/services/importService.ts` for any client-side pre-validation/
 
 ### 3.4 Audio File Handling for Listening
 
-**Storage root:** `~/.ielts-hub` (same base directory already used by `commands::storage::save_file` for `writing-assets` and `listening-audio`).
+**Storage root:** `~/.imh` (same base directory already used by `commands::storage::save_file` for `writing-assets` and `listening-audio`).
 
 **Proposed folder structure (new, descriptive, test-scoped):**
 
 ```
-~/.ielts-hub/
+~/.imh/
 └── listening-tests/
     └── <test-id>-<title-slug>/
         ├── section-1.<ext>
@@ -272,7 +272,7 @@ And a new `src/ui/services/importService.ts` for any client-side pre-validation/
 
 **When folders are created:** Only during a successful, committed import — the whole `listening-tests/<test-id>-<slug>/` directory tree is created via `tokio::fs::create_dir_all` right before writing files, inside the same service function that performs the DB insert, called only after JSON validation has fully passed.
 
-**`audio_url` persisted value:** the **absolute filesystem path** to the file (e.g. `/home/alice/.ielts-hub/listening-tests/<id>-<slug>/section-1.mp3`), exactly matching the existing convention in `commands::storage::save_file`, which returns the absolute path and where the frontend calls `convertFileSrc(path)` (Tauri's asset-protocol helper, already enabled per `RELEASES.md`: *"enable asset protocol for ~/.ielts-hub"*) to turn it into a playable URL at runtime. This keeps the new feature consistent with `uploadListeningAudio`'s existing behavior — the DB never stores a `convertFileSrc`-transformed URL, only the raw path, and the UI re-derives the playable URL via `convertFileSrc` at read time (see `listeningPracticeService.ts` / audio player components) — confirm this by checking how `audio_url` is consumed by the player component before finalizing (Open Question).
+**`audio_url` persisted value:** the **absolute filesystem path** to the file (e.g. `/home/alice/.imh/listening-tests/<id>-<slug>/section-1.mp3`), exactly matching the existing convention in `commands::storage::save_file`, which returns the absolute path and where the frontend calls `convertFileSrc(path)` (Tauri's asset-protocol helper, already enabled per `RELEASES.md`: *"enable asset protocol for ~/.imh"*) to turn it into a playable URL at runtime. This keeps the new feature consistent with `uploadListeningAudio`'s existing behavior — the DB never stores a `convertFileSrc`-transformed URL, only the raw path, and the UI re-derives the playable URL via `convertFileSrc` at read time (see `listeningPracticeService.ts` / audio player components) — confirm this by checking how `audio_url` is consumed by the player component before finalizing (Open Question).
 
 **Collision handling:** Because `<test-id>` is always a freshly generated UUID, directory collisions are structurally impossible even if the same JSON (with the same advisory `id`/title) is imported multiple times — each import creates its own timestamp-free but UUID-unique folder. The only "collision" a user perceives is duplicate *titles* in the test list, handled by the confirm-before-import UX in Edge Cases, not by file-path collision logic.
 

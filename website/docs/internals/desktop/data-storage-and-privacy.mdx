@@ -9,12 +9,12 @@ title: Local Data Storage & Privacy
 
 All application data — `profiles`, `user_roles`, test content, and `user_test_sessions` (including in-progress answers and AI feedback) — is stored in a single local SQLite file, `ielts.db`, in the OS-specific Tauri app data directory (see [Running the App in Development](../getting-started/running-the-app.mdx) for exact paths per OS). There is **no cloud sync** by default and no remote database.
 
-Uploaded media (writing task images, listening audio) is stored under `$HOME/.ielts-hub/<domain>/<user_id>/` (`src/core/src/commands/storage.rs`), matching the `assetProtocol.scope` configured in `src/core/tauri.conf.json`:
+Uploaded media (writing task images, listening audio) is stored under `$HOME/.imh/<domain>/<user_id>/` (`src/core/src/commands/storage.rs`), matching the `assetProtocol.scope` configured in `src/core/tauri.conf.json`:
 
 ```json
 "assetProtocol": {
   "enable": true,
-  "scope": ["$HOME/.ielts-hub/**"]
+  "scope": ["$HOME/.imh/**"]
 }
 ```
 

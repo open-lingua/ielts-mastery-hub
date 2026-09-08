@@ -198,7 +198,7 @@ mod writing_asset_seed_dest_path_test {
         // Assert
         assert_eq!(
             result,
-            PathBuf::from("/Users/alice/.ielts-hub/writing-assets/task-123.jpeg")
+            PathBuf::from("/Users/alice/.imh/writing-assets/task-123.jpeg")
         );
     }
 }
@@ -211,13 +211,13 @@ mod to_asset_url_test {
     fn it_percent_encodes_forward_slashes_and_prepends_the_asset_protocol() {
         // Act
         let result = to_asset_url(Path::new(
-            "/Users/lucho/.ielts-hub/writing-assets/2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg",
+            "/Users/lucho/.imh/writing-assets/2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg",
         ));
 
         // Assert
         assert_eq!(
             result,
-            "asset://localhost/%2FUsers%2Flucho%2F.ielts-hub%2Fwriting-assets%2F2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg"
+            "asset://localhost/%2FUsers%2Flucho%2F.imh%2Fwriting-assets%2F2f1be46b-a5b2-4106-adcf-4b7fd1b2a24f.jpeg"
         );
     }
 

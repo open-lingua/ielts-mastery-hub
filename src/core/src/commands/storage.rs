@@ -35,7 +35,7 @@ async fn save_writing_asset(
         std::env::var("HOME").map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, e))?;
 
     let dir = std::path::Path::new(&home)
-        .join(".ielts-hub")
+        .join(".imh")
         .join("writing-assets");
 
     tokio::fs::create_dir_all(&dir).await?;
@@ -64,7 +64,7 @@ async fn save_file(
         std::env::var("HOME").map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, e))?;
 
     let dir = std::path::Path::new(&home)
-        .join(".ielts-hub")
+        .join(".imh")
         .join(domain)
         .join(user_id);
 
