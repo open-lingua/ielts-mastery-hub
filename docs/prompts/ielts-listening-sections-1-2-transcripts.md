@@ -1,20 +1,23 @@
-# Role: Senior IELTS Content Creator — Listening Transcripts (Sections 1 & 2)
+# Role: Senior Full-Stack Content Engineer & Database Architect & Senior IELTS Content Creator, Assessment Design, Educational Measurement
 
 # Context
-You are tasked with writing the **full audio transcripts for Section 1 and Section 2** of a brand-new IELTS Listening test, calibrated to the Target Band difficulty below. This is a standalone content-generation task: your output will later be embedded into a SQL seed file by a separate process, but you are not responsible for the SQL, the questions, or the database IDs here.
+You are tasked with generating **PART 1 of 2** of a comprehensive SQLite SQL Seed File for the Listening module (`src/core/src/database/seeds/listening/ielts_listening_band_<band>_test_<n>.sql`). This part covers **Section 1 and Section 2 only**. Section 3, Section 4, and the final combined SQL file will be produced in a separate follow-up prompt.
 
-Do **NOT** produce SQL, questions, options, or answer keys in this task. Your output is raw transcript text only.
+In THIS prompt, your job is ONLY to generate the validated transcripts for Section 1 and Section 2. Do NOT generate SQL, questions, or JSON yet — that comes after both transcripts are validated.
 
-# Output Rules (STRICT)
-- Output ONLY the two transcripts, clearly labeled.
-- No preamble, no commentary, no explanations, no meta-notes to the user.
-- No questions, no answer keys, no SQL, no JSON, no IDs.
-- After each transcript, output a single line with the validated word count in the exact format:
-  `WORD_COUNT: <number>`
-- Use the exact output template shown at the bottom of this prompt.
+# Tech Stack
+- **Database:** SQLite — target for the final `.sql` script (produced later, not in this step).
+- **Data Format:** Standard SQL `INSERT INTO` statements with complex `JSONB` payloads for question options and accepted answers (produced later, not in this step).
 
-# Transcript Format
-Wrap the dialogue/monologue with **one speaker label per line**, for example:
+# Feature Specification (context for the overall test — for your awareness only)
+- **Section 1 (Transactional Dialogue):** Title + full Audio Transcript (e.g., everyday social context like a booking). Q1–10: Form/Sentence Completion.
+- **Section 2 (Monologue):** Title + full Audio Transcript (e.g., everyday social context like a facility tour). Q11–20: Multiple Choice and Map Labeling (simulated via multiple choice/matching).
+- Sections 3 and 4 are NOT part of this prompt.
+
+# Transcript Technical Specifications (MANDATORY per Section)
+*Each `transcript` field MUST comply with the technical parameters below. These parameters are non-negotiable and are designed to replicate the pacing, length, and linguistic complexity of authentic IELTS audio recordings. Respect the target word count strictly, as it directly determines the realistic audio duration.*
+
+*The transcript must wrap the dialogue/monologue with one speaker label per line:*
 
 ```
 Agent: ...
@@ -23,56 +26,50 @@ Agent: ...
 Customer: ...
 ```
 
-When counting words to validate the target word count, **do not count the speaker labels** (e.g. "Agent:", "Customer:", "Presenter:") — count only the actual spoken content.
+*When counting words to validate the target word count below, do not count the dialogue tags or the speaker labels (e.g. "Agent:", "Customer:") — only count the actual spoken content.*
 
-# Transcript Technical Specifications (MANDATORY)
+## Section 1 — Everyday conversation
+- Speakers: **2 people** (typically customer service + customer, or similar)
+- Audio duration: **~4 to 5 minutes**
+- Transcript word count: **~700 to 900 words**
+- Context: hotel booking, course enrollment, travel information, etc.
+- Level: easiest, slow speech with natural pauses
+- Must-include content hooks: several concrete testable facts (spelled names, numbers, dates, times, prices, addresses, phone/email), a question→answer→correction pattern, and at least one moment where a speaker corrects a previously stated detail (typical IELTS trap).
 
-## Section 1 — Everyday Conversation (Transactional Dialogue)
-- **Speakers:** 2 people (typically customer service agent + customer, or similar)
-- **Audio duration target:** ~4 to 5 minutes
-- **Transcript word count:** **~700 to 900 words** (spoken content only)
-- **Context:** hotel booking, course enrollment, travel information request, rental inquiry, membership sign-up, etc.
-- **Level:** easiest of the four; slow speech with natural pauses, everyday vocabulary
-- **Must-include content hooks (for later question design):**
-  - Several concrete, testable facts (names spelled out, numbers, dates, times, prices, addresses, phone numbers, email addresses)
-  - Natural pattern of question → answer → clarification/correction typical of Section 1
-  - At least one moment where a speaker corrects a previously stated detail (typical IELTS trap)
+## Section 2 — Everyday monologue
+- Speakers: **1 person** (sometimes with a brief initial exchange with a radio host)
+- Audio duration: **~4 to 5 minutes**
+- Transcript word count: **~700 to 900 words**
+- Context: guide to a place, informative talk, radio announcement, facility presentation
+- Level: lower-intermediate
+- Must-include content hooks: a sequence of locations/features/options suitable for map labeling or matching, several distinct facts suitable for multiple-choice items, and signposting language ("first", "over to your left", "next", "finally").
 
-## Section 2 — Everyday Monologue
-- **Speakers:** 1 person (optionally a brief intro exchange with a radio host / interviewer before the monologue begins)
-- **Audio duration target:** ~4 to 5 minutes
-- **Transcript word count:** **~700 to 900 words** (spoken content only)
-- **Context:** guided tour of a facility, informative talk, radio announcement, community/venue presentation, event briefing
-- **Level:** lower-intermediate
-- **Must-include content hooks (for later question design):**
-  - A sequence of locations, features, or options suitable for map labeling / matching (mention them in a natural spoken order)
-  - Several distinct facts or descriptions that can support multiple-choice items
-  - Signposting language ("first", "over to your left", "next", "finally") to help support map/order-based questions
+# Agent Execution Workflow (MANDATORY order of operations)
+*Follow this exact sequence. Do not skip steps or merge them into a single pass — each transcript's word-count and format constraints are strict, and generating both at once tends to produce transcripts that drift off target.*
 
-# Execution Workflow (MANDATORY)
-1. Draft Section 1 transcript.
-2. Count the spoken words (excluding speaker labels). If the count is outside 700–900, regenerate before moving on. Do NOT carry an out-of-range transcript forward.
-3. Draft Section 2 transcript.
-4. Count the spoken words (excluding speaker labels). If the count is outside 700–900, regenerate before moving on.
-5. Output both transcripts using the exact template below, each followed by its validated `WORD_COUNT`.
+1. **Generate the Section 1 transcript first, alone, in a single uninterrupted piece of writing.** Produce ONLY the title and transcript — nothing else.
+2. **Validate the word count immediately**: count only the actual spoken content (excluding speaker labels). If the count falls outside 700–900, regenerate before moving on. Do NOT carry an out-of-range transcript forward.
+3. **Generate the Section 2 transcript next, alone, in a single uninterrupted piece of writing.** Produce ONLY the title and transcript — nothing else.
+4. **Validate the word count immediately**: count only the actual spoken content (excluding speaker labels). If the count falls outside 700–900, regenerate before moving on.
+5. Output both validated transcripts using the exact template below. Do not add SQL, questions, JSON, or commentary of any kind.
+
+# Data Handling: Output Requirements
+- Output ONLY the two transcripts and their titles, each followed by its validated word count.
+- No SQL, no questions, no JSONB, no IDs — those belong to the follow-up prompt.
+- No preamble, no explanations, no meta-commentary.
 
 # UUID Inventory (Input Section)
-*Not used in this task — provided for consistency with the companion prompt. No UUIDs need to be referenced in your output.*
+*Not consumed in this step (no SQL is generated here) — kept for consistency with the companion prompt that will assemble the final SQL file.*
 
 **PASTE YOUR RANDOM UUIDS BELOW:**
 ```
 PASTE_YOUR_RANDOM_UUIDS_BELOW
 ```
 
-# Output Template (use exactly this format, nothing else)
-
-```
-
-WORD_COUNT: <integer>
-
-WORD_COUNT: <integer>
+# These files already exist in seeds/
+```sql
+01_ielts_practice_test.sql
 ```
 
 # Configuration Variables
 - **TARGET_BAND_DIFFICULTY:** [5 to 9]
-
