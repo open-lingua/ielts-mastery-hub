@@ -13,7 +13,7 @@ Repos     (src/core/src/repositories/) — all SQL, entity structs, auth checks
               ↓ sqlx
 Database  (src/core/src/database/)    — pool init, migrations, seeds
               ↓
-         ielts.db  (OS default dir, or DATABASE_URL override)
+         imh.db  (OS default dir, or DATABASE_URL override)
 ```
 
 ## Database Path Resolution
@@ -28,9 +28,9 @@ runtime:
 
 | OS | Default path |
 |---|---|
-| macOS | `$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db` |
-| Linux | `$HOME/.local/share/com.openlingua.ieltsmasteryhub/ielts.db` |
-| Windows | `%APPDATA%\com.openlingua.ieltsmasteryhub\ielts.db` |
+| macOS | `$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db` |
+| Linux | `$HOME/.local/share/com.openlingua.ieltsmasteryhub/imh.db` |
+| Windows | `%APPDATA%\com.openlingua.ieltsmasteryhub\imh.db` |
 
 The identifier segment matches `identifier` in `tauri.conf.json`. If the
 required env var (`HOME` on macOS/Linux, `APPDATA` on Windows) is missing,
@@ -42,17 +42,17 @@ If you need to run `sqlx` CLI commands (e.g. `sqlx migrate run`), set
 
 **macOS**
 ```bash
-export DATABASE_URL="sqlite:///Users/$(whoami)/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+export DATABASE_URL="sqlite:///Users/$(whoami)/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db"
 ```
 
 **Linux**
 ```bash
-export DATABASE_URL="sqlite:///home/$(whoami)/.local/share/com.openlingua.ieltsmasteryhub/ielts.db"
+export DATABASE_URL="sqlite:///home/$(whoami)/.local/share/com.openlingua.ieltsmasteryhub/imh.db"
 ```
 
 **Windows (PowerShell)**
 ```powershell
-$env:DATABASE_URL = "sqlite:///$env:APPDATA\com.openlingua.ieltsmasteryhub\ielts.db"
+$env:DATABASE_URL = "sqlite:///$env:APPDATA\com.openlingua.ieltsmasteryhub\imh.db"
 ```
 
 ## Key Rules

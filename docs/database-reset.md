@@ -15,7 +15,7 @@ This guide explains how to delete the local development database and re-apply mi
 ### 1. Delete the existing database
 
 ```bash
-rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/ielts.db*
+rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/imh.db*
 ls -la ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/
 ```
 
@@ -37,7 +37,7 @@ cargo install sqlx-cli --no-default-features --features sqlite   # if you don't 
 mkdir -p "$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub"
 
 # Point DATABASE_URL to the same file used by the app
-export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+export DATABASE_URL="sqlite://$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db"
 ```
 
 ### 5. Drop, create, and migrate the database
@@ -51,7 +51,7 @@ sqlx migrate run --source src/database/migrations
 ### 6. Apply the seed files
 
 ```bash
-DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db"
 
 for f in src/database/seeds/listening/*.sql \
          src/database/seeds/reading/*.sql \

@@ -68,7 +68,7 @@ mod resolve_database_url_test {
         // Assert
         let url = result.unwrap();
         assert!(url.contains(APP_IDENTIFIER));
-        assert!(url.contains("ielts.db"));
+        assert!(url.contains("imh.db"));
     }
 }
 
@@ -87,7 +87,7 @@ mod default_db_path_test {
         assert_eq!(
             result.unwrap(),
             PathBuf::from(format!(
-                "{MACOS_HOME}/Library/Application Support/{APP_IDENTIFIER}/ielts.db"
+                "{MACOS_HOME}/Library/Application Support/{APP_IDENTIFIER}/imh.db"
             ))
         );
     }
@@ -104,7 +104,7 @@ mod default_db_path_test {
         assert_eq!(
             result.unwrap(),
             PathBuf::from(format!(
-                "{LINUX_HOME}/.local/share/{APP_IDENTIFIER}/ielts.db"
+                "{LINUX_HOME}/.local/share/{APP_IDENTIFIER}/imh.db"
             ))
         );
     }

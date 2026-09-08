@@ -10,7 +10,7 @@ title: Environment Variables Reference
 | `VITE_AI_API_KEY` | Required for AI grading | none | `src/ui/services/aiGradingService.ts` | Bearer token sent to the AI grading gateway |
 | `VITE_AI_GATEWAY_URL` | Required for AI grading | none | `src/ui/services/aiGradingService.ts` | URL of the AI grading gateway endpoint (chat-completions style API) |
 | `OPEN_DEVTOOLS` | Optional | unset (devtools closed) | `src/core/src/lib.rs` (`setup` hook) | Set to `"true"` to auto-open the webview devtools window on launch |
-| `DATABASE_URL` | Optional (only for `sqlx` CLI usage) | none | Not read by the app itself; only used by the `sqlx` CLI for migrations/CLI tooling | Points `sqlx migrate`/`sqlx database` commands at the real `ielts.db` file — see [Troubleshooting](../desktop/troubleshooting.mdx) |
+| `DATABASE_URL` | Optional (only for `sqlx` CLI usage) | none | Not read by the app itself; only used by the `sqlx` CLI for migrations/CLI tooling | Points `sqlx migrate`/`sqlx database` commands at the real `imh.db` file — see [Troubleshooting](../desktop/troubleshooting.mdx) |
 
 ## Notes
 

@@ -30,9 +30,9 @@ const SEED_WRITING_ASSETS_DIR: &str =
 /// (trusted as-is, matching the standard `sqlx` convention). Otherwise, a
 /// default path is derived per OS using only `std::env`:
 ///
-/// - macOS: `$HOME/Library/Application Support/<identifier>/ielts.db`
-/// - Linux: `$HOME/.local/share/<identifier>/ielts.db`
-/// - Windows: `%APPDATA%\<identifier>\ielts.db`
+/// - macOS: `$HOME/Library/Application Support/<identifier>/imh.db`
+/// - Linux: `$HOME/.local/share/<identifier>/imh.db`
+/// - Windows: `%APPDATA%\<identifier>\imh.db`
 pub fn resolve_database_url() -> Result<String, AppError> {
     if let Ok(url) = std::env::var("DATABASE_URL") {
         if !url.is_empty() {
@@ -57,7 +57,7 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
                 .join("Library")
                 .join("Application Support")
                 .join(APP_IDENTIFIER)
-                .join("ielts.db"))
+                .join("imh.db"))
         }
         "windows" => {
             let app_data = std::env::var("APPDATA").map_err(|_| {
@@ -65,7 +65,7 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
             })?;
             Ok(PathBuf::from(app_data)
                 .join(APP_IDENTIFIER)
-                .join("ielts.db"))
+                .join("imh.db"))
         }
         _ => {
             // Linux and other Unix-like platforms.
@@ -76,7 +76,7 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
                 .join(".local")
                 .join("share")
                 .join(APP_IDENTIFIER)
-                .join("ielts.db"))
+                .join("imh.db"))
         }
     }
 }

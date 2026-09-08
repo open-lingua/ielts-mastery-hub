@@ -12,7 +12,7 @@ graph LR
   UI[React 19 UI<br/>src/ui] -->|invoke commands| SVC[Service Layer<br/>src/ui/services, lib/tauri.ts]
   SVC -->|Tauri IPC| CMD[Rust Commands<br/>src/core/src/commands]
   CMD --> REPO[Repositories<br/>src/core/src/repositories]
-  REPO --> DB[(SQLite<br/>ielts.db)]
+  REPO --> DB[(SQLite<br/>imh.db)]
   CMD -.grade_writing only.-> GW[External AI Gateway<br/>VITE_AI_GATEWAY_URL]
 ```
 
@@ -37,7 +37,7 @@ graph LR
 
 ## Local-first, not client-server
 
-There is no REST/GraphQL API and no remote database. All Reading, Writing, Listening, and session data lives in a single SQLite file (`ielts.db`) in the OS-specific app data directory (see [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx)). The one exception is the Writing module's AI grading feature, which sends the prompt and student response to an external gateway URL configured via `VITE_AI_GATEWAY_URL` (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)).
+There is no REST/GraphQL API and no remote database. All Reading, Writing, Listening, and session data lives in a single SQLite file (`imh.db`) in the OS-specific app data directory (see [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx)). The one exception is the Writing module's AI grading feature, which sends the prompt and student response to an external gateway URL configured via `VITE_AI_GATEWAY_URL` (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)).
 
 ## Where to go next
 

@@ -13,7 +13,7 @@ graph TB
   IPC --> CMD[Commands<br/>src/core/src/commands/*.rs<br/>thin validation + delegation]
   CMD --> REPO[Repositories<br/>src/core/src/repositories/*.rs<br/>SQL + entity structs + ownership checks]
   REPO --> DBMOD[Database<br/>src/core/src/database/<br/>pool init, migrations, seeds]
-  DBMOD --> SQLITE[(ielts.db)]
+  DBMOD --> SQLITE[(imh.db)]
 ```
 
 `src/core/src/lib.rs` wires everything together: it configures the `tauri-plugin-dialog` plugin, runs the `database::init()` setup hook (which opens the pool, runs migrations/seeds, and calls `app.manage(pool)`), and registers every command in a single `tauri::generate_handler![...]` call.

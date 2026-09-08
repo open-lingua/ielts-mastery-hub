@@ -5,7 +5,7 @@ title: Database Schema & Data Model
 
 # Database Schema & Data Model
 
-All data lives in a single SQLite database file (`ielts.db`), created and migrated automatically on app startup by `src/core/src/database/mod.rs`. The full schema is defined in one migration: `src/core/src/database/migrations/20260811000000_initial_schema.sql`.
+All data lives in a single SQLite database file (`imh.db`), created and migrated automatically on app startup by `src/core/src/database/mod.rs`. The full schema is defined in one migration: `src/core/src/database/migrations/20260811000000_initial_schema.sql`.
 
 ## Entities
 
@@ -84,7 +84,7 @@ Note: `user_test_sessions.user_id`/`test_id` are plain TEXT columns, **not** dec
 
 ## Migrations & compile-time query checking
 
-Migrations live in `src/core/src/database/migrations/` and run automatically via `sqlx::migrate!(...)` in `database::init()` at app startup — there are currently two migration files (`20260811000000_initial_schema.sql` and `20260907000000_add_figure_description_to_writing_tasks.sql`). `sqlx`'s macros (`query!`, `query_as!`, `query_scalar!`) type-check SQL against the live schema at compile time, which is why the schema and Rust code must stay in sync; the `DATABASE_URL` env var must point at a real `ielts.db` (see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md)) for `cargo build`/`cargo check` to succeed.
+Migrations live in `src/core/src/database/migrations/` and run automatically via `sqlx::migrate!(...)` in `database::init()` at app startup — there are currently two migration files (`20260811000000_initial_schema.sql` and `20260907000000_add_figure_description_to_writing_tasks.sql`). `sqlx`'s macros (`query!`, `query_as!`, `query_scalar!`) type-check SQL against the live schema at compile time, which is why the schema and Rust code must stay in sync; the `DATABASE_URL` env var must point at a real `imh.db` (see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md)) for `cargo build`/`cargo check` to succeed.
 
 ## Why Practice Library merges results in Rust, not SQL `UNION`
 
