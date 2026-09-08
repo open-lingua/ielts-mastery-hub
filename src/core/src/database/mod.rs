@@ -174,7 +174,7 @@ pub fn to_asset_url(path: &Path) -> String {
 /// `task_id` with no matching `writing_tasks` row, a copy/IO error, or a
 /// failed `UPDATE`) are logged with `eprintln!` and skipped — they never
 /// abort the sync or block app startup. Only a failure to read the seed
-/// directory itself, or a missing `$HOME`, is propagated as `Err`.
+/// directory itself, or a missing `$HOME`, is propagated as `Err`
 pub async fn sync_writing_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
     let home = std::env::var("HOME").map_err(|_| {
         AppError::Validation("HOME environment variable is not set".to_string())
