@@ -27,18 +27,18 @@ You are tasked with generating a comprehensive **SQLite SQL Seed File** specific
 ## 3. Transcript Technical Specifications (MANDATORY per Section)
 *Note to AI: Each `transcript` field MUST comply with the technical parameters below. These parameters are non-negotiable and are designed to replicate the pacing, length, and linguistic complexity of authentic IELTS audio recordings. Respect the target word count strictly, as it directly determines the realistic audio duration.*
 
-*Note to AI: The script will have a structure like the following, wrapping the dialogue/monologue in a `<DIALOGUE>` tag with one speaker label per line:*
+*Note to AI: The script will have a structure like the following, wrapping the dialogue/monologue with one speaker label per line:*
 
-<DIALOGUE>
+```
 Agent: ...
 Customer: ...
 Agent: ...
 Customer: ...
 Agent: ...
 Customer: ...
-</DIALOGUE>
+```
 
-*When counting words to validate the target word count below, do not count the `<DIALOGUE>`/`</DIALOGUE>` tags or the speaker labels (e.g. "Agent:", "Customer:") — only count the actual spoken content.*
+*When counting words to validate the target word count below, do not count the dialogue tags or the speaker labels (e.g. "Agent:", "Customer:") — only count the actual spoken content.*
 
 - **Section 1 — Everyday conversation**
   - Speakers: **2 people** (typically customer service + customer, or similar)
@@ -67,6 +67,14 @@ Customer: ...
   - Transcript word count: **~700 to 900 words**
   - Context: university lecture on an academic topic
   - Level: the hardest, high density of Academic Word List (AWL ~5.85%)
+
+# Agent Execution Workflow (MANDATORY order of operations)
+*Note to AI: Follow this exact sequence. Do not skip steps or merge them into a single pass — each transcript's word-count and format constraints are strict, and generating everything at once tends to produce transcripts that drift off target.*
+
+1. **Generate each transcript separately, one at a time, in its own dedicated response/call.** For each of the 4 sections (in order), produce ONLY that section's full `audio_transcript` text (nothing else — no SQL, no questions yet). Each transcript must be generated in a single, uninterrupted call so the required word count, speaker count, and pacing/vocabulary level (per section 3 below) can all be satisfied consistently within one continuous piece of writing.
+2. **Validate the word count immediately after generating each transcript**, before moving on: count only the actual spoken content (excluding speaker labels like "Agent:"/"Customer:"). If the count falls outside the target range for that section, regenerate that transcript before proceeding — do not carry an out-of-range transcript forward.
+3. **Only after all 4 transcripts are generated and validated**, move on to writing the 40 questions and the final SQL seed script.
+4. **Cross-check consistency**: every fact, name, number, date, or detail referenced in an `accepted_answer` or question `option` must actually appear in its section's validated transcript (and vice versa — don't introduce answers the transcript never mentions). Fix any mismatch by adjusting the question, not by silently changing the already-validated transcript's word count.
 
 # Data Handling: Output Requirements
 - Provide the **complete, exact SQL script**.
