@@ -500,7 +500,7 @@ mod import_listening_fn {
         let home = std::env::var("HOME").expect("HOME must be set");
         let dir = std::path::Path::new(&home)
             .join(".imh")
-            .join("listening-tests")
+            .join("listening-assets")
             .join(&test_id);
         assert!(
             std::fs::metadata(&dir).is_ok(),

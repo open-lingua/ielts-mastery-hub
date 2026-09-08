@@ -801,11 +801,11 @@ async fn insert_writing_task(
     Ok(())
 }
 
-fn build_listening_test_dir(test_id: &str) -> Result<PathBuf, AppError> {
+fn build_listening_assets_dir(test_id: &str) -> Result<PathBuf, AppError> {
     let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
     Ok(Path::new(&home)
         .join(".imh")
-        .join("listening-tests")
+        .join("listening-assets")
         .join(test_id))
 }
 
@@ -842,7 +842,7 @@ pub async fn import_listening(
     .execute(&mut *tx)
     .await?;
 
-    let dir = build_listening_test_dir(&test_id)?;
+    let dir = build_listening_assets_dir(&test_id)?;
     let audio_by_section: HashMap<i64, &AudioAssignment> =
         audios.iter().map(|a| (a.section_number, a)).collect();
     let mut written_files: Vec<PathBuf> = Vec::new();

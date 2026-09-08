@@ -5,7 +5,7 @@
 //! is the one seam in the codebase where reading env vars directly is
 //! intentional (mirroring the existing pragmatic exception already used by
 //! `services::export_service::default_export_dir` and
-//! `services::import_service::build_listening_test_dir`). Because
+//! `services::import_service::build_listening_assets_dir`). Because
 //! `std::env::set_var`/`remove_var` mutate global process state and Rust runs
 //! tests on multiple threads by default, every test that mutates an env var
 //! serializes on `ENV_LOCK` and restores the previous value before
