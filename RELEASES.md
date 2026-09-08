@@ -73,6 +73,38 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.22](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.21...1.0.0-beta.22) (2026-09-08)
+
+
+### Features
+
+* **core:** backfill audio_url for listening sections when syncing seed assets ([e0d3d9c](https://github.com/open-lingua/ielts-mastery-hub/commit/e0d3d9cf8da6859ba8e95b9c5f7bd4e8148b4080))
+* **seeds:** add band 7 listening seed with college enrollment & rec center tour test ([c00b188](https://github.com/open-lingua/ielts-mastery-hub/commit/c00b1882eca5469f2fe804e9c938847bdb6c69a6))
+* **seeds:** add section 1-2 audio for listening test 4bb75c40 ([7091931](https://github.com/open-lingua/ielts-mastery-hub/commit/7091931bcb1c9d325089274ee8f0dab39383a822))
+* **seeds:** add section 3-4 audio for listening test 4bb75c40 ([164f8ae](https://github.com/open-lingua/ielts-mastery-hub/commit/164f8ae702afb8aba35000c51eb0612c8aed4061))
+* **seeds:** add TTS configs for band 7 test 001 listening seed ([0561d01](https://github.com/open-lingua/ielts-mastery-hub/commit/0561d0167e081250e067702aadbab88e49e86a9f))
+* **seeds:** add TTS configs for band 8 test 002 listening seed ([93faaae](https://github.com/open-lingua/ielts-mastery-hub/commit/93faaae6c0c641f28ac7f7bb86efc54c24a02174))
+* **seeds:** add TTS configs for band 9 test 001 listening seed ([e631243](https://github.com/open-lingua/ielts-mastery-hub/commit/e63124340b9ac4b55eaec086a32bb0706a633d50))
+* **seeds:** replace band 8 test 002 listening seed with corporate retreat & sustainable library test ([0ff3b89](https://github.com/open-lingua/ielts-mastery-hub/commit/0ff3b89ff28dda1ae0bc98c905bb1f5b1d6e4564))
+* **seeds:** replace band 9 listening seed with high-altitude logistics & urban agriculture test ([33927e1](https://github.com/open-lingua/ielts-mastery-hub/commit/33927e140f8b0446c9ce154771bddf32e6ca0eb9))
+
+
+### Documentation
+
+* **prompts:** add agent execution workflow and fix dialogue format in listening seed generator ([c326e2e](https://github.com/open-lingua/ielts-mastery-hub/commit/c326e2e346e9c9356cd05ee789c8aafd7a22ca59))
+* **prompts:** add transcript generator prompts for listening sections 1-2 and 3-4 ([0305d01](https://github.com/open-lingua/ielts-mastery-hub/commit/0305d0133ab4720aa3f8d45128b2b89b4bca845a))
+* **prompts:** clarify dialogue format and word count rules in listening seed generator ([587184b](https://github.com/open-lingua/ielts-mastery-hub/commit/587184be326bac6739113de8ec2914e046e5c393))
+* **prompts:** update listening transcript generator prompts ([6154cfe](https://github.com/open-lingua/ielts-mastery-hub/commit/6154cfe850567d2409525b6f070d557abba72e2e))
+* **prompts:** update listening transcript generator prompts ([a092438](https://github.com/open-lingua/ielts-mastery-hub/commit/a09243867effe6e8277160355d065fbaf1a10a07))
+* **prompts:** update sections 1-2 transcript generator prompt ([1144fae](https://github.com/open-lingua/ielts-mastery-hub/commit/1144fae383a18a6222768c3932cca744b836488f))
+* **prompts:** update transcript word count ranges for all listening sections ([72b4140](https://github.com/open-lingua/ielts-mastery-hub/commit/72b41403cc4387f2535535a03374e0a3ddb8f437))
+
+
+### Chores
+
+* **seeds:** remove outdated listening seed files and their associated TTS configs ([e6d5ae0](https://github.com/open-lingua/ielts-mastery-hub/commit/e6d5ae0afb606aff11523e3760ce214f0e452703))
+* **seeds:** rename TTS config files from section-N-tts-config.json to section-N.json ([d53e3f4](https://github.com/open-lingua/ielts-mastery-hub/commit/d53e3f4323fe645e76de210b2bf97044d5423fb0))
+
 ## [1.0.0-beta.21](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.20...1.0.0-beta.21) (2026-09-08)
 
 
