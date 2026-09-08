@@ -73,6 +73,25 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.20](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.19...1.0.0-beta.20) (2026-09-08)
+
+
+### Features
+
+* **core:** add writing_assets_migration module with sync logic and tests ([5155eb0](https://github.com/open-lingua/ielts-mastery-hub/commit/5155eb0dc875ca403789dfa03fc4e361b248d524))
+
+
+### Refactors
+
+* **core:** extract writing asset sync logic into database::writing_assets_migration module ([c14f80e](https://github.com/open-lingua/ielts-mastery-hub/commit/c14f80e12ba3d458b6339affdaacc96a33289cf2))
+* **core:** store writing assets as &lt;task_id&gt;/figure.&lt;ext&gt; instead of &lt;task_id&gt;.&lt;ext&gt; ([e53d130](https://github.com/open-lingua/ielts-mastery-hub/commit/e53d130a386549b31bb64f71e0a628e81a5d8a84))
+* **core:** use test id alone as listening audio folder name, drop title slug ([4f85522](https://github.com/open-lingua/ielts-mastery-hub/commit/4f855225dea0751bad487f295454217004586c9e))
+
+
+### Chores
+
+* rename database file from ielts.db to imh.db ([e4112ea](https://github.com/open-lingua/ielts-mastery-hub/commit/e4112ea26c287853f589b41fc4a8632e2f995050))
+
 ## [1.0.0-beta.19](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.18...1.0.0-beta.19) (2026-09-08)
 
 
