@@ -500,19 +500,14 @@ mod import_listening_fn {
         let home = std::env::var("HOME").expect("HOME must be set");
         let dir = std::path::Path::new(&home)
             .join(".imh")
-            .join("listening-tests");
-        let entry = std::fs::read_dir(&dir)
-            .expect("read test dir")
-            .filter_map(|e| e.ok())
-            .find(|e| e.file_name().to_string_lossy().starts_with(&test_id));
+            .join("listening-tests")
+            .join(&test_id);
         assert!(
-            entry.is_some(),
-            "expected a directory for the imported test's audio files"
+            std::fs::metadata(&dir).is_ok(),
+            "expected a directory named exactly after the test id for the imported test's audio files"
         );
 
         // Cleanup: remove the directory this test created so no real-disk artifacts remain.
-        if let Some(entry) = entry {
-            let _ = std::fs::remove_dir_all(entry.path());
-        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
