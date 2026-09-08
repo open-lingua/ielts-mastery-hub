@@ -73,6 +73,25 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.21](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.20...1.0.0-beta.21) (2026-09-08)
+
+
+### Features
+
+* **core:** rename listening-tests to listening-assets with startup migration ([eeaea33](https://github.com/open-lingua/ielts-mastery-hub/commit/eeaea33e26b42dfea31a1846fdaa625ff624cb66))
+* **core:** sync seed listening assets to local storage on app startup ([21ce576](https://github.com/open-lingua/ielts-mastery-hub/commit/21ce576d4d904471a32c5ef50c7fe5251611a451))
+
+
+### Refactors
+
+* **core:** replace listening_assets_migration with a shared LISTENING_ASSETS_DIR_NAME constant ([2b33024](https://github.com/open-lingua/ielts-mastery-hub/commit/2b33024953c896e3e6e64a1a01b7ffe98acf373f))
+
+
+### Chores
+
+* **seeds:** remove legacy tts-config flat directory ([22eb494](https://github.com/open-lingua/ielts-mastery-hub/commit/22eb49481289f4070be18ed0b0244dc75db8fc48))
+* **seeds:** reorganize TTS configs into per-test UUID subdirectories ([83804e4](https://github.com/open-lingua/ielts-mastery-hub/commit/83804e48ccc89620282de30e6ba7c85f451463af))
+
 ## [1.0.0-beta.20](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.19...1.0.0-beta.20) (2026-09-08)
 
 
