@@ -10,264 +10,274 @@
 -- ████████████████████████████████████████████████████████████
 
 INSERT INTO listening_tests (id, created_by, title, difficulty, duration, status) VALUES
-('ed22087f-0fe9-43b4-94a1-88f11cdd338c', '6f533c9e-8894-4a62-ab5c-f384efab49fd',
- 'IELTS Advanced Listening: Freight Logistics, Desalination Plant & Space Economics (Band 8)', '8', '40 mins', 'published');
+('272c646a-6c20-48c1-91ac-3cc9a84b5465', 'f5713ad5-fa7b-4f00-85cb-6dcf52512d23',
+ 'IELTS Advanced Listening: Corporate Retreat & Sustainable Library (Band 8)', '8', '40 mins', 'published');
 
 -- ══════════════════════════════════════════════════════════════
--- ██  SECTION 1: Transactional Dialogue (Freight Booking)     ██
+-- ██  SECTION 1: Transactional Dialogue (Corporate Retreat)   ██
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('ec7919db-514d-4260-bd56-270a25002c70', 'ed22087f-0fe9-43b4-94a1-88f11cdd338c', 1,
- 'International Freight Booking',
- 'Agent: Good afternoon, Apex Global Logistics. You are speaking with Marcus. How can I assist you with your shipping needs today?
-Client: Hello, Marcus. I need to arrange an expedited international shipment for some highly sensitive medical equipment. We have used your standard freight service in the past, but this is a rather urgent dispatch to a new client facility overseas.
-Agent: I can certainly help you arrange an expedited dispatch. First, could I get your company name and account number, just so I can pull up your existing profile on our system?
-Client: Yes, of course. The company name is Bio-Metrics Limited. That’s spelled B-I-O hyphen M-E-T-R-I-C-S. 
-Agent: Thank you. And the account number?
-Client: It’s an alphanumeric code: A-R-T 5-5-9-2.
-Agent: Let me just type that in... A-R-T 5-5-9-2. Yes, I have your profile right here. The primary contact is listed as Helen Cho. Is that you?
-Client: No, Helen moved to our European branch last month. I am the new logistics coordinator. My name is David Aris. That’s A-R-I-S. 
-Agent: I will update the contact details now, David. Now, where exactly is this expedited shipment heading? You mentioned an overseas facility.
-Client: Yes, it needs to be flown to Japan. Specifically, to a medical research institute located in Kyoto. 
-Agent: Kyoto, Japan. Understood. Now, I need some specific details about the cargo itself to determine the appropriate handling protocols. What exactly is the item being shipped?
-Client: It is a diagnostic scanner used for neurological imaging. It is incredibly delicate and sensitive to environmental changes.
-Agent: A diagnostic scanner. I will flag that as fragile. You mentioned it is sensitive to environmental changes. Does it require a climate-controlled container during transit?
-Client: It does. It cannot be exposed to extreme heat. The maximum temperature it can endure during transit is 15 degrees Celsius. If it gets any warmer than that, the internal calibration gets completely ruined. 
-Agent: Noted. Maximum temperature: 15 degrees Celsius. We will use a refrigerated unit for that. Now, what are the exact dimensions and weight of the crate?
-Client: The crate is rectangular. It is exactly 1.2 metres wide, and the height is 0.8 metres. The depth is 1 metre flat. 
-Agent: So that’s 1.2 metres wide by 0.8 metres high. And the total gross weight?
-Client: With the protective packaging, it comes to exactly 145 kilograms. 
-Agent: Thank you. Given the value and fragility of the scanner, which level of insurance coverage would you like to select? We offer Basic, Standard, and Comprehensive cover.
-Client: Because of the high replacement cost, our company policy mandates that we take out Comprehensive cover for anything over 100 kilograms. 
-Agent: Comprehensive cover selected. Now, regarding the collection timeline, when will the crate be ready for our drivers to pick up?
-Client: Today is the 21st. We need two more days to finalize the shock-absorbent packaging, so it will be ready for collection first thing in the morning on the 24th of November.
-Agent: The 24th of November. I’ll schedule a morning slot. Just a logistical note for the driver—our records show your facility is on a busy main road. Where exactly should the truck park for loading?
-Client: Please instruct the driver to avoid the main entrance on the East side. They need to turn down the alleyway and park at the South entrance. We have a dedicated loading bay there with a forklift ready to assist.
-Agent: South entrance. Perfect. Finally, because this is an international shipment of medical technology, there is one crucial document we need before the truck leaves your site. The driver cannot take the cargo unless you provide a physically signed customs declaration. 
-Client: A signed customs declaration. I already have the digital forms filled out, so I’ll print them and have our director sign them today. 
-Agent: Excellent. I will process this quote and email you the final tracking itinerary within the hour. Is there anything else you need, David?
-Client: No, Marcus, that covers everything. Thank you for the efficient service.
-Agent: My pleasure. Have a great day.');
+('f423bb72-f6dd-4fa0-9eba-37c6b3ce8bd8', '272c646a-6c20-48c1-91ac-3cc9a84b5465', 1,
+ 'Corporate Retreat Booking',
+ 'Agent: Good morning, you have reached the events and reservations team at the Silverwood Alpine Resort. My name is Thomas. How can I assist you with your booking today?
+Client: Good morning, Thomas. My name is Sarah Jenkins. I am the event coordinator for a tech firm called Nexus Dynamics. I am looking to book a corporate retreat for our executive team for this upcoming winter season. I know it is a bit late to be booking for December, but we had a last-minute cancellation at our previous venue.
+Agent: I understand completely, Sarah. December is indeed our peak season, but we do have a few select dates still available. To start, could you spell your company name for me so I can create a new profile in our system?
+Client: Certainly. It is Nexus Dynamics. N-E-X-U-S, and then Dynamics.
+Agent: Thank you, Sarah. And what are the exact dates you are looking at for this retreat?
+Client: We are aiming to arrive on the 12th of December and depart on the 16th of December.
+Agent: Let me check our availability calendar... The 12th through the 16th. Yes, we can accommodate that. Now, how many attendees are we expecting for this retreat?
+Client: It will be a relatively intimate group. Exactly twenty-five executives, plus three support staff. So, twenty-eight people in total. However, the executives will each require their own individual room. The support staff can share.
+Agent: Not a problem. We can reserve twenty-five of our premium Alpine suites for the executives. Now, regarding the event spaces, will you need a main conference room for the duration of your stay?
+Client: Yes, we need a primary meeting room. It must have high-speed broadband and a modern projector. But more importantly, it needs to have a panoramic view. Our CEO is very particular about having natural light and a view of the mountains.
+Agent: I would highly recommend the Cedar Room, then. It features floor-to-ceiling windows looking directly out over the southern valley. It also has an integrated state-of-the-art audiovisual system. Will you require any breakout rooms for smaller group sessions?
+Client: Yes, please. Two smaller breakout rooms would be perfect. We plan to do intensive strategy sessions in the afternoons.
+Agent: Done. Now, let us discuss catering. Do you want us to provide all three meals, or will your team be dining off-site?
+Client: We want a full-board package, so all meals included. However, we have some strict dietary requirements. Two of our executives have a severe allergy to shellfish. It is crucial that the kitchen is aware of this to avoid any cross-contamination.
+Agent: I am making a very clear note of that right now. No shellfish. Our culinary team is highly experienced in managing severe allergies. Now, for the recreational aspect of the retreat. We offer several team-building activities. We have guided snowshoeing, introductory ice climbing, and a wilderness survival workshop.
+Client: The wilderness survival workshop sounds a bit too intense for this group. Let’s go with the guided snowshoeing. It’s active but accessible for everyone. Can we schedule that for the afternoon of the 14th?
+Agent: Guided snowshoeing on the 14th. Booked. We also have a world-class spa facility. Would you like to pre-book any group treatments or offer open access to your team?
+Client: Open access would be fantastic. They will definitely appreciate the sauna and hydrotherapy pools after the strategy sessions.
+Agent: Excellent. Just a quick logistical question regarding transportation. How will your team be arriving at the resort? We are located about two hours from the nearest international airport.
+Client: We are flying into Geneva Airport. We will need a private coach transfer from the arrivals terminal directly to the resort. We cannot rely on public trains with all the presentation equipment we are bringing.
+Agent: I can arrange a luxury coach transfer for you. It will meet your team directly outside Terminal 2. Now, regarding the deposit to secure the booking. We require a forty percent upfront payment.
+Client: Forty percent. That is fine. Can I pay that via a corporate wire transfer?
+Agent: A wire transfer is perfect. I will include our bank details in the preliminary invoice. Speaking of the invoice, I need an email address to send this to.
+Client: You can send it directly to my finance department. The email is billing, that’s B-I-L-L-I-N-G, at nexusdynamics.com.
+Agent: Perfect. I will send that over within the next thirty minutes. Before we wrap up, we should discuss our cancellation policy, especially for high-season bookings. Standard policy dictates that any cancellations made within thirty days of the arrival date will result in a forfeiture of the deposit.
+Client: I understand. Our schedule is locked in, so I am not too worried about cancelling. However, I am a bit concerned about our equipment. We are shipping a prototype server ahead of our arrival. Can your receiving department securely store it for us?
+Agent: Absolutely. We have a climate-controlled storage room specifically for guest parcels and valuable equipment. Just ensure the shipping label clearly states "Nexus Dynamics Retreat - Hold for Arrival". Do you need us to arrange any special insurance for it while it is on our premises?
+Client: No, our corporate insurance covers the server globally. But please make sure the storage room is locked at all times. It contains highly sensitive proprietary software.
+Agent: Rest assured, the storage room is access-controlled and monitored by security cameras twenty-four hours a day. Only the senior management team has the keycard. Is there anything else, perhaps regarding the evening entertainment?
+Client: Oh, actually, yes. Instead of a standard dinner on the second night, could we arrange a wine-tasting event? It would be a nice icebreaker for the executives.
+Agent: We have a fantastic sommelier who can host a regional wine tasting in our subterranean cellar. It usually takes about ninety minutes and includes artisanal cheese pairings.
+Client: That sounds perfect. Please add the wine tasting to the itinerary for the evening of the 13th. Thank you for all your help today, Thomas.
+Agent: You are very welcome, Sarah. We look forward to hosting Nexus Dynamics.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('4cc12958-6b64-4baa-bddc-95a78378d9d8', 'ec7919db-514d-4260-bd56-270a25002c70', 1,
+('aadaf50a-1001-4722-b961-faac6e3ddaea', 'f423bb72-f6dd-4fa0-9eba-37c6b3ce8bd8', 1,
  'sentence-completion', 'Complete the booking form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('81535762-aedf-43bc-995a-c1b2067e1c50', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 1,
- 'Company Name: Bio-Metrics ________', 'Limited', '["Limited","limited","LIMITED"]'),
-('ebbbe77f-a708-4852-866f-5d60deb402bd', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 2,
- 'Account Number: ART ________', '5592', '["5592"]'),
-('43509e90-5a2e-4e60-b41e-8d80ab28bcf9', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 3,
- 'Destination city: ________', 'Kyoto', '["Kyoto","kyoto"]'),
-('7270ed94-2330-477c-b2ee-675054d07c30', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 4,
- 'Item being shipped: A diagnostic ________', 'scanner', '["scanner","Scanner"]'),
-('7973e9b9-3cb9-4264-a7a9-a2e6800e77da', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 5,
- 'Maximum temperature during transit: ________ degrees', '15', '["15","fifteen","Fifteen"]'),
-('e822fa5a-fe97-419b-a0ed-a19ceb84093d', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 6,
- 'Dimension of crate: 1.2 metres wide by ________ metres high', '0.8', '["0.8",".8","zero point eight"]'),
-('6103b961-06bd-4b41-a7ef-7839f0cde8d9', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 7,
- 'Type of insurance selected: ________ cover', 'Comprehensive', '["Comprehensive","comprehensive"]'),
-('647d8063-6ead-437b-afae-258add2b0951', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 8,
- 'Collection date: ________', '24th November', '["24 November","November 24","24th of November"]'),
-('213352fe-161c-4855-964b-fa5916fd0356', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 9,
- 'Driver needs to park at the ________ entrance', 'South', '["South","south"]'),
-('8955115f-b0e9-40f6-8211-d05a40af17ad', '4cc12958-6b64-4baa-bddc-95a78378d9d8', 10,
- 'Customer must provide a signed ________', 'customs declaration', '["customs declaration","Customs declaration","Customs Declaration"]');
+('5b212f81-c3a6-494c-9e3e-050a503aef79', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 1,
+ 'Company Name: Nexus ________', 'Dynamics', '["Dynamics","dynamics","DYNAMICS"]'),
+('3d507cd7-c011-4287-a858-608d108aa082', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 2,
+ 'Retreat dates: 12th to ________ December', '16th', '["16th","16","sixteenth","16th of December"]'),
+('2686620e-1200-4552-b3ec-c1ec802df75f', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 3,
+ 'Total number of attendees: ________', '28', '["28","twenty-eight","twenty eight"]'),
+('e7ee62db-b945-47c6-996f-8f686fdb0a29', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 4,
+ 'Primary meeting room must have a ________', 'panoramic view', '["panoramic view","Panoramic view"]'),
+('845cf405-b2ff-4d3e-b687-6f5ba129f7db', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 5,
+ 'Severe dietary allergy to avoid: ________', 'shellfish', '["shellfish","Shellfish"]'),
+('69a4720a-e4e7-4b1f-bc51-e02583e041ad', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 6,
+ 'Selected recreational activity: guided ________', 'snowshoeing', '["snowshoeing","Snowshoeing"]'),
+('fea4ad2e-0755-46df-acc4-db031ace8680', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 7,
+ 'Transportation from airport: private ________', 'coach', '["coach","Coach","coach transfer","private coach"]'),
+('bd1dd385-c0ec-41b9-961a-9c92c54865b5', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 8,
+ 'Send invoice to the ________ department', 'finance', '["finance","Finance"]'),
+('04037ae9-32a4-4d6e-99ec-f02cb59c4f6d', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 9,
+ 'Standard cancellation policy: forfeit deposit within ________ days', '30', '["30","thirty","Thirty"]'),
+('f5f2caac-bb68-4d4c-8fba-1d7cb1c5280d', 'aadaf50a-1001-4722-b961-faac6e3ddaea', 10,
+ 'Resort must securely store a prototype ________ before arrival', 'server', '["server","Server","prototype server"]');
 
 -- ══════════════════════════════════════════════════════════════
--- ██  SECTION 2: Monologue (Desalination Plant Tour)          ██
+-- ██  SECTION 2: Monologue (Sustainable Library Tour)         ██
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('937625c4-ded2-43a8-b81e-638275d2b527', 'ed22087f-0fe9-43b4-94a1-88f11cdd338c', 2,
- 'Desalination Facility Orientation',
- 'Guide: Good morning, ladies and gentlemen, and welcome to the Seaview Desalination and Water Treatment Facility. My name is Dr. Aris Thorne, and I am the lead operations manager here. I will be guiding you through one of the most advanced reverse-osmosis plants in the country. 
+('0ffa5277-c135-4674-accb-b4f2584219ef', '272c646a-6c20-48c1-91ac-3cc9a84b5465', 2,
+ 'Oakbridge Community Library Orientation',
+ 'Director: Good morning, everyone, and welcome to the grand reopening of the Oakbridge Community Library and Cultural Hub. I am Margaret, the library director, and I am absolutely thrilled to show you the results of our extensive two-year renovation project.
 
-Before we commence our physical tour, I want to give you a brief overview of the plant’s recent history and our operational protocols. You might be aware that the plant underwent a massive fifty-million-dollar upgrade two years ago. While many locals assumed this was to expand our total water output capacity to meet population growth, the actual primary objective was to increase overall energy efficiency. Desalination is notoriously power-hungry, and our new turbines have successfully cut our electricity consumption by twenty percent. 
+Before we begin the walking tour, I want to share a little background on why this renovation was so desperately needed. Our original building, constructed in the 1970s, was charming but entirely unsuited for the digital age. Furthermore, it was incredibly energy inefficient. While many residents assumed our primary goal was simply to add more bookshelves to accommodate our growing collection, the actual driving force behind the funding was the urgent need to modernize our technological infrastructure. We have completely overhauled our digital access points, increasing public computer terminals by sixty percent and installing gigabit Wi-Fi throughout the entire campus.
 
-We rely heavily on consistency, but nature occasionally intervenes. Last summer, we experienced a brief shutdown. Some reports in the media falsely claimed we had a chemical leak, but in reality, an unexpected algae bloom in the bay completely clogged our primary intake filters, forcing us to halt operations for forty-eight hours to clear the biomass. We have since installed ultrasonic deterrents to prevent a recurrence.
+One of the most exciting aspects of this renovation is our commitment to sustainability. We didn''t just update the technology; we completely redesigned the building''s environmental footprint. The roof is now entirely covered in solar panels, which supply nearly forty percent of our daily electricity needs. Even more impressively, we installed a rainwater harvesting system. This system collects runoff from the roof, filters it, and uses it exclusively to flush the toilets and irrigate the community garden outside. This reduces our reliance on the municipal water supply by thousands of gallons a month.
 
-A common misconception among the public is that the water coming out of our reverse-osmosis membranes is instantly ready to drink. The truth is quite the opposite. The filtration process is so aggressively thorough that it strips away absolutely everything—leaving pure, distilled H2O. This water is actually quite acidic and tasteless. Therefore, it requires extensive remineralization—where we artificially add calcium and magnesium back into the water—before it meets municipal health standards. 
+We were also incredibly fortunate to receive a substantial grant from the National Arts Council. This grant was specifically ring-fenced for expanding our local history archives, allowing us to digitize thousands of fragile photographs and documents that were previously inaccessible to the public.
 
-Now, for your own safety today, you are required to wear high-visibility vests at all times, which you have already been given. However, when we enter the chemical testing areas, it is mandatory that everyone wears safety goggles. We will provide these at the door of that specific sector. Hard hats are not required on this specific route, but please wear the goggles when instructed.
+During the closure, we operated a temporary mobile library, which was quite an adventure. The most common feedback we received during that period was how much the community missed our quiet study areas. We listened. The new layout has been specifically acoustically engineered. We have installed specialized sound-dampening panels in the ceiling and thick carpeting in the reading rooms to ensure that the quiet zones remain genuinely peaceful, even when the rest of the building is bustling.
 
-To give you a sense of our scale, this single facility supplies just under a third of the entire region’s fresh water. While there are talks of building a second plant to push that figure over fifty percent, for now, we operate at a steady thirty percent. 
+Now, I must cover a few brief safety and operational guidelines before we move on. You will notice that we have completely eliminated physical library cards. Everything is now managed via a smartphone application. If you do not have a smartphone, do not worry; our front desk can issue a biometric scan linked to your account. Also, for today''s tour, we ask that you please refrain from bringing any food or beverages beyond the lobby area. We have pristine new furnishings, and we want to keep them that way. Finally, in the event of a fire alarm, please do not use the elevators. The emergency exits are clearly illuminated with green LED strips along the baseboards.
 
-Please direct your attention to the laminated maps on your clipboards. We are currently standing in the Visitor Centre, located at the very bottom of the map by the main road. 
+Alright, let us get oriented with the new floor plan. Please take a look at the maps provided in your welcome brochures. We are currently standing in the Main Foyer, which is located at the bottom center of your map, right next to the automatic entrance doors.
 
-Let’s trace our route. When we leave the Visitor Centre, we will walk straight up the central path. The very first building you will encounter on your left is the Primary Intake Pumps. This is where millions of gallons of raw seawater are sucked into the facility daily. 
+As we move straight ahead from the Foyer, we enter the Central Atrium. Immediately to your left, you will see a large, curved glass wall. That is the new Digital Media Lab. It is equipped with 3D printers, graphic design tablets, and video editing suites. It is a fantastic resource for local creatives.
 
-If you continue up the central path, you will come to a T-junction. If you look to the building occupying the top-right corner of this junction, that is the Coagulation Basins. Here, chemicals are added to make large particles clump together so they can be removed. 
+If you look directly across the Central Atrium, on your right-hand side, there is a dedicated space with brightly colored seating and lower shelving. That is the Children’s Interactive Zone. We have soundproofed this area completely, so the kids can enjoy storytime and interactive learning without disturbing the rest of the library.
 
-Taking a left at the T-junction, the path takes a sharp curve towards the coast. At the very end of this curved path, situated closest to the ocean, is our massive Reverse Osmosis Hall. This is the true heart of the plant, housing thousands of membrane cylinders. 
+Now, if we walk straight through the Central Atrium to the very back of the building, the space opens up into a large, well-lit hall with panoramic windows facing the park. This is the Heritage Reading Room. We have kept the original oak tables from the 1970s building, but we’ve added modern, ergonomic chairs and individual reading lamps.
 
-Now, heading back to the T-junction, if you walk straight ahead past the junction, you will see a pair of tall, cylindrical structures directly on your left. These are the Remineralization Silos, where the essential minerals are reintroduced into the purified water. 
+Let''s head back to the center and take the corridor that branches off to the left of the Central Atrium. Halfway down this corridor, on the right side, you will find a small, enclosed room. This is the Podcast Studio. It is completely soundproofed and features professional-grade microphones and mixing equipment. It can be booked in two-hour slots by anyone in the community.
 
-Finally, right opposite the silos, on the right side of the path, is a heavily fortified, windowless building. That is the Main Control Room. From there, our engineers monitor pressure levels across the entire grid. We won’t go inside, but you will see it through the observation glass.');
+Finally, if you take the corridor that branches off to the right of the Central Atrium, you will pass the restrooms. At the very end of that right-hand corridor is the Community Workshop Space. It has a durable, easy-to-clean floor and modular tables, making it perfect for arts and crafts sessions, community meetings, or small lectures.
+
+We are so proud of this new facility, and we cannot wait for you to explore it. Let’s head over to the Digital Media Lab first.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('f26eb9fc-5297-4260-885f-f5f83a8ed4f2', '937625c4-ded2-43a8-b81e-638275d2b527', 1,
+('79cbda3a-68c0-4eed-a3c8-6d824d7764b4', '0ffa5277-c135-4674-accb-b4f2584219ef', 1,
  'multiple-choice', 'Choose the correct letter, A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('79f48de3-3699-4bcb-b818-b6470e7844ad', 'f26eb9fc-5297-4260-885f-f5f83a8ed4f2', 11,
- 'Why was the desalination plant upgraded recently?',
- '["A. To expand total water output for a growing population", "B. To increase overall energy efficiency", "C. To improve the taste of the purified water"]', 'B'),
-('c327bfef-7f8c-4c61-a59b-f709ed788dd2', 'f26eb9fc-5297-4260-885f-f5f83a8ed4f2', 12,
- 'What caused the plant to shut down briefly last summer?',
- '["A. An unexpected algae bloom", "B. A dangerous chemical leak", "C. A failure in the main power grid"]', 'A'),
-('fd7e6e46-f4b2-48a1-9a53-8e4fb15d3586', 'f26eb9fc-5297-4260-885f-f5f83a8ed4f2', 13,
- 'What does the guide emphasize about the water immediately after reverse osmosis?',
- '["A. It is ready for public consumption", "B. It is distilled and requires remineralization", "C. It contains high levels of beneficial minerals"]', 'B'),
-('f2301bdf-a9c1-423a-acc4-14409a967667', 'f26eb9fc-5297-4260-885f-f5f83a8ed4f2', 14,
- 'What safety equipment must visitors wear in the chemical testing areas?',
- '["A. High-visibility vests", "B. Hard hats", "C. Safety goggles"]', 'C'),
-('2180ae66-1a56-4ce0-baa6-161b9fe8adae', 'f26eb9fc-5297-4260-885f-f5f83a8ed4f2', 15,
- 'How much of the region''s fresh water does the facility currently supply?',
- '["A. Exactly fifty percent", "B. Just under a third", "C. Less than twenty percent"]', 'B');
+('2be32940-3967-4b02-9199-0821081b99af', '79cbda3a-68c0-4eed-a3c8-6d824d7764b4', 11,
+ 'What was the primary driving force behind the funding for the library renovation?',
+ '["A. To add more bookshelves for a growing collection", "B. To modernize the technological infrastructure", "C. To improve the acoustic engineering of the building"]', 'B'),
+('08ecbd53-3569-4152-b16d-5fe903691c8a', '79cbda3a-68c0-4eed-a3c8-6d824d7764b4', 12,
+ 'Which sustainable feature supplies nearly forty percent of the library''s electricity?',
+ '["A. Wind turbines", "B. Solar panels", "C. Geothermal heating"]', 'B'),
+('1308799f-b78a-4f78-845d-a80e6ed25891', '79cbda3a-68c0-4eed-a3c8-6d824d7764b4', 13,
+ 'How is the water from the rainwater harvesting system utilized?',
+ '["A. For public drinking fountains", "B. For flushing toilets and irrigation", "C. For cooling the server rooms"]', 'B'),
+('795c5bad-cb08-4516-b584-0920bd8f5f59', '79cbda3a-68c0-4eed-a3c8-6d824d7764b4', 14,
+ 'How are patrons'' library accounts managed in the newly renovated building?',
+ '["A. Through physical plastic library cards", "B. Via a smartphone application or biometric scan", "C. Using traditional paper registration forms"]', 'B'),
+('b3c213b3-877f-4529-897e-3fa788457ed3', '79cbda3a-68c0-4eed-a3c8-6d824d7764b4', 15,
+ 'In the event of a fire alarm, what visual cue should visitors follow?',
+ '["A. The ceiling sprinkler systems", "B. Green LED strips along the baseboards", "C. Red emergency exit signs above doors"]', 'B');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('277ce3ba-e09e-463a-9454-7f4d414cb8f5', '937625c4-ded2-43a8-b81e-638275d2b527', 2,
+('b5be7be8-08d5-491c-a9c5-1f96bab20f25', '0ffa5277-c135-4674-accb-b4f2584219ef', 2,
  'matching', 'Label the map below. Write the correct letter, A-H, next to Questions 16-20.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('009caca2-56e4-4ccb-9ba6-377ce6ab5646', '277ce3ba-e09e-463a-9454-7f4d414cb8f5', 16,
- 'Primary Intake Pumps', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'C'),
-('16bc258c-31ea-44e9-8d40-7fa1c846367a', '277ce3ba-e09e-463a-9454-7f4d414cb8f5', 17,
- 'Coagulation Basins', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'F'),
-('8842d10d-7d8a-4095-9231-e88b51cb6f77', '277ce3ba-e09e-463a-9454-7f4d414cb8f5', 18,
- 'Reverse Osmosis Hall', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'A'),
-('9601db0e-ea77-4a45-80ad-05b5a8c96cc4', '277ce3ba-e09e-463a-9454-7f4d414cb8f5', 19,
- 'Remineralization Silos', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'D'),
-('9f95797c-1bc4-4bd2-a3d5-0ed9f952f8a0', '277ce3ba-e09e-463a-9454-7f4d414cb8f5', 20,
- 'Main Control Room', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'E');
-
+('8521c574-1c11-4e17-99d8-2eb7b898dd7c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 16,
+ 'Digital Media Lab', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'C'),
+('2f52961d-35a8-4369-a151-cfb1cb4bf691', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 17,
+ 'Children''s Interactive Zone', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'E'),
+('136f6aa3-10ef-4fa3-93d4-05871a49e497', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 18,
+ 'Heritage Reading Room', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'A'),
+('3cf28eb7-ac71-40a1-9fa7-25d0c18b7e3c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 19,
+ 'Podcast Studio', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'D'),
+('22b9c702-fbc3-47fe-a4c4-996cf84be53b', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 20,
+ 'Community Workshop Space', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'B');
 
 -- ══════════════════════════════════════════════════════════════
--- ██  SECTION 3: Academic Dialogue (Behavioral Economics)     ██
+-- ██  SECTION 3: Academic Dialogue (Urban Heat Islands)       ██
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('6ed6df3a-8db8-481a-bc56-b14d3990476a', 'ed22087f-0fe9-43b4-94a1-88f11cdd338c', 3,
- 'Behavioral Economics: Nudge Theory and Choice Architecture',
- 'Tutor: Come in, Eleanor, Julian. Take a seat. Let’s look at the progress of your joint assignment on behavioral economics. You’ve chosen to focus heavily on "Nudge Theory" and choice architecture.
-Eleanor: Yes, Dr. Vance. When I first read about the concept, I assumed it was a form of psychological manipulation. But I was actually quite surprised to find that its core principle is preserving freedom of choice. It alters behavior predictably, but without forbidding any options or changing economic incentives. 
-Julian: That’s the theory, anyway. I’m a bit more sceptical. We’ve been reviewing some of the classic case studies, like the organ donation opt-out systems used in parts of Europe. 
-Tutor: A seminal study. What was your critique of it, Julian? Did you find the data on increased registration rates unconvincing?
-Julian: The data is mathematically sound—opt-out systems clearly yield higher registration than opt-in systems. My issue is that the researchers entirely ignored deeply ingrained cultural factors regarding medical ethics in those specific countries. You can’t just attribute the success solely to the default option without acknowledging the societal context.
-Tutor: An excellent point of critical analysis. Make sure you highlight that methodological flaw in your essay. Now, what about the cafeteria food placement studies? That’s the classic example of choice architecture: putting fruit at eye level to encourage healthy eating.
-Eleanor: We both looked at that. I argued that it is a brilliant, low-cost public health strategy. 
-Julian: And I argued that it treats adults like children incapable of making rational dietary decisions. 
-Tutor: Despite your ideological differences, what did the empirical data lead you to agree upon?
-Eleanor: Well, looking at longitudinal studies, we had to agree that while it is highly effective in the short term, the effect fades after about six months. People simply revert to their underlying preferences once the novelty of the new layout wears off. 
-Tutor: Precisely. Behavioral interventions often struggle with long-term adherence. Given the vast scope of Nudge Theory, you need to narrow your research focus. Have you considered looking at digital choice architecture? Specifically, how user interfaces guide consumers online.
-Julian: We hadn’t thought of that, but it’s incredibly relevant. E-commerce platforms use defaults and visual hierarchy constantly. We can pivot to analyzing software interfaces.
-Eleanor: Actually, speaking of software, Julian, how did you get on with the default-options software modelling tool I sent you? 
-Julian: Honestly, it was a frustrating experience. The interface itself was fine, but I struggled to isolate the variables. When you change a default setting, so many secondary behaviors alter simultaneously that tracking a clear cause-and-effect relationship became nearly impossible. 
-Eleanor: I can run the statistical regressions for you if that helps. 
-Julian: That would be great, thanks. 
-Tutor: Good teamwork. Now, a crucial part of your literature review will be contrasting the views of key academics in the field. Let’s quickly run through some prominent figures. Richard Thaler is arguably the father of this field. 
-Eleanor: Yes, Thaler’s primary argument is that humans are fundamentally irrational actors who rely heavily on cognitive heuristics, which justifies the need for gentle nudges.
-Tutor: Spot on. And his frequent collaborator, Cass Sunstein? 
-Julian: Sunstein takes a more political angle. He introduced the concept of "libertarian paternalism," arguing that institutions have a moral duty to steer citizens toward better choices as long as the freedom to opt-out remains cheap and easy. 
-Tutor: Correct. You must also include Daniel Kahneman.
-Eleanor: Kahneman’s dual-process theory—System 1 and System 2 thinking—underpins the psychological mechanics of why nudges work. He showed that nudges target our fast, intuitive, and lazy System 1 brain.
-Tutor: Excellent. Now, not everyone is an advocate. What about Dan Ariely?
-Julian: Ariely is interesting. He acknowledges that nudges work, but he focuses heavily on the dark side—what he calls "sludges." He emphasizes how corporations weaponize choice architecture to exploit consumers, like making subscriptions incredibly difficult to cancel.
-Tutor: A vital counter-perspective. Lastly, what did you make of the philosopher Sarah Conly?
-Eleanor: Conly rejects the soft approach entirely. She argues that if a behavior is genuinely harmful, like smoking, nudging is insufficient. She believes in coercive paternalism—outright banning harmful choices rather than just making them slightly less convenient. 
-Tutor: It seems you both have a very firm grasp on the literature. Focus on structuring these arguments coherently, and your draft will be very strong.');
+('3f9433af-a4be-4779-824a-bdc80f2bb9e3', '272c646a-6c20-48c1-91ac-3cc9a84b5465', 3,
+ 'Urban Heat Island Mitigation Strategies',
+ 'Tutor: Come in, Leo, Maya. Grab a seat. Let’s review your draft on urban heat island mitigation strategies. I see you’ve chosen to focus specifically on retrofitting existing green infrastructure.
+Maya: Yes, Dr. Aris. Originally, we were going to look at new developments and how they integrate sustainability from the ground up, but we realized retrofitting existing urban environments is a far more pressing issue. Given that the vast majority of the projected 2050 urban population will be living in cities that are already built, focusing on new builds seemed somewhat redundant.
+Leo: We started by analyzing the traditional municipal approach of simply planting more street trees. While the historical data consistently shows a marginal reduction in surface temperatures, it’s severely limited by underground utility constraints and poor soil volume in modern cities. You just can''t plant a large canopy tree on a pavement that is tightly packed with fiber-optic cables, gas lines, and high-pressure water mains. The roots simply have nowhere to go.
+Tutor: That’s a very practical, often overlooked limitation to highlight. Urban planning isn''t just about what happens above ground. So, what alternative did you propose in your core thesis?
+Maya: We pivoted to examining the integration of ''green roofs'' and vertical ''living walls''. We found that extensive green roofs—the ones with very shallow soil layers that only support hardy plants like mosses and succulents—are far more economically viable for retrofitting. This is compared to intensive green roofs, which feature deep soil and large plants, but require major, expensive structural reinforcement of the host building to safely bear the load.
+Tutor: Excellent distinction between extensive and intensive systems. However, in your methodology section, I noticed you relied almost entirely on simulation models from the University of Melbourne. Did you consider the empirical data from the recent longitudinal trial conducted in Singapore?
+Leo: We did review the Singapore study quite thoroughly, but we intentionally decided to exclude it. Their climate is equatorial, meaning they deal with consistent, oppressive year-round humidity and heat. Our predictive model is specifically tailored for temperate cities experiencing acute, short-term summer heatwaves, like London or Chicago. We concluded that injecting the Singapore data would have skewed our baseline variables completely, rendering the final projections inaccurate.
+Tutor: That is a highly defensible methodological choice, Leo. But as I always say, you must explicitly state that rationale in the text of your paper. If you don''t tell the reader why you purposefully excluded such a major, widely-cited study, the peer reviewers will just assume you missed it entirely during your literature review. You must control the narrative.
+Maya: We will definitely add a dedicated paragraph clarifying our exclusionary criteria. Now, moving on to the economic analysis section, this is where we really struggled. We found it incredibly difficult to quantify the financial return on investment for living walls. The initial installation and ongoing maintenance costs are high, and the direct energy savings for the building are relatively modest.
+Tutor: It is notoriously tricky to quantify. This is where you need to look beyond the direct energy savings of individual buildings and examine the macroeconomic benefits. Have you considered the consequential reduction in municipal healthcare costs? Severe heatwaves cause significant, predictable spikes in hospital admissions for cardiovascular and respiratory issues. Green infrastructure reduces ambient city temperatures, thereby lowering those hospital admission rates and saving the public health sector millions.
+Leo: That’s a brilliant angle. We hadn''t thought about externalized public health savings. We can easily incorporate those public health metrics into the final cost-benefit analysis.
+Tutor: Good. Now, let’s look at your literature review. You’ve compiled an impressive array of researchers, but you need to accurately match them to their specific theoretical contributions or critiques. Let''s run through a few key figures to ensure you have the attributions correct. What was Professor O''Rourke''s main argument?
+Maya: O''Rourke focused on the concept of ''eco-gentrification''. She controversially argued that installing high-end green infrastructure in low-income neighborhoods often increases local property values so dramatically that it prices out and displaces the very residents the environmental improvements were originally meant to help.
+Tutor: Precisely. A vital socio-economic critique of green policies. And what about Dr. Henshall?
+Leo: Henshall took a more pessimistic, structural engineering perspective. He warned about the hidden, long-term maintenance costs. He pointed out that living walls often fail within five to seven years because the integrated drip-irrigation systems inevitably leak, which can cause severe structural water damage to the host building’s facade if not caught early.
+Tutor: Yes, the long-term viability and maintenance issue. Now, contrast that with the more optimistic work of Dr. Carmichael.
+Maya: Carmichael is a staunch advocate for what she calls ''bio-solar'' roofs. She provided empirical evidence showing that pairing solar panels with a green roof actually increases the overall efficiency of the photovoltaic cells. The plants undergo transpiration, which cools the ambient air, preventing the solar panels from overheating and losing their operational efficiency during peak summer radiation.
+Tutor: Correct. It''s a fantastic synergistic approach that solves two problems at once. What did you make of the policy critique published by Dr. Al-Fayed?
+Leo: Al-Fayed was highly critical of the current regulatory framework in Europe. He stated that municipal governments rely far too heavily on offering tax incentives to private developers to build green spaces. He argues this results in fragmented, isolated green patches that look good on paper, rather than a cohesive, connected, city-wide ecological corridor which is what is actually needed for urban biodiversity.
+Tutor: A very astute observation on the failures of neoliberal urban policy. Finally, let''s discuss Dr. Sterling''s contribution to the field.
+Maya: Sterling shifted the academic focus away from temperature reduction entirely and looked at stormwater management. He quantified how extensive green roofs act as massive, biological sponges during heavy rainfall events. By retaining the water, they significantly reduce the sudden strain on aging municipal sewer systems, thereby preventing catastrophic urban flash floods.
+Tutor: Perfect. Your grasp of the academic landscape is very strong. Just synthesize these perspectives coherently, and make sure you address that public health economic angle. I look forward to reading the final draft next week.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('b3fadb8c-b04b-4597-897f-6f7fb80c7a10', '6ed6df3a-8db8-481a-bc56-b14d3990476a', 1,
+('4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', '3f9433af-a4be-4779-824a-bdc80f2bb9e3', 1,
  'multiple-choice', 'Choose the correct letter, A, B or C.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('b18facd8-19e3-4d49-a4b8-734dcf806657', 'b3fadb8c-b04b-4597-897f-6f7fb80c7a10', 21,
- 'Why was Eleanor initially surprised by Nudge Theory?',
- '["A. It relies on severe economic penalties", "B. It preserves freedom of choice", "C. It is a form of psychological manipulation"]', 'B'),
-('f9ea4cc2-bd94-4bdd-87d5-b7984f9714b8', 'b3fadb8c-b04b-4597-897f-6f7fb80c7a10', 22,
- 'Julian criticizes the organ donation study because...',
- '["A. The registration data was mathematically flawed", "B. Opt-in systems actually proved more effective", "C. Cultural factors were completely ignored"]', 'C'),
-('5ff26f22-3e29-4212-a411-d5ff9b2d10ca', 'b3fadb8c-b04b-4597-897f-6f7fb80c7a10', 23,
- 'What do Eleanor and Julian agree on regarding the cafeteria food placement strategy?',
- '["A. It treats adults like children", "B. It is highly effective in the short term", "C. It successfully alters long-term dietary habits"]', 'B'),
-('e1e243ce-fc74-4e4c-b16f-290c206dc65e', 'b3fadb8c-b04b-4597-897f-6f7fb80c7a10', 24,
- 'What does the tutor suggest they narrow their research focus to?',
- '["A. Digital choice architecture", "B. Public health interventions", "C. Financial decision making"]', 'A'),
-('37ffe65b-8c47-4327-abaf-955d2e9ab094', 'b3fadb8c-b04b-4597-897f-6f7fb80c7a10', 25,
- 'What problem did Julian experience with the modelling software?',
- '["A. The user interface was confusing", "B. He struggled to isolate the variables", "C. The statistical regressions failed to load"]', 'B');
+('4b40141f-63e0-4326-bc53-20b540fe52db', '4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', 21,
+ 'Why did the students decide to focus on retrofitting existing green infrastructure?',
+ '["A. Because new developments are too technologically complex to analyze.", "B. Because the majority of the future urban population will live in already-built cities.", "C. Because municipal funding is exclusively allocated to older neighborhoods."]', 'B'),
+('1b6cb5ba-6a41-4e8d-b3a7-75acdfcd8641', '4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', 22,
+ 'According to Leo, what is the primary limitation of planting more street trees in modern cities?',
+ '["A. The high cost of specialized soil and fertilizers.", "B. The lack of available underground space due to utilities.", "C. The amount of maintenance required during the autumn months."]', 'B'),
+('78bb73ca-5d62-4bb0-97b9-b6ebedf48816', '4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', 23,
+ 'Why did the students intentionally exclude the empirical data from the Singapore study?',
+ '["A. The study focused on intensive rather than extensive green roofs.", "B. The data was published too recently to be independently verified.", "C. The equatorial climate would have skewed their baseline variables for temperate cities."]', 'C'),
+('e20e7664-67bd-4ad3-962b-48751eac2ccb', '4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', 24,
+ 'What does the tutor advise the students to do regarding the excluded study?',
+ '["A. Explicitly state their rationale for excluding it in the text of the paper.", "B. Incorporate a small portion of the data into their appendix.", "C. Contact the Singapore researchers to request temperate climate data."]', 'A'),
+('fcfb582d-79e5-4e6c-bce4-02b8d6eb15a2', '4ff37bb5-ed27-4211-8cdc-d8c862ba79f8', 25,
+ 'How does the tutor suggest the students justify the high cost of living walls in their economic analysis?',
+ '["A. By emphasizing the significant increase in residential property taxes.", "B. By calculating the externalized savings in municipal healthcare costs.", "C. By focusing on the long-term reduction in a building''s heating bills."]', 'B');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('3b7ee68d-800b-41aa-ad4a-969db08e3980', '6ed6df3a-8db8-481a-bc56-b14d3990476a', 2,
- 'matching', 'Match the following researchers to their primary views or theories. Choose the correct letter, A-F.', true);
+('1d5e70b8-c8dd-497f-85a0-dd4117e05266', '3f9433af-a4be-4779-824a-bdc80f2bb9e3', 2,
+ 'matching', 'Match the following academic critiques or theories to the correct researcher. Choose the correct letter, A-E.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('c1081e09-c103-41c8-88b8-a0896f3d08dd', '3b7ee68d-800b-41aa-ad4a-969db08e3980', 26,
- 'Richard Thaler', 
- '["A. Corporations weaponize choice architecture to exploit consumers.", "B. Nudges target our fast, intuitive System 1 brain.", "C. Institutions have a moral duty to steer choices via libertarian paternalism.", "D. Harmful choices should be outright banned, not just nudged.", "E. Humans are fundamentally irrational and rely on heuristics.", "F. Choice architecture is a violation of basic human rights."]', 'E'),
-('1a1ec1fb-d72b-45c6-bc47-ca1c7c4d6216', '3b7ee68d-800b-41aa-ad4a-969db08e3980', 27,
- 'Cass Sunstein', 
- '["A. Corporations weaponize choice architecture to exploit consumers.", "B. Nudges target our fast, intuitive System 1 brain.", "C. Institutions have a moral duty to steer choices via libertarian paternalism.", "D. Harmful choices should be outright banned, not just nudged.", "E. Humans are fundamentally irrational and rely on heuristics.", "F. Choice architecture is a violation of basic human rights."]', 'C'),
-('89027595-d0ad-4e23-95f7-1997019bd59f', '3b7ee68d-800b-41aa-ad4a-969db08e3980', 28,
- 'Daniel Kahneman', 
- '["A. Corporations weaponize choice architecture to exploit consumers.", "B. Nudges target our fast, intuitive System 1 brain.", "C. Institutions have a moral duty to steer choices via libertarian paternalism.", "D. Harmful choices should be outright banned, not just nudged.", "E. Humans are fundamentally irrational and rely on heuristics.", "F. Choice architecture is a violation of basic human rights."]', 'B'),
-('c494490f-bb7e-454d-91a2-7bef48f5baad', '3b7ee68d-800b-41aa-ad4a-969db08e3980', 29,
- 'Dan Ariely', 
- '["A. Corporations weaponize choice architecture to exploit consumers.", "B. Nudges target our fast, intuitive System 1 brain.", "C. Institutions have a moral duty to steer choices via libertarian paternalism.", "D. Harmful choices should be outright banned, not just nudged.", "E. Humans are fundamentally irrational and rely on heuristics.", "F. Choice architecture is a violation of basic human rights."]', 'A'),
-('6e0ea3a1-c598-489c-93a9-02ebca62aa37', '3b7ee68d-800b-41aa-ad4a-969db08e3980', 30,
- 'Sarah Conly', 
- '["A. Corporations weaponize choice architecture to exploit consumers.", "B. Nudges target our fast, intuitive System 1 brain.", "C. Institutions have a moral duty to steer choices via libertarian paternalism.", "D. Harmful choices should be outright banned, not just nudged.", "E. Humans are fundamentally irrational and rely on heuristics.", "F. Choice architecture is a violation of basic human rights."]', 'D');
+('91499ec9-d352-4e0b-a306-73ca81e919ca', '1d5e70b8-c8dd-497f-85a0-dd4117e05266', 26,
+ 'Criticized the reliance on tax incentives for creating fragmented rather than cohesive green spaces.',
+ '["A. Professor O''Rourke", "B. Dr. Henshall", "C. Dr. Carmichael", "D. Dr. Al-Fayed", "E. Dr. Sterling"]', 'D'),
+('33c6bc66-e5f4-498a-84b6-f61b2c1bd710', '1d5e70b8-c8dd-497f-85a0-dd4117e05266', 27,
+ 'Demonstrated that extensive green roofs can prevent catastrophic urban flash floods.',
+ '["A. Professor O''Rourke", "B. Dr. Henshall", "C. Dr. Carmichael", "D. Dr. Al-Fayed", "E. Dr. Sterling"]', 'E'),
+('73ffba4e-a582-4bb9-850b-2e47dad321ee', '1d5e70b8-c8dd-497f-85a0-dd4117e05266', 28,
+ 'Highlighted the risk of long-term structural water damage caused by leaking irrigation systems.',
+ '["A. Professor O''Rourke", "B. Dr. Henshall", "C. Dr. Carmichael", "D. Dr. Al-Fayed", "E. Dr. Sterling"]', 'B'),
+('3bec44dd-aeac-4041-813b-21b2ced15887', '1d5e70b8-c8dd-497f-85a0-dd4117e05266', 29,
+ 'Argued that environmental improvements can lead to the displacement of low-income residents.',
+ '["A. Professor O''Rourke", "B. Dr. Henshall", "C. Dr. Carmichael", "D. Dr. Al-Fayed", "E. Dr. Sterling"]', 'A'),
+('28ef047d-3bc6-4080-99e6-46b340c31dbe', '1d5e70b8-c8dd-497f-85a0-dd4117e05266', 30,
+ 'Showed that vegetation can cool ambient air and prevent photovoltaic cells from losing efficiency.',
+ '["A. Professor O''Rourke", "B. Dr. Henshall", "C. Dr. Carmichael", "D. Dr. Al-Fayed", "E. Dr. Sterling"]', 'C');
 
 
 -- ══════════════════════════════════════════════════════════════
--- ██  SECTION 4: Academic Monologue (Space Economics)         ██
+-- ██  SECTION 4: Academic Monologue (Self-Healing Concrete)   ██
 -- ══════════════════════════════════════════════════════════════
 
 INSERT INTO listening_sections (id, test_id, section_number, title, transcript) VALUES
-('848d9e4a-c5a0-4d5f-845d-68056070be4a', 'ed22087f-0fe9-43b4-94a1-88f11cdd338c', 4,
- 'Asteroid Mining and Orbital Economics',
- 'Lecturer: Good morning. As we transition into the latter half of our module on Resource Economics, today’s lecture will pivot away from terrestrial extraction and look toward an emerging, albeit highly speculative, sector: Asteroid Mining. The prospect of harvesting resources from near-Earth objects was once the exclusive domain of science fiction, but recent advancements in autonomous robotics and propulsion systems have thrust this concept into the realm of economic feasibility.
+('849fb747-83aa-404b-95af-9df9cd74c9de', '272c646a-6c20-48c1-91ac-3cc9a84b5465', 4,
+ 'The Development and Application of Bio-Concrete',
+ 'Lecturer: Welcome back to Advanced Construction Materials. Today, we are going to explore one of the most fascinating, interdisciplinary breakthroughs in modern civil engineering: the development of self-healing concrete, which is technically referred to in the literature as bio-concrete.
 
-To understand the economic potential, we must first look at what these celestial bodies contain. Asteroids are not all created equal; they are primarily categorized by their composition. The three main types are C-type, S-type, and M-type. While C-type asteroids are abundant in carbon and water, the financial sector is intensely focused on the M-type, or metallic, asteroids. These bodies are rich in iron and nickel, but more crucially, they contain staggering concentrations of platinum group metals. A single, mid-sized M-type asteroid could theoretically yield more platinum than has been mined in the entire history of humanity. 
+To truly understand the absolute necessity of this innovation, we must first acknowledge the fundamental, inescapable flaw of traditional concrete. While it is undeniably the most widely used construction material on the planet due to its immense compressive strength—meaning it can effortlessly support massive amounts of vertical weight—it is notoriously weak in tension. This inherent brittleness dictates that concrete will, without exception, eventually crack. In fact, small micro-cracks are a standard, accepted feature of all concrete structures from the moment they finish curing. 
 
-However, the barriers to entry are astronomical, both literally and figuratively. The most significant financial hurdle is not the mining technology itself, but the sheer cost of escaping Earth’s gravity well. Launching heavy extraction equipment into orbit requires immense amounts of rocket fuel, making the initial capital expenditure prohibitively expensive for most private enterprises. 
+Initially, a microscopic surface crack might not seem like a pressing structural threat. However, these tiny fissures act as direct pathways for rainwater, and more dangerously, winter de-icing salts, to penetrate deep into the porous material. When this corrosive moisture finally reaches the internal steel rebar—the metallic skeleton that actually gives the structure its necessary tensile strength—the steel inevitably begins to rust and expand. This aggressive expansion causes the surrounding concrete to spall and break away, eventually leading to catastrophic structural failure if left untreated. Currently, the global construction industry spends billions of dollars annually on manual maintenance, applying temporary chemical sealants just to fight this slow, inevitable decay.
 
-To circumvent this, aerospace engineers propose a paradigm shift: in-situ resource utilization. This means utilizing the resources found in space to further space exploration. The most critical application of this is manufacturing propellant off-world. Remember those C-type asteroids I mentioned? The water ice they contain can be harvested, melted, and subjected to electrolysis. This process splits the water into hydrogen and oxygen—the exact two components required for high-efficiency rocket fuel. By establishing orbital refueling depots, spacecraft wouldn’t need to launch with all their return fuel, drastically reducing the payload weight and cost.
+Enter self-healing concrete. This revolutionary material was pioneered not just by structural engineers, but through a unique collaboration with microbiologists at Delft University in the Netherlands. They asked a beautifully simple question: could we fundamentally re-engineer a building material to act much like human skin, rendering it capable of autonomously repairing its own wounds? 
 
-Beyond the engineering challenges, we must consider the labyrinth of international space law. The foundational legal framework is the 1967 Outer Space Treaty. This treaty explicitly states that space is the "province of all mankind" and strictly prevents nations from claiming sovereignty over the Moon or any other celestial bodies. However, a major legal grey area exists: while you cannot own the asteroid itself, can a private company own the materials extracted from it? In 2015, the United States passed legislation granting its citizens the right to own and sell asteroid resources, a move that sparked intense debate at the United Nations regarding the equitable distribution of space wealth.
+The solution they ultimately discovered was entirely biological. They decided to embed specific strains of live bacteria directly into the liquid concrete mixture. But they couldn''t use just any common bacteria. The highly alkaline environment of wet concrete is extremely toxic, possessing a pH level akin to industrial bleach, and the chemical curing process itself generates intense, sustained heat. Therefore, the researchers had to select extremophile bacteria from the Bacillus genus—specifically, rare strains typically found surviving near highly alkaline, active volcanoes. 
 
-Let us consider the profound macroeconomic implications if this industry succeeds. Bringing millions of tonnes of precious metals back to Earth would trigger a massive supply shock. According to basic supply and demand principles, a sudden influx of rare metals could cause a catastrophic crash in the global market, decimating the economies of nations that currently rely heavily on terrestrial mining exports. 
+These remarkable bacteria have an evolutionary adaptation: the ability to form highly resilient spores. You can think of a spore as a microscopic, impenetrable seed. These robust spores can lie completely dormant inside the dry concrete matrix for up to two hundred years, surviving perfectly well without any food or oxygen.
 
-Yet, from an environmental perspective, this could be a monumental victory for our planet. Current terrestrial mining operations cause severe environmental degradation, ranging from toxic runoff contaminating watersheds to widespread deforestation and habitat destruction. If we can master the logistics of orbital logistics, the long-term vision is the complete relocation of heavy, polluting industries off-world. Earth could eventually be zoned primarily for residential, agricultural, and light commercial use, while the heavy, resource-intensive manufacturing occurs in the sterile vacuum of space. 
+So, how does the autonomous healing mechanism actually trigger? Along with the dormant bacterial spores, the engineers must also mix in a specific food source, which in this case is a chemical compound called calcium lactate. To prevent premature consumption, both the bacteria and their food are safely encapsulated in tiny, biodegradable capsules made of a specialized plastic. 
 
-In conclusion, while the foundational technologies are rapidly maturing, true commercial viability remains elusive. Most conservative economic models estimate that profitable asteroid mining is at least a decade away, requiring sustained investment and unprecedented international cooperation.');
+When a stress crack inevitably forms in the concrete structure, ambient rainwater seeps into the newly formed fissure and physically dissolves the plastic capsules. This sudden influx of moisture simultaneously wakes up the dormant bacteria and releases the calcium lactate into their immediate environment. The revived bacteria aggressively begin to consume the calcium lactate. As they rapidly metabolize this food source, they excrete a hardened byproduct: calcium carbonate, which is essentially pure limestone. 
+
+This excreted limestone gradually builds up along the edges of the fissure, bridging the physical gap and completely sealing the crack from the inside out in a matter of three to four weeks. Once the crack is fully sealed and the external water supply is cut off, the bacteria intuitively recognize the change in their environment. They simply form protective spores once again and return to their dormant state, silently waiting for the next crack to appear. 
+
+The industrial applications for this technology are truly staggering. Its most immediate value lies in subterranean and highly hazardous environments where manual maintenance is either physically impossible or prohibitively expensive. Imagine the structural benefits for underground wastewater tunnels, deep-sea oil drilling platforms, or the massive containment vessels of nuclear power plants. Utilizing bio-concrete in these inaccessible structures would dramatically increase both their operational lifespan and their safety margins.
+
+However, widespread commercial adoption of bio-concrete currently faces two major industry hurdles. The first, unsurprisingly, is cost. The specialized laboratory preparation of the extremophile bacteria and the calcium lactate makes bio-concrete roughly twice as expensive to produce as traditional concrete. While the long-term savings on structural maintenance would easily offset this initial capital expenditure within a decade, the global construction industry is notoriously conservative and remains heavily focused on minimizing upfront material costs. 
+
+The second major hurdle is standardized regulatory testing. Because this is fundamentally a living, biological material, its healing performance can fluctuate wildly based on ambient temperature and regional humidity. Before bio-concrete can be officially written into international building codes and safely used to construct high-rise skyscrapers, regulatory engineers need decades of longitudinal data to definitively prove its reliability under diverse, extreme weather conditions. 
+
+Despite these significant challenges, the successful integration of microbiology into civil engineering represents a profound paradigm shift. We are finally moving away from relying on inert, lifeless building materials and entering a new era of smart, responsive infrastructure that actively maintains itself. In tomorrow''s practical seminar, we will look at the specific chemical equations behind the calcium lactate metabolism.');
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('c431fcb7-b132-4660-accd-397a581f0a4a', '848d9e4a-c5a0-4d5f-845d-68056070be4a', 1,
- 'sentence-completion', 'Complete the notes below. Write NO MORE THAN ONE WORD for each answer.', true);
+('9b47703b-232d-4ea0-83fe-584284fa600d', '849fb747-83aa-404b-95af-9df9cd74c9de', 1,
+ 'sentence-completion', 'Complete the notes below. Write NO MORE THAN TWO WORDS for each answer.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, answer, accepted_answers) VALUES
-('2d1af743-d716-49b9-b1f9-06d110736426', 'c431fcb7-b132-4660-accd-397a581f0a4a', 31,
- 'Asteroids are primarily categorized by their ________.', 'composition', '["composition","Composition"]'),
-('3f8bf362-9ba9-478a-ba9d-cb10d2a51fe7', 'c431fcb7-b132-4660-accd-397a581f0a4a', 32,
- 'Type-M asteroids are highly sought after for their ________ group metals.', 'platinum', '["platinum","Platinum"]'),
-('1c6c858f-b7cf-486c-b4cf-669ea4067500', 'c431fcb7-b132-4660-accd-397a581f0a4a', 33,
- 'A major financial hurdle is the cost of escaping Earth’s ________ well.', 'gravity', '["gravity","Gravity"]'),
-('adf3f0de-b52f-4616-ae23-33cf155a9e61', 'c431fcb7-b132-4660-accd-397a581f0a4a', 34,
- 'To combat costs, engineers propose manufacturing ________ in space.', 'propellant', '["propellant","fuel","Propellant"]'),
-('1fde9c64-aa40-466e-bb9c-90208c6d88c4', 'c431fcb7-b132-4660-accd-397a581f0a4a', 35,
- 'Water found on asteroids can be electrolyzed into hydrogen and ________.', 'oxygen', '["oxygen","Oxygen"]'),
-('a56cae89-0202-4565-a6ec-3c9faae5bd1e', 'c431fcb7-b132-4660-accd-397a581f0a4a', 36,
- 'The 1967 Outer Space Treaty prevents nations from claiming ________ over celestial bodies.', 'sovereignty', '["sovereignty","Sovereignty"]'),
-('2f68030a-01ce-44e5-bb22-a14f6e5d2ff6', 'c431fcb7-b132-4660-accd-397a581f0a4a', 37,
- 'A sudden influx of rare metals could cause a crash in the global ________.', 'market', '["market","Market"]'),
-('1daefd5d-0329-4c35-ae00-f94d6990c6bf', 'c431fcb7-b132-4660-accd-397a581f0a4a', 38,
- 'Current terrestrial mining causes severe environmental ________.', 'degradation', '["degradation","Degradation"]'),
-('07254056-799c-4475-9dd0-7fb896b3017e', 'c431fcb7-b132-4660-accd-397a581f0a4a', 39,
- 'Extracting resources off-world could eventually lead to the ________ of heavy industry.', 'relocation', '["relocation","Relocation"]'),
-('c246c5ad-76e8-41da-be58-de888ec9d78d', 'c431fcb7-b132-4660-accd-397a581f0a4a', 40,
- 'True commercial viability is estimated to be at least a ________ away.', 'decade', '["decade","Decade"]');
+('12a0cbce-8756-40ad-af8b-92073d62af5f', '9b47703b-232d-4ea0-83fe-584284fa600d', 31,
+ 'Traditional concrete is highly susceptible to cracking due to its weakness in ________.', 'tension', '["tension","Tension"]'),
+('58b4c409-a9cd-4f78-8309-91c2f9303006', '9b47703b-232d-4ea0-83fe-584284fa600d', 32,
+ 'Micro-cracks allow moisture and ________ to reach the internal steel rebar, causing it to rust.', 'de-icing salts', '["de-icing salts","deicing salts","salts"]'),
+('55738064-3458-41a1-82a9-f387deb302ea', '9b47703b-232d-4ea0-83fe-584284fa600d', 33,
+ 'The extremophile bacteria selected for bio-concrete are typically found near active ________.', 'volcanoes', '["volcanoes","Volcanoes"]'),
+('b1b2a407-043e-4bd3-8a19-aa6fde145f2a', '9b47703b-232d-4ea0-83fe-584284fa600d', 34,
+ 'The bacteria are able to survive inside the dry concrete for up to 200 years by forming highly resilient ________.', 'spores', '["spores","Spores"]'),
+('4dbe6904-64a3-4a98-b087-b6158b7d0ce9', '9b47703b-232d-4ea0-83fe-584284fa600d', 35,
+ 'The bacteria''s food source is safely encased in capsules made of specialized ________.', 'plastic', '["plastic","biodegradable plastic","Plastic"]'),
+('86b502a4-6271-4870-a6eb-22f0b5acca4c', '9b47703b-232d-4ea0-83fe-584284fa600d', 36,
+ 'When water enters a crack, the bacteria wake up, consume the food, and excrete pure ________ to seal the gap.', 'limestone', '["limestone","Limestone","calcium carbonate"]'),
+('1c76fc68-0444-4875-88fa-59d889b2be01', '9b47703b-232d-4ea0-83fe-584284fa600d', 37,
+ 'The technology is particularly valuable for subterranean and ________ environments where manual repair is impossible.', 'hazardous', '["hazardous","Hazardous"]'),
+('0a4ebb59-dfd8-44fa-a0e6-54f6d6f16ed9', '9b47703b-232d-4ea0-83fe-584284fa600d', 38,
+ 'Widespread commercial use is currently limited because the material is twice as ________ as standard concrete.', 'expensive', '["expensive","Expensive"]'),
+('9d471db3-b262-452a-bd6b-35746110ddcd', '9b47703b-232d-4ea0-83fe-584284fa600d', 39,
+ 'The global construction industry is conservative and focuses heavily on minimizing upfront ________.', 'costs', '["costs","Costs","material costs"]'),
+('a6d90fb6-25d4-4077-b801-771ccf9e810b', '9b47703b-232d-4ea0-83fe-584284fa600d', 40,
+ 'Regulatory engineers are concerned that the healing performance of the material can fluctuate wildly depending on regional ________.', 'humidity', '["humidity","Humidity"]');
