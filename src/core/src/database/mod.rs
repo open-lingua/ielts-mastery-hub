@@ -123,12 +123,13 @@ pub fn split_task_id_and_ext(file_name: &str) -> Option<(&str, &str)> {
 
 /// Builds the local-storage destination path for a writing asset,
 /// mirroring `commands::storage::upload_writing_asset`'s
-/// `$HOME/.imh/writing-assets/<task_id>.<ext>` convention.
+/// `$HOME/.imh/writing-assets/<task_id>/figure.<ext>` convention.
 pub fn writing_asset_seed_dest_path(home: &str, task_id: &str, ext: &str) -> PathBuf {
     Path::new(home)
         .join(".imh")
         .join("writing-assets")
-        .join(format!("{task_id}.{ext}"))
+        .join(task_id)
+        .join(format!("figure.{ext}"))
 }
 
 /// Percent-encodes a string exactly like JavaScript's `encodeURIComponent`:
@@ -170,11 +171,12 @@ pub fn to_asset_url(path: &Path) -> String {
 /// once assets are seeded, and it never clobbers an `image_url` a user has
 /// since intentionally changed away from the seeded value.
 ///
-/// Individual per-file problems (an asset filename that doesn't parse, a
-/// `task_id` with no matching `writing_tasks` row, a copy/IO error, or a
-/// failed `UPDATE`) are logged with `eprintln!` and skipped — they never
-/// abort the sync or block app startup. Only a failure to read the seed
-/// directory itself, or a missing `$HOME`, is propagated as `Err`
+/// Individual per-file problems (a task subfolder with no `figure.<ext>`
+/// file inside it, a `task_id` with no matching `writing_tasks` row, a
+/// copy/IO error, or a failed `UPDATE`) are logged with `eprintln!` and
+/// skipped — they never abort the sync or block app startup. Only a failure
+/// to read the seed directory itself, or a missing `$HOME`, is propagated as
+/// `Err`
 pub async fn sync_writing_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
     let home = std::env::var("HOME").map_err(|_| {
         AppError::Validation("HOME environment variable is not set".to_string())
@@ -209,26 +211,54 @@ pub async fn sync_writing_assets_from_dir(
             }
         };
 
-        let path = entry.path();
-        if !path.is_file() {
+        // Each seed asset lives in a `<task_id>/` subfolder containing a
+        // single `figure.<ext>` file; skip anything else (e.g. stray files).
+        let task_dir = entry.path();
+        if !task_dir.is_dir() {
             continue;
         }
-        let Some(file_name) = path.file_name().and_then(|n| n.to_str()) else {
+        let Some(task_id) = task_dir.file_name().and_then(|n| n.to_str()) else {
+            eprintln!(
+                "[sync_writing_assets_to_local_storage] skipping non-UTF-8 directory name at {}",
+                task_dir.display()
+            );
+            continue;
+        };
+        let task_id = task_id.to_string();
+
+        let figure_path = match find_figure_file(&task_dir).await {
+            Ok(Some(path)) => path,
+            Ok(None) => {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] no figure.<ext> file found in {}, skipping",
+                    task_dir.display()
+                );
+                continue;
+            }
+            Err(e) => {
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] failed to read task asset directory {}: {e}",
+                    task_dir.display()
+                );
+                continue;
+            }
+        };
+
+        let Some(file_name) = figure_path.file_name().and_then(|n| n.to_str()) else {
             eprintln!(
                 "[sync_writing_assets_to_local_storage] skipping non-UTF-8 file name at {}",
-                path.display()
+                figure_path.display()
             );
             continue;
         };
-
-        let Some((task_id, ext)) = split_task_id_and_ext(file_name) else {
+        let Some((_, ext)) = split_task_id_and_ext(file_name) else {
             eprintln!(
-                "[sync_writing_assets_to_local_storage] could not parse a task id from filename `{file_name}`, skipping"
+                "[sync_writing_assets_to_local_storage] could not parse an extension from filename `{file_name}`, skipping"
             );
             continue;
         };
 
-        let dest = writing_asset_seed_dest_path(home, task_id, ext);
+        let dest = writing_asset_seed_dest_path(home, &task_id, ext);
 
         // Idempotent skip: once the file exists at its destination, never
         // touch this task again (also protects a user-edited `image_url`).
@@ -274,12 +304,12 @@ pub async fn sync_writing_assets_from_dir(
             }
         }
 
-        let bytes = match tokio::fs::read(&path).await {
+        let bytes = match tokio::fs::read(&figure_path).await {
             Ok(bytes) => bytes,
             Err(e) => {
                 eprintln!(
                     "[sync_writing_assets_to_local_storage] failed to read seed asset {}: {e}",
-                    path.display()
+                    figure_path.display()
                 );
                 continue;
             }
@@ -308,4 +338,23 @@ pub async fn sync_writing_assets_from_dir(
     }
 
     Ok(())
+}
+
+/// Looks inside a `<task_id>/` seed asset subfolder for its `figure.<ext>`
+/// file, returning `Ok(None)` if the directory has no such file. Only the
+/// stem (`figure`) is required to match; any extension is accepted so the
+/// caller can derive it via [`split_task_id_and_ext`]. If more than one
+/// `figure.*` file is present, the first one found is used.
+async fn find_figure_file(task_dir: &Path) -> std::io::Result<Option<PathBuf>> {
+    let mut entries = tokio::fs::read_dir(task_dir).await?;
+    while let Some(entry) = entries.next_entry().await? {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        if path.file_stem().and_then(|s| s.to_str()) == Some("figure") {
+            return Ok(Some(path));
+        }
+    }
+    Ok(None)
 }
