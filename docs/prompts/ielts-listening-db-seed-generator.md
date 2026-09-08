@@ -27,6 +27,19 @@ You are tasked with generating a comprehensive **SQLite SQL Seed File** specific
 ## 3. Transcript Technical Specifications (MANDATORY per Section)
 *Note to AI: Each `transcript` field MUST comply with the technical parameters below. These parameters are non-negotiable and are designed to replicate the pacing, length, and linguistic complexity of authentic IELTS audio recordings. Respect the target word count strictly, as it directly determines the realistic audio duration.*
 
+*Note to AI: The script will have a structure like the following, wrapping the dialogue/monologue in a `<DIALOGUE>` tag with one speaker label per line:*
+
+<DIALOGUE>
+Agent: ...
+Customer: ...
+Agent: ...
+Customer: ...
+Agent: ...
+Customer: ...
+</DIALOGUE>
+
+*When counting words to validate the target word count below, do not count the `<DIALOGUE>`/`</DIALOGUE>` tags or the speaker labels (e.g. "Agent:", "Customer:") — only count the actual spoken content.*
+
 - **Section 1 — Everyday conversation**
   - Speakers: **2 people** (typically customer service + customer, or similar)
   - Audio duration: **~4 to 5 minutes**
