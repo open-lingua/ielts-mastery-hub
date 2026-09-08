@@ -1,0 +1,77 @@
+{
+  "scenario_id": "ielts_s2_library_reopening_tour",
+  "title": "Library Reopening Tour",
+  "ielts_section": 2,
+  "temperature": 0.8,
+  "scene": "A library director giving a welcome speech and map orientation to visitors at the grand reopening of a renovated community library.",
+  "sample_context": "Warm, informative monologue with clear signposting, map orientation language, and natural engaging delivery.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Director / Margaret",
+      "voice_name": "Kore",
+      "audio_profile": "Warm, welcoming, and clear host speaking to a group of visitors.",
+      "director_note": {
+        "style": "Warm, informative, engaging",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear",
+        "disfluencies": "Light, natural"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, everyone, and welcome to the grand reopening of the Oakbridge Community Library and Cultural Hub. I am Margaret, the library director, and I am absolutely thrilled to show you the results of our extensive two-year renovation project."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Before we begin the walking tour, I want to share a little background on why this renovation was so desperately needed. Our original building, constructed in the 1970s, was charming but entirely unsuited for the digital age. Furthermore, it was incredibly energy inefficient. While many residents assumed our primary goal was simply to add more bookshelves to accommodate our growing collection, the actual driving force behind the funding was the urgent need to modernize our technological infrastructure. We have completely overhauled our digital access points, increasing public computer terminals by sixty percent and installing gigabit Wi-Fi throughout the entire campus."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "One of the most exciting aspects of this renovation is our commitment to sustainability. We didn't just update the technology; we completely redesigned the building's environmental footprint. The roof is now entirely covered in solar panels, which supply nearly forty percent of our daily electricity needs. Even more impressively, we installed a rainwater harvesting system. This system collects runoff from the roof, filters it, and uses it exclusively to flush the toilets and irrigate the community garden outside. This reduces our reliance on the municipal water supply by thousands of gallons a month."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We were also incredibly fortunate to receive a substantial grant from the National Arts Council. This grant was specifically ring-fenced for expanding our local history archives, allowing us to digitize thousands of fragile photographs and documents that were previously inaccessible to the public."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "During the closure, we operated a temporary mobile library, which was quite an adventure. The most common feedback we received during that period was how much the community missed our quiet study areas. We listened. The new layout has been specifically acoustically engineered. We have installed specialized sound-dampening panels in the ceiling and thick carpeting in the reading rooms to ensure that the quiet zones remain genuinely peaceful, even when the rest of the building is bustling."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, I must cover a few brief safety and operational guidelines before we move on. You will notice that we have completely eliminated physical library cards. Everything is now managed via a smartphone application. If you do not have a smartphone, do not worry; our front desk can issue a biometric scan linked to your account. Also, for today's tour, we ask that you please refrain from bringing any food or beverages beyond the lobby area. We have pristine new furnishings, and we want to keep them that way. Finally, in the event of a fire alarm, please do not use the elevators. The emergency exits are clearly illuminated with green LED strips along the baseboards."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Alright, let us get oriented with the new floor plan. Please take a look at the maps provided in your welcome brochures. We are currently standing in the Main Foyer, which is located at the bottom center of your map, right next to the automatic entrance doors."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "As we move straight ahead from the Foyer, we enter the Central Atrium. Immediately to your left, you will see a large, curved glass wall. That is the new Digital Media Lab. It is equipped with 3D printers, graphic design tablets, and video editing suites. It is a fantastic resource for local creatives."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If you look directly across the Central Atrium, on your right-hand side, there is a dedicated space with brightly colored seating and lower shelving. That is the Children’s Interactive Zone. We have soundproofed this area completely, so the kids can enjoy storytime and interactive learning without disturbing the rest of the library."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, if we walk straight through the Central Atrium to the very back of the building, the space opens up into a large, well-lit hall with panoramic windows facing the park. This is the Heritage Reading Room. We have kept the original oak tables from the 1970s building, but we’ve added modern, ergonomic chairs and individual reading lamps."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let's head back to the center and take the corridor that branches off to the left of the Central Atrium. Halfway down this corridor, on the right side, you will find a small, enclosed room. This is the Podcast Studio. It is completely soundproofed and features professional-grade microphones and mixing equipment. It can be booked in two-hour slots by anyone in the community."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Finally, if you take the corridor that branches off to the right of the Central Atrium, you will pass the restrooms. At the very end of that right-hand corridor is the Community Workshop Space. It has a durable, easy-to-clean floor and modular tables, making it perfect for arts and crafts sessions, community meetings, or small lectures."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We are so proud of this new facility, and we cannot wait for you to explore it. Let’s head over to the Digital Media Lab first."
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "scenario_id": "ielts_s1_corporate_retreat_booking",
+  "title": "Corporate Retreat Booking Enquiry",
+  "ielts_section": 1,
+  "temperature": 0.7,
+  "scene": "A phone call between a resort reservations agent and a corporate event coordinator booking a winter retreat.",
+  "sample_context": "Polite, transactional exchange with clear data intake regarding dates, numbers, dietary requirements, and specific logistics.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Agent / Thomas",
+      "voice_name": "Orus",
+      "audio_profile": "Polite, professional, and accommodating resort reservations agent.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal; deliberate self-corrections on key data"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Client / Sarah",
+      "voice_name": "Leda",
+      "audio_profile": "Professional, articulate, and organized corporate event coordinator.",
+      "director_note": {
+        "style": "Polite, professional, clear",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear",
+        "disfluencies": "Minimal, natural conversational pauses"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, you have reached the events and reservations team at the Silverwood Alpine Resort. My name is Thomas. How can I assist you with your booking today?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Good morning, Thomas. My name is Sarah Jenkins. I am the event coordinator for a tech firm called Nexus Dynamics. I am looking to book a corporate retreat for our executive team for this upcoming winter season. I know it is a bit late to be booking for December, but we had a last-minute cancellation at our previous venue."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I understand completely, Sarah. December is indeed our peak season, but we do have a few select dates still available. To start, could you spell your company name for me so I can create a new profile in our system?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Certainly. It is Nexus Dynamics. N-E-X-U-S, and then Dynamics."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Thank you, Sarah. And what are the exact dates you are looking at for this retreat?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We are aiming to arrive on the 12th of December and depart on the 16th of December."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me check our availability calendar... The 12th through the 16th. Yes, we can accommodate that. Now, how many attendees are we expecting for this retreat?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It will be a relatively intimate group. Exactly twenty-five executives, plus three support staff. So, twenty-eight people in total. However, the executives will each require their own individual room. The support staff can share."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Not a problem. We can reserve twenty-five of our premium Alpine suites for the executives. Now, regarding the event spaces, will you need a main conference room for the duration of your stay?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, we need a primary meeting room. It must have high-speed broadband and a modern projector. But more importantly, it needs to have a panoramic view. Our CEO is very particular about having natural light and a view of the mountains."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I would highly recommend the Cedar Room, then. It features floor-to-ceiling windows looking directly out over the southern valley. It also has an integrated state-of-the-art audiovisual system. Will you require any breakout rooms for smaller group sessions?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, please. Two smaller breakout rooms would be perfect. We plan to do intensive strategy sessions in the afternoons."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Done. Now, let us discuss catering. Do you want us to provide all three meals, or will your team be dining off-site?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We want a full-board package, so all meals included. However, we have some strict dietary requirements. Two of our executives have a severe allergy to shellfish. It is crucial that the kitchen is aware of this to avoid any cross-contamination."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I am making a very clear note of that right now. No shellfish. Our culinary team is highly experienced in managing severe allergies. Now, for the recreational aspect of the retreat. We offer several team-building activities. We have guided snowshoeing, introductory ice climbing, and a wilderness survival workshop."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The wilderness survival workshop sounds a bit too intense for this group. Let’s go with the guided snowshoeing. It’s active but accessible for everyone. Can we schedule that for the afternoon of the 14th?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Guided snowshoeing on the 14th. Booked. We also have a world-class spa facility. Would you like to pre-book any group treatments or offer open access to your team?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Open access would be fantastic. They will definitely appreciate the sauna and hydrotherapy pools after the strategy sessions."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. Just a quick logistical question regarding transportation. How will your team be arriving at the resort? We are located about two hours from the nearest international airport."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We are flying into Geneva Airport. We will need a private coach transfer from the arrivals terminal directly to the resort. We cannot rely on public trains with all the presentation equipment we are bringing."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I can arrange a luxury coach transfer for you. It will meet your team directly outside Terminal 2. Now, regarding the deposit to secure the booking. We require a forty percent upfront payment."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Forty percent. That is fine. Can I pay that via a corporate wire transfer?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A wire transfer is perfect. I will include our bank details in the preliminary invoice. Speaking of the invoice, I need an email address to send this to."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "You can send it directly to my finance department. The email is billing, that’s B-I-L-L-I-N-G, at nexusdynamics.com."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Perfect. I will send that over within the next thirty minutes. Before we wrap up, we should discuss our cancellation policy, especially for high-season bookings. Standard policy dictates that any cancellations made within thirty days of the arrival date will result in a forfeiture of the deposit."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I understand. Our schedule is locked in, so I am not too worried about cancelling. However, I am a bit concerned about our equipment. We are shipping a prototype server ahead of our arrival. Can your receiving department securely store it for us?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Absolutely. We have a climate-controlled storage room specifically for guest parcels and valuable equipment. Just ensure the shipping label clearly states \"Nexus Dynamics Retreat - Hold for Arrival\". Do you need us to arrange any special insurance for it while it is on our premises?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "No, our corporate insurance covers the server globally. But please make sure the storage room is locked at all times. It contains highly sensitive proprietary software."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Rest assured, the storage room is access-controlled and monitored by security cameras twenty-four hours a day. Only the senior management team has the keycard. Is there anything else, perhaps regarding the evening entertainment?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Oh, actually, yes. Instead of a standard dinner on the second night, could we arrange a wine-tasting event? It would be a nice icebreaker for the executives."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We have a fantastic sommelier who can host a regional wine tasting in our subterranean cellar. It usually takes about ninety minutes and includes artisanal cheese pairings."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "That sounds perfect. Please add the wine tasting to the itinerary for the evening of the 13th. Thank you for all your help today, Thomas."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "You are very welcome, Sarah. We look forward to hosting Nexus Dynamics."
+    }
+  ]
+}
