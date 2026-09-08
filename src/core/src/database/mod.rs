@@ -4,7 +4,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 
 use crate::error::AppError;
 
-pub mod listening_assets_migration;
+pub mod listening_assets;
 pub mod writing_assets_migration;
 
 pub type Db = sqlx::SqlitePool;
@@ -96,6 +96,5 @@ pub async fn init(_app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .run(&pool)
         .await?;
     writing_assets_migration::sync_writing_assets_to_local_storage(&pool).await?;
-    listening_assets_migration::migrate_listening_assets_dir_to_local_storage(&pool).await?;
     Ok(pool)
 }

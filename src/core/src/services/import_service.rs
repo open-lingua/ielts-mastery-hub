@@ -805,7 +805,7 @@ fn build_listening_assets_dir(test_id: &str) -> Result<PathBuf, AppError> {
     let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
     Ok(Path::new(&home)
         .join(".imh")
-        .join("listening-assets")
+        .join(crate::database::listening_assets::LISTENING_ASSETS_DIR_NAME)
         .join(test_id))
 }
 
