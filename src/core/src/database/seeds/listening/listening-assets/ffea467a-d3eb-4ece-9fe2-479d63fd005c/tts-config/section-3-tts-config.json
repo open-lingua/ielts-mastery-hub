@@ -1,0 +1,143 @@
+{
+  "scenario_id": "ielts_s3_marine_geoengineering",
+  "title": "Marine Geoengineering Proposal Discussion",
+  "ielts_section": 3,
+  "temperature": 0.9,
+  "scene": "A university professor's office where two students are reviewing their draft proposal on Marine Geoengineering with their professor.",
+  "sample_context": "Academic but collegial discussion evaluating methodology, logistical constraints, and literature review attributions with natural turn-taking.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Professor / Prof. Vance",
+      "voice_name": "Orus",
+      "audio_profile": "Academic, collegial, and challenging university professor.",
+      "director_note": {
+        "style": "Academic, collegial, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Student / Chloe",
+      "voice_name": "Leda",
+      "audio_profile": "Articulate, engaged university student discussing her proposal.",
+      "director_note": {
+        "style": "Academic, engaged, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    },
+    {
+      "id": "Speaker 3",
+      "role": "Student / Sam",
+      "voice_name": "Puck",
+      "audio_profile": "Analytical, articulate university student defending methodological choices.",
+      "director_note": {
+        "style": "Academic, analytical, conversational",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Come in, Chloe, Sam. Have a seat. Let’s get straight into your draft proposal on Marine Geoengineering, specifically your focus on Ocean Alkalinity Enhancement, or OAE."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Thanks, Professor Vance. We felt it was a more viable and controllable carbon sequestration strategy than the solar radiation management topics we debated in the seminar last week."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "It certainly carries less immediate atmospheric risk. But why did you pivot away from ocean iron fertilization? Your initial abstract leaned heavily in that direction, and it’s arguably much cheaper."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "Well, as we dug deeply into the biogeochemical literature, the cascading side effects of iron fertilization became impossible to ignore. While it does trigger massive phytoplankton growth as intended, the subsequent decomposition of those blooms severely depletes oceanic oxygen, ultimately creating sprawling hypoxic dead zones. OAE avoids that ecological trap entirely by simply accelerating the natural weathering process of silicate rocks."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A sound justification. However, your methodology section severely glosses over the logistical constraints of OAE. You suggest using crushed olivine rock because it’s highly reactive, but you fail to account for the energy deficit."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Are you referring to the carbon footprint of the extraction process?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Exactly that. To sequester a single gigaton of CO2, you need to mine, transport, crush, and mill roughly three gigatons of olivine. The fossil fuels burned during the mechanical crushing process alone could negate up to thirty percent of the carbon you intend to sequester. You absolutely must address this paradox in your life-cycle assessment."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "That’s a fair criticism. We could expand the methodology to propose coupling the coastal milling facilities directly with offshore wind arrays to mitigate those processing emissions."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Please do. Now, looking at your literature review... it is comprehensive, but it leans disproportionately on computational modeling. You have almost entirely neglected the empirical data from the recent mesocosm experiments conducted in the North Sea. The Norwegian team actually isolated a cubic decameter of seawater and tracked the calcifying organisms for eight consecutive months."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We rigorously reviewed that study, but we ultimately chose to exclude it because their baseline pH metrics were heavily skewed by anomalous coastal upwelling during the trial period. We felt the computational models from the Max Planck Institute provided a much more stable baseline for a global projection."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That is a highly defensible methodological choice, Chloe, but you must explicitly state that rationale in the text of your paper. If you silently omit the Norwegian study, the peer reviewers will simply assume you missed it during your literature search. You need to control the academic narrative. State clearly why the empirical data was excluded due to those upwelling anomalies to preempt their criticism."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "Understood. We’ll draft an exclusionary justification paragraph. I am actually much more concerned about the regulatory section of our proposal. As it stands, international maritime law, specifically the London Protocol and the UN Convention on the Law of the Sea, strictly prohibit the dumping of industrial waste into the ocean. We are struggling to define whether powdered olivine constitutes \"waste\" or \"environmental remediation.\""
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That legal ambiguity is the absolute crux of the geopolitical debate, Sam. The legislation was drafted in the 1970s and 1980s; it lacks any framework for climate intervention technologies. That geopolitical vacuum is currently a larger barrier to entry than any of the biochemical engineering challenges. Now, let’s refine your citations. You’ve compiled a vast array of researchers, but you need to critically attribute specific paradigm shifts to the correct authors. Let’s review a few key figures. What was Dr. Sato's primary contribution to the field?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sato conducted the very first coastal dispersal trials. Her team made the rather counter-intuitive discovery that immediately following the olivine dispersal, there is actually a temporary localized drop in pH—a sudden spike in acidity—before the dissolution stabilizes and the alkalinity finally rises."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Precisely, she identified the \"acidification lag.\" And what about Henderson’s critique?"
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "Henderson moved the focus away from the pelagic surface waters and modeled the long-term ecological impact on benthic organisms. He warned that un-dissolved silicate particles sinking to the deep sea floor could physically smother fragile, slow-growing coral ecosystems."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Correct. It’s vital to mention benthic impacts. Next, evaluate the foundational work by Sterling."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sterling’s paper was the one that first quantified the logistical nightmare we discussed earlier. He rigorously audited the carbon emissions associated with the rock milling process, proving mathematically that without full renewable energy integration, OAE is economically and environmentally bankrupt."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A harsh but entirely accurate assessment. Now, let’s look at O’Reilly’s logistical proposal."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "O’Reilly offered a highly pragmatic solution to the physical distribution problem. Rather than building a dedicated, expensive fleet of dispersal vessels, he suggested retrofitting existing commercial shipping fleets to slowly release the alkaline slurry along established trans-oceanic trade routes."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, the \"commercial integration\" distribution model. Highly influential work. Finally, what did you make of the socio-economic analysis conducted by Dubois?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Dubois stepped completely away from the biochemistry and analyzed the human element. She argued that the artificial alteration of local seawater chemistry could unpredictably shift pelagic fish migration patterns, which would ultimately devastate the economies of coastal fishing communities."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. Your theoretical mapping is robust. To achieve a top grade, synthesize these perspectives rather than just listing them chronologically. I want to see a revised draft on my desk by Thursday morning."
+    }
+  ]
+}

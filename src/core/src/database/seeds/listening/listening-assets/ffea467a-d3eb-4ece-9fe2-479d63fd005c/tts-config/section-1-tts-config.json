@@ -1,0 +1,150 @@
+{
+  "scenario_id": "ielts_s1_expedition_booking",
+  "title": "High-Altitude Expedition Booking",
+  "ielts_section": 1,
+  "temperature": 0.7,
+  "scene": "A phone call between an expedition outfitter agent and a client finalizing logistics for a high-altitude mountaineering and research trip.",
+  "sample_context": "Polite, highly professional transactional exchange with clear data intake, advanced vocabulary, and precise logistical details.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Agent / Sylvia",
+      "voice_name": "Aoede",
+      "audio_profile": "Professional, articulate, and highly organized booking agent.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Client / Dr. Thorne",
+      "voice_name": "Orus",
+      "audio_profile": "Formal, precise, and authoritative academic mountaineer.",
+      "director_note": {
+        "style": "Formal, precise, clear",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear",
+        "disfluencies": "Minimal, natural conversational pauses"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, Apex Ascents Expeditions, Sylvia speaking. How may I direct your inquiry this morning?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Good morning, Sylvia. My name is Dr. Aris Thorne. I am looking to finalize a booking for a bespoke acclimatization and summit package in the Karakoram range. My previous outfitter went into administration unexpectedly, leaving me in a rather precarious logistical position."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I’m so sorry to hear about that disruption, Dr. Thorne. We can certainly step in to assist. Just to ensure I populate the correct client profile, could you spell your surname for the record?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, it is Thorne. T-H-O-R-N-E."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Thank you. And for which specific peak are you requiring logistical support?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We are targeting Broad Peak. We initially considered K2, but given the shifting meteorological anomalies this season, Broad Peak offers a marginally more stable ascent window."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Broad Peak, understood. A formidable objective nonetheless. Regarding your timeline, when is your expedition window scheduled to commence?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Our advanced base camp must be fully operational by the 14th of July. Therefore, we require the advance porter team to mobilize from Skardu no later than the 28th of June."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me just input those parameters. Mobilization by the 28th of June. Yes, we have elite porter contingents available. Now, concerning your base camp infrastructure, will you require our standard geodesic dome tents, or do you need something more heavily reinforced?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The standard domes will not suffice. We are conducting meteorological research, so we require the reinforced dual-layer canvas structures. They must be capable of withstanding sustained katabatic winds."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Dual-layer canvas structures. Noted. These are significantly heavier, which necessitates a larger porter team. Now, regarding your oxygen requirements. How many cylinders are you anticipating per climber above camp three?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We are running a semi-alpine style ascent, so we want to minimize reliance on supplemental oxygen. However, for emergency contingencies, we need an allocation of five titanium cylinders per climber. We specifically need the titanium ones, not the older steel variants, to keep the weight absolutely minimal."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Five titanium cylinders per climber. I’ll ensure the procurement team sources those exact models. Moving on to communications, our premium packages include satellite uplinks. Will you require a dedicated broadband terminal, or just standard VHF radio handsets?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "A dedicated broadband terminal is mandatory. We are transmitting large packets of atmospheric data back to our university daily. VHF radios are fine for inter-camp comms, but the broadband terminal is critical for the scientific payload."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I will add the broadband terminal to the manifest. Now, regarding medical provisions. We supply a comprehensive trauma kit, but do you require a dedicated high-altitude physician at base camp, or are your personnel already qualified?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "My co-leader is a certified wilderness paramedic, so we do not need a dedicated physician. However, we do require a portable hyperbaric chamber. If someone develops acute mountain sickness, we need the capability to simulate lower altitudes immediately."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A portable hyperbaric chamber. A very prudent addition. I will reserve one from our medical cache. Let us discuss the dietary logistics. We typically provide dehydrated rations for the high camps. Do you have any specific dietary restrictions within your team?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, one of our lead climbers has a severe allergy to legumes. You must ensure that absolutely no peanuts or lentils are present in any of the dehydrated meal pouches. Cross-contamination would be catastrophic at that altitude."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I have highlighted the legume allergy in red on your profile. Our catering team is meticulous with cross-contamination protocols. Before I finalize the preliminary itinerary, we need to address the mandatory insurance requirements. Have you already secured comprehensive evacuation coverage?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I have a standard policy through the Alpine Club, but I am uncertain if it covers helicopter extraction above 6,000 meters."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I strongly advise upgrading that. The standard Alpine Club policy typically caps helicopter rescues at 5,500 meters. For Broad Peak, you absolutely require the Apex Premier coverage tier, which guarantees extraction up to 7,000 meters, weather permitting."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Ah, I wasn't aware of that altitude ceiling. Yes, please append the Apex Premier coverage to our package. Better to have the redundancy than face a catastrophic logistical failure."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Exactly. Added. Now, concerning your transit from Skardu to the trailhead at Askole. We can arrange a standard convoy of 4x4 vehicles, or, if you are pressed for time and carrying sensitive calibration equipment, we can charter a military-grade transport truck with specialized suspension."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The road to Askole is notoriously treacherous. Given the fragility of our atmospheric sensors, we cannot risk severe vibrations. We will opt for the military-grade transport truck, regardless of the additional cost."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A wise decision. The standard 4x4s tend to struggle with the river crossings early in the season anyway. Lastly, I need to know the total estimated weight of your scientific payload so we can calculate the exact number of yaks required for the trek up the Baltoro Glacier."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The instrumentation, batteries, and solar arrays total approximately 240 kilograms. We have managed to shave off about 30 kilograms by switching to lighter lithium power banks, but 240 is our absolute baseline."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "240 kilograms of scientific payload. That will require an additional six yaks, solely dedicated to your research equipment. I will update the logistical manifest immediately."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Excellent. Thank you for your thoroughness, Sylvia. I shall await your preliminary invoice."
+    }
+  ]
+}
