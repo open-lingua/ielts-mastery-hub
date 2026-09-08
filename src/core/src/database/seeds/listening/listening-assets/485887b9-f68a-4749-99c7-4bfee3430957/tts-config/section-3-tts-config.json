@@ -1,0 +1,183 @@
+{
+  "scenario_id": "ielts_s3_urban_planning_assignment",
+  "title": "Urban Planning Assignment Discussion",
+  "ielts_section": 3,
+  "temperature": 0.9,
+  "scene": "A university tutor's office where two students are discussing their research proposal on urban green spaces.",
+  "sample_context": "Academic but collegial discussion with turn-taking, evaluating options, and natural back-and-forth about research methodology.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Tutor / Dr. Aris",
+      "voice_name": "Orus",
+      "audio_profile": "Academic, collegial, and supportive university tutor.",
+      "director_note": {
+        "style": "Academic, collegial, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Student / Maya",
+      "voice_name": "Leda",
+      "audio_profile": "Bright, engaged university student discussing her project.",
+      "director_note": {
+        "style": "Academic, engaged, thoughtful",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    },
+    {
+      "id": "Speaker 3",
+      "role": "Student / Leo",
+      "voice_name": "Puck",
+      "audio_profile": "Inquisitive, analytical university student.",
+      "director_note": {
+        "style": "Academic, analytical, conversational",
+        "pace": "Natural (slightly quicker)",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear despite back-and-forth",
+        "disfluencies": "Natural hedging, occasional overlap (—)"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Come in, Leo and Maya. Take a seat. I've been looking over your initial proposal for the urban planning assignment, and I think you have a very solid foundation. Focusing on urban green spaces and their psychological impacts is certainly relevant right now."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Thank you, Dr. Aris. We were a bit worried the topic might be too broad, considering how much literature is out there regarding city planning."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "It is a vast field, which is exactly why I want to discuss narrowing your scope today. Let's look at your methodology first. You mentioned wanting to conduct surveys, but you haven't specified your target demographic."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "Right. Initially, we thought about just surveying university students because they are easily accessible on campus. But then we realized that might skew the data, since students often use green spaces differently than, say, families with young children or elderly residents."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s a very astute observation, Leo. A student sample would definitely introduce age and lifestyle bias. So, what is your revised plan?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We decided to focus specifically on office workers in the central business district. We want to measure how accessing a nearby park during their lunch hour affects their self-reported stress levels for the rest of the afternoon."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. That is much more specific and highly measurable. Now, regarding the literature review, you’ve included a lot of classic studies, like Kaplan’s Attention Restoration Theory. But I noticed a distinct lack of recent studies focusing on post-pandemic urban behavior."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "We did struggle to find peer-reviewed articles published in the last two years that specifically addressed lunch-hour habits. Most recent studies seem to focus on people relocating to the suburbs."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That’s true, but you need to look at journals specializing in occupational health, not just urban planning. I suggest looking into the Journal of Environmental Psychology. There was a fascinating paper published just last month by a researcher named Henderson that directly addresses micro-breaks in urban environments."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Journal of Environmental Psychology... Henderson. I'm writing that down. Thank you, we will definitely look that up."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, let's talk about your data collection methods. You're planning to use a digital questionnaire. How are you distributing this to the office workers?"
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "We were planning to stand near the entrances of three major parks in the business district and hand out flyers with a QR code. The code links directly to our online survey. We figured this would be faster than asking people to fill out paper forms on the spot."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The QR code is an efficient approach, but you must consider the response rate. People often take a flyer and simply throw it away without scanning it. You need an incentive. Have you budgeted for any kind of small reward?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, we actually pooled our department printing allowance and managed to secure a small grant from the student union. We are offering a voucher for a free coffee at a local cafe to the first one hundred respondents who complete the survey."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Perfect. A tangible incentive like a coffee voucher will significantly boost your participation numbers. Okay, let's move on to the actual design of the survey. You have twenty questions currently. That is far too long for a lunch-break survey. People will abandon it halfway through."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "We were worried about that. We wanted to gather as much demographic data as possible, but we can probably cut some of those out. Which sections do you think are redundant?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Well, looking at questions five through ten, you ask very detailed questions about their commute to work. While interesting, it doesn't directly serve your core hypothesis about lunch-hour green space usage. I would eliminate those entirely."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "That makes sense. If we cut those five questions, it brings the total down to fifteen, which should take less than three minutes to complete."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Exactly. Keep it brief. Now, regarding the parks themselves, you mentioned selecting three specific locations. Let's review them to ensure they offer good comparative data. Your first choice is Centennial Park."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "Yes. It’s the largest park in the district, very traditional, with lots of large trees, grassy areas, and a duck pond. We figured it represents the classic nature escape."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Good. And your second choice is the new Highline Walkway?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Exactly. It's very different from Centennial. It's elevated, heavily paved, with mostly structural planting and modern art installations. It gets a lot of foot traffic, but it’s a very different aesthetic experience."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "A strong contrast. And the third location?"
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "We chose the Victoria Square Gardens. It's quite small, completely surrounded by high-rise buildings, and consists mostly of formal flower beds and benches. It’s a very structured, enclosed space."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Those three locations offer excellent variance in design and atmosphere. Now, I want you both to think carefully about how you will analyze the emotional descriptors people use in their open-ended survey responses. You can't just count the word 'relaxed'."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Right, we were looking into using a sentiment analysis software. The university has a license for a program called LexiStat. Have you used it before?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, LexiStat is quite robust. It will categorize the open-ended responses into positive, negative, and neutral emotional states based on a pre-programmed dictionary. But remember, the software isn't perfect with sarcasm or local idioms, so you will still need to manually review the data set to ensure accuracy."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "So we should probably allocate an extra week just for data cleaning before we start writing the final report."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "I highly recommend that. When is your proposed deadline for finishing data collection?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We are aiming to finish the surveys by the end of October, which gives us all of November for analysis and writing."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Sounds like a very solid timeline. Just make sure you submit your ethics approval form by this Friday. You cannot begin collecting data until the committee signs off on your survey design."
+    },
+    {
+      "speaker": "Speaker 3",
+      "text": "We have it mostly filled out. We just need your signature as our supervisor."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Bring a printed copy to my office hours on Thursday morning, and I'll sign it then. Excellent work so far, both of you."
+    }
+  ]
+}

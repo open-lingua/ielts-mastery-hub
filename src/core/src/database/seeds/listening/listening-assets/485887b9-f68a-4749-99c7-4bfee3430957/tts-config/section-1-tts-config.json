@@ -1,0 +1,222 @@
+{
+  "scenario_id": "ielts_s1_photography_course_enrollment",
+  "title": "Evening Photography Course Enrollment",
+  "ielts_section": 1,
+  "temperature": 0.7,
+  "scene": "A phone call between a college continuing education agent and a prospective student enrolling in an evening photography course.",
+  "sample_context": "Polite, transactional exchange with clear data intake, confirmation read-backs, and natural self-corrections on schedule and pricing details.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Agent / Mark",
+      "voice_name": "Orus",
+      "audio_profile": "Polite, professional, and helpful college administrative staff.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal; deliberate self-corrections on key data"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Caller / Rachel",
+      "voice_name": "Leda",
+      "audio_profile": "Friendly, interested prospective student calling to register for a class.",
+      "director_note": {
+        "style": "Polite, conversational, engaged",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear",
+        "disfluencies": "Natural pauses when giving personal information"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good afternoon, Westcombe Community College continuing education department. This is Mark speaking. How can I help you today?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Hello, Mark. My name is Rachel. I'm calling because I'd like to enroll in one of your evening courses for the upcoming autumn semester. I was looking at the catalog online and I'm interested in the photography programs."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Great, Rachel. We have several photography courses running this autumn. Are you a beginner, or do you have some prior experience? We have an introductory course, and then a more intermediate one focused on digital editing."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I’ve been taking photos as a hobby for a few years, so I think the beginner one might be too basic. I'm specifically looking at the course titled \"Advanced Digital Landscapes\"."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Ah, yes. \"Advanced Digital Landscapes\". Let me just bring up the registration system on my computer. Bear with me a moment. Okay, yes, that course is still open for enrollment. It's an eight-week program. It runs on Tuesday and Thursday evenings."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Oh, wait. The website said it was on Wednesdays. Has that changed?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Ah, let me double-check. I apologize, you are correct. The beginner course is Tuesday and Thursday. The \"Advanced Digital Landscapes\" is a longer single session on Wednesday evenings, from 6:30 PM to 9:00 PM."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Perfect, Wednesdays work much better for my schedule. Who is the instructor for that class?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The instructor is a professional photographer named Jonathan Steeves."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Could you spell his surname for me, please?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Certainly. It's S-T-E-E-V-E-S. He’s won several regional awards for his nature photography."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Excellent. And what are the prerequisites? I have a DSLR camera, but it's a few years old."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "That shouldn't be a problem as long as it has manual settings. The main prerequisite is that you need to have a basic understanding of photo editing software. The college provides the software in our Mac labs, but we won't be covering the absolute basics of how to use it."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "That's fine. I use standard editing software all the time at home. What is the total cost of the course?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The tuition fee is two hundred and forty-five pounds. However, there is also a mandatory studio fee for the printing materials we provide, which is an additional thirty pounds. So, the total is two hundred and seventy-five pounds."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Okay, two hundred and seventy-five. Do I have to pay that all at once?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "No, you can secure your place with a twenty percent deposit today, and the balance is due two weeks before the course begins."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Great. Let's go ahead and get me registered."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Wonderful. I'll just need to take down some of your personal details. You said your first name is Rachel. What is your surname?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It's Hargreaves. H-A-R-G-R-E-A-V-E-S."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Thank you. And your date of birth?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It's the 14th of September, 1992."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. Now, I need a current residential address to send your student card and campus map."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "I live at 42 Willow Court, in the Riverside district."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "42 Willow Court... and what is the postcode for that area?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It is W-C-8 4-P-L."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me read that back. W-C-8 4-P-L. Got it. And a contact telephone number?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "My mobile number is 0-7-7-0-0 9-0-0 4-1-2."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Perfect. Now, regarding parking. Since it's an evening class, the main staff car park is available for students after 5:00 PM. Would you like to purchase a parking permit? It's heavily discounted for evening students."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, please. I'll be driving straight from work. How much is the permit?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "It's fifteen pounds for the entire eight-week term. I'll add that to your registration file. When you come in for your first class, you can pick up the physical parking pass from the security office at the main gate."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The security office, got it. One last question. Is there a textbook required for this course?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "There isn't a mandatory textbook you need to buy. However, Jonathan highly recommends a book called \"The Light in the Landscape\" for supplementary reading. But all essential reading materials will be provided as digital handouts."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "\"The Light in the Landscape\". I might look for a second-hand copy."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Good idea. One more thing regarding equipment. Jonathan requires all students to bring a sturdy tripod to every session. A lot of the evening work involves long exposures, so a handheld camera won't be sufficient."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Oh, I have a small travel tripod. Will that work?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "He specifically advises against lightweight travel tripods because they can vibrate in the wind. You don't need a professional studio one, but it needs to be made of aluminum or carbon fiber, something with a bit of weight to it."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Okay, I’ll look into upgrading my tripod before the term starts. Does the class involve any outdoor shoots?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, I'm glad you asked. On the fourth week of the course, the Wednesday session is replaced by a Saturday morning field trip. You will be going to Blackwood Forest to practice dawn photography. The college provides a mini-bus from the campus, leaving at 5:00 AM sharp."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "5:00 AM! That is early, but Blackwood Forest is beautiful in the morning. Is there an extra charge for the transport?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "No, the mini-bus transport is included in your course fees. Just remember to bring warm clothing and waterproof boots, as the forest can be quite muddy in October."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Sounds like quite an adventure. Now, we just need to process my deposit. I will use my Visa credit card."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Okay, I will send a secure payment link to your email address right now. Once that is processed, your enrollment is confirmed. Can I have your email?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Yes, it is r.hargreaves at mail.com."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. You should receive that shortly. We look forward to seeing you in September, Rachel."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Thank you for your help, Mark. Bye."
+    }
+  ]
+}
