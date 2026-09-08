@@ -1,2 +1,2 @@
 mod mod_test;
-mod sync_writing_assets_test;
+mod writing_assets_migration_test;
