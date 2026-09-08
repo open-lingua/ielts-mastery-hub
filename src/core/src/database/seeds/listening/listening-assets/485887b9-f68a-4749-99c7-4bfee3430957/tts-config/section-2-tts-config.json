@@ -1,0 +1,73 @@
+{
+  "scenario_id": "ielts_s2_recreation_center_tour",
+  "title": "Recreation Center Open Day Tour",
+  "ielts_section": 2,
+  "temperature": 0.8,
+  "scene": "A facility manager giving an introductory talk and map orientation to visitors at a new community recreation center.",
+  "sample_context": "Warm, informative monologue with clear signposting, map orientation language, and natural engaging delivery.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Manager / David",
+      "voice_name": "Fenrir",
+      "audio_profile": "Warm, welcoming, and clear host speaking to a group of visitors.",
+      "director_note": {
+        "style": "Warm, informative, engaging",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear",
+        "disfluencies": "Light, natural"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Welcome, everyone, to the official open day of the brand-new Westside Community Recreation Center. My name is David, and I’m the facility manager here. We are thrilled to finally open our doors after nearly three years of planning and construction. Before we start our physical tour of the building, I’d like to give you a brief overview of what we offer and how you can make the most of this fantastic new community asset."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "When the city council first proposed this project, the main objective wasn't just to build another gym. The goal was to create a holistic wellness hub that caters to all age groups and abilities. While many private health clubs focus solely on intense fitness and weightlifting, our primary focus has been on accessibility and family-oriented activities. We want this center to be a place where a teenager can play basketball, a parent can take a yoga class, and a grandparent can participate in water aerobics, all under one roof."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, regarding membership. We’ve designed our pricing structure to be as flexible as possible. You can buy a day pass, a monthly rolling contract, or an annual membership. However, if you are a resident of the Westside district, you are eligible for a community discount. To claim this, you don't just need a driver's license; you must bring in a recent utility bill—something like a water or electricity bill—dated within the last three months, along with a photo ID. This ensures the subsidized rates go directly to local taxpayers."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me tell you about some of the unique features of the center. We are particularly proud of our indoor aquatic facility. Unlike traditional swimming pools that use heavy chlorine, our pools utilize a state-of-the-art saltwater purification system. This is much gentler on the skin and eyes, which is especially beneficial for young children and those with sensitive skin. Furthermore, the main pool features a movable floor. This means we can adjust the water depth from a standard two meters for competitive swimming down to just half a meter for toddler splash sessions."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Another major highlight is the community garden situated on the roof. This isn’t just for decoration; it’s a fully functioning urban farm managed by local volunteers. The produce grown there—tomatoes, herbs, and leafy greens—is actually used in the ground-floor cafe. Any surplus is donated to the local food bank. If you're interested in volunteering up there, there’s a sign-up sheet at the main reception desk."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, let's look at the floor plan so you know your way around. Please refer to the map on the back of your welcome brochure. Right now, we are standing in the Main Entrance Hall, located at the bottom of your map."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If you walk straight ahead from the entrance hall, you’ll enter the Central Atrium, which is the heart of the building. Immediately to the left of the Atrium is a large space labeled with a dumbbell icon. That is the Free Weights and Cardio Gym. It’s equipped with the latest treadmills and resistance machines, and it’s strictly for members aged sixteen and over."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Directly across from the Gym, on the right side of the Atrium, you will see a curved, glass-fronted room. This is the Mind and Body Studio. We deliberately placed it on the east side of the building so it catches the morning sunlight. This is where we host our yoga, pilates, and meditation classes. We ask that you remove your shoes before entering this space."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "If we continue straight past the Central Atrium, moving towards the back of the building, you will find the Aquatic Center. It takes up the entire rear section of the ground floor. As I mentioned, this houses both the main lap pool and the smaller therapy pool."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Now, let’s go back to the Central Atrium. If you take the corridor branching off to the left, just past the Gym, the first door on your right is the Childcare Facility. For a small hourly fee, parents can leave their children here with our certified staff while they exercise. It has a fantastic indoor playground and a quiet nap area."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Finally, if you take the corridor branching off to the right of the Central Atrium, past the Mind and Body Studio, you'll walk down a short hallway. At the very end of this right-hand corridor is the Multipurpose Sports Hall. This is a massive space with sprung wooden floors, and it can be divided into three smaller courts for badminton, basketball, or five-a-side football."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Alright, that covers the layout. Please gather your belongings, and we will begin the walking tour, starting with the Cardio Gym."
+    }
+  ]
+}
