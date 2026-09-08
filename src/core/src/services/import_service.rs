@@ -232,21 +232,6 @@ fn rename_keys(v: &Option<Value>, renames: &[(&str, &str)]) -> String {
     Value::Array(normalized).to_string()
 }
 
-fn slugify(title: &str) -> String {
-    let mut out = String::new();
-    let mut last_dash = false;
-    for c in title.to_lowercase().chars() {
-        if c.is_ascii_alphanumeric() {
-            out.push(c);
-            last_dash = false;
-        } else if !last_dash {
-            out.push('-');
-            last_dash = true;
-        }
-    }
-    out.trim_matches('-').chars().take(60).collect()
-}
-
 // ── validation ───────────────────────────────────────────────────────────────
 
 pub fn validate_reading(raw: &Value) -> Result<ReadingImport, Vec<ImportError>> {
@@ -816,13 +801,12 @@ async fn insert_writing_task(
     Ok(())
 }
 
-fn build_listening_test_dir(test_id: &str, title: &str) -> Result<PathBuf, AppError> {
+fn build_listening_test_dir(test_id: &str) -> Result<PathBuf, AppError> {
     let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
-    let slug = slugify(title);
     Ok(Path::new(&home)
         .join(".imh")
         .join("listening-tests")
-        .join(format!("{test_id}-{slug}")))
+        .join(test_id))
 }
 
 pub async fn import_listening(
@@ -858,7 +842,7 @@ pub async fn import_listening(
     .execute(&mut *tx)
     .await?;
 
-    let dir = build_listening_test_dir(&test_id, &title)?;
+    let dir = build_listening_test_dir(&test_id)?;
     let audio_by_section: HashMap<i64, &AudioAssignment> =
         audios.iter().map(|a| (a.section_number, a)).collect();
     let mut written_files: Vec<PathBuf> = Vec::new();

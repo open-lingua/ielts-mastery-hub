@@ -258,23 +258,22 @@ And a new `src/ui/services/importService.ts` for any client-side pre-validation/
 ```
 ~/.imh/
 └── listening-tests/
-    └── <test-id>-<title-slug>/
+    └── <test-id>/
         ├── section-1.<ext>
         ├── section-2.<ext>
         ├── section-3.<ext>
         └── section-4.<ext>
 ```
 
-- `<test-id>` = the **newly generated** UUID of the `listening_tests` row (not the JSON's advisory id), guaranteeing no collision across re-imports.
-- `<title-slug>` = lowercased, ASCII, hyphenated slug of the test title (e.g. `ielts-academic-listening-relocation-community-centres-architecture`), truncated to ~60 chars, for human readability when browsing the filesystem.
+- `<test-id>` = the **newly generated** UUID of the `listening_tests` row (not the JSON's advisory id), guaranteeing no collision across re-imports; it is also the folder name in full — no title slug is appended.
 - File name is fixed per section (`section-<n>.<ext>`) — the original uploaded filename is discarded except for its extension, since section number (not filename) is the authoritative mapping key chosen explicitly by the admin in the UI (§2.2 step 3). This avoids relying on the JSON's `audio_url` hint (`./section_1.mp3`), though that hint may be used as a *default suggestion* to pre-fill which upload slot the admin should use.
 - Extension is taken from the uploaded file (validated against an allow-list: `mp3`, `wav`, `m4a`, `ogg`); rejected otherwise (see Edge Cases table).
 
-**When folders are created:** Only during a successful, committed import — the whole `listening-tests/<test-id>-<slug>/` directory tree is created via `tokio::fs::create_dir_all` right before writing files, inside the same service function that performs the DB insert, called only after JSON validation has fully passed.
+**When folders are created:** Only during a successful, committed import — the whole `listening-tests/<test-id>/` directory tree is created via `tokio::fs::create_dir_all` right before writing files, inside the same service function that performs the DB insert, called only after JSON validation has fully passed.
 
-**`audio_url` persisted value:** the **absolute filesystem path** to the file (e.g. `/home/alice/.imh/listening-tests/<id>-<slug>/section-1.mp3`), exactly matching the existing convention in `commands::storage::save_file`, which returns the absolute path and where the frontend calls `convertFileSrc(path)` (Tauri's asset-protocol helper, already enabled per `RELEASES.md`: *"enable asset protocol for ~/.imh"*) to turn it into a playable URL at runtime. This keeps the new feature consistent with `uploadListeningAudio`'s existing behavior — the DB never stores a `convertFileSrc`-transformed URL, only the raw path, and the UI re-derives the playable URL via `convertFileSrc` at read time (see `listeningPracticeService.ts` / audio player components) — confirm this by checking how `audio_url` is consumed by the player component before finalizing (Open Question).
+**`audio_url` persisted value:** the **absolute filesystem path** to the file (e.g. `/home/alice/.imh/listening-tests/<test-id>/section-1.mp3`), exactly matching the existing convention in `commands::storage::save_file`, which returns the absolute path and where the frontend calls `convertFileSrc(path)` (Tauri's asset-protocol helper, already enabled per `RELEASES.md`: *"enable asset protocol for ~/.imh"*) to turn it into a playable URL at runtime. This keeps the new feature consistent with `uploadListeningAudio`'s existing behavior — the DB never stores a `convertFileSrc`-transformed URL, only the raw path, and the UI re-derives the playable URL via `convertFileSrc` at read time (see `listeningPracticeService.ts` / audio player components) — confirm this by checking how `audio_url` is consumed by the player component before finalizing (Open Question).
 
-**Collision handling:** Because `<test-id>` is always a freshly generated UUID, directory collisions are structurally impossible even if the same JSON (with the same advisory `id`/title) is imported multiple times — each import creates its own timestamp-free but UUID-unique folder. The only "collision" a user perceives is duplicate *titles* in the test list, handled by the confirm-before-import UX in Edge Cases, not by file-path collision logic.
+**Collision handling:** Because `<test-id>` is always a freshly generated UUID and is used verbatim as the folder name, directory collisions are structurally impossible even if the same JSON (with the same advisory `id`/title) is imported multiple times — each import creates its own UUID-unique folder. The only "collision" a user perceives is duplicate *titles* in the test list, handled by the confirm-before-import UX in Edge Cases, not by file-path collision logic.
 
 **Rollback/cleanup:** The import service must track every file path it successfully wrote during the current import attempt. If:
 - validation fails before any I/O → nothing to clean up (fail fast, before touching disk or DB).
