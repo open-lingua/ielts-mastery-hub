@@ -38,17 +38,17 @@ if std::env::var("OPEN_DEVTOOLS").as_deref() == Ok("true") {
 
 ## Local SQLite database
 
-On startup, the Rust backend (`src/core/src/database/mod.rs`) resolves the platform's app data directory and opens/creates `ielts.db` there, then runs migrations (`src/core/src/database/migrations/`) and seeds (`src/core/src/database/seeds/`) automatically:
+On startup, the Rust backend (`src/core/src/database/mod.rs`) resolves the platform's app data directory and opens/creates `imh.db` there, then runs migrations (`src/core/src/database/migrations/`) and seeds (`src/core/src/database/seeds/`) automatically:
 
 | OS | Typical location |
 |---|---|
-| macOS | `~/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db` |
-| Linux | `~/.local/share/com.openlingua.ieltsmasteryhub/ielts.db` |
-| Windows | `%APPDATA%\com.openlingua.ieltsmasteryhub\ielts.db` |
+| macOS | `~/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db` |
+| Linux | `~/.local/share/com.openlingua.ieltsmasteryhub/imh.db` |
+| Windows | `%APPDATA%\com.openlingua.ieltsmasteryhub\imh.db` |
 
 ### Resetting the database during development
 
-To start fresh, quit the app and delete the `ielts.db` file (plus any `-wal`/`-shm` companion files) at the path above. On the next `npm run tauri` launch, migrations and seeds will recreate it. See [`docs/database-reset.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/docs/database-reset.md) for repo-specific reset notes and [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md) for how to point `sqlx` CLI tooling at this same file via `DATABASE_URL`.
+To start fresh, quit the app and delete the `imh.db` file (plus any `-wal`/`-shm` companion files) at the path above. On the next `npm run tauri` launch, migrations and seeds will recreate it. See [`docs/database-reset.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/docs/database-reset.md) for repo-specific reset notes and [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md) for how to point `sqlx` CLI tooling at this same file via `DATABASE_URL`.
 
 ## Dev architecture at a glance
 
@@ -58,7 +58,7 @@ graph LR
   B -->|invoke commands| C[Tauri IPC]
   C --> D[Rust Commands]
   D --> E[Repositories]
-  E --> F[(ielts.db<br/>SQLite, app_data_dir)]
+  E --> F[(imh.db<br/>SQLite, app_data_dir)]
   G[OPEN_DEVTOOLS=true] -.opens.-> H[Webview Devtools]
 ```
 

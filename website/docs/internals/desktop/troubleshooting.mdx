@@ -23,7 +23,7 @@ For a full reset (drop, recreate, re-migrate, re-seed), see `docs/database-reset
 
 ```bash
 # 1. Delete the existing database (macOS path shown; see CONTRIBUTING.md for Linux/Windows)
-rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/ielts.db*
+rm -f ~/Library/Application\ Support/com.openlingua.ieltsmasteryhub/imh.db*
 
 # 2. Point DATABASE_URL at the same file the app uses, then re-migrate
 cd src/core
@@ -32,10 +32,10 @@ sqlx database create
 sqlx migrate run --source src/database/migrations
 
 # 3. Re-apply seed data
-DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/ielts.db"
+DB="$HOME/Library/Application Support/com.openlingua.ieltsmasteryhub/imh.db"
 for f in src/database/seeds/listening/*.sql src/database/seeds/reading/*.sql src/database/seeds/writing/*.sql; do
   sqlite3 "$DB" < "$f"
 done
 ```
 
-Simply deleting `ielts.db` and relaunching with `npm run tauri` also recreates the schema automatically (migrations run on startup), but seed data must still be applied manually via the loop above.
+Simply deleting `imh.db` and relaunching with `npm run tauri` also recreates the schema automatically (migrations run on startup), but seed data must still be applied manually via the loop above.
