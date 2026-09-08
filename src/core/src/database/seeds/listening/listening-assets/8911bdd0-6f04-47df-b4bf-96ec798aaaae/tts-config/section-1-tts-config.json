@@ -1,0 +1,131 @@
+{
+  "scenario_id": "ielts_s1_community_centre_booking",
+  "title": "Community Centre Room Booking",
+  "ielts_section": 1,
+  "difficulty": "easy",
+  "temperature": 0.7,
+  "scene": "A telephone conversation between a community centre receptionist and a caller looking to book a room for a photography club.",
+  "sample_context": "Polite, transactional exchange covering booking details, costs, venue rules, and spelling of names.",
+  "speakers": [
+    {
+      "id": "Speaker 1",
+      "role": "Receptionist",
+      "voice_name": "Aoede",
+      "audio_profile": "Soft, warm female receptionist speaking clearly and politely.",
+      "director_note": {
+        "style": "Polite, helpful, transactional",
+        "pace": "Slow to Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Very clear, fully enunciated",
+        "disfluencies": "Minimal; deliberate self-corrections on key data"
+      }
+    },
+    {
+      "id": "Speaker 2",
+      "role": "Caller",
+      "voice_name": "Puck",
+      "audio_profile": "Upbeat, polite male caller inquiring about a room booking.",
+      "director_note": {
+        "style": "Polite, conversational",
+        "pace": "Natural",
+        "accent": "British (Received Pronunciation), clear and standard",
+        "articulation": "Clear and distinct",
+        "disfluencies": "Minimal"
+      }
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Speaker 1",
+      "text": "Good morning, Highfield Community Centre, Rachel speaking. How can I help you today?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Hi there, Rachel. I’m calling to see if it’s possible to book a room at the centre for a new club I’m starting."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We certainly do have rooms available for hire. What kind of club is it?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "It’s a local photography club. We want to meet once a week to discuss techniques and plan weekend outings. I’m hoping to call it the Focus Club."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The Focus Club. That sounds brilliant. Now, what day of the week were you hoping to hold these meetings?"
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Well, initially we thought about Wednesdays, but a lot of our potential members work late on that day. So we’ve decided that Thursday evenings would be best, probably starting around 7:00 PM."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Let me just check the system for Thursdays. Okay, we have two rooms available on Thursday evenings. There’s the Elm Room, which is quite small and holds about 15 people, and then there’s the Oak Room, which is larger and holds up to 40."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "We’re expecting around 25 to 30 people, so we’d definitely need the Oak Room."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "The Oak Room it is. Now, let’s discuss the cost. Because you are a local community group, you qualify for our discounted rate. The standard commercial rate is £85 per evening, but for you, it will be £65."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "£65? That’s very reasonable. Does that price include the use of any equipment?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "It includes chairs, tables, and a whiteboard. If you need a laptop, you have to bring your own, but we can provide a projector for an extra £5 per session if you need to display your photos."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Oh, yes, a projector is essential for a photography group. Please add that to the booking."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Not a problem. I’ll make a note of that. Now, just a few administrative details. Because your meeting starts at 7:00 PM, the main reception desk will actually be closed. You’ll need to pick up the key from the security office at the back of the building."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "The security office. Got it. And what about parking? Our members will mostly be driving."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "We have a private car park, but it is strictly regulated to stop shoppers from using it. I will email you a printable parking permit. Tell all your members to display it on their dashboard, or they might get a fine."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "A parking permit. I’ll make sure to email that out to everyone before the first meeting. One more question: are we allowed to bring our own refreshments?"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Yes, you can bring hot drinks and snacks. However, our policy is that only cold snacks like biscuits or sandwiches are allowed in the carpeted rooms. No hot food, please, as it leaves a smell."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Just biscuits and tea, that’s absolutely fine. We won’t be cooking meals!"
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Excellent. And please remember that it’s the club’s responsibility to tidy up. You must ensure all the tables are wiped down before you lock up and leave. We provide cleaning sprays in the cupboard."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "Wipe down the tables. Yes, we will make sure the room is spotless."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Perfect. Now, I just need your full name and contact details to set up the account."
+    },
+    {
+      "speaker": "Speaker 2",
+      "text": "My name is Steven Marshall. That’s M-A-R-S-H-A-L-L."
+    },
+    {
+      "speaker": "Speaker 1",
+      "text": "Thank you, Steven. If you can just give me your email address, I’ll send over the contract and the parking permits right away."
+    }
+  ]
+}
