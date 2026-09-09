@@ -14,8 +14,11 @@
     "preview": "vite preview --config src/ui/vite.config.ts",
     "test": "vitest run --silent --config src/ui/vitest.config.ts",
     "test:watch": "vitest --config src/ui/vitest.config.ts",
+    "test:scripts": "vitest run --config scripts/vitest.config.ts",
     "tauri": "tauri dev --config src/core/tauri.conf.json",
     "tauri:build": "tauri build --config src/core/tauri.conf.json",
+    "tauri:build:windows": "tauri build --config src/core/tauri.conf.json --config src/core/tauri.windows.msi.conf.json",
+    "sync:msi-version": "node scripts/sync-msi-version.mjs",
     "check:versions": "node scripts/check-version-consistency.mjs"
   },
   "dependencies": {

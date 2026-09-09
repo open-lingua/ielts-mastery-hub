@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 // Fails with a non-zero exit code if the version strings tracked across
 // package.json, src/core/Cargo.toml and src/core/tauri.conf.json ever drift
-// apart. This is the CI safety net described in RELEASES.md's version
-// automation section — it guards against manual edits reintroducing drift
-// even when release-please is the source of truth.
+// apart, or if the generated src/core/tauri.windows.msi.conf.json WiX version
+// no longer matches the canonical version. This is the CI safety net
+// described in RELEASES.md's version automation section — it guards against
+// manual edits reintroducing drift even when release-please is the source of
+// truth.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { deriveWixVersion } from "./sync-msi-version.mjs";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -59,4 +62,45 @@ if (versions.size > 1) {
   process.exit(1);
 }
 
-console.log(`OK: all tracked files agree on version ${[...versions][0]}`);
+const canonicalVersion = [...versions][0];
+
+// The MSI overlay legitimately differs from the canonical version (WiX
+// requires an all-numeric 4-part version), so it can't be compared with the
+// exact-match Set above — instead assert it equals the derived WiX version.
+const msiConfigFile = "src/core/tauri.windows.msi.conf.json";
+let msiWixVersion;
+try {
+  const msiConfig = JSON.parse(
+    readFileSync(path.join(repoRoot, msiConfigFile), "utf8"),
+  );
+  msiWixVersion = msiConfig?.bundle?.windows?.wix?.version;
+  if (typeof msiWixVersion !== "string") {
+    throw new Error(
+      `No bundle.windows.wix.version string found in ${msiConfigFile}`,
+    );
+  }
+} catch (error) {
+  console.error(`Failed to read ${msiConfigFile}: ${error.message}`);
+  console.error(
+    "Run `node scripts/sync-msi-version.mjs` to generate it instead of editing it by hand.",
+  );
+  process.exit(1);
+}
+
+const expectedWixVersion = deriveWixVersion(canonicalVersion);
+
+if (msiWixVersion !== expectedWixVersion) {
+  console.error("MSI overlay WiX version is out of sync:\n");
+  console.error(`  ${"package.json version".padEnd(28)} -> ${canonicalVersion}`);
+  console.error(`  ${"expected WiX version".padEnd(28)} -> ${expectedWixVersion}`);
+  console.error(`  ${msiConfigFile.padEnd(28)} -> ${msiWixVersion}`);
+  console.error(
+    "\nRun `node scripts/sync-msi-version.mjs` to regenerate it instead of editing it by hand.",
+  );
+  process.exit(1);
+}
+
+console.log(
+  `OK: all tracked files agree on version ${canonicalVersion} ` +
+    `(MSI overlay WiX version: ${msiWixVersion})`,
+);
