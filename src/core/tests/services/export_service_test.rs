@@ -63,7 +63,7 @@ mod build_export {
             .expect("build_export");
 
         // Act
-        let mut archive = ZipArchive::new(std::io::Cursor::new(built.zip_bytes)).expect("open zip");
+        let archive = ZipArchive::new(std::io::Cursor::new(built.zip_bytes)).expect("open zip");
 
         // Assert
         assert_eq!(archive.len(), 1);
