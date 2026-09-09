@@ -24,7 +24,7 @@ those three files, and do not manually add entries to `RELEASES.md`; both are no
    malformed title breaks both the version bump and the changelog grouping for that change.
 2. **Merge to `main`.** `.github/workflows/release-please.yml` runs on every push to `main` and
    maintains a standing "Release PR" (opened/updated automatically) that:
-   - Computes the next `X.Y.Z-beta.N` version from all conventional commits merged since the last
+   - Computes the next `X.Y.Z-rc.N` version from all conventional commits merged since the last
      release.
    - Updates `package.json`, `src/core/Cargo.toml`, and `src/core/tauri.conf.json` to the exact
      same version string, in the same commit — see `release-please-config.json`'s `extra-files`
@@ -35,7 +35,7 @@ those three files, and do not manually add entries to `RELEASES.md`; both are no
      Chores, Documentation, Refactors, CI/CD, Tests), from the commits since the last release —
      replacing the previous manual per-release bullet list process.
 3. **Merge the Release PR** (a maintainer reviews and merges it like any other PR) to actually cut
-   the release. Merging it tags the commit (`X.Y.Z-beta.N`, no `v`/component prefix, matching this
+   the release. Merging it tags the commit (`X.Y.Z-rc.N`, no `v`/component prefix, matching this
    repo's existing tag history) and publishes the GitHub Release.
 4. **Publishing the GitHub Release** triggers `.github/workflows/release.yml` exactly as before —
    that workflow is untouched by this automation and still builds/uploads the cross-platform
@@ -77,9 +77,9 @@ needed, but the primary source is the conventional commit type + PR title.
 
 ## Versioning scheme
 
-Versions follow `MAJOR.MINOR.PATCH-beta.N` (e.g. `1.0.0-beta.14`), tracked in `package.json`'s
+Versions follow `MAJOR.MINOR.PATCH-rc.N` (e.g. `1.0.0-rc.1`), tracked in `package.json`'s
 `version` field and mirrored automatically (never manually) into `src/core/Cargo.toml` and
-`src/core/tauri.conf.json` by release-please. The `-beta.N` prerelease counter keeps incrementing
+`src/core/tauri.conf.json` by release-please. The `-rc.N` prerelease counter keeps incrementing
 indefinitely for now; there is no target date/criteria yet for promoting to a stable `1.0.0`.
 
 ## Binary releases
