@@ -48,6 +48,7 @@ impl CreateListeningQuestionGroupBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_group_order(mut self, group_order: i64) -> Self {
         self.group_order = Some(group_order);
         self
@@ -58,36 +59,43 @@ impl CreateListeningQuestionGroupBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_instructions(mut self, instructions: &str) -> Self {
         self.instructions = Some(instructions.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_word_limit(mut self, word_limit: &str) -> Self {
         self.word_limit = Some(word_limit.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_has_word_bank(mut self, has_word_bank: bool) -> Self {
         self.has_word_bank = Some(has_word_bank);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_word_bank(mut self, word_bank: &str) -> Self {
         self.word_bank = Some(word_bank.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_sequential_order(mut self, sequential_order: bool) -> Self {
         self.sequential_order = Some(sequential_order);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_multiple_selection(mut self, multiple_selection: bool) -> Self {
         self.multiple_selection = Some(multiple_selection);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_select_count(mut self, select_count: i64) -> Self {
         self.select_count = Some(select_count);
         self
@@ -109,6 +117,7 @@ impl CreateListeningQuestionGroupBuilder {
     }
 }
 
+#[allow(dead_code)]
 #[allow(dead_code)]
 pub fn default_listening_question_group() -> CreateListeningQuestionGroup {
     CreateListeningQuestionGroupBuilder::default().build()
@@ -135,41 +144,49 @@ impl UpdateListeningQuestionGroupBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_question_type(mut self, question_type: &str) -> Self {
         self.question_type = Some(question_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_instructions(mut self, instructions: &str) -> Self {
         self.instructions = Some(instructions.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_word_limit(mut self, word_limit: &str) -> Self {
         self.word_limit = Some(word_limit.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_has_word_bank(mut self, has_word_bank: bool) -> Self {
         self.has_word_bank = Some(has_word_bank);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_word_bank(mut self, word_bank: &str) -> Self {
         self.word_bank = Some(word_bank.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_sequential_order(mut self, sequential_order: bool) -> Self {
         self.sequential_order = Some(sequential_order);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_multiple_selection(mut self, multiple_selection: bool) -> Self {
         self.multiple_selection = Some(multiple_selection);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_select_count(mut self, select_count: i64) -> Self {
         self.select_count = Some(select_count);
         self

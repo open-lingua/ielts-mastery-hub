@@ -40,11 +40,13 @@ impl CreateListeningSectionBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_transcript(mut self, transcript: &str) -> Self {
         self.transcript = Some(transcript.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_audio_url(mut self, audio_url: &str) -> Self {
         self.audio_url = Some(audio_url.to_string());
         self
@@ -62,6 +64,7 @@ impl CreateListeningSectionBuilder {
 }
 
 #[allow(dead_code)]
+#[allow(dead_code)]
 pub fn default_listening_section() -> CreateListeningSection {
     CreateListeningSectionBuilder::default().build()
 }
@@ -77,16 +80,19 @@ pub struct UpdateListeningSectionBuilder {
 }
 
 impl UpdateListeningSectionBuilder {
+    #[allow(dead_code)]
     pub fn with_section_number(mut self, section_number: i64) -> Self {
         self.section_number = Some(section_number);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_title(mut self, title: &str) -> Self {
         self.title = Some(title.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_transcript(mut self, transcript: &str) -> Self {
         self.transcript = Some(transcript.to_string());
         self
