@@ -67,31 +67,37 @@ impl UpdateUserTestSessionBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_progress_percent(mut self, progress_percent: i64) -> Self {
         self.progress_percent = Some(progress_percent);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_score_band(mut self, score_band: f64) -> Self {
         self.score_band = Some(score_band);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_answers(mut self, answers: &str) -> Self {
         self.answers = Some(answers.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_feedback_data(mut self, feedback_data: &str) -> Self {
         self.feedback_data = Some(feedback_data.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_completed_at(mut self, completed_at: &str) -> Self {
         self.completed_at = Some(completed_at.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_last_active_at(mut self, last_active_at: &str) -> Self {
         self.last_active_at = Some(last_active_at.to_string());
         self
