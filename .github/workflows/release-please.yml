@@ -45,7 +45,7 @@ jobs:
           manifest-file: .release-please-manifest.json
 
   refresh-cargo-lock:
-    name: Refresh Cargo.lock on the release-please PR
+    name: Refresh Cargo.lock and MSI version on the release-please PR
     needs: release-please
     if: needs.release-please.outputs.prs_created == 'true'
     runs-on: ubuntu-latest
@@ -57,6 +57,10 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/krypton
+
       - name: Refresh Cargo.lock for the bumped core crate version
         # Only resolves the dependency graph (no compilation needed), so this
         # doesn't require the Tauri/webkit2gtk system dependencies that a full
@@ -64,14 +68,23 @@ jobs:
         working-directory: src/core
         run: cargo generate-lockfile
 
-      - name: Commit and push Cargo.lock if it changed
+      - name: Regenerate the MSI WiX version overlay for the bumped version
+        # release-please's extra-files can't perform the `-rc.N` -> `.N`
+        # transformation the msi/WiX bundle target requires, so it's
+        # regenerated here instead. See scripts/sync-msi-version.mjs and
+        # RELEASES.md's version automation section.
+        run: node scripts/sync-msi-version.mjs
+
+      - name: Commit and push if Cargo.lock or the MSI overlay changed
+        # A single commit/push for both files avoids a race between separate
+        # jobs pushing to the same Release PR branch.
         run: |
-          if ! git diff --quiet -- src/core/Cargo.lock; then
+          if ! git diff --quiet -- src/core/Cargo.lock src/core/tauri.windows.msi.conf.json; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add src/core/Cargo.lock
-            git commit -m "chore: refresh Cargo.lock for release"
+            git add src/core/Cargo.lock src/core/tauri.windows.msi.conf.json
+            git commit -m "chore: sync MSI version and refresh Cargo.lock for release"
             git push
           else
-            echo "Cargo.lock already up to date, nothing to push."
+            echo "Cargo.lock and MSI overlay already up to date, nothing to push."
           fi

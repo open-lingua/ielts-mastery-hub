@@ -15,8 +15,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/krypton
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install
       - name: Verify version strings agree across tracked files
         run: node scripts/check-version-consistency.mjs
+      - name: Run scripts/ unit tests (e.g. MSI version derivation)
+        run: npm run test:scripts
 
   frontend:
     name: Frontend - Lint, Test & Build

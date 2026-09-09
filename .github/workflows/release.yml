@@ -90,4 +90,11 @@ jobs:
         with:
           projectPath: src/core
           releaseId: ${{ github.event.release.id }}
-          args: --target ${{ matrix.target }}
+          # tauri-action runs the CLI with cwd = projectPath (src/core), so
+          # the overlay path here is relative to src/core, not the repo root.
+          # Only Windows needs it: the msi/WiX bundle target requires an
+          # all-numeric version, unlike nsis/dmg/deb/rpm/appimage. See
+          # src/core/tauri.windows.msi.conf.json and RELEASES.md.
+          args: >-
+            --target ${{ matrix.target }}
+            ${{ runner.os == 'Windows' && '--config tauri.windows.msi.conf.json' || '' }}
