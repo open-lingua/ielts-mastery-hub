@@ -8,7 +8,7 @@
 # TODO(everyone): Keep this script simple and easily auditable.
 #
 # Usage:
-#   curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+#   curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
 #
 # Env vars:
 #   v            Version to install (e.g. "1.0.0"). Defaults to the
@@ -49,7 +49,7 @@ show_help() {
 IELTS Mastery Hub installer (Linux / macOS)
 
 Usage:
-  curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+  curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
   sh install.sh [--help]
 
 Environment variables:

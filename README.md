@@ -49,3 +49,34 @@ npm install
 # Run the app
 npm run tauri dev
 ```
+
+## Documentation Site
+
+The docs site (this repo's `website/` folder) is a separate [Docusaurus](https://docusaurus.io/) project with its own `package.json`. Always `cd website/` first:
+
+```bash
+cd website/
+
+# Install dependencies
+npm install
+
+# Build the static site
+npm run build
+
+# Deploy to GitHub Pages
+USE_SSH=true npm run deploy
+# or: GIT_USER=<your-github-username> npm run deploy
+```
+
+> **Note:** `npm run deploy` requires the `gh-pages` branch to already exist on the remote (and to be non-empty). On a brand-new repo, create it once before the first deploy:
+> ```bash
+> git checkout --orphan gh-pages
+> git rm -rf .
+> touch .nojekyll
+> git add .nojekyll
+> git commit -m "Init gh-pages branch"
+> git push origin gh-pages
+> git checkout -
+> ```
+
+See `website/README.md` for more details.
