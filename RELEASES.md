@@ -89,6 +89,30 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.1.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.1-rc.2...1.1.0-rc.2) (2026-09-09)
+
+
+### Features
+
+* **ci:** add MSI/WiX version overlay for Windows builds ([8f2cd82](https://github.com/open-lingua/ielts-mastery-hub/commit/8f2cd828ee70fbefbdcbeefdf424419b03aa4f86))
+* **website:** add Unix installer script and fix sidebar position ([d3beb77](https://github.com/open-lingua/ielts-mastery-hub/commit/d3beb771eec957b1f8139bd106e9199df93ae1f3))
+
+
+### Documentation
+
+* document MSI/WiX version overlay and Windows build process ([4bd7785](https://github.com/open-lingua/ielts-mastery-hub/commit/4bd7785da8ad2e3ad9e3b91f510fb21198ec4314))
+* **website:** add installing the app guide with Unix installer instructions ([a4e8fea](https://github.com/open-lingua/ielts-mastery-hub/commit/a4e8fea047d764722e9201f62254b16b2676025d))
+
+
+### CI/CD
+
+* sync MSI overlay and test scripts in release and CI workflows ([6b9c7db](https://github.com/open-lingua/ielts-mastery-hub/commit/6b9c7dbae7e025a5504741044335e4560ea57cd3))
+
+
+### Chores
+
+* **website:** switch to GitHub Pages URL and add docs site deploy instructions ([63d2daa](https://github.com/open-lingua/ielts-mastery-hub/commit/63d2daa00fb4049f904c2d5e8b81fce8158e9b53))
+
 ## [1.0.1-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-rc.2...1.0.1-rc.2) (2026-09-09)
 
 
