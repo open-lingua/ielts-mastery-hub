@@ -47,7 +47,8 @@ npm tauri build
 │   ├── core/          # Rust / Tauri 2 backend
 │   │   ├── src/
 │   │   ├── Cargo.toml
-│   │   └── tauri.conf.json
+│   │   ├── tauri.conf.json
+│   │   └── tauri.windows.msi.conf.json  # generated Windows MSI/WiX version overlay — do not hand-edit
 │   └── ui/            # React / TypeScript frontend
 │       ├── src/
 │       ├── index.html
@@ -74,7 +75,7 @@ Before modifying code in a layer, read the corresponding context file (both file
 ## Environment Variables & Config
 
 - Frontend env vars: defined in `.env` / `.env.local` — must be prefixed with `VITE_` to be exposed.
-- Tauri config: `src/core/tauri.conf.json` — controls permissions, window settings, bundle identifiers.
+- Tauri config: `src/core/tauri.conf.json` — controls permissions, window settings, bundle identifiers. `src/core/tauri.windows.msi.conf.json` is a generated overlay (see `scripts/sync-msi-version.mjs`) applied only for Windows MSI builds; never hand-edit it.
 - **Never expose secrets to the frontend** — secrets must stay in the Rust layer.
 - Key env vars in use:
   - `VITE_[YOUR KEY]` — [YOUR PURPOSE]
