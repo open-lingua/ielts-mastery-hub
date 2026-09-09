@@ -30,11 +30,13 @@ impl CreateListeningTestBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_duration(mut self, duration: &str) -> Self {
         self.duration = Some(duration.to_string());
         self
@@ -75,11 +77,13 @@ impl UpdateListeningTestBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_duration(mut self, duration: &str) -> Self {
         self.duration = Some(duration.to_string());
         self
