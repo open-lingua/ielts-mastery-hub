@@ -1,0 +1,68 @@
+---
+sidebar_position: 2
+title: Installing the App
+---
+
+# Installing the App
+
+The fastest way to install IELTS Mastery Hub on Linux or macOS is the one-line
+install script. It downloads the right build for your platform, verifies its
+checksum, and installs it for you.
+
+## One-line install (Linux / macOS)
+
+```bash
+curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+```
+
+This detects your OS and CPU architecture, installs the appropriate package,
+and (for AppImage installs) adds the app to your `PATH` so you can launch it
+with `imh`.
+
+:::info Windows
+This script only supports Linux and macOS. On Windows, download an installer
+manually from the [GitHub Releases page](https://github.com/open-lingua/ielts-mastery-hub/releases).
+:::
+
+## Customizing the install
+
+The script reads a few optional environment variables:
+
+| Variable      | Purpose                                                                 | Default                        |
+|---------------|--------------------------------------------------------------------------|---------------------------------|
+| `v`           | Version to install, e.g. `v=1.0.1-rc.2`                                   | Latest GitHub release           |
+| `IMH_INSTALL` | Install directory                                                         | `$HOME/.ielts-mastery-hub`      |
+| `IMH_PACKAGE` | Package format: `appimage`, `deb`, `rpm` (Linux) or `dmg`, `app` (macOS) | Auto-detected for your platform |
+
+Examples:
+
+```bash
+# Install a specific version
+v=1.0.1-rc.2 curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+
+# Force a .deb install on a Debian/Ubuntu system
+IMH_PACKAGE=deb curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+
+# Install to a custom directory
+IMH_INSTALL="$HOME/apps/imh" curl -fsSL https://ielts-mastery-hub.dev/install/install.sh | sh
+```
+
+You can also see all options by downloading the script and running it with
+`--help`:
+
+```bash
+curl -fsSL https://ielts-mastery-hub.dev/install/install.sh -o install.sh
+sh install.sh --help
+```
+
+## What the script does
+
+1. Detects your OS/architecture (`macOS arm64/x86_64`, `Linux amd64/aarch64`).
+2. Resolves the version to install (latest release, unless `v` is set).
+3. Picks a package format (`AppImage`/`.deb`/`.rpm` on Linux, `.dmg`/`.app` on
+   macOS), auto-detecting the best fit for Linux based on available tools.
+4. Downloads the matching asset from the
+   [GitHub Releases page](https://github.com/open-lingua/ielts-mastery-hub/releases)
+   and verifies its SHA-256 checksum against the published release metadata.
+5. Installs it (`AppImage` binary, `dpkg`/`rpm`, or copies the `.app` bundle
+   into `/Applications`) and updates your shell profile's `PATH` if needed.
