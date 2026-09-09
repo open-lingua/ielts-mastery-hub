@@ -73,6 +73,21 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0-beta.23](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.22...1.0.0-beta.23) (2026-09-09)
+
+
+### Features
+
+* **seeds:** add section audio for band 7 test 001 listening seed ([553af6e](https://github.com/open-lingua/ielts-mastery-hub/commit/553af6e27fddd91564ff0d3c31702d286f8668da))
+* **seeds:** add section audio for band 8 test 002 listening seed ([c609ffc](https://github.com/open-lingua/ielts-mastery-hub/commit/c609ffc191f4c3500dce52b8e8bd596cad17092d))
+* **seeds:** add section audio for band 9 test 001 listening seed ([4d949db](https://github.com/open-lingua/ielts-mastery-hub/commit/4d949dbec0dfac0c57b84c382031972aac43b90b))
+* **seeds:** update TTS config for band 9 test 001 section 4 (LiDAR archaeology) ([37db498](https://github.com/open-lingua/ielts-mastery-hub/commit/37db4986824750d53409770829295659660fd83e))
+
+
+### Chores
+
+* **seeds:** remove band 6 test 001 listening seed and its assets ([89d2526](https://github.com/open-lingua/ielts-mastery-hub/commit/89d2526897a1064b3a45e2ea93220fa31e668810))
+
 ## [1.0.0-beta.22](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.21...1.0.0-beta.22) (2026-09-08)
 
 
