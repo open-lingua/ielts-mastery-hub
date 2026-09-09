@@ -42,6 +42,7 @@ impl CreateListeningQuestionBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_question_order(mut self, question_order: i64) -> Self {
         self.question_order = Some(question_order);
         self
@@ -52,31 +53,37 @@ impl CreateListeningQuestionBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_answer(mut self, answer: &str) -> Self {
         self.answer = Some(answer.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_options(mut self, options: &str) -> Self {
         self.options = Some(options.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_matching_pairs(mut self, matching_pairs: &str) -> Self {
         self.matching_pairs = Some(matching_pairs.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_completion_gaps(mut self, completion_gaps: &str) -> Self {
         self.completion_gaps = Some(completion_gaps.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_accepted_answers(mut self, accepted_answers: &str) -> Self {
         self.accepted_answers = Some(accepted_answers.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_timestamp(mut self, timestamp: &str) -> Self {
         self.timestamp = Some(timestamp.to_string());
         self
@@ -98,6 +105,7 @@ impl CreateListeningQuestionBuilder {
 }
 
 #[allow(dead_code)]
+#[allow(dead_code)]
 pub fn default_listening_question() -> CreateListeningQuestion {
     CreateListeningQuestionBuilder::default().build()
 }
@@ -117,11 +125,13 @@ pub struct UpdateListeningQuestionBuilder {
 }
 
 impl UpdateListeningQuestionBuilder {
+    #[allow(dead_code)]
     pub fn with_question_order(mut self, question_order: i64) -> Self {
         self.question_order = Some(question_order);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_text(mut self, text: &str) -> Self {
         self.text = Some(text.to_string());
         self
@@ -132,26 +142,31 @@ impl UpdateListeningQuestionBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_options(mut self, options: &str) -> Self {
         self.options = Some(options.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_matching_pairs(mut self, matching_pairs: &str) -> Self {
         self.matching_pairs = Some(matching_pairs.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_completion_gaps(mut self, completion_gaps: &str) -> Self {
         self.completion_gaps = Some(completion_gaps.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_accepted_answers(mut self, accepted_answers: &str) -> Self {
         self.accepted_answers = Some(accepted_answers.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_timestamp(mut self, timestamp: &str) -> Self {
         self.timestamp = Some(timestamp.to_string());
         self

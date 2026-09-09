@@ -59,11 +59,13 @@ impl CreateWritingTaskBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_task_number(mut self, task_number: i64) -> Self {
         self.task_number = Some(task_number);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_task_type(mut self, task_type: &str) -> Self {
         self.task_type = Some(task_type.to_string());
         self
@@ -74,41 +76,49 @@ impl CreateWritingTaskBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_suggested_time(mut self, suggested_time: &str) -> Self {
         self.suggested_time = Some(suggested_time.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_prompt(mut self, prompt: &str) -> Self {
         self.prompt = Some(prompt.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_min_words(mut self, min_words: i64) -> Self {
         self.min_words = Some(min_words);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_max_words(mut self, max_words: &str) -> Self {
         self.max_words = Some(max_words.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_image_url(mut self, image_url: &str) -> Self {
         self.image_url = Some(image_url.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_include_model_answer(mut self, include_model_answer: bool) -> Self {
         self.include_model_answer = Some(include_model_answer);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_model_answer(mut self, model_answer: &str) -> Self {
         self.model_answer = Some(model_answer.to_string());
         self
@@ -140,6 +150,7 @@ impl CreateWritingTaskBuilder {
 }
 
 #[allow(dead_code)]
+#[allow(dead_code)]
 pub fn default_writing_task() -> CreateWritingTask {
     CreateWritingTaskBuilder::default().build()
 }
@@ -163,31 +174,37 @@ pub struct UpdateWritingTaskBuilder {
 }
 
 impl UpdateWritingTaskBuilder {
+    #[allow(dead_code)]
     pub fn with_task_number(mut self, task_number: i64) -> Self {
         self.task_number = Some(task_number);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_task_type(mut self, task_type: &str) -> Self {
         self.task_type = Some(task_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_title(mut self, title: &str) -> Self {
         self.title = Some(title.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_suggested_time(mut self, suggested_time: &str) -> Self {
         self.suggested_time = Some(suggested_time.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_prompt(mut self, prompt: &str) -> Self {
         self.prompt = Some(prompt.to_string());
         self
@@ -198,21 +215,25 @@ impl UpdateWritingTaskBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_max_words(mut self, max_words: &str) -> Self {
         self.max_words = Some(max_words.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_image_url(mut self, image_url: &str) -> Self {
         self.image_url = Some(image_url.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_include_model_answer(mut self, include_model_answer: bool) -> Self {
         self.include_model_answer = Some(include_model_answer);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_model_answer(mut self, model_answer: &str) -> Self {
         self.model_answer = Some(model_answer.to_string());
         self

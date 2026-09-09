@@ -31,6 +31,7 @@ impl CreateReadingPassageBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_passage_number(mut self, passage_number: i64) -> Self {
         self.passage_number = Some(passage_number);
         self
@@ -41,11 +42,13 @@ impl CreateReadingPassageBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_content(mut self, content: &str) -> Self {
         self.content = Some(content.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_notes(mut self, notes: &str) -> Self {
         self.notes = Some(notes.to_string());
         self
@@ -63,6 +66,7 @@ impl CreateReadingPassageBuilder {
 }
 
 #[allow(dead_code)]
+#[allow(dead_code)]
 pub fn default_reading_passage() -> CreateReadingPassage {
     CreateReadingPassageBuilder::default().build()
 }
@@ -78,11 +82,13 @@ pub struct UpdateReadingPassageBuilder {
 }
 
 impl UpdateReadingPassageBuilder {
+    #[allow(dead_code)]
     pub fn with_passage_number(mut self, passage_number: i64) -> Self {
         self.passage_number = Some(passage_number);
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_title(mut self, title: &str) -> Self {
         self.title = Some(title.to_string());
         self
@@ -93,6 +99,7 @@ impl UpdateReadingPassageBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_notes(mut self, notes: &str) -> Self {
         self.notes = Some(notes.to_string());
         self
