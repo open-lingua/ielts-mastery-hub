@@ -73,6 +73,14 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.0.0](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-rc.2...1.0.0) (2026-09-09)
+
+
+### Chores
+
+* clean up RELEASES.md and switch release-please versioning to default ([5c10d1a](https://github.com/open-lingua/ielts-mastery-hub/commit/5c10d1ac0ba529544355bf0681ab79fc528f4736))
+* restore prerelease versioning strategy in release-please config ([37744d8](https://github.com/open-lingua/ielts-mastery-hub/commit/37744d8de09d98e498c58189a940bfebcd3a58a5))
+
 ## [1.0.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-rc.1...1.0.0-rc.2) (2026-09-09)
 
 ## [1.0.0-beta.23](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.0-beta.22...1.0.0-beta.23) (2026-09-09)
