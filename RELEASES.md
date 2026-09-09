@@ -23,7 +23,8 @@ The workflow only requires the built-in `GITHUB_TOKEN` (provided automatically b
 
 > **This section (and the version headings below it) are now generated content.** Do not hand-edit
 > past entries, and do not manually bump `package.json` / `src/core/Cargo.toml` /
-> `src/core/tauri.conf.json` versions — see below for the one supported way to cut a release.
+> `src/core/tauri.conf.json` / `src/core/tauri.windows.msi.conf.json` versions — see below for the
+> one supported way to cut a release.
 
 Versions used to be bumped by hand across three files (`package.json`, `src/core/Cargo.toml`,
 `src/core/tauri.conf.json`), which caused real drift in production (see the
@@ -42,14 +43,29 @@ fully automated with [release-please](https://github.com/googleapis/release-plea
      seeded version: [`.release-please-manifest.json`](.release-please-manifest.json)).
    - Prepends a new dated section to this file (`RELEASES.md`), grouped by commit type
      (Features/Bug Fixes/Chores/etc.), from the commits since the last release.
-   - Refreshes `src/core/Cargo.lock`'s core-crate version entry via a follow-up job
-     (`cargo generate-lockfile`) and pushes that onto the same PR branch.
+   - Refreshes `src/core/Cargo.lock`'s core-crate version entry, and regenerates
+     `src/core/tauri.windows.msi.conf.json`'s WiX version (via
+     [`scripts/sync-msi-version.mjs`](scripts/sync-msi-version.mjs)), via a follow-up job and
+     pushes both onto the same PR branch in a single commit.
 3. Merging that Release PR tags the release as `X.Y.Z-rc.N` (no `v`/component prefix, matching
    this repo's existing tag history) and publishes the GitHub Release — which is what triggers
    `release.yml` above, unchanged.
 4. A `version-consistency` CI job ([`.github/workflows/ci-linux.yml`](.github/workflows/ci-linux.yml),
    backed by `scripts/check-version-consistency.mjs`) fails any PR where the three version-bearing
-   files disagree, as defense in depth against manual edits reintroducing drift.
+   files disagree, or where `src/core/tauri.windows.msi.conf.json`'s WiX version doesn't match the
+   value derived from the canonical version, as defense in depth against manual edits
+   reintroducing drift.
+
+**MSI/WiX version overlay:** Tauri's `msi` bundle target (built with WiX on Windows) requires an
+all-numeric 4-part version (each field ≤ 65535), so a semver pre-release like `1.0.1-rc.2` fails to
+bundle as-is — `nsis`, `dmg`, `deb`, `rpm`, and `appimage` don't have this restriction.
+`src/core/tauri.windows.msi.conf.json` is a **generated** overlay config (`bundle.windows.wix.version`,
+e.g. `1.0.1-rc.2` → `1.0.1.2`) applied only for Windows builds via `--config`
+(see [`.github/workflows/release.yml`](.github/workflows/release.yml) and the
+`tauri:build:windows` npm script) — never hand-edit it; regenerate it with
+`npm run sync:msi-version` if it's ever out of sync locally.
+
+
 
 **Note:** release-please must authenticate with a fine-grained Personal Access Token stored as the
 `RELEASE_PLEASE_TOKEN` repository secret, not the default `GITHUB_TOKEN`. This is a hard GitHub
