@@ -36,7 +36,7 @@ jobs:
         uses: googleapis/release-please-action@v5
         with:
           # Falls back to the default GITHUB_TOKEN if the PAT secret hasn't been
-          # configured yet (e.g. on first setup) instead of failing outright —
+          # configured yet (e.g. on first setup) instead of failing outright
           # note that release-please still requires RELEASE_PLEASE_TOKEN to be
           # set for the resulting GitHub Release to trigger release.yml (see the
           # note above); this fallback only prevents a hard failure.
