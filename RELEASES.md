@@ -36,7 +36,7 @@ fully automated with [release-please](https://github.com/googleapis/release-plea
    makes the PR title the commit message that release-please parses.
 2. [`.github/workflows/release-please.yml`](.github/workflows/release-please.yml) runs on every
    push to `main`. It maintains a standing "Release PR" that:
-   - Computes the next `X.Y.Z-beta.N` version from the accumulated conventional commits.
+   - Computes the next `X.Y.Z-rc.N` version from the accumulated conventional commits.
    - Updates `package.json`, `src/core/Cargo.toml`, and `src/core/tauri.conf.json` to the same
      version, in the same commit (config: [`release-please-config.json`](release-please-config.json),
      seeded version: [`.release-please-manifest.json`](.release-please-manifest.json)).
@@ -44,7 +44,7 @@ fully automated with [release-please](https://github.com/googleapis/release-plea
      (Features/Bug Fixes/Chores/etc.), from the commits since the last release.
    - Refreshes `src/core/Cargo.lock`'s core-crate version entry via a follow-up job
      (`cargo generate-lockfile`) and pushes that onto the same PR branch.
-3. Merging that Release PR tags the release as `X.Y.Z-beta.N` (no `v`/component prefix, matching
+3. Merging that Release PR tags the release as `X.Y.Z-rc.N` (no `v`/component prefix, matching
    this repo's existing tag history) and publishes the GitHub Release — which is what triggers
    `release.yml` above, unchanged.
 4. A `version-consistency` CI job ([`.github/workflows/ci-linux.yml`](.github/workflows/ci-linux.yml),
