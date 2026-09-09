@@ -33,16 +33,19 @@ impl CreateReadingTestBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_test_type(mut self, test_type: &str) -> Self {
         self.test_type = Some(test_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_duration(mut self, duration: &str) -> Self {
         self.duration = Some(duration.to_string());
         self
@@ -85,16 +88,19 @@ impl UpdateReadingTestBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_test_type(mut self, test_type: &str) -> Self {
         self.test_type = Some(test_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_difficulty(mut self, difficulty: &str) -> Self {
         self.difficulty = Some(difficulty.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_duration(mut self, duration: &str) -> Self {
         self.duration = Some(duration.to_string());
         self
