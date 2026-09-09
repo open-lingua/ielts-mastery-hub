@@ -5,9 +5,9 @@ title: Installing the App
 
 # Installing the App
 
-The fastest way to install IELTS Mastery Hub on Linux or macOS is the one-line
-install script. It downloads the right build for your platform, verifies its
-checksum, and installs it for you.
+The fastest way to install IELTS Mastery Hub is a one-line install script,
+available for Linux, macOS, and Windows. It downloads the right build for
+your platform, verifies its checksum, and installs it for you.
 
 ## One-line install (Linux / macOS)
 
@@ -19,14 +19,36 @@ This detects your OS and CPU architecture, installs the appropriate package,
 and (for AppImage installs) adds the app to your `PATH` so you can launch it
 with `imh`.
 
-:::info Windows
-This script only supports Linux and macOS. On Windows, download an installer
-manually from the [GitHub Releases page](https://github.com/open-lingua/ielts-mastery-hub/releases).
+## One-line install (Windows)
+
+```powershell
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+This detects your CPU architecture (`x64` or `arm64`), downloads the
+matching NSIS installer, verifies its SHA-256 checksum, and installs it
+silently. Requires PowerShell 5.1+ (built into Windows) or PowerShell 7+.
+
+To install the MSI package instead of the default NSIS installer, or to pass
+other options, use the scriptblock invocation form (`param()` blocks don't
+work when a script is piped into `iex`):
+
+```powershell
+&([scriptblock]::Create((irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1))) -Package msi
+```
+
+:::warning Elevation & SmartScreen
+The installer may require Administrator privileges (UAC) depending on the
+install location. Windows builds are currently **unsigned**, so SmartScreen
+may show an "unknown publisher" warning — choose **More info → Run
+anyway** to proceed.
 :::
 
 ## Customizing the install
 
-The script reads a few optional environment variables:
+### Linux / macOS
+
+The Unix script reads a few optional environment variables:
 
 | Variable      | Purpose                                                                 | Default                        |
 |---------------|--------------------------------------------------------------------------|---------------------------------|
@@ -55,7 +77,39 @@ curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh -o
 sh install.sh --help
 ```
 
+### Windows
+
+The PowerShell script accepts parameters (via the scriptblock form above) or
+the equivalent environment variables:
+
+| Parameter      | Environment variable | Purpose                                | Default                 |
+|----------------|-----------------------|-----------------------------------------|--------------------------|
+| `-Version`     | `IMH_VERSION`         | Version to install, e.g. `1.0.1-rc.2`   | Latest GitHub release    |
+| `-Package`     | `IMH_PACKAGE`         | Package format: `nsis` or `msi`         | `nsis`                    |
+| `-InstallDir`  | —                     | Custom install directory                 | Installer's own default  |
+| `-Interactive` | —                     | Show the installer UI instead of silent | Off (installs silently)  |
+
+Examples:
+
+```powershell
+# Install a specific version
+&([scriptblock]::Create((irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1))) -Version 1.0.1-rc.2
+
+# Install the MSI package instead of the NSIS installer
+$env:IMH_PACKAGE = 'msi'; irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+You can also see all options by downloading the script and running it with
+`-Help`:
+
+```powershell
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 -OutFile install.ps1
+.\install.ps1 -Help
+```
+
 ## What the script does
+
+### Linux / macOS
 
 1. Detects your OS/architecture (`macOS arm64/x86_64`, `Linux amd64/aarch64`).
 2. Resolves the version to install (latest release, unless `v` is set).
@@ -66,3 +120,16 @@ sh install.sh --help
    and verifies its SHA-256 checksum against the published release metadata.
 5. Installs it (`AppImage` binary, `dpkg`/`rpm`, or copies the `.app` bundle
    into `/Applications`) and updates your shell profile's `PATH` if needed.
+
+### Windows
+
+1. Detects your CPU architecture (`x64` or `arm64`).
+2. Resolves the version to install (latest release, unless `-Version` /
+   `IMH_VERSION` is set).
+3. Picks a package format (`nsis` installer by default, or `msi`).
+4. Downloads the matching asset from the
+   [GitHub Releases page](https://github.com/open-lingua/ielts-mastery-hub/releases)
+   and verifies its SHA-256 checksum against the published release metadata.
+5. Runs the installer silently (`/S` for NSIS, `/qn` for MSI) unless
+   `-Interactive` is passed, then reports how to launch the app from the
+   Start Menu.
