@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_open_lingua_ielts_mastery_hub_website=self.webpackChunk_open_lingua_ielts_mastery_hub_website||[]).push([["1833"],{5513(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"First Blog Post","permalink":"/ielts-mastery-hub/blog/first-blog-post","unlisted":false,"date":"2019-05-28T00:00:00.000Z"}]}')}}]);

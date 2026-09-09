@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_open_lingua_ielts_mastery_hub_website=self.webpackChunk_open_lingua_ielts_mastery_hub_website||[]).push([["3220"],{1912(e){e.exports=JSON.parse('{"blogBasePath":"/blog","blogTitle":"Blog","authorsListPath":"/blog/authors"}')}}]);

@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>IELTS Mastery Hub Blog</title>
-        <link>https://ielts-mastery-hub.dev/blog</link>
+        <link>https://open-lingua.github.io/ielts-mastery-hub/blog/</link>
         <description>IELTS Mastery Hub Blog</description>
         <lastBuildDate>Tue, 28 May 2019 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
@@ -10,8 +10,8 @@
         <language>en</language>
         <item>
             <title><![CDATA[First Blog Post]]></title>
-            <link>https://ielts-mastery-hub.dev/blog/first-blog-post</link>
-            <guid>https://ielts-mastery-hub.dev/blog/first-blog-post</guid>
+            <link>https://open-lingua.github.io/ielts-mastery-hub/blog/first-blog-post/</link>
+            <guid>https://open-lingua.github.io/ielts-mastery-hub/blog/first-blog-post/</guid>
             <pubDate>Tue, 28 May 2019 00:00:00 GMT</pubDate>
             <description><![CDATA[Lorem ipsum dolor sit amet...]]></description>
             <content:encoded><![CDATA[<p>Lorem ipsum dolor sit amet...</p>
