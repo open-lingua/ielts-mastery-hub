@@ -12,14 +12,22 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://ielts-mastery-hub.dev',
-  baseUrl: '/',
+  url: 'https://open-lingua.github.io',
+  baseUrl: '/ielts-mastery-hub/',
 
   organizationName: 'open-lingua',
   projectName: 'ielts-mastery-hub',
 
+  // GitHub Pages project sites serve URLs with a trailing slash.
+  trailingSlash: true,
+
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
