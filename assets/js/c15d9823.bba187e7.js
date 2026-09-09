@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_open_lingua_ielts_mastery_hub_website=self.webpackChunk_open_lingua_ielts_mastery_hub_website||[]).push([["6431"],{9328(e){e.exports=JSON.parse('{"metadata":{"permalink":"/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
