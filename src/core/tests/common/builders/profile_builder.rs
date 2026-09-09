@@ -29,16 +29,19 @@ impl CreateProfileBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_avatar_url(mut self, avatar_url: &str) -> Self {
         self.avatar_url = Some(avatar_url.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_plan_type(mut self, plan_type: &str) -> Self {
         self.plan_type = Some(plan_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_email(mut self, email: &str) -> Self {
         self.email = Some(email.to_string());
         self
@@ -72,21 +75,25 @@ pub struct UpdateProfileBuilder {
 }
 
 impl UpdateProfileBuilder {
+    #[allow(dead_code)]
     pub fn with_full_name(mut self, full_name: &str) -> Self {
         self.full_name = Some(full_name.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_avatar_url(mut self, avatar_url: &str) -> Self {
         self.avatar_url = Some(avatar_url.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_plan_type(mut self, plan_type: &str) -> Self {
         self.plan_type = Some(plan_type.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_email(mut self, email: &str) -> Self {
         self.email = Some(email.to_string());
         self
@@ -97,11 +104,13 @@ impl UpdateProfileBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_ban_reason(mut self, ban_reason: &str) -> Self {
         self.ban_reason = Some(ban_reason.to_string());
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_banned_until(mut self, banned_until: &str) -> Self {
         self.banned_until = Some(banned_until.to_string());
         self
