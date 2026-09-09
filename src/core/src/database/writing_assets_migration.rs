@@ -14,8 +14,10 @@ use crate::error::AppError;
 /// path on disk (e.g. dev builds / running from a repo checkout) — a
 /// distributed production bundle would need a different mechanism (e.g.
 /// Tauri bundled resources or `include_bytes!` via a build script).
-const SEED_WRITING_ASSETS_DIR: &str =
-    concat!(env!("CARGO_MANIFEST_DIR"), "/src/database/seeds/writing/writing-assets");
+const SEED_WRITING_ASSETS_DIR: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/src/database/seeds/writing/writing-assets"
+);
 
 /// Splits a seed asset filename (e.g. `"<uuid>.jpeg"`) into its
 /// `(task_id, ext)` stem/extension pair, splitting on the last `.`. Returns
@@ -49,8 +51,18 @@ fn encode_uri_component(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
     for byte in input.bytes() {
         match byte {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'!' | b'~' | b'*'
-            | b'\'' | b'(' | b')' => out.push(byte as char),
+            b'A'..=b'Z'
+            | b'a'..=b'z'
+            | b'0'..=b'9'
+            | b'-'
+            | b'_'
+            | b'.'
+            | b'!'
+            | b'~'
+            | b'*'
+            | b'\''
+            | b'('
+            | b')' => out.push(byte as char),
             _ => out.push_str(&format!("%{byte:02X}")),
         }
     }
@@ -85,9 +97,8 @@ pub fn to_asset_url(path: &Path) -> String {
 /// to read the seed directory itself, or a missing `$HOME`, is propagated as
 /// `Err`
 pub async fn sync_writing_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
-    let home = std::env::var("HOME").map_err(|_| {
-        AppError::Validation("HOME environment variable is not set".to_string())
-    })?;
+    let home = std::env::var("HOME")
+        .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
     sync_writing_assets_from_dir(pool, Path::new(SEED_WRITING_ASSETS_DIR), &home).await
 }
 
@@ -113,7 +124,9 @@ pub async fn sync_writing_assets_from_dir(
             Ok(Some(entry)) => entry,
             Ok(None) => break,
             Err(e) => {
-                eprintln!("[sync_writing_assets_to_local_storage] failed to read a directory entry: {e}");
+                eprintln!(
+                    "[sync_writing_assets_to_local_storage] failed to read a directory entry: {e}"
+                );
                 continue;
             }
         };

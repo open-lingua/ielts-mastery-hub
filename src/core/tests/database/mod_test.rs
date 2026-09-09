@@ -49,7 +49,11 @@ mod resolve_database_url_test {
         let _guard = ENV_LOCK.lock().unwrap();
 
         // Act
-        let result = with_env_var("DATABASE_URL", Some(CUSTOM_DATABASE_URL), resolve_database_url);
+        let result = with_env_var(
+            "DATABASE_URL",
+            Some(CUSTOM_DATABASE_URL),
+            resolve_database_url,
+        );
 
         // Assert
         assert_eq!(result.unwrap(), CUSTOM_DATABASE_URL);
@@ -103,9 +107,7 @@ mod default_db_path_test {
         // Assert
         assert_eq!(
             result.unwrap(),
-            PathBuf::from(format!(
-                "{LINUX_HOME}/.local/share/{APP_IDENTIFIER}/imh.db"
-            ))
+            PathBuf::from(format!("{LINUX_HOME}/.local/share/{APP_IDENTIFIER}/imh.db"))
         );
     }
 
@@ -118,7 +120,10 @@ mod default_db_path_test {
         let result = with_env_var("HOME", None, || default_db_path("linux"));
 
         // Assert
-        assert!(matches!(result, Err(app_lib::error::AppError::Validation(_))));
+        assert!(matches!(
+            result,
+            Err(app_lib::error::AppError::Validation(_))
+        ));
     }
 
     #[test]
@@ -130,6 +135,9 @@ mod default_db_path_test {
         let result = with_env_var("APPDATA", None, || default_db_path("windows"));
 
         // Assert
-        assert!(matches!(result, Err(app_lib::error::AppError::Validation(_))));
+        assert!(matches!(
+            result,
+            Err(app_lib::error::AppError::Validation(_))
+        ));
     }
 }

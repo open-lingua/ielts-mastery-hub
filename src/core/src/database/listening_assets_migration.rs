@@ -19,8 +19,10 @@ pub const LISTENING_ASSETS_DIR_NAME: &str = "listening-assets";
 /// the source tree, not its contents, so it only resolves correctly when
 /// the running binary can still reach that path on disk (dev builds /
 /// running from a repo checkout).
-const SEED_LISTENING_ASSETS_DIR: &str =
-    concat!(env!("CARGO_MANIFEST_DIR"), "/src/database/seeds/listening/listening-assets");
+const SEED_LISTENING_ASSETS_DIR: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/src/database/seeds/listening/listening-assets"
+);
 
 /// Copies bundled seed Listening test assets (`SEED_LISTENING_ASSETS_DIR`)
 /// into the user's local `$HOME/.imh/listening-assets/` storage, backfilling
@@ -37,10 +39,11 @@ const SEED_LISTENING_ASSETS_DIR: &str =
 /// abort the sync or block app startup. Only a missing `$HOME` is
 /// propagated as `Err`.
 pub async fn sync_listening_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
-    let home = std::env::var("HOME").map_err(|_| {
-        AppError::Validation("HOME environment variable is not set".to_string())
-    })?;
-    let dest_root = Path::new(&home).join(".imh").join(LISTENING_ASSETS_DIR_NAME);
+    let home = std::env::var("HOME")
+        .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
+    let dest_root = Path::new(&home)
+        .join(".imh")
+        .join(LISTENING_ASSETS_DIR_NAME);
     sync_listening_assets_from_dir(pool, Path::new(SEED_LISTENING_ASSETS_DIR), &dest_root).await
 }
 
@@ -171,7 +174,8 @@ fn section_number_from_file_name(file_name: &str) -> Option<i64> {
 /// never aborts the overall walk.
 async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf> {
     let mut copied = Vec::new();
-    let mut stack: Vec<(PathBuf, PathBuf)> = vec![(source_root.to_path_buf(), dest_root.to_path_buf())];
+    let mut stack: Vec<(PathBuf, PathBuf)> =
+        vec![(source_root.to_path_buf(), dest_root.to_path_buf())];
 
     while let Some((src_dir, dest_dir)) = stack.pop() {
         let mut entries = match tokio::fs::read_dir(&src_dir).await {

@@ -141,15 +141,20 @@ mod sync_writing_assets_from_dir_test {
 
         let source_dir = unique_temp_dir("source");
         let home_dir = unique_temp_dir("home");
-        tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
+        tokio::fs::create_dir_all(&source_dir)
+            .await
+            .expect("create source dir");
         let task_dir = source_dir.join(task_id);
-        tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+        tokio::fs::create_dir_all(&task_dir)
+            .await
+            .expect("create task dir");
         tokio::fs::write(task_dir.join("figure.jpeg"), b"fake-image-bytes")
             .await
             .expect("write seed asset");
 
         // Act
-        let result = sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
+        let result =
+            sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
         assert!(result.is_ok());
@@ -158,14 +163,19 @@ mod sync_writing_assets_from_dir_test {
             .join("writing-assets")
             .join(task_id)
             .join("figure.jpeg");
-        let copied = tokio::fs::read(&dest).await.expect("destination file should exist");
+        let copied = tokio::fs::read(&dest)
+            .await
+            .expect("destination file should exist");
         assert_eq!(copied, b"fake-image-bytes");
 
         let task = writing_tasks::find_by_id(&pool, task_id, OWNER_ID)
             .await
             .expect("find")
             .expect("present");
-        assert_eq!(task.image_url.as_deref(), Some(to_asset_url(&dest).as_str()));
+        assert_eq!(
+            task.image_url.as_deref(),
+            Some(to_asset_url(&dest).as_str())
+        );
 
         // Cleanup
         let _ = tokio::fs::remove_dir_all(&source_dir).await;
@@ -181,9 +191,13 @@ mod sync_writing_assets_from_dir_test {
 
         let source_dir = unique_temp_dir("source-idempotent");
         let home_dir = unique_temp_dir("home-idempotent");
-        tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
+        tokio::fs::create_dir_all(&source_dir)
+            .await
+            .expect("create source dir");
         let task_dir = source_dir.join(task_id);
-        tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+        tokio::fs::create_dir_all(&task_dir)
+            .await
+            .expect("create task dir");
         tokio::fs::write(task_dir.join("figure.jpeg"), b"original-bytes")
             .await
             .expect("write seed asset");
@@ -227,12 +241,18 @@ mod sync_writing_assets_from_dir_test {
             .expect("rewrite seed asset");
 
         // Act
-        let result = sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
+        let result =
+            sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
         assert!(result.is_ok());
-        let copied = tokio::fs::read(&dest).await.expect("destination file should still exist");
-        assert_eq!(copied, b"original-bytes", "destination file must not be overwritten");
+        let copied = tokio::fs::read(&dest)
+            .await
+            .expect("destination file should still exist");
+        assert_eq!(
+            copied, b"original-bytes",
+            "destination file must not be overwritten"
+        );
 
         let task = writing_tasks::find_by_id(&pool, task_id, OWNER_ID)
             .await
@@ -255,15 +275,20 @@ mod sync_writing_assets_from_dir_test {
         let pool = test_pool().await;
         let source_dir = unique_temp_dir("source-orphan");
         let home_dir = unique_temp_dir("home-orphan");
-        tokio::fs::create_dir_all(&source_dir).await.expect("create source dir");
+        tokio::fs::create_dir_all(&source_dir)
+            .await
+            .expect("create source dir");
         let task_dir = source_dir.join("99999999-9999-9999-9999-999999999999");
-        tokio::fs::create_dir_all(&task_dir).await.expect("create task dir");
+        tokio::fs::create_dir_all(&task_dir)
+            .await
+            .expect("create task dir");
         tokio::fs::write(task_dir.join("figure.jpeg"), b"orphan-bytes")
             .await
             .expect("write seed asset");
 
         // Act
-        let result = sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
+        let result =
+            sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
         assert!(result.is_ok());
@@ -285,7 +310,8 @@ mod sync_writing_assets_from_dir_test {
         let home_dir = unique_temp_dir("home-missing-source");
 
         // Act
-        let result = sync_writing_assets_from_dir(&pool, &missing_dir, &home_dir.to_string_lossy()).await;
+        let result =
+            sync_writing_assets_from_dir(&pool, &missing_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
         assert!(result.is_err());
