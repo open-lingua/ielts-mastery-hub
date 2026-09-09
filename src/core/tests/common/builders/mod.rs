@@ -11,7 +11,9 @@ mod user_test_session_builder;
 mod writing_task_builder;
 mod writing_test_builder;
 
-pub use listening_question_builder::{CreateListeningQuestionBuilder, UpdateListeningQuestionBuilder};
+pub use listening_question_builder::{
+    CreateListeningQuestionBuilder, UpdateListeningQuestionBuilder,
+};
 pub use listening_question_group_builder::{
     CreateListeningQuestionGroupBuilder, UpdateListeningQuestionGroupBuilder,
 };

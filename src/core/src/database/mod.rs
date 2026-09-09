@@ -52,9 +52,7 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
             let app_data = std::env::var("APPDATA").map_err(|_| {
                 AppError::Validation("APPDATA environment variable is not set".to_string())
             })?;
-            Ok(PathBuf::from(app_data)
-                .join(APP_IDENTIFIER)
-                .join("imh.db"))
+            Ok(PathBuf::from(app_data).join(APP_IDENTIFIER).join("imh.db"))
         }
         _ => {
             // Linux and other Unix-like platforms.

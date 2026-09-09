@@ -101,17 +101,23 @@ mod sync_listening_assets_from_dir_test {
         tokio::fs::create_dir_all(&seed_tts_dir)
             .await
             .expect("create nested seed dir");
-        tokio::fs::write(seed_tts_dir.join("section-1-tts-config.json"), b"seed-bytes")
-            .await
-            .expect("write seed asset");
+        tokio::fs::write(
+            seed_tts_dir.join("section-1-tts-config.json"),
+            b"seed-bytes",
+        )
+        .await
+        .expect("write seed asset");
 
         let dest_tts_dir = dest_dir.join(test_id).join("tts-config");
         tokio::fs::create_dir_all(&dest_tts_dir)
             .await
             .expect("create existing dest dir");
-        tokio::fs::write(dest_tts_dir.join("section-1-tts-config.json"), b"user-bytes")
-            .await
-            .expect("seed existing destination file");
+        tokio::fs::write(
+            dest_tts_dir.join("section-1-tts-config.json"),
+            b"user-bytes",
+        )
+        .await
+        .expect("seed existing destination file");
 
         // Act
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
@@ -142,9 +148,12 @@ mod sync_listening_assets_from_dir_test {
         tokio::fs::create_dir_all(&seed_tts_dir)
             .await
             .expect("create nested seed dir");
-        tokio::fs::write(seed_tts_dir.join("section-1-tts-config.json"), b"seed-bytes")
-            .await
-            .expect("write seed asset");
+        tokio::fs::write(
+            seed_tts_dir.join("section-1-tts-config.json"),
+            b"seed-bytes",
+        )
+        .await
+        .expect("write seed asset");
 
         // A file the seed tree knows nothing about, already present under
         // the destination test folder (e.g. a user-recorded audio file).
@@ -152,9 +161,12 @@ mod sync_listening_assets_from_dir_test {
         tokio::fs::create_dir_all(&dest_test_dir)
             .await
             .expect("create existing dest test dir");
-        tokio::fs::write(dest_test_dir.join("section-1-audio.mp3"), b"real-audio-bytes")
-            .await
-            .expect("seed unrelated existing file");
+        tokio::fs::write(
+            dest_test_dir.join("section-1-audio.mp3"),
+            b"real-audio-bytes",
+        )
+        .await
+        .expect("seed unrelated existing file");
 
         // Act
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
@@ -165,9 +177,13 @@ mod sync_listening_assets_from_dir_test {
             .await
             .expect("unrelated existing file should be preserved");
         assert_eq!(unrelated, b"real-audio-bytes");
-        let copied = tokio::fs::read(dest_test_dir.join("tts-config").join("section-1-tts-config.json"))
-            .await
-            .expect("new seed file should still be copied alongside the unrelated file");
+        let copied = tokio::fs::read(
+            dest_test_dir
+                .join("tts-config")
+                .join("section-1-tts-config.json"),
+        )
+        .await
+        .expect("new seed file should still be copied alongside the unrelated file");
         assert_eq!(copied, b"seed-bytes");
 
         // Cleanup
@@ -311,7 +327,10 @@ mod sync_listening_assets_from_dir_test {
         let copied = tokio::fs::read(&dest_audio_path)
             .await
             .expect("destination audio file should still exist");
-        assert_eq!(copied, b"original-bytes", "destination file must not be overwritten");
+        assert_eq!(
+            copied, b"original-bytes",
+            "destination file must not be overwritten"
+        );
 
         let updated = sqlx::query!(
             "SELECT audio_url FROM listening_sections WHERE id = ?",
