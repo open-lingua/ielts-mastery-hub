@@ -26,6 +26,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
 
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AiConfigurations from "./pages/admin/AiConfigurations";
 import ContentLibrary from "./pages/admin/ContentLibrary";
 import CreateContent from "./pages/admin/CreateContent";
 import ImportDataset from "./pages/admin/ImportDataset";
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/admin/content" element={<ContentLibrary />} />
               <Route path="/admin/create" element={<CreateContent />} />
               <Route path="/admin/import" element={<ImportDataset />} />
+              <Route path="/admin/ai-configurations" element={<AiConfigurations />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
