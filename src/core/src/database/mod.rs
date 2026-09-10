@@ -4,6 +4,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 
 use crate::error::AppError;
 
+pub mod asset_sync;
 pub mod listening_assets_migration;
 pub mod seed_data;
 pub mod writing_assets_migration;
@@ -99,7 +100,14 @@ pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .set_ignore_missing(true)
         .run(&pool)
         .await?;
+    // Deliberately fail-fast on `run_seed_data` errors (via `?`): a failure there indicates a
+    // broken database/SQL seed file, not merely a missing bundled asset, so it's treated as a
+    // startup-blocking condition distinct from the two asset syncs below.
     seed_data::run_seed_data(&pool, app_handle).await?;
+    // Both asset syncs are unconditional on every startup (no feature flag or early return
+    // skips them) and are individually non-fatal: a missing seed source directory is logged
+    // loudly via `log::warn!` (see each module's docs) but never blocks startup, since a build
+    // may legitimately ship without bundled seed assets.
     writing_assets_migration::sync_writing_assets_to_local_storage(&pool, app_handle).await?;
     listening_assets_migration::sync_listening_assets_to_local_storage(&pool, app_handle).await?;
     Ok(pool)

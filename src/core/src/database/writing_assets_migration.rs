@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use tauri::Manager;
 
+use crate::database::asset_sync::AssetSyncOutcome;
 use crate::database::Db;
 use crate::error::AppError;
 
@@ -89,14 +90,17 @@ pub fn to_asset_url(path: &Path) -> String {
 ///
 /// Individual per-file problems (a task subfolder with no `figure.<ext>`
 /// file inside it, a `task_id` with no matching `writing_tasks` row, a
-/// copy/IO error, or a failed `UPDATE`) are logged with `eprintln!` and
-/// skipped — they never abort the sync or block app startup. Only a failure
-/// to read the seed directory itself, or a missing `$HOME`, is propagated as
-/// `Err`
+/// copy/IO error, or a failed `UPDATE`) are logged with `log::warn!`/`log::error!`
+/// and skipped — they never abort the sync or block app startup. A missing
+/// seed source directory is also non-fatal (see [`AssetSyncOutcome::SourceMissing`]):
+/// it's logged loudly with `log::warn!` (including the exact resolved path) so it's
+/// visible in both `tauri dev` and packaged-build logs, but never blocks startup,
+/// since a build may legitimately ship without seed assets. Only a missing `$HOME`
+/// is propagated as `Err`.
 pub async fn sync_writing_assets_to_local_storage(
     pool: &Db,
     app_handle: &tauri::AppHandle,
-) -> Result<(), AppError> {
+) -> Result<AssetSyncOutcome, AppError> {
     let home = std::env::var("HOME")
         .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
     let source_dir = app_handle
@@ -110,7 +114,23 @@ pub async fn sync_writing_assets_to_local_storage(
                 "failed to resolve writing asset seed resource directory {SEED_WRITING_ASSETS_RESOURCE_PATH}: {e}"
             ))
         })?;
-    sync_writing_assets_from_dir(pool, &source_dir, &home).await
+
+    let source_exists = tokio::fs::metadata(&source_dir).await.is_ok();
+    log::info!(
+        "[sync_writing_assets_to_local_storage] resolved seed source directory to {} (exists: {source_exists})",
+        source_dir.display()
+    );
+
+    let outcome = sync_writing_assets_from_dir(pool, &source_dir, &home).await?;
+    if let AssetSyncOutcome::SourceMissing { source_dir } = &outcome {
+        log::warn!(
+            "[sync_writing_assets_to_local_storage] seed source directory {} does not exist; no writing task images were copied. \
+             If this is unexpected (e.g. not an intentionally asset-free build), check `bundle.resources` in tauri.conf.json \
+             and how resources are resolved in this environment.",
+            source_dir.display()
+        );
+    }
+    Ok(outcome)
 }
 
 /// Internal implementation of [`sync_writing_assets_to_local_storage`],
@@ -118,11 +138,24 @@ pub async fn sync_writing_assets_to_local_storage(
 /// exercised end-to-end in tests without touching the real seed assets or
 /// `$HOME`. `pub` (rather than crate-private) solely so integration tests in
 /// `tests/database/writing_assets_migration_test.rs` can call it directly.
+///
+/// A missing `source_dir` is not fatal: it's reported via
+/// `Ok(AssetSyncOutcome::SourceMissing { .. })` rather than `Err`, mirroring
+/// `listening_assets_migration::sync_listening_assets_from_dir` — there may
+/// legitimately be no bundled Writing seed assets to sync (e.g. an
+/// assets-free build, or a `tauri dev` environment where resources aren't
+/// laid out the same way as in a packaged app).
 pub async fn sync_writing_assets_from_dir(
     pool: &Db,
     source_dir: &Path,
     home: &str,
-) -> Result<(), AppError> {
+) -> Result<AssetSyncOutcome, AppError> {
+    if tokio::fs::metadata(source_dir).await.is_err() {
+        return Ok(AssetSyncOutcome::SourceMissing {
+            source_dir: source_dir.to_path_buf(),
+        });
+    }
+
     let mut entries = tokio::fs::read_dir(source_dir).await.map_err(|e| {
         AppError::Validation(format!(
             "failed to read writing asset seed directory {}: {e}",
@@ -130,12 +163,14 @@ pub async fn sync_writing_assets_from_dir(
         ))
     })?;
 
+    let mut copied = 0usize;
+
     loop {
         let entry = match entries.next_entry().await {
             Ok(Some(entry)) => entry,
             Ok(None) => break,
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] failed to read a directory entry: {e}"
                 );
                 continue;
@@ -149,7 +184,7 @@ pub async fn sync_writing_assets_from_dir(
             continue;
         }
         let Some(task_id) = task_dir.file_name().and_then(|n| n.to_str()) else {
-            eprintln!(
+            log::warn!(
                 "[sync_writing_assets_to_local_storage] skipping non-UTF-8 directory name at {}",
                 task_dir.display()
             );
@@ -160,14 +195,14 @@ pub async fn sync_writing_assets_from_dir(
         let figure_path = match find_figure_file(&task_dir).await {
             Ok(Some(path)) => path,
             Ok(None) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] no figure.<ext> file found in {}, skipping",
                     task_dir.display()
                 );
                 continue;
             }
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] failed to read task asset directory {}: {e}",
                     task_dir.display()
                 );
@@ -176,14 +211,14 @@ pub async fn sync_writing_assets_from_dir(
         };
 
         let Some(file_name) = figure_path.file_name().and_then(|n| n.to_str()) else {
-            eprintln!(
+            log::warn!(
                 "[sync_writing_assets_to_local_storage] skipping non-UTF-8 file name at {}",
                 figure_path.display()
             );
             continue;
         };
         let Some((_, ext)) = split_task_id_and_ext(file_name) else {
-            eprintln!(
+            log::warn!(
                 "[sync_writing_assets_to_local_storage] could not parse an extension from filename `{file_name}`, skipping"
             );
             continue;
@@ -208,13 +243,13 @@ pub async fn sync_writing_assets_from_dir(
         {
             Ok(Some(row)) => row,
             Ok(None) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] seed writing asset {task_id} has no matching writing_tasks row, skipping"
                 );
                 continue;
             }
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] failed to look up writing_tasks row {task_id}: {e}"
                 );
                 continue;
@@ -227,7 +262,7 @@ pub async fn sync_writing_assets_from_dir(
 
         if let Some(parent) = dest.parent() {
             if let Err(e) = tokio::fs::create_dir_all(parent).await {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] failed to create directory {}: {e}",
                     parent.display()
                 );
@@ -238,7 +273,7 @@ pub async fn sync_writing_assets_from_dir(
         let bytes = match tokio::fs::read(&figure_path).await {
             Ok(bytes) => bytes,
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_writing_assets_to_local_storage] failed to read seed asset {}: {e}",
                     figure_path.display()
                 );
@@ -247,12 +282,13 @@ pub async fn sync_writing_assets_from_dir(
         };
 
         if let Err(e) = tokio::fs::write(&dest, bytes).await {
-            eprintln!(
+            log::warn!(
                 "[sync_writing_assets_to_local_storage] failed to write {}: {e}",
                 dest.display()
             );
             continue;
         }
+        copied += 1;
 
         if let Err(e) = sqlx::query!(
             "UPDATE writing_tasks SET image_url = ? WHERE id = ?",
@@ -262,13 +298,17 @@ pub async fn sync_writing_assets_from_dir(
         .execute(pool)
         .await
         {
-            eprintln!(
+            log::error!(
                 "[sync_writing_assets_to_local_storage] failed to update image_url for writing_tasks {task_id}: {e}"
             );
         }
     }
 
-    Ok(())
+    log::info!(
+        "[sync_writing_assets_to_local_storage] copied {copied} writing task image(s) from {}",
+        source_dir.display()
+    );
+    Ok(AssetSyncOutcome::Synced { copied })
 }
 
 /// Looks inside a `<task_id>/` seed asset subfolder for its `figure.<ext>`

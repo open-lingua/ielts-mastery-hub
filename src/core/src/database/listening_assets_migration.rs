@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use tauri::Manager;
 
+use crate::database::asset_sync::AssetSyncOutcome;
 use crate::database::Db;
 use crate::error::AppError;
 
@@ -23,7 +24,7 @@ pub const LISTENING_ASSETS_DIR_NAME: &str = "listening-assets";
 /// in at compile time.
 const SEED_LISTENING_ASSETS_RESOURCE_PATH: &str = "seeds/listening/listening-assets";
 
-/// Copies bundled seed Listening test assets (`SEED_LISTENING_ASSETS_DIR`)
+/// Copies bundled seed Listening test audio assets (`SEED_LISTENING_ASSETS_DIR`)
 /// into the user's local `$HOME/.imh/listening-assets/` storage, backfilling
 /// each matching `listening_sections.audio_url` to point at a freshly-copied
 /// `section-<N>.mp3` file.
@@ -34,13 +35,17 @@ const SEED_LISTENING_ASSETS_RESOURCE_PATH: &str = "seeds/listening/listening-ass
 /// the user/app) is left untouched, and `audio_url` is only ever backfilled
 /// — never overwritten once set. Individual per-entry problems (an
 /// unreadable subdirectory, an unreadable file, a failed copy, a failed
-/// `audio_url` update) are logged with `eprintln!` and skipped — they never
-/// abort the sync or block app startup. Only a missing `$HOME` is
-/// propagated as `Err`.
+/// `audio_url` update) are logged with `log::warn!`/`log::error!` and
+/// skipped — they never abort the sync or block app startup. A missing seed
+/// source directory is also non-fatal (see [`AssetSyncOutcome::SourceMissing`]):
+/// it's logged loudly with `log::warn!` (including the exact resolved path)
+/// so it's visible in both `tauri dev` and packaged-build logs, but never
+/// blocks startup, since a build may legitimately ship without seed assets.
+/// Only a missing `$HOME` is propagated as `Err`.
 pub async fn sync_listening_assets_to_local_storage(
     pool: &Db,
     app_handle: &tauri::AppHandle,
-) -> Result<(), AppError> {
+) -> Result<AssetSyncOutcome, AppError> {
     let home = std::env::var("HOME")
         .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
     let dest_root = Path::new(&home)
@@ -57,7 +62,23 @@ pub async fn sync_listening_assets_to_local_storage(
                 "failed to resolve listening asset seed resource directory {SEED_LISTENING_ASSETS_RESOURCE_PATH}: {e}"
             ))
         })?;
-    sync_listening_assets_from_dir(pool, &source_dir, &dest_root).await
+
+    let source_exists = tokio::fs::metadata(&source_dir).await.is_ok();
+    log::info!(
+        "[sync_listening_assets_to_local_storage] resolved seed source directory to {} (exists: {source_exists})",
+        source_dir.display()
+    );
+
+    let outcome = sync_listening_assets_from_dir(pool, &source_dir, &dest_root).await?;
+    if let AssetSyncOutcome::SourceMissing { source_dir } = &outcome {
+        log::warn!(
+            "[sync_listening_assets_to_local_storage] seed source directory {} does not exist; no listening test audio was copied. \
+             If this is unexpected (e.g. not an intentionally asset-free build), check `bundle.resources` in tauri.conf.json \
+             and how resources are resolved in this environment.",
+            source_dir.display()
+        );
+    }
+    Ok(outcome)
 }
 
 /// Internal implementation of [`sync_listening_assets_to_local_storage`],
@@ -68,11 +89,10 @@ pub async fn sync_listening_assets_to_local_storage(
 /// `tests/database/listening_assets_migration_test.rs` can call it
 /// directly.
 ///
-/// Unlike `writing_assets_migration::sync_writing_assets_from_dir` (which
-/// treats a missing seed directory as a hard error), a missing
-/// `source_dir` here is not fatal: it's skipped gracefully, returning
-/// `Ok(())`, since there may legitimately be no bundled Listening seed
-/// assets to sync.
+/// A missing `source_dir` is not fatal: it's reported via
+/// `Ok(AssetSyncOutcome::SourceMissing { .. })` rather than `Err`, mirroring
+/// `writing_assets_migration::sync_writing_assets_from_dir` — there may
+/// legitimately be no bundled Listening seed assets to sync.
 ///
 /// Each immediate subdirectory of `source_dir` is treated as a `<test_id>/`
 /// folder (mirroring `writing_assets_migration`'s per-`<task_id>/` seed
@@ -85,28 +105,32 @@ pub async fn sync_listening_assets_from_dir(
     pool: &Db,
     source_dir: &Path,
     dest_root: &Path,
-) -> Result<(), AppError> {
+) -> Result<AssetSyncOutcome, AppError> {
     if tokio::fs::metadata(source_dir).await.is_err() {
-        return Ok(());
+        return Ok(AssetSyncOutcome::SourceMissing {
+            source_dir: source_dir.to_path_buf(),
+        });
     }
 
     let mut entries = match tokio::fs::read_dir(source_dir).await {
         Ok(entries) => entries,
         Err(e) => {
-            eprintln!(
+            log::warn!(
                 "[sync_listening_assets_to_local_storage] failed to read seed directory {}: {e}",
                 source_dir.display()
             );
-            return Ok(());
+            return Ok(AssetSyncOutcome::Synced { copied: 0 });
         }
     };
+
+    let mut copied = 0usize;
 
     loop {
         let entry = match entries.next_entry().await {
             Ok(Some(entry)) => entry,
             Ok(None) => break,
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_listening_assets_to_local_storage] failed to read a directory entry in {}: {e}",
                     source_dir.display()
                 );
@@ -121,7 +145,7 @@ pub async fn sync_listening_assets_from_dir(
             continue;
         }
         let Some(test_id) = test_source_dir.file_name().and_then(|n| n.to_str()) else {
-            eprintln!(
+            log::warn!(
                 "[sync_listening_assets_to_local_storage] skipping non-UTF-8 directory name at {}",
                 test_source_dir.display()
             );
@@ -131,6 +155,7 @@ pub async fn sync_listening_assets_from_dir(
 
         let test_dest_dir = dest_root.join(&test_id);
         let copied_files = copy_dir_additive(&test_source_dir, &test_dest_dir).await;
+        copied += copied_files.len();
 
         for dest_file in copied_files {
             let Some(file_name) = dest_file.file_name().and_then(|n| n.to_str()) else {
@@ -152,14 +177,18 @@ pub async fn sync_listening_assets_from_dir(
             .execute(pool)
             .await
             {
-                eprintln!(
+                log::error!(
                     "[sync_listening_assets_to_local_storage] failed to update audio_url for test {test_id} section {section_number}: {e}"
                 );
             }
         }
     }
 
-    Ok(())
+    log::info!(
+        "[sync_listening_assets_to_local_storage] copied {copied} listening asset file(s) from {}",
+        source_dir.display()
+    );
+    Ok(AssetSyncOutcome::Synced { copied })
 }
 
 /// Parses a seed audio filename's section number, requiring the file
@@ -182,7 +211,7 @@ fn section_number_from_file_name(file_name: &str) -> Option<i64> {
 /// new copies — pre-existing files that were skipped are not included).
 ///
 /// Every per-entry failure (unreadable directory, unreadable file type,
-/// failed read/write) is logged with `eprintln!`
+/// failed read/write) is logged with `log::warn!`
 /// (`[sync_listening_assets_to_local_storage]` prefix) and skipped; it
 /// never aborts the overall walk.
 async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf> {
@@ -194,7 +223,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
         let mut entries = match tokio::fs::read_dir(&src_dir).await {
             Ok(entries) => entries,
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[sync_listening_assets_to_local_storage] failed to read directory {}: {e}",
                     src_dir.display()
                 );
@@ -207,7 +236,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
                 Ok(Some(entry)) => entry,
                 Ok(None) => break,
                 Err(e) => {
-                    eprintln!(
+                    log::warn!(
                         "[sync_listening_assets_to_local_storage] failed to read a directory entry in {}: {e}",
                         src_dir.display()
                     );
@@ -221,7 +250,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
             let file_type = match entry.file_type().await {
                 Ok(file_type) => file_type,
                 Err(e) => {
-                    eprintln!(
+                    log::warn!(
                         "[sync_listening_assets_to_local_storage] failed to read file type for {}: {e}",
                         src_path.display()
                     );
@@ -247,7 +276,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
             }
 
             if let Err(e) = tokio::fs::create_dir_all(&dest_dir).await {
-                eprintln!(
+                log::warn!(
                     "[sync_listening_assets_to_local_storage] failed to create directory {}: {e}",
                     dest_dir.display()
                 );
@@ -257,7 +286,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
             let bytes = match tokio::fs::read(&src_path).await {
                 Ok(bytes) => bytes,
                 Err(e) => {
-                    eprintln!(
+                    log::warn!(
                         "[sync_listening_assets_to_local_storage] failed to read seed asset {}: {e}",
                         src_path.display()
                     );
@@ -266,7 +295,7 @@ async fn copy_dir_additive(source_root: &Path, dest_root: &Path) -> Vec<PathBuf>
             };
 
             if let Err(e) = tokio::fs::write(&dest_path, &bytes).await {
-                eprintln!(
+                log::warn!(
                     "[sync_listening_assets_to_local_storage] failed to write {}: {e}",
                     dest_path.display()
                 );
