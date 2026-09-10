@@ -56,7 +56,13 @@ jobs:
             libssl-dev \
             libxdo-dev \
             patchelf \
-            sqlite3
+            sqlite3 \
+            xdg-utils
+          # xdg-utils provides the `xdg-open` binary, which linuxdeploy
+          # requires while bundling AppImages. It's preinstalled on the
+          # ubuntu-22.04 (x86_64) runner image but not on ubuntu-22.04-arm,
+          # so without it the aarch64 release build fails at the AppImage
+          # bundling step (deb/rpm bundling do not need it).
 
       - name: Install sqlite3 CLI (Windows)
         if: matrix.platform == 'windows-latest' || matrix.platform == 'windows-11-arm'
