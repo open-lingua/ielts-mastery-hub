@@ -39,6 +39,7 @@ import { deleteUserTestSession } from "@/lib/tauri";
 import WritingGradingLoader from "@/components/writing/WritingGradingLoader";
 import WritingResultsDashboard from "@/components/writing/WritingResultsDashboard";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
+import { useAiConfigurationStatus } from "@/hooks/useAiConfigurationStatus";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import { getAnonId } from "@/lib/anonId";
 import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
@@ -402,7 +403,13 @@ const WritingSimulator: React.FC = () => {
     navigate("/tests");
   };
 
+  const { hasActiveConfig, isLoading: isAiConfigLoading } = useAiConfigurationStatus();
+
   const handleStart = async () => {
+    if (!hasActiveConfig) {
+      toast.error("Set up an active AI configuration before starting the Writing test.");
+      return;
+    }
     if (testId) {
       try {
         const active = await fetchActiveSession(userId);
@@ -471,6 +478,11 @@ const WritingSimulator: React.FC = () => {
           sections="2 Tasks"
           questions="2 Essays"
           durationMinutes={60}
+          locked={!isAiConfigLoading && !hasActiveConfig}
+          lockTitle="AI configuration required"
+          lockMessage="The Writing test is graded by AI. Set up and activate an AI configuration before starting."
+          lockActionLabel="Go to AI Configurations"
+          onLockAction={() => navigate("/admin/ai-configurations")}
         >
           {/* ─── Header ─── */}
           <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
