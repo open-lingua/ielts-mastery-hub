@@ -38,8 +38,9 @@
       "icons/icon.png"
     ],
     "resources": {
-      "src/database/seeds/writing/writing-assets": "seeds/writing/writing-assets",
-      "src/database/seeds/listening/listening-assets": "seeds/listening/listening-assets"
+      "src/database/seeds/reading": "seeds/reading",
+      "src/database/seeds/listening": "seeds/listening",
+      "src/database/seeds/writing": "seeds/writing"
     }
   }
 }
