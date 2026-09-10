@@ -56,6 +56,21 @@ Two call sites in `src/ui/lib/tauri.ts` use this:
 
 See [Import & Export Commands](../api-reference/import-export-commands.mdx) and [Listening Test Commands](../api-reference/listening-commands.mdx).
 
+## Seed asset copying vs. schema migrations: why they behave differently
+
+`database::init()` (`src/core/src/database/mod.rs`) runs two very different kinds of startup work back to back:
+
+- **Schema migrations** (`sqlx::migrate!("./src/database/migrations")`) are embedded into the compiled binary at *compile time* (relative to `CARGO_MANIFEST_DIR`), so they run identically and reliably in every environment — dev, CI, and packaged builds.
+- **Seed asset copying** (`writing_assets_migration::sync_writing_assets_to_local_storage` and `listening_assets_migration::sync_listening_assets_to_local_storage`) resolves its bundled source directory at *runtime*, via `app_handle.path().resolve(.., BaseDirectory::Resource)`. This depends on `tauri.conf.json`'s `bundle.resources` entries being resolvable in the current environment, which can differ between `tauri dev` and a packaged build, or simply not exist if the resource bundling step didn't run.
+
+Because of this, it's possible for migrations to always succeed while seed images/audio are missing. To make this loudly visible instead of a silent no-op:
+
+- Both sync functions log the *exact* resolved seed source path and whether it exists, at `info` level, before attempting to copy anything (`log::info!` — visible with `RUST_LOG=info`, the default).
+- If the resolved source directory doesn't exist, a `log::warn!` is emitted with the module's `[sync_writing_assets_to_local_storage]` / `[sync_listening_assets_to_local_storage]` prefix and the attempted path — but the sync still returns `Ok(..)` (specifically `AssetSyncOutcome::SourceMissing`) rather than failing startup, since a build may legitimately ship without bundled seed assets.
+- These logs are visible on stderr in both the `tauri dev` console and packaged-build logs (see `env_logger` initialization in `src/core/src/lib.rs::run()`).
+
+See the [Troubleshooting](./troubleshooting.mdx#missing-seed-images--audio-after-first-run) page if seed images/audio don't appear under `~/.imh/...` after a fresh install.
+
 ## Tauri ACL / capabilities
 
 Tauri 2's permission model is capability-based; adding a new plugin (like `tauri-plugin-dialog`) requires regenerating the ACL/capabilities schema so the plugin's commands are actually allowed to run. `RELEASES.md` records this exact step during the export feature's development:

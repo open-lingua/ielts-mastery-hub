@@ -50,6 +50,10 @@ On startup, the Rust backend (`src/core/src/database/mod.rs`) resolves the platf
 
 To start fresh, quit the app and delete the `imh.db` file (plus any `-wal`/`-shm` companion files) at the path above. On the next `npm run tauri` launch, migrations and seeds will recreate it. See [`docs/database-reset.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/docs/database-reset.md) for repo-specific reset notes and [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md) for how to point `sqlx` CLI tooling at this same file via `DATABASE_URL`.
 
+### Seed asset (image/audio) copying
+
+Schema migrations and SQL seed data always run reliably, but copying bundled seed *asset files* (writing task images, listening audio) into `~/.imh/...` resolves its source directory at runtime and can behave differently in `tauri dev` vs. a packaged build — run with `RUST_LOG=info npm run tauri` to see exactly which seed source paths were resolved and whether they were found. See [Seed asset copying vs. schema migrations](../desktop/file-system-integration.mdx#seed-asset-copying-vs-schema-migrations-why-they-behave-differently) and the [Troubleshooting](../desktop/troubleshooting.mdx#missing-seed-images--audio-after-first-run) page.
+
 ## Dev architecture at a glance
 
 ```mermaid

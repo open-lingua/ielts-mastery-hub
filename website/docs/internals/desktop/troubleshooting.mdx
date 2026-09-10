@@ -16,6 +16,7 @@ title: Troubleshooting Common Issues
 | Database appears locked, corrupted, or stale | Leftover `-wal`/`-shm` files, or manual edits while the app was running | Reset the local database — see below |
 | `cargo`/Rust build failures | Rust toolchain mismatch or missing native deps | Verify `rustc --version`/`cargo --version` match [Prerequisites](../getting-started/prerequisites.mdx); reinstall via `rustup` if needed |
 | Webview devtools don't open automatically | `OPEN_DEVTOOLS` not set | Run with `OPEN_DEVTOOLS=true npm run tauri` (see [Running the App in Development](../getting-started/running-the-app.mdx)) |
+| Seed writing images / listening audio missing from `~/.imh/...` after first run | Seed asset copying resolves its bundled source directory at runtime and can differ across dev/build environments (unlike schema migrations, which are reliable everywhere) | Check the app logs for `[sync_writing_assets_to_local_storage]` / `[sync_listening_assets_to_local_storage]` warnings about an unresolved or missing source directory — see below |
 
 ## Resetting the local database
 
@@ -39,3 +40,16 @@ done
 ```
 
 Simply deleting `imh.db` and relaunching with `npm run tauri` also recreates the schema automatically (migrations run on startup), but seed data must still be applied manually via the loop above.
+
+## Missing seed images / audio after first run
+
+Unlike schema migrations (which are baked into the binary at compile time and always run identically), seed asset copying resolves its bundled source directory at *runtime* — see [Seed asset copying vs. schema migrations](./file-system-integration.mdx#seed-asset-copying-vs-schema-migrations-why-they-behave-differently) for why this can differ between `tauri dev` and a packaged build.
+
+If writing task images or listening test audio are missing from `~/.imh/writing-assets/` or `~/.imh/listening-assets/` after a fresh install:
+
+1. Run the app with `RUST_LOG=info` (or `warn`) set so startup logs are visible, e.g. `RUST_LOG=info npm run tauri dev`.
+2. Look for lines prefixed `[sync_writing_assets_to_local_storage]` / `[sync_listening_assets_to_local_storage]` in the console/log output.
+   - An `info`-level line logs the exact resolved seed source path and whether it exists, on every startup.
+   - A `warn`-level line means the resolved source directory did not exist, so nothing was copied — this is never a hard failure (the app still starts), but it means the seed assets you expected aren't there.
+3. If the source directory is missing unexpectedly, check `bundle.resources` in `src/core/tauri.conf.json` and confirm the corresponding `src/database/seeds/*` directories are present and bundled for your build.
+
