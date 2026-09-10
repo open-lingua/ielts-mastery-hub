@@ -62,7 +62,8 @@ pub async fn complete(
         }
         "claude" => {
             let api_key = get_required(credentials, "apiKey")?;
-            claude_completion(api_key, system_prompt, user_content).await
+            let model = get_optional_model(credentials, CLAUDE_MODEL);
+            claude_completion(api_key, model, system_prompt, user_content).await
         }
         "gemini" => {
             let api_key = get_required(credentials, "apiKey")?;
@@ -130,11 +131,12 @@ async fn openai_compatible_completion(
 
 async fn claude_completion(
     api_key: &str,
+    model: &str,
     system_prompt: &str,
     user_content: &str,
 ) -> Result<String, AppError> {
     let body = serde_json::json!({
-        "model": CLAUDE_MODEL,
+        "model": model,
         "max_tokens": CLAUDE_MAX_TOKENS,
         "system": system_prompt,
         "messages": [
@@ -316,6 +318,18 @@ mod tests {
     fn it_uses_the_configured_model_credential_for_chatgpt_over_the_default() {
         let credentials = creds(&[("apiKey", "sk-test"), ("model", "gpt-4o")]);
         assert_eq!(get_optional_model(&credentials, OPENAI_MODEL), "gpt-4o");
+    }
+
+    #[test]
+    fn it_resolves_the_default_claude_model_when_no_model_credential_is_set() {
+        let credentials = creds(&[("apiKey", "sk-ant-test")]);
+        assert_eq!(get_optional_model(&credentials, CLAUDE_MODEL), CLAUDE_MODEL);
+    }
+
+    #[test]
+    fn it_uses_the_configured_model_credential_for_claude_over_the_default() {
+        let credentials = creds(&[("apiKey", "sk-ant-test"), ("model", "claude-3-7-sonnet-latest")]);
+        assert_eq!(get_optional_model(&credentials, CLAUDE_MODEL), "claude-3-7-sonnet-latest");
     }
 
     #[test]

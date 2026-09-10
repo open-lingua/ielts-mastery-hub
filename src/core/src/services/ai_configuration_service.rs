@@ -11,8 +11,9 @@ use crate::state::AiConfigKey;
 /// frontend's `PROVIDERS` schema (`src/ui/pages/admin/AiConfigurations.tsx`).
 fn required_fields(provider_id: &str) -> Option<&'static [&'static str]> {
     match provider_id {
-        // `model` is optional for `chatgpt`/`gemini` (default to OPENAI_MODEL/GEMINI_MODEL
-        // in ai_provider_client.rs when not set), same as `general`'s optional `model` field.
+        // `model` is optional for `chatgpt`/`gemini`/`claude` (default to
+        // OPENAI_MODEL/GEMINI_MODEL/CLAUDE_MODEL in ai_provider_client.rs when not
+        // set), same as `general`'s optional `model` field.
         "gemini" => Some(&["apiKey"]),
         "chatgpt" => Some(&["apiKey"]),
         "claude" => Some(&["apiKey"]),
