@@ -9,21 +9,12 @@ export async function evaluateWriting(
   userResponse: string
 ): Promise<GradingResult> {
   const userId = getAnonId();
-  // AI API credentials must be set via VITE_AI_API_KEY / VITE_AI_GATEWAY_URL
-  const aiApiKey = import.meta.env.VITE_AI_API_KEY as string | undefined;
-  const aiGatewayUrl = import.meta.env.VITE_AI_GATEWAY_URL as string | undefined;
-
-  if (!aiApiKey || !aiGatewayUrl) {
-    throw new Error("AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)");
-  }
 
   return gradeWriting({
     user_id: userId,
     task_type: taskType,
     prompt: promptText,
     user_response: userResponse,
-    ai_api_key: aiApiKey,
-    ai_gateway_url: aiGatewayUrl,
   });
 }
 

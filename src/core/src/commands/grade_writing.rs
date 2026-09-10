@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::database::Db;
+use crate::services::{ai_configuration_service, ai_provider_client};
+use crate::state::AiConfigKey;
 
 const MAX_RESPONSE_LEN: usize = 10_000;
 const MAX_PROMPT_LEN: usize = 5_000;
@@ -38,8 +40,6 @@ pub struct GradeWritingInput {
     pub prompt: String,
     pub user_response: String,
     pub session_id: Option<String>,
-    pub ai_api_key: String,
-    pub ai_gateway_url: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -71,7 +71,8 @@ pub struct GradingResult {
 
 #[tauri::command]
 pub async fn grade_writing(
-    _db: State<'_, Db>,
+    db: State<'_, Db>,
+    key: State<'_, AiConfigKey>,
     input: GradeWritingInput,
 ) -> Result<GradingResult, String> {
     if input.task_type != "task1" && input.task_type != "task2" {
@@ -100,33 +101,14 @@ pub async fn grade_writing(
         task_label, input.prompt, input.user_response
     );
 
-    let request_body = serde_json::json!({
-        "model": "google/gemini-2.5-flash",
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_content}
-        ],
-        "temperature": 0.3
-    });
+    let (provider_id, credentials) = ai_configuration_service::get_active_credentials(&db, &key)
+        .await
+        .map_err(|e| e.to_string())?
+        .ok_or_else(|| "No AI provider is configured".to_string())?;
 
-    let client = reqwest::Client::new();
-    let response = client
-        .post(&input.ai_gateway_url)
-        .bearer_auth(&input.ai_api_key)
-        .json(&request_body)
-        .send()
+    let content = ai_provider_client::complete(&provider_id, &credentials, SYSTEM_PROMPT, &user_content)
         .await
         .map_err(|e| e.to_string())?;
-
-    if !response.status().is_success() {
-        return Err("AI grading failed".to_string());
-    }
-
-    let ai_data: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
-    let content = ai_data["choices"][0]["message"]["content"]
-        .as_str()
-        .unwrap_or("")
-        .to_string();
 
     let json_str = extract_json(&content);
     serde_json::from_str::<GradingResult>(&json_str)
