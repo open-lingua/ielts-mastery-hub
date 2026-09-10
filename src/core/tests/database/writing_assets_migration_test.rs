@@ -102,6 +102,7 @@ mod to_asset_url_test {
 /// that takes the seed source directory and `$HOME` as arguments so this can
 /// run against temp directories instead of the real seed assets/`$HOME`.
 mod sync_writing_assets_from_dir_test {
+    use app_lib::database::asset_sync::AssetSyncOutcome;
     use app_lib::database::writing_assets_migration::{sync_writing_assets_from_dir, to_asset_url};
     use app_lib::database::Db;
     use app_lib::repositories::{writing_tasks, writing_tests};
@@ -157,7 +158,7 @@ mod sync_writing_assets_from_dir_test {
             sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 1 });
         let dest = home_dir
             .join(".imh")
             .join("writing-assets")
@@ -245,7 +246,7 @@ mod sync_writing_assets_from_dir_test {
             sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 0 });
         let copied = tokio::fs::read(&dest)
             .await
             .expect("destination file should still exist");
@@ -291,7 +292,7 @@ mod sync_writing_assets_from_dir_test {
             sync_writing_assets_from_dir(&pool, &source_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 0 });
         let dest_dir = home_dir.join(".imh").join("writing-assets");
         assert!(
             tokio::fs::metadata(&dest_dir).await.is_err(),
@@ -303,7 +304,7 @@ mod sync_writing_assets_from_dir_test {
     }
 
     #[tokio::test]
-    async fn it_returns_an_error_when_the_source_directory_does_not_exist() {
+    async fn it_is_a_graceful_no_op_when_the_source_directory_does_not_exist() {
         // Arrange
         let pool = test_pool().await;
         let missing_dir = unique_temp_dir("does-not-exist");
@@ -314,6 +315,15 @@ mod sync_writing_assets_from_dir_test {
             sync_writing_assets_from_dir(&pool, &missing_dir, &home_dir.to_string_lossy()).await;
 
         // Assert
-        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap(),
+            AssetSyncOutcome::SourceMissing {
+                source_dir: missing_dir.clone()
+            }
+        );
+        assert!(
+            tokio::fs::metadata(&home_dir).await.is_err(),
+            "no destination directory should be created when the source is missing"
+        );
     }
 }
