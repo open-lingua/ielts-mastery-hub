@@ -89,6 +89,18 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.3.1-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.3.0-rc.2...1.3.1-rc.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* update bun.lockb to include missing autoprefixer dependency ([9686782](https://github.com/open-lingua/ielts-mastery-hub/commit/96867824a6de1a1962117b307b14285cd957990d))
+
+
+### Chores
+
+* migrate bun lockfile to new format ([e4cf2ea](https://github.com/open-lingua/ielts-mastery-hub/commit/e4cf2ea65ca4d2d7e001e73d96d19441bdc1c708))
+
 ## [1.3.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.2.0-rc.2...1.3.0-rc.2) (2026-09-10)
 
 
