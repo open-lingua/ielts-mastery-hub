@@ -5,12 +5,21 @@ use crate::error::AppError;
 const OPENAI_CHAT_COMPLETIONS_URL: &str = "https://api.openai.com/v1/chat/completions";
 const ANTHROPIC_MESSAGES_URL: &str = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION: &str = "2023-06-01";
-const GEMINI_MODEL_URL: &str =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const GEMINI_MODEL_URL_TEMPLATE: &str =
+    "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent";
 
 const OPENAI_MODEL: &str = "gpt-4o-mini";
 const CLAUDE_MODEL: &str = "claude-3-5-sonnet-latest";
 const CLAUDE_MAX_TOKENS: u32 = 2048;
+/// Default Gemini model as of this writing — Google periodically retires older model
+/// versions (e.g. `gemini-1.5-flash` was retired for the `v1beta` API), so this is also
+/// overridable per-configuration via an optional `model` credential, same as `local`/`general`.
+const GEMINI_MODEL: &str = "gemini-2.5-flash";
+
+/// Builds the `generateContent` URL for a given Gemini model name.
+fn gemini_model_url(model: &str) -> String {
+    GEMINI_MODEL_URL_TEMPLATE.replace("{model}", model)
+}
 
 fn get_required<'a>(
     credentials: &'a HashMap<String, String>,
@@ -23,16 +32,16 @@ fn get_required<'a>(
         .ok_or_else(|| AppError::Validation(format!("missing required credential field `{field}`")))
 }
 
-/// `local`/`general` providers let the admin optionally override the model name (e.g. a
-/// locally-pulled Ollama model like `llama3.1`). Falls back to `OPENAI_MODEL` only as a last
-/// resort — that default almost never matches a real local model name, so configuring one
-/// explicitly is strongly recommended for the `local`/`general` providers.
-fn get_optional_model(credentials: &HashMap<String, String>) -> &str {
+/// `local`/`general`/`gemini` providers let the admin optionally override the model name
+/// (e.g. a locally-pulled Ollama model like `llama3.1`, or a newer Gemini model once
+/// `GEMINI_MODEL` is eventually retired too). Falls back to the caller-supplied `default`
+/// when no `model` credential is set.
+fn get_optional_model<'a>(credentials: &'a HashMap<String, String>, default: &'a str) -> &'a str {
     credentials
         .get("model")
         .map(|s| s.as_str())
         .filter(|s| !s.trim().is_empty())
-        .unwrap_or(OPENAI_MODEL)
+        .unwrap_or(default)
 }
 
 /// Dispatches an AI grading completion request to the appropriate provider, isolating
@@ -56,19 +65,20 @@ pub async fn complete(
         }
         "gemini" => {
             let api_key = get_required(credentials, "apiKey")?;
-            gemini_completion(api_key, system_prompt, user_content).await
+            let model = get_optional_model(credentials, GEMINI_MODEL);
+            gemini_completion(api_key, model, system_prompt, user_content).await
         }
         "local" => {
             let endpoint = get_required(credentials, "endpoint")?;
             let url = format!("{}/chat/completions", endpoint.trim_end_matches('/'));
-            let model = get_optional_model(credentials);
+            let model = get_optional_model(credentials, OPENAI_MODEL);
             openai_compatible_completion(&url, None, model, system_prompt, user_content).await
         }
         "general" => {
             let endpoint = get_required(credentials, "endpoint")?;
             let header_name = get_required(credentials, "headerName")?;
             let api_key = credentials.get("apiKey").map(|s| s.as_str()).filter(|s| !s.trim().is_empty());
-            let model = get_optional_model(credentials);
+            let model = get_optional_model(credentials, OPENAI_MODEL);
             general_completion(endpoint, header_name, api_key, model, system_prompt, user_content).await
         }
         other => Err(AppError::Validation(format!("unknown AI provider: {other}"))),
@@ -177,6 +187,7 @@ async fn failure_error(response: reqwest::Response) -> AppError {
 
 async fn gemini_completion(
     api_key: &str,
+    model: &str,
     system_prompt: &str,
     user_content: &str,
 ) -> Result<String, AppError> {
@@ -191,7 +202,7 @@ async fn gemini_completion(
     });
 
     let client = reqwest::Client::new();
-    let url = format!("{GEMINI_MODEL_URL}?key={}", urlencode(api_key));
+    let url = format!("{}?key={}", gemini_model_url(model), urlencode(api_key));
     let response = client
         .post(&url)
         .json(&body)
@@ -269,6 +280,35 @@ mod tests {
             .iter()
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect()
+    }
+
+    #[test]
+    fn it_builds_the_gemini_url_with_the_default_model() {
+        assert_eq!(
+            gemini_model_url(GEMINI_MODEL),
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        );
+    }
+
+    #[test]
+    fn it_builds_the_gemini_url_with_an_overridden_model() {
+        assert_eq!(
+            gemini_model_url("gemini-2.0-flash"),
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        );
+    }
+
+    #[test]
+    fn it_falls_back_to_the_supplied_default_when_no_model_credential_is_set() {
+        let credentials = HashMap::new();
+        assert_eq!(get_optional_model(&credentials, GEMINI_MODEL), GEMINI_MODEL);
+        assert_eq!(get_optional_model(&credentials, OPENAI_MODEL), OPENAI_MODEL);
+    }
+
+    #[test]
+    fn it_uses_the_configured_model_credential_over_the_default() {
+        let credentials = creds(&[("model", "gemini-2.5-pro")]);
+        assert_eq!(get_optional_model(&credentials, GEMINI_MODEL), "gemini-2.5-pro");
     }
 
     #[tokio::test]
