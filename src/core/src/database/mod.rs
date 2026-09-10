@@ -5,6 +5,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use crate::error::AppError;
 
 pub mod listening_assets_migration;
+pub mod seed_data;
 pub mod writing_assets_migration;
 
 pub type Db = sqlx::SqlitePool;
@@ -89,10 +90,7 @@ pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .set_ignore_missing(true)
         .run(&pool)
         .await?;
-    sqlx::migrate!("./src/database/seeds")
-        .set_ignore_missing(true)
-        .run(&pool)
-        .await?;
+    seed_data::run_seed_data(&pool, app_handle).await?;
     writing_assets_migration::sync_writing_assets_to_local_storage(&pool, app_handle).await?;
     listening_assets_migration::sync_listening_assets_to_local_storage(&pool, app_handle).await?;
     Ok(pool)
