@@ -89,6 +89,27 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.5.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.4.0-rc.2...1.5.0-rc.2) (2026-09-10)
+
+
+### Features
+
+* add preStartContent slot to TestStartOverlay ... ([e4f59cc](https://github.com/open-lingua/ielts-mastery-hub/commit/e4f59cc9f5ec662ed4719bfa05643ee5c71599ed))
+* add unscored mode to Writing test ... ([f414938](https://github.com/open-lingua/ielts-mastery-hub/commit/f41493824dcb0305ac3cf4a59afb2c32ca54502d))
+* make ChatGPT model name configurable; update docs ([7e99014](https://github.com/open-lingua/ielts-mastery-hub/commit/7e99014d97ad6aad504bdfb77055fbb17e7eb88d))
+* make Claude model name configurable to fix 404 on retired model aliases ([000c63f](https://github.com/open-lingua/ielts-mastery-hub/commit/000c63f9d493b23f026e7499e06b5a8ac499ac04))
+* make Gemini model name configurable; update default to gemini-2.5-flash ([ee89ed2](https://github.com/open-lingua/ielts-mastery-hub/commit/ee89ed2ccbbac16911c7154a609f54ac8174995c))
+
+
+### Tests
+
+* add WritingSimulator integration tests for AI configuration gate ([ee9c61a](https://github.com/open-lingua/ielts-mastery-hub/commit/ee9c61acd36d286b44636bb23acfe4e1c2a8a2b4))
+
+
+### Chores
+
+* mark .sh and .ps1 as linguist-detectable=false ([5360921](https://github.com/open-lingua/ielts-mastery-hub/commit/5360921c2994bb27f871417cd07ebd9d15ccfd0d))
+
 ## [1.4.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.3.1-rc.2...1.4.0-rc.2) (2026-09-10)
 
 
