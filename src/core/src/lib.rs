@@ -37,6 +37,7 @@ pub fn run() {
             commands::ai_configurations::list_ai_configurations,
             commands::ai_configurations::save_ai_configuration,
             commands::ai_configurations::delete_ai_configuration,
+            commands::ai_configurations::activate_ai_configuration,
             commands::profiles::get_profiles,
             commands::profiles::list_profiles,
             commands::profiles::create_profiles,
