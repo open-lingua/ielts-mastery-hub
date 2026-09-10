@@ -11,6 +11,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             if std::env::var("OPEN_DEVTOOLS").as_deref() == Ok("true") {
                 if let Some(window) = app.get_webview_window("main") {
@@ -96,6 +97,7 @@ pub fn run() {
             commands::import::import_reading_test,
             commands::import::import_writing_test,
             commands::import::import_listening_test,
+            commands::update::check_for_update,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

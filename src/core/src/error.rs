@@ -12,6 +12,8 @@ pub enum AppError {
     Validation(String),
     #[error("serialization error: {0}")]
     Serialization(#[from] serde_json::Error),
+    #[error("update check failed: {0}")]
+    UpdateCheck(String),
 }
 
 impl From<AppError> for String {

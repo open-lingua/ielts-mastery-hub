@@ -1,1 +1,1 @@
-{}
+{"default":{"identifier":"default","description":"Default capability for the main window. Grants the frontend permission to invoke `@tauri-apps/plugin-opener`'s `openUrl`, used to open the GitHub release page in the OS default browser when the user clicks the \"Update available\" control.","local":true,"windows":["main"],"permissions":["opener:default"]}}
