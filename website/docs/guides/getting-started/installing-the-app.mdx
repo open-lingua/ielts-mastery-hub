@@ -37,7 +37,7 @@ work when a script is piped into `iex`):
 &([scriptblock]::Create((irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1))) -Package msi
 ```
 
-:::warning Elevation & SmartScreen
+:::warning Elevation &amp; SmartScreen
 The installer may require Administrator privileges (UAC) depending on the
 install location. Windows builds are currently **unsigned**, so SmartScreen
 may show an "unknown publisher" warning — choose **More info → Run
@@ -52,16 +52,12 @@ The Unix script reads a few optional environment variables:
 
 | Variable      | Purpose                                                                 | Default                        |
 |---------------|--------------------------------------------------------------------------|---------------------------------|
-| `v`           | Version to install, e.g. `v=1.0.1-rc.2`                                   | Latest GitHub release           |
 | `IMH_INSTALL` | Install directory                                                         | `$HOME/.ielts-mastery-hub`      |
 | `IMH_PACKAGE` | Package format: `appimage`, `deb`, `rpm` (Linux) or `dmg`, `app` (macOS) | Auto-detected for your platform |
 
 Examples:
 
 ```bash
-# Install a specific version
-v=1.0.1-rc.2 curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
-
 # Force a .deb install on a Debian/Ubuntu system
 IMH_PACKAGE=deb curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
 
@@ -112,7 +108,7 @@ irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 -OutFile
 ### Linux / macOS
 
 1. Detects your OS/architecture (`macOS arm64/x86_64`, `Linux amd64/aarch64`).
-2. Resolves the version to install (latest release, unless `v` is set).
+2. Resolves the version to install (latest release by default).
 3. Picks a package format (`AppImage`/`.deb`/`.rpm` on Linux, `.dmg`/`.app` on
    macOS), auto-detecting the best fit for Linux based on available tools.
 4. Downloads the matching asset from the
