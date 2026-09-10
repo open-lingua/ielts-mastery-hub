@@ -1,4 +1,9 @@
-import { listAiConfigurations, saveAiConfiguration as saveAiConfigurationCommand } from "@/lib/tauri";
+import {
+  activateAiConfiguration as activateAiConfigurationCommand,
+  deleteAiConfiguration as deleteAiConfigurationCommand,
+  listAiConfigurations,
+  saveAiConfiguration as saveAiConfigurationCommand,
+} from "@/lib/tauri";
 
 export interface AiConfigurationState {
   configuredMap: Record<string, boolean>;
@@ -33,4 +38,22 @@ export async function saveAiConfiguration(
 ): Promise<{ configured: boolean; isActive: boolean }> {
   const summary = await saveAiConfigurationCommand(providerId, credentials);
   return { configured: summary.configured, isActive: summary.isActive };
+}
+
+/**
+ * Reactivates an already-configured provider without touching its stored
+ * credentials, deactivating whichever provider was previously active.
+ */
+export async function activateAiConfiguration(providerId: string): Promise<{ isActive: boolean }> {
+  const summary = await activateAiConfigurationCommand(providerId);
+  return { isActive: summary.isActive };
+}
+
+/**
+ * Permanently removes a provider's stored credentials and deactivates it. Named
+ * `removeAiConfiguration` (rather than `deleteAiConfiguration`) to avoid shadowing the
+ * `lib/tauri.ts` wrapper it delegates to.
+ */
+export async function removeAiConfiguration(providerId: string): Promise<void> {
+  await deleteAiConfigurationCommand(providerId);
 }

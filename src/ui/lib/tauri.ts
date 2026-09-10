@@ -707,6 +707,10 @@ export async function deleteAiConfiguration(providerId: string): Promise<void> {
   return invoke<void>("delete_ai_configuration", { providerId });
 }
 
+export async function activateAiConfiguration(providerId: string): Promise<AiConfigurationSummary> {
+  return invoke<AiConfigurationSummary>("activate_ai_configuration", { providerId });
+}
+
 // ── update check ───────────────────────────────────────────────────────────
 
 export interface UpdateCheckResult {

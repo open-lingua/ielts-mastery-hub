@@ -6,23 +6,41 @@ import {
   EyeOff,
   Globe,
   HardDrive,
+  Loader2,
   MessageSquareText,
   RotateCcw,
   Save,
   Sparkles,
+  Trash2,
   Zap,
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { fetchAiConfigurations, saveAiConfiguration } from "@/services/aiConfigurationService";
+import {
+  activateAiConfiguration,
+  fetchAiConfigurations,
+  removeAiConfiguration,
+  saveAiConfiguration,
+} from "@/services/aiConfigurationService";
 
 // ── Types ──────────────────────────────────────────────────
 type ProviderId = "gemini" | "chatgpt" | "claude" | "local" | "general";
@@ -266,6 +284,10 @@ const AiConfigurations: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [activateState, setActivateState] = useState<"idle" | "activating">("idle");
+  const [activateError, setActivateError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProviderId | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -314,6 +336,7 @@ const AiConfigurations: React.FC = () => {
     setSelectedId(id);
     setSaveState("idle");
     setSaveError(null);
+    setActivateError(null);
   };
 
   const handleSave = async () => {
@@ -337,8 +360,44 @@ const AiConfigurations: React.FC = () => {
     setSaveError(null);
   };
 
+  const handleActivate = async () => {
+    setActivateState("activating");
+    setActivateError(null);
+    try {
+      const result = await activateAiConfiguration(selectedId);
+      if (result.isActive) setActiveId(selectedId);
+    } catch (err) {
+      setActivateError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setActivateState("idle");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const providerId = deleteTarget;
+    setDeleting(true);
+    try {
+      await removeAiConfiguration(providerId);
+      setConfigured((prev) => ({ ...prev, [providerId]: false }));
+      setActiveId((prev) => (prev === providerId ? null : prev));
+      setDrafts((prev) => ({ ...prev, [providerId]: {} }));
+      toast({ title: `${PROVIDERS.find((p) => p.id === providerId)?.name ?? providerId} configuration deleted` });
+    } catch (err) {
+      toast({
+        title: "Failed to delete configuration",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
+
   const isActiveProvider = activeId === selectedId;
   const ProviderIcon = provider.icon;
+  const deleteTargetProvider = PROVIDERS.find((p) => p.id === deleteTarget);
 
   return (
     <AdminLayout>
@@ -427,7 +486,46 @@ const AiConfigurations: React.FC = () => {
                     </div>
                     <p className="text-sm text-muted-foreground">{provider.tagline}</p>
                   </div>
+                  {!!configured[selectedId] && (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {!isActiveProvider && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleActivate}
+                          disabled={activateState === "activating"}
+                          className="gap-1.5"
+                        >
+                          {activateState === "activating" ? (
+                            <Loader2 size={14} strokeWidth={2} className="animate-spin" />
+                          ) : (
+                            <Zap size={14} strokeWidth={2} />
+                          )}
+                          Set as active
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteTarget(selectedId)}
+                        className="gap-1.5 text-destructive hover:text-destructive"
+                        aria-label={`Delete ${provider.name} configuration`}
+                      >
+                        <Trash2 size={14} strokeWidth={2} />
+                        Delete
+                      </Button>
+                    </div>
+                  )}
                 </div>
+
+                {activateError && (
+                  <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-2 text-xs text-destructive">
+                    <AlertCircle size={14} className="shrink-0" />
+                    Failed to activate configuration: {activateError}
+                  </div>
+                )}
 
                 <div className="space-y-5 mb-8">
                   {provider.fields.map((f) => (
@@ -489,6 +587,34 @@ const AiConfigurations: React.FC = () => {
         </Card>
         )}
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && !deleting && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{deleteTargetProvider?.name}" configuration?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the stored credentials for {deleteTargetProvider?.name} and deactivate it
+              if it's currently the active provider. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
