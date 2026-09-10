@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { checkForUpdate, openReleaseUrl } from "@/lib/tauri";
-import { fetchAiConfigurations, saveAiConfiguration } from "@/services/aiConfigurationService";
+import { fetchAiConfigurations, saveAiConfiguration, activateAiConfiguration, removeAiConfiguration } from "@/services/aiConfigurationService";
 
 vi.mock("@/contexts/ThemeContext", () => ({
   useTheme: () => ({ theme: "light", toggleTheme: vi.fn() }),
@@ -18,6 +18,8 @@ vi.mock("@/lib/tauri", () => ({
 vi.mock("@/services/aiConfigurationService", () => ({
   fetchAiConfigurations: vi.fn(),
   saveAiConfiguration: vi.fn(),
+  activateAiConfiguration: vi.fn(),
+  removeAiConfiguration: vi.fn(),
 }));
 
 import AiConfigurations from "../AiConfigurations";
@@ -26,6 +28,8 @@ const mockCheckForUpdate = vi.mocked(checkForUpdate);
 const mockOpenReleaseUrl = vi.mocked(openReleaseUrl);
 const mockFetchAiConfigurations = vi.mocked(fetchAiConfigurations);
 const mockSaveAiConfiguration = vi.mocked(saveAiConfiguration);
+const mockActivateAiConfiguration = vi.mocked(activateAiConfiguration);
+const mockRemoveAiConfiguration = vi.mocked(removeAiConfiguration);
 
 const renderPage = () =>
   render(
@@ -45,10 +49,12 @@ describe("AiConfigurations", () => {
       releaseUrl: "https://example.com/releases/current",
     });
     mockFetchAiConfigurations.mockResolvedValue({
-      configuredMap: { claude: true },
+      configuredMap: { claude: true, gemini: true },
       activeProviderId: "claude",
     });
     mockSaveAiConfiguration.mockResolvedValue({ configured: true, isActive: true });
+    mockActivateAiConfiguration.mockResolvedValue({ isActive: true });
+    mockRemoveAiConfiguration.mockResolvedValue(undefined);
   });
 
   it("shows a loading state while configurations are being fetched", () => {
@@ -178,5 +184,94 @@ describe("AiConfigurations", () => {
     await user.click(await screen.findByText("General"));
     expect(screen.getAllByText("REQUIRED").length).toBe(2);
     expect(screen.getAllByText("OPTIONAL").length).toBe(1);
+  });
+
+  it("hides the set-as-active button for the active provider and shows it for a configured inactive one", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Claude" });
+    expect(screen.queryByRole("button", { name: /set as active/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByText("Gemini"));
+    expect(await screen.findByRole("button", { name: /set as active/i })).toBeInTheDocument();
+  });
+
+  it("activates a configured provider and marks it as the active one", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(await screen.findByText("Gemini"));
+    await user.click(await screen.findByRole("button", { name: /set as active/i }));
+
+    expect(mockActivateAiConfiguration).toHaveBeenCalledWith("gemini");
+    expect(await screen.findAllByText("ACTIVE")).not.toHaveLength(0);
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /set as active/i })).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows an error when activation fails", async () => {
+    const user = userEvent.setup();
+    mockActivateAiConfiguration.mockRejectedValue(new Error("provider not configured"));
+    renderPage();
+
+    await user.click(await screen.findByText("Gemini"));
+    await user.click(await screen.findByRole("button", { name: /set as active/i }));
+
+    expect(await screen.findByText(/failed to activate configuration/i)).toBeInTheDocument();
+    expect(screen.getByText(/provider not configured/i)).toBeInTheDocument();
+  });
+
+  it("opens a delete confirmation dialog and cancels without deleting", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Claude" });
+    await user.click(screen.getByRole("button", { name: "Delete Claude configuration" }));
+
+    expect(await screen.findByText('Delete "Claude" configuration?')).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Delete "Claude" configuration?')).not.toBeInTheDocument();
+    });
+    expect(mockRemoveAiConfiguration).not.toHaveBeenCalled();
+  });
+
+  it("deletes the configuration on confirm and updates the provider's state", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Claude" });
+    await user.click(screen.getByRole("button", { name: "Delete Claude configuration" }));
+    await screen.findByText('Delete "Claude" configuration?');
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    expect(mockRemoveAiConfiguration).toHaveBeenCalledWith("claude");
+    await waitFor(() => {
+      expect(screen.queryByText('Delete "Claude" configuration?')).not.toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Delete Claude configuration" })).not.toBeInTheDocument();
+    });
+    expect(screen.queryAllByText("ACTIVE")).toHaveLength(0);
+  });
+
+  it("closes the dialog and leaves the provider unchanged when delete fails", async () => {
+    const user = userEvent.setup();
+    mockRemoveAiConfiguration.mockRejectedValue(new Error("could not delete"));
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Claude" });
+    await user.click(screen.getByRole("button", { name: "Delete Claude configuration" }));
+    await screen.findByText('Delete "Claude" configuration?');
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Delete "Claude" configuration?')).not.toBeInTheDocument();
+    });
+    // The provider stays configured since the delete call failed.
+    expect(screen.getByRole("button", { name: "Delete Claude configuration" })).toBeInTheDocument();
   });
 });
