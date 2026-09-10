@@ -89,6 +89,30 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.3.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.2.0-rc.2...1.3.0-rc.2) (2026-09-10)
+
+
+### Features
+
+* add GitHub release update check service and Tauri command ([1ae6399](https://github.com/open-lingua/ielts-mastery-hub/commit/1ae6399b7882e97bb7c130960c431c0773edcf0c))
+* resolve seed asset paths at runtime via Tauri resource API ([e012c65](https://github.com/open-lingua/ielts-mastery-hub/commit/e012c659ec13d4400bdade5cc4173ce0acb30c29))
+* **update:** wire real update check via GitHub API and open release URL with tauri-plugin-opener ([01eb417](https://github.com/open-lingua/ielts-mastery-hub/commit/01eb417ea3530798d11840dd85a55db3db0caa14))
+
+
+### Documentation
+
+* **website:** fix HTML entity and remove version env var from install guide ([1bb6d9c](https://github.com/open-lingua/ielts-mastery-hub/commit/1bb6d9c2fad1cd28a8f6afee4452f9a7e42a4e0f))
+
+
+### Tests
+
+* add integration and unit tests for update check ([cd564ca](https://github.com/open-lingua/ielts-mastery-hub/commit/cd564ca4dab7b8e0f9bf4e8dd17a74d6b0b6889a))
+
+
+### Chores
+
+* mark .sh and .ps1 installer scripts in .gitattributes ([f0b9e49](https://github.com/open-lingua/ielts-mastery-hub/commit/f0b9e497ae72eaafa958244c9da2d34d7989d116))
+
 ## [1.2.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.1.0-rc.2...1.2.0-rc.2) (2026-09-09)
 
 
