@@ -89,6 +89,18 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.2.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.1.0-rc.2...1.2.0-rc.2) (2026-09-09)
+
+
+### Features
+
+* **website:** add PowerShell Windows installer script ([9bbee6d](https://github.com/open-lingua/ielts-mastery-hub/commit/9bbee6deeee8b619d5493f5095e3919a709f1dcf))
+
+
+### Documentation
+
+* **website:** add Windows PowerShell installer instructions to install guide ([eda0f62](https://github.com/open-lingua/ielts-mastery-hub/commit/eda0f62086a48bd22d3883f43c59b1cd3cbbfb8b))
+
 ## [1.1.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.0.1-rc.2...1.1.0-rc.2) (2026-09-09)
 
 
