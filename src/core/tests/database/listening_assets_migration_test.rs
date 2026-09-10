@@ -6,6 +6,7 @@
 //! destination root as arguments so this can run against temp directories
 //! and a test database instead of the real seed assets/`$HOME`.
 mod sync_listening_assets_from_dir_test {
+    use app_lib::database::asset_sync::AssetSyncOutcome;
     use app_lib::database::listening_assets_migration::sync_listening_assets_from_dir;
     use app_lib::database::Db;
     use app_lib::repositories::listening_sections;
@@ -74,7 +75,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 1 });
         let copied = tokio::fs::read(
             dest_dir
                 .join(test_id)
@@ -123,7 +124,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 0 });
         let contents = tokio::fs::read(dest_tts_dir.join("section-1-tts-config.json"))
             .await
             .expect("destination file should still exist");
@@ -172,7 +173,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 1 });
         let unrelated = tokio::fs::read(dest_test_dir.join("section-1-audio.mp3"))
             .await
             .expect("unrelated existing file should be preserved");
@@ -202,7 +203,12 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &missing_source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(
+            result.unwrap(),
+            AssetSyncOutcome::SourceMissing {
+                source_dir: missing_source_dir.clone()
+            }
+        );
         assert!(
             tokio::fs::metadata(&dest_dir).await.is_err(),
             "no destination directory should be created when the source is missing"
@@ -240,7 +246,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 1 });
         let dest_audio_path = dest_dir.join(test_id).join("section-2.mp3");
         let copied = tokio::fs::read(&dest_audio_path)
             .await
@@ -322,7 +328,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 0 });
         let dest_audio_path = dest_dir.join(test_id).join("section-3.mp3");
         let copied = tokio::fs::read(&dest_audio_path)
             .await
@@ -369,7 +375,7 @@ mod sync_listening_assets_from_dir_test {
         let result = sync_listening_assets_from_dir(&pool, &source_dir, &dest_dir).await;
 
         // Assert
-        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), AssetSyncOutcome::Synced { copied: 1 });
         let copied = tokio::fs::read(dest_dir.join(test_id).join("section-1.mp3"))
             .await
             .expect("destination audio file should still be copied");
