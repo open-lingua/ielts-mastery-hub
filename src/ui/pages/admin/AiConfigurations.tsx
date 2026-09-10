@@ -133,6 +133,14 @@ const PROVIDERS: Provider[] = [
         required: true,
         hint: "Issued from console.anthropic.com.",
       },
+      {
+        key: "model",
+        label: "Model Name",
+        type: "text",
+        placeholder: "claude-3-5-sonnet-latest",
+        required: false,
+        hint: "Defaults to claude-3-5-sonnet-latest if left blank. Check Anthropic's current model list to override.",
+      },
     ],
   },
   {
