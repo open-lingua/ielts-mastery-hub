@@ -89,6 +89,24 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.6.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.5.0-rc.2...1.6.0-rc.2) (2026-09-10)
+
+
+### Features
+
+* add log/env_logger and initialize logger at startup ([1b67992](https://github.com/open-lingua/ielts-mastery-hub/commit/1b67992d9936ca91eab2a4341a2a8b46ac34ef6c))
+* structured AssetSyncOutcome + replace eprintln with log macros ([1e986c4](https://github.com/open-lingua/ielts-mastery-hub/commit/1e986c49fbd601497207f8262259c5d5d945e376))
+
+
+### Documentation
+
+* document seed asset sync logging and troubleshooting ([d3a2dff](https://github.com/open-lingua/ielts-mastery-hub/commit/d3a2dff0332bef814284bec02fb36e79a5ae8ca8))
+
+
+### Tests
+
+* update asset sync tests to assert on AssetSyncOutcome ([f509d58](https://github.com/open-lingua/ielts-mastery-hub/commit/f509d582235c85305ab3a116d9daff4b3c5d3198))
+
 ## [1.5.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.4.0-rc.2...1.5.0-rc.2) (2026-09-10)
 
 
