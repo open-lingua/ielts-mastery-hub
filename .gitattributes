@@ -13,6 +13,10 @@ src/ui/index.html linguist-generated
 *.md linguist-documentation
 *.mdx linguist-documentation
 
+# Installer scripts (website/static/install/install.sh, install.ps1)
+*.sh
+*.ps1
+
 # Lock files
 *.lockb           linguist-generated
 Cargo.lock        linguist-generated
