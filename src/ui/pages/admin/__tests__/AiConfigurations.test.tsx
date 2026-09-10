@@ -183,7 +183,7 @@ describe("AiConfigurations", () => {
 
     await user.click(await screen.findByText("General"));
     expect(screen.getAllByText("REQUIRED").length).toBe(2);
-    expect(screen.getAllByText("OPTIONAL").length).toBe(1);
+    expect(screen.getAllByText("OPTIONAL").length).toBe(2);
   });
 
   it("hides the set-as-active button for the active provider and shows it for a configured inactive one", async () => {
