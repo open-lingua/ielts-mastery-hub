@@ -1,3 +1,4 @@
+pub mod ai_configurations;
 pub mod import;
 pub mod listening_question_groups;
 pub mod listening_questions;
