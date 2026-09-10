@@ -1,4 +1,5 @@
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import type { PaginatedResponse } from "@/types/pagination";
 
 // ── Shared response types (snake_case — no serde rename_all on Rust structs) ──
@@ -662,11 +663,7 @@ export interface ExportResult {
   warnings: string[];
 }
 
-export async function exportTestToZip(
-  userId: string,
-  kind: ImportKind,
-  id: string
-): Promise<ExportResult | null> {
+export async function exportTestToZip(userId: string, kind: ImportKind, id: string): Promise<ExportResult | null> {
   return invoke<ExportResult | null>("export_test_to_zip", { userId, kind, id });
 }
 
@@ -682,4 +679,20 @@ export async function gradeWriting(input: {
   ai_gateway_url: string;
 }): Promise<GradingResult> {
   return invoke<GradingResult>("grade_writing", { input });
+}
+
+// ── update check ───────────────────────────────────────────────────────────
+
+export interface UpdateCheckResult {
+  latestVersion: string;
+  releaseUrl: string;
+}
+
+export async function checkForUpdate(): Promise<UpdateCheckResult> {
+  return invoke<UpdateCheckResult>("check_for_update");
+}
+
+/** Opens a URL (e.g. a GitHub release page) in the user's default browser. */
+export async function openReleaseUrl(url: string): Promise<void> {
+  await openUrl(url);
 }

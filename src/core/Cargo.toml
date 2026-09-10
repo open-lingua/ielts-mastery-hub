@@ -19,6 +19,7 @@ thiserror = "2.0.20"
 sqlx = { version = "0.9.0", features = ["sqlite", "runtime-tokio", "macros", "migrate"] }
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 tauri-plugin-dialog = "2.7.2"
+tauri-plugin-opener = "2"
 
 [build-dependencies]
 tauri-build = { version = "2.6.3", features = [] }
@@ -29,3 +30,4 @@ mockall = "0.13"
 rstest = "0.23"
 pretty_assertions = "1.4"
 assert_matches = "1.5"
+wiremock = "0.6"

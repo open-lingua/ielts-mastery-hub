@@ -12,6 +12,7 @@ pub mod reading_question_groups;
 pub mod reading_questions;
 pub mod reading_tests;
 pub mod storage;
+pub mod update;
 pub mod user_roles;
 pub mod user_test_sessions;
 pub mod writing_tasks;
