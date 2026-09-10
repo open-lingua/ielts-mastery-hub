@@ -11,6 +11,14 @@ use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Ensure warn!/info!/error! logs (e.g. from database::writing_assets_migration and
+    // database::listening_assets_migration) are visible on stderr in both `tauri dev` and
+    // packaged builds. Defaults to `info` level when `RUST_LOG` is unset. `try_init` (rather
+    // than `init`) is used so a second call (e.g. from tests that also initialize a logger)
+    // never panics.
+    let _ = env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .try_init();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
