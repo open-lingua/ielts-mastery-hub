@@ -2952,7 +2952,7 @@ dependencies = [
 
 [[package]]
 name = "open-lingua-ielts-mastery-hub-core"
-version = "1.4.0-rc.2"
+version = "1.5.0-rc.2"
 dependencies = [
  "aes-gcm",
  "assert_matches",
