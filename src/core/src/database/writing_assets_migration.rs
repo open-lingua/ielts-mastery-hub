@@ -1,23 +1,20 @@
 use std::path::{Path, PathBuf};
 
+use tauri::Manager;
+
 use crate::database::Db;
 use crate::error::AppError;
 
-/// Directory bundling seed images for Writing Task 1 prompts, whose
-/// filenames (stem) are `writing_tasks.id` values. Resolved at compile time
-/// relative to this crate, mirroring the crate-relative style used by
-/// `sqlx::migrate!("./src/database/seeds")` in `database::init`.
+/// Resource-relative path (as configured in `tauri.conf.json`'s
+/// `bundle.resources`) to the directory bundling seed images for Writing
+/// Task 1 prompts, whose filenames (stem) are `writing_tasks.id` values.
 ///
-/// Caveat: unlike `sqlx::migrate!` (which embeds file *contents* into the
-/// binary at compile time), this only embeds the *path* to the source tree.
-/// It only resolves correctly when the running binary can still reach that
-/// path on disk (e.g. dev builds / running from a repo checkout) — a
-/// distributed production bundle would need a different mechanism (e.g.
-/// Tauri bundled resources or `include_bytes!` via a build script).
-const SEED_WRITING_ASSETS_DIR: &str = concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/src/database/seeds/writing/writing-assets"
-);
+/// Resolved at *runtime* via `tauri::Manager::path()`'s
+/// `resolve(.., BaseDirectory::Resource)`, so it works both in dev (Tauri
+/// resolves resources relative to the crate/source tree) and in a
+/// distributed production bundle (resolved relative to the bundled app's
+/// Resources directory) — see `sync_writing_assets_to_local_storage`.
+const SEED_WRITING_ASSETS_RESOURCE_PATH: &str = "seeds/writing/writing-assets";
 
 /// Splits a seed asset filename (e.g. `"<uuid>.jpeg"`) into its
 /// `(task_id, ext)` stem/extension pair, splitting on the last `.`. Returns
@@ -96,10 +93,24 @@ pub fn to_asset_url(path: &Path) -> String {
 /// skipped — they never abort the sync or block app startup. Only a failure
 /// to read the seed directory itself, or a missing `$HOME`, is propagated as
 /// `Err`
-pub async fn sync_writing_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
+pub async fn sync_writing_assets_to_local_storage(
+    pool: &Db,
+    app_handle: &tauri::AppHandle,
+) -> Result<(), AppError> {
     let home = std::env::var("HOME")
         .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
-    sync_writing_assets_from_dir(pool, Path::new(SEED_WRITING_ASSETS_DIR), &home).await
+    let source_dir = app_handle
+        .path()
+        .resolve(
+            SEED_WRITING_ASSETS_RESOURCE_PATH,
+            tauri::path::BaseDirectory::Resource,
+        )
+        .map_err(|e| {
+            AppError::Validation(format!(
+                "failed to resolve writing asset seed resource directory {SEED_WRITING_ASSETS_RESOURCE_PATH}: {e}"
+            ))
+        })?;
+    sync_writing_assets_from_dir(pool, &source_dir, &home).await
 }
 
 /// Internal implementation of [`sync_writing_assets_to_local_storage`],

@@ -1,5 +1,7 @@
 use std::path::{Path, PathBuf};
 
+use tauri::Manager;
+
 use crate::database::Db;
 use crate::error::AppError;
 
@@ -9,20 +11,17 @@ use crate::error::AppError;
 /// `$HOME/.imh/listening-assets/<test_id>/` convention.
 pub const LISTENING_ASSETS_DIR_NAME: &str = "listening-assets";
 
-/// Directory bundling seed Listening test assets, keyed by `<test_id>/`
-/// subfolder (currently `tts-config/*.json` files and, once generated,
-/// `section-<N>.mp3` audio files). Resolved at compile time relative to
-/// this crate, mirroring the crate-relative style used by
-/// `writing_assets_migration::SEED_WRITING_ASSETS_DIR`.
+/// Resource-relative path (as configured in `tauri.conf.json`'s
+/// `bundle.resources`) to the directory bundling seed Listening test
+/// assets, keyed by `<test_id>/` subfolder (currently `tts-config/*.json`
+/// files and, once generated, `section-<N>.mp3` audio files).
 ///
-/// Same caveat as `SEED_WRITING_ASSETS_DIR`: this only embeds the *path* to
-/// the source tree, not its contents, so it only resolves correctly when
-/// the running binary can still reach that path on disk (dev builds /
-/// running from a repo checkout).
-const SEED_LISTENING_ASSETS_DIR: &str = concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/src/database/seeds/listening/listening-assets"
-);
+/// Resolved at *runtime* via `tauri::Manager::path()`'s
+/// `resolve(.., BaseDirectory::Resource)`, mirroring
+/// `writing_assets_migration::SEED_WRITING_ASSETS_RESOURCE_PATH` — see that
+/// module's docs for why this must be resolved at runtime rather than baked
+/// in at compile time.
+const SEED_LISTENING_ASSETS_RESOURCE_PATH: &str = "seeds/listening/listening-assets";
 
 /// Copies bundled seed Listening test assets (`SEED_LISTENING_ASSETS_DIR`)
 /// into the user's local `$HOME/.imh/listening-assets/` storage, backfilling
@@ -38,13 +37,27 @@ const SEED_LISTENING_ASSETS_DIR: &str = concat!(
 /// `audio_url` update) are logged with `eprintln!` and skipped — they never
 /// abort the sync or block app startup. Only a missing `$HOME` is
 /// propagated as `Err`.
-pub async fn sync_listening_assets_to_local_storage(pool: &Db) -> Result<(), AppError> {
+pub async fn sync_listening_assets_to_local_storage(
+    pool: &Db,
+    app_handle: &tauri::AppHandle,
+) -> Result<(), AppError> {
     let home = std::env::var("HOME")
         .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
     let dest_root = Path::new(&home)
         .join(".imh")
         .join(LISTENING_ASSETS_DIR_NAME);
-    sync_listening_assets_from_dir(pool, Path::new(SEED_LISTENING_ASSETS_DIR), &dest_root).await
+    let source_dir = app_handle
+        .path()
+        .resolve(
+            SEED_LISTENING_ASSETS_RESOURCE_PATH,
+            tauri::path::BaseDirectory::Resource,
+        )
+        .map_err(|e| {
+            AppError::Validation(format!(
+                "failed to resolve listening asset seed resource directory {SEED_LISTENING_ASSETS_RESOURCE_PATH}: {e}"
+            ))
+        })?;
+    sync_listening_assets_from_dir(pool, &source_dir, &dest_root).await
 }
 
 /// Internal implementation of [`sync_listening_assets_to_local_storage`],
