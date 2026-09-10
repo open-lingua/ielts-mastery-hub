@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, FileText, Headphones, Info, Play, Timer } from "lucide-react";
+import { AlertTriangle, BookOpen, FileText, Headphones, Info, Lock, Play, Timer } from "lucide-react";
 import type React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface TestStartOverlayProps {
@@ -23,6 +25,19 @@ interface TestStartOverlayProps {
   durationMinutes: number;
   /** Custom instructions */
   instructions?: string[];
+  /**
+   * When true, the Start button is disabled and a warning banner is shown
+   * instead of allowing the test to begin (e.g. missing prerequisite state).
+   */
+  locked?: boolean;
+  /** Banner title shown when `locked` is true. */
+  lockTitle?: string;
+  /** Banner message shown when `locked` is true, explaining the block. */
+  lockMessage?: string;
+  /** Label for the banner's action button when `locked` is true. */
+  lockActionLabel?: string;
+  /** Called when the user clicks the banner's action button. */
+  onLockAction?: () => void;
   /** Children (the actual test content) */
   children: React.ReactNode;
 }
@@ -63,10 +78,27 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
   questions,
   durationMinutes,
   instructions,
+  locked = false,
+  lockTitle = "Action required",
+  lockMessage = "This action is currently unavailable.",
+  lockActionLabel = "Resolve",
+  onLockAction,
   children,
 }) => {
   const Icon = moduleIcons[module];
   const rules = instructions || defaultInstructions[module];
+
+  const startButton = (
+    <Button
+      onClick={onStart}
+      disabled={locked}
+      size="lg"
+      className="w-full gap-2 rounded-xl py-3 text-base font-semibold shadow-lg shadow-primary/20"
+    >
+      {locked ? <Lock className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+      Start Now
+    </Button>
+  );
 
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden min-h-0">
@@ -134,15 +166,39 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
                   </ul>
                 </div>
 
+                {/* Lock banner — shown when a prerequisite is missing */}
+                {locked && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>{lockTitle}</AlertTitle>
+                    <AlertDescription className="space-y-3">
+                      <p>{lockMessage}</p>
+                      {onLockAction && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={onLockAction}
+                          className="gap-1.5"
+                        >
+                          {lockActionLabel}
+                        </Button>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {/* Start Button */}
-                <Button
-                  onClick={onStart}
-                  size="lg"
-                  className="w-full gap-2 rounded-xl py-3 text-base font-semibold shadow-lg shadow-primary/20"
-                >
-                  <Play className="h-5 w-5" />
-                  Start Now
-                </Button>
+                {locked ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="block w-full">{startButton}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>{lockMessage}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  startButton
+                )}
               </Card>
             </motion.div>
           </motion.div>
