@@ -90,7 +90,7 @@ The exact HTTP request/response shape and default model are provider-specific, i
 |---|---|---|---|
 | `chatgpt` | `POST https://api.openai.com/v1/chat/completions` | `gpt-4o-mini` | API key sent via the HTTP `Authorization` request header |
 | `claude` | `POST https://api.anthropic.com/v1/messages` | `claude-3-5-sonnet-latest` | `x-api-key` header + `anthropic-version: 2023-06-01` |
-| `gemini` | `POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent` | `gemini-1.5-flash` | API key as a `?key=` query parameter |
+| `gemini` | `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` | `gemini-2.5-flash` (overridable via an optional `model` credential, like `local`/`general`) | API key as a `?key=` query parameter |
 | `local` | `POST <endpoint>/chat/completions` | (whatever the local runtime serves) | none |
 | `general` | `POST <endpoint>` | (provider-defined) | optional custom header, both admin-configured |
 

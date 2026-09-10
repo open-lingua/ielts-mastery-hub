@@ -83,6 +83,14 @@ const PROVIDERS: Provider[] = [
         required: true,
         hint: "Generate from Google AI Studio.",
       },
+      {
+        key: "model",
+        label: "Model Name",
+        type: "text",
+        placeholder: "gemini-2.5-flash",
+        required: false,
+        hint: "Defaults to gemini-2.5-flash if left blank. Override if Google retires that model.",
+      },
     ],
   },
   {
