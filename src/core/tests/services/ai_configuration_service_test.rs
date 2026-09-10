@@ -188,3 +188,78 @@ mod get_active_credentials {
         assert_matches!(active, Ok(None));
     }
 }
+
+mod activate_configuration {
+    use super::*;
+
+    #[tokio::test]
+    async fn it_rejects_an_unknown_provider() {
+        // Arrange
+        let pool = test_pool().await;
+        let key = test_key();
+
+        // Act
+        let result = service::activate_configuration(&pool, &key, "unknown").await;
+
+        // Assert
+        assert_matches!(result, Err(app_lib::error::AppError::Validation(_)));
+    }
+
+    #[tokio::test]
+    async fn it_rejects_a_provider_with_no_stored_row() {
+        // Arrange
+        let pool = test_pool().await;
+        let key = test_key();
+
+        // Act
+        let result = service::activate_configuration(&pool, &key, "gemini").await;
+
+        // Assert
+        assert_matches!(result, Err(app_lib::error::AppError::NotFound(_)));
+    }
+
+    #[tokio::test]
+    async fn it_rejects_a_provider_whose_stored_credentials_are_incomplete() {
+        // Arrange
+        let pool = test_pool().await;
+        let key = test_key();
+        service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "sk-real")]))
+            .await
+            .expect("save gemini");
+        service::delete_configuration(&pool, "gemini").await.expect("clear gemini");
+
+        // Act
+        let result = service::activate_configuration(&pool, &key, "gemini").await;
+
+        // Assert
+        assert_matches!(result, Err(app_lib::error::AppError::Validation(_)));
+    }
+
+    #[tokio::test]
+    async fn it_reactivates_a_previously_configured_provider_and_deactivates_the_active_one() {
+        // Arrange
+        let pool = test_pool().await;
+        let key = test_key();
+        service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "sk-real")]))
+            .await
+            .expect("save gemini");
+        service::save_configuration(&pool, &key, &input("claude", &[("apiKey", "sk-claude")]))
+            .await
+            .expect("save claude (deactivates gemini)");
+
+        // Act
+        let summary = service::activate_configuration(&pool, &key, "gemini")
+            .await
+            .expect("activate gemini");
+
+        // Assert
+        assert_eq!(summary.provider_id, "gemini");
+        assert!(summary.is_active);
+        assert!(summary.configured);
+
+        let all = service::list_configurations(&pool, &key).await.expect("list");
+        let active: Vec<_> = all.iter().filter(|c| c.is_active).collect();
+        assert_eq!(active.len(), 1);
+        assert_eq!(active[0].provider_id, "gemini");
+    }
+}
