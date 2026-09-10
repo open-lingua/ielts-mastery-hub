@@ -89,6 +89,51 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.4.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.3.1-rc.2...1.4.0-rc.2) (2026-09-10)
+
+
+### Features
+
+* add activate and delete flows to AI Configurations page ([3a7e343](https://github.com/open-lingua/ielts-mastery-hub/commit/3a7e34367395e0307aa7f3e819fac582a137f8a0))
+* add activate_ai_configuration command ([fd4b453](https://github.com/open-lingua/ielts-mastery-hub/commit/fd4b4535b829bd25159a328aa81b22a03d72dbc5))
+* add AES-GCM encryption key infrastructure for AI credentials ([90f80fa](https://github.com/open-lingua/ielts-mastery-hub/commit/90f80faf3230fde764504a6f81397d88e44e91c5))
+* add AI configuration model, repository, service, and commands ([d2afa57](https://github.com/open-lingua/ielts-mastery-hub/commit/d2afa57a021c1e4cca500002acb2194ce9b8041e))
+* add AI Configurations admin page and nav entry ([be31819](https://github.com/open-lingua/ielts-mastery-hub/commit/be31819b282cb2ee83c53329476cd6c55550f6b2))
+* add locked state to TestStartOverlay ([14e5e85](https://github.com/open-lingua/ielts-mastery-hub/commit/14e5e856e3d23655c6e4c9e6816ddd6202c9b5e3))
+* add model name field to local and general provider forms ([67ef7d1](https://github.com/open-lingua/ielts-mastery-hub/commit/67ef7d17c36e21e24b35c247835c4ba5fc9168b8))
+* **db:** add ai_configurations migration ([83690fa](https://github.com/open-lingua/ielts-mastery-hub/commit/83690fafb0e873da7fff12df05a4c733bc131853))
+* extract seed data runner and bundle full seed directories as resources ([ae60a20](https://github.com/open-lingua/ielts-mastery-hub/commit/ae60a206f8fe7e17e9ee52f658bfbcbd44636da7))
+* gate Writing test start on an active AI configuration ([2fd1f00](https://github.com/open-lingua/ielts-mastery-hub/commit/2fd1f0043c05934b944f9566744de0c88c53acd0))
+* make model name configurable for local/general providers; improve failure errors ([942518c](https://github.com/open-lingua/ielts-mastery-hub/commit/942518c938de7ac534542a1c0da80e4a91e66d0f))
+* wire AI Configurations page to backend ([485c217](https://github.com/open-lingua/ielts-mastery-hub/commit/485c2173f1ce562188c5e702348b922faa50cc0e))
+
+
+### Refactors
+
+* wire grade_writing to use stored AI config instead of env vars ([57b5256](https://github.com/open-lingua/ielts-mastery-hub/commit/57b5256f86d14fef74e75af0bb113500e992c782))
+
+
+### Documentation
+
+* remove legacy AI env vars from .env.example ([9e53a9b](https://github.com/open-lingua/ielts-mastery-hub/commit/9e53a9ba15cf602fde325deea258771ac4ed6625))
+* update internals docs for AI Configurations feature ([b252db0](https://github.com/open-lingua/ielts-mastery-hub/commit/b252db07d224a6a07f5f171f99dd2c9c4b1ba879))
+
+
+### CI/CD
+
+* install xdg-utils on Linux runners to fix aarch64 AppImage bundling ([88adf8f](https://github.com/open-lingua/ielts-mastery-hub/commit/88adf8ff32acf883bd38b4cde95808db9f3e2de5))
+
+
+### Tests
+
+* add activate tests for ai_configurations repository and service ([8164d9d](https://github.com/open-lingua/ielts-mastery-hub/commit/8164d9de63cde75254fcfbc4546c8fac946de804))
+* add AiConfigurations page tests ([060baee](https://github.com/open-lingua/ielts-mastery-hub/commit/060baeed390f688b6d19f6fa26ae4f5d31a84c58))
+* add locked state tests to TestStartOverlay; wrap renders in TooltipProvider ([6f80383](https://github.com/open-lingua/ielts-mastery-hub/commit/6f8038379b2dc0fcfe77388766c6f823e08d10fe))
+* add seed_data integration tests ([8f6e2da](https://github.com/open-lingua/ielts-mastery-hub/commit/8f6e2daa7dac54e72714a9c610996363078e492c))
+* add tests for AI configuration model, repository, and service ([d50e744](https://github.com/open-lingua/ielts-mastery-hub/commit/d50e7448ee2437926eb8ebf9f5728f8095b50a3d))
+* assert AI Configurations nav item renders in AdminLayout ([1c6982e](https://github.com/open-lingua/ielts-mastery-hub/commit/1c6982e7d3fc8c1a8116a34ea535f68324f62860))
+* extend AiConfigurations page tests for activate and delete flows ([ab9f7fd](https://github.com/open-lingua/ielts-mastery-hub/commit/ab9f7fdc10983c803f6856ab438e0fdeda5e1471))
+
 ## [1.3.1-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.3.0-rc.2...1.3.1-rc.2) (2026-09-10)
 
 
