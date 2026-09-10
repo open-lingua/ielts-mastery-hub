@@ -154,4 +154,13 @@ describe("TestStartOverlay", () => {
       expect(onLockAction).toHaveBeenCalledTimes(1);
     });
   });
+
+  it("renders preStartContent between instructions and the Start button", () => {
+    renderOverlay(
+      <TestStartOverlay {...defaultProps} preStartContent={<div>Take this test without AI scoring</div>}>
+        <div>X</div>
+      </TestStartOverlay>
+    );
+    expect(screen.getByText("Take this test without AI scoring")).toBeInTheDocument();
+  });
 });
