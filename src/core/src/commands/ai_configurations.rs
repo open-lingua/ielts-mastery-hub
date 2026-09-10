@@ -30,3 +30,14 @@ pub async fn delete_ai_configuration(db: State<'_, Db>, provider_id: String) -> 
         .await
         .map_err(Into::into)
 }
+
+#[tauri::command]
+pub async fn activate_ai_configuration(
+    db: State<'_, Db>,
+    key: State<'_, AiConfigKey>,
+    provider_id: String,
+) -> Result<AiConfigurationSummary, String> {
+    service::activate_configuration(&db, &key, &provider_id)
+        .await
+        .map_err(Into::into)
+}

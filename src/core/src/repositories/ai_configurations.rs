@@ -74,6 +74,35 @@ pub async fn upsert_and_activate(
     Ok(())
 }
 
+/// Makes `provider_id` the sole active provider without touching its stored
+/// credentials, deactivating any other provider that was previously active. Runs in a
+/// transaction so the "only one active provider" invariant is never observable as
+/// violated. Returns `AppError::NotFound` (and rolls back) if `provider_id` has no
+/// stored row.
+pub async fn activate(pool: &Db, provider_id: &str) -> Result<(), AppError> {
+    let now = chrono::Utc::now().to_rfc3339();
+    let mut tx = pool.begin().await?;
+
+    sqlx::query!("UPDATE ai_configurations SET is_active = 0 WHERE provider_id != ?", provider_id)
+        .execute(&mut *tx)
+        .await?;
+
+    let result = sqlx::query!(
+        "UPDATE ai_configurations SET is_active = 1, updated_at = ? WHERE provider_id = ?",
+        now,
+        provider_id
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(AppError::NotFound(provider_id.to_string()));
+    }
+
+    tx.commit().await?;
+    Ok(())
+}
+
 /// Clears a provider's stored credentials and deactivates it. Backs the
 /// `delete_ai_configuration` command; a no-op if the provider has no stored row.
 pub async fn clear(pool: &Db, provider_id: &str) -> Result<(), AppError> {

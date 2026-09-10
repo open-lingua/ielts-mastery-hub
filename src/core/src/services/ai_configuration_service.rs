@@ -94,6 +94,44 @@ pub async fn save_configuration(
     Ok(to_summary(&row, key))
 }
 
+/// Reactivates an already-configured provider without touching its stored
+/// credentials, deactivating whichever provider was previously active. Rejects unknown
+/// provider ids, providers with no stored row, and providers whose stored credentials
+/// don't satisfy their required fields (so `grade_writing` never silently ends up
+/// "active" with unusable credentials).
+pub async fn activate_configuration(
+    pool: &Db,
+    key: &AiConfigKey,
+    provider_id: &str,
+) -> Result<AiConfigurationSummary, AppError> {
+    if required_fields(provider_id).is_none() {
+        return Err(AppError::Validation(format!(
+            "unknown AI provider: {}",
+            provider_id
+        )));
+    }
+
+    let row = repo::find_by_provider(pool, provider_id)
+        .await?
+        .ok_or_else(|| AppError::NotFound(provider_id.to_string()))?;
+
+    let credentials = decrypt_credentials(&row, key)?;
+    if !has_required_fields(provider_id, &credentials) {
+        return Err(AppError::Validation(format!(
+            "provider `{}` is not configured",
+            provider_id
+        )));
+    }
+
+    repo::activate(pool, provider_id).await?;
+
+    let row = repo::find_by_provider(pool, provider_id)
+        .await?
+        .ok_or_else(|| AppError::NotFound(provider_id.to_string()))?;
+
+    Ok(to_summary(&row, key))
+}
+
 pub async fn delete_configuration(pool: &Db, provider_id: &str) -> Result<(), AppError> {
     if required_fields(provider_id).is_none() {
         return Err(AppError::Validation(format!(
