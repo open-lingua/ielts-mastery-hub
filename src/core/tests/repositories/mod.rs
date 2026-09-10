@@ -1,3 +1,4 @@
+mod ai_configurations_test;
 mod listening_question_groups_test;
 mod listening_questions_test;
 mod listening_sections_test;
