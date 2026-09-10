@@ -36,6 +36,10 @@
       "icons/icon.icns",
       "icons/icon.ico",
       "icons/icon.png"
-    ]
+    ],
+    "resources": {
+      "src/database/seeds/writing/writing-assets": "seeds/writing/writing-assets",
+      "src/database/seeds/listening/listening-assets": "seeds/listening/listening-assets"
+    }
   }
 }
