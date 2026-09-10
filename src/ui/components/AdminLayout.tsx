@@ -1,6 +1,7 @@
 import {
   ChevronLeft,
   ChevronRight,
+  Cpu,
   FileJson,
   GraduationCap,
   LayoutDashboard,
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Content Library", icon: Library, path: "/admin/content" },
   { label: "Create New", icon: PlusCircle, path: "/admin/create" },
   { label: "Import Dataset", icon: FileJson, path: "/admin/import" },
+  { label: "AI Configurations", icon: Cpu, path: "/admin/ai-configurations" },
   //  { label: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
