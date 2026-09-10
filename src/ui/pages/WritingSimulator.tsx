@@ -20,6 +20,8 @@ import TestStartOverlay from "@/components/shared/TestStartOverlay";
 import UnifiedTimer, { TimeUpOverlay } from "@/components/shared/UnifiedTimer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -189,6 +191,8 @@ const WritingSimulator: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isGrading, setIsGrading] = useState(false);
   const [gradingResults, setGradingResults] = useState<GradingResults | null>(null);
+  const [submissionMode, setSubmissionMode] = useState<"graded" | "unscored" | "unavailable" | null>(null);
+  const [takeUnscored, setTakeUnscored] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -312,17 +316,35 @@ const WritingSimulator: React.FC = () => {
 
   const runAIGrading = useCallback(async () => {
     if (!sessionId || !tasks[0] || !tasks[1]) return;
-    setIsGrading(true);
+
+    // Persist raw answers first — this happens regardless of scoring mode.
     try {
-      // Persist raw answers first
       await submitWritingTest(sessionId, {
         task1: drafts[0].text,
         task2: drafts[1].text,
         task1WordCount: drafts[0].wordCount,
         task2WordCount: drafts[1].wordCount,
       });
+    } catch (err) {
+      console.error("Failed to save writing answers:", err);
+      toast.error("Failed to save your answers.");
+      setSubmissionMode("unavailable");
+      setShowResults(true);
+      localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+      return;
+    }
 
-      // Call AI grading
+    // Skip AI grading entirely for unscored runs.
+    if (takeUnscored) {
+      setSubmissionMode("unscored");
+      setShowResults(true);
+      toast.success("Test submitted without scoring.");
+      localStorage.removeItem(`ielts_writing_drafts_${testId}`);
+      return;
+    }
+
+    setIsGrading(true);
+    try {
       const results = await gradeWritingTest([
         { taskType: "task1", prompt: tasks[0].prompt, userResponse: drafts[0].text },
         { taskType: "task2", prompt: tasks[1].prompt, userResponse: drafts[1].text },
@@ -337,16 +359,18 @@ const WritingSimulator: React.FC = () => {
         overallBand: results.overallBand,
       });
 
+      setSubmissionMode("graded");
       toast.success("Your writing has been graded by AI.");
     } catch (err) {
       console.error("AI grading failed:", err);
+      setSubmissionMode("unavailable");
       toast.error("AI grading failed. Your work has been saved.");
     } finally {
       setIsGrading(false);
       setShowResults(true);
       localStorage.removeItem(`ielts_writing_drafts_${testId}`);
     }
-  }, [sessionId, drafts, tasks, testId]);
+  }, [sessionId, drafts, tasks, testId, takeUnscored]);
 
   const handleTimeUp = useCallback(() => {
     if (showResults || isGrading) return;
@@ -365,6 +389,8 @@ const WritingSimulator: React.FC = () => {
     setShowResults(false);
     setAutoSubmitted(false);
     setGradingResults(null);
+    setSubmissionMode(null);
+    setTakeUnscored(false);
     setDrafts([
       { text: "", wordCount: 0 },
       { text: "", wordCount: 0 },
@@ -389,6 +415,8 @@ const WritingSimulator: React.FC = () => {
     setShowResults(false);
     setAutoSubmitted(false);
     setGradingResults(null);
+    setSubmissionMode(null);
+    setTakeUnscored(false);
     setDrafts([
       { text: "", wordCount: 0 },
       { text: "", wordCount: 0 },
@@ -406,7 +434,7 @@ const WritingSimulator: React.FC = () => {
   const { hasActiveConfig, isLoading: isAiConfigLoading } = useAiConfigurationStatus();
 
   const handleStart = async () => {
-    if (!hasActiveConfig) {
+    if (!hasActiveConfig && !takeUnscored) {
       toast.error("Set up an active AI configuration before starting the Writing test.");
       return;
     }
@@ -478,11 +506,29 @@ const WritingSimulator: React.FC = () => {
           sections="2 Tasks"
           questions="2 Essays"
           durationMinutes={60}
-          locked={!isAiConfigLoading && !hasActiveConfig}
+          locked={!isAiConfigLoading && !hasActiveConfig && !takeUnscored}
           lockTitle="AI configuration required"
           lockMessage="The Writing test is graded by AI. Set up and activate an AI configuration before starting."
           lockActionLabel="Go to AI Configurations"
           onLockAction={() => navigate("/admin/ai-configurations")}
+          preStartContent={
+            <div className="rounded-xl border border-border bg-secondary/30 p-3 space-y-2">
+              <div className="flex items-start gap-2.5">
+                <Checkbox
+                  id="take-unscored"
+                  checked={takeUnscored}
+                  onCheckedChange={(checked) => setTakeUnscored(checked === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="take-unscored" className="text-sm font-medium text-foreground cursor-pointer">
+                  Take this test without AI scoring
+                </Label>
+              </div>
+              <p className="pl-6 text-xs text-muted-foreground leading-relaxed">
+                Your answers will be saved for review, but won't be graded or count toward your band score.
+              </p>
+            </div>
+          }
         >
           {/* ─── Header ─── */}
           <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 md:px-6 shrink-0 gap-3">
@@ -761,11 +807,16 @@ const WritingSimulator: React.FC = () => {
       {showResults && !gradingResults && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl bg-card shadow-2xl overflow-hidden border border-border p-8 text-center space-y-4">
-            <AlertTriangle className="h-10 w-10 text-warning mx-auto" />
+            {submissionMode === "unscored" ? (
+              <Info className="h-10 w-10 text-primary mx-auto" />
+            ) : (
+              <AlertTriangle className="h-10 w-10 text-warning mx-auto" />
+            )}
             <h2 className="text-xl font-bold text-foreground">Test Submitted</h2>
             <p className="text-sm text-muted-foreground">
-              Your answers have been saved but AI grading was unavailable. You can review your essays or return to the
-              library.
+              {submissionMode === "unscored"
+                ? "You chose to skip AI scoring. Your answers were saved for review only and were not graded."
+                : "Your answers have been saved but AI grading was unavailable. You can review your essays or return to the library."}
             </p>
             <div className="flex justify-center gap-3 pt-2">
               <button
