@@ -1,3 +1,4 @@
+pub mod ai_configurations;
 pub mod export;
 pub mod grade_writing;
 pub mod import;
