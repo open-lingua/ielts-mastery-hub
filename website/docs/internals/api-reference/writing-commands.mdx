@@ -45,7 +45,9 @@ title: Writing Test Commands
 
 ## `grade_writing`
 
-AI-grades a single Writing task response. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx) for the full behavior, system prompt, and gateway request shape.
+AI-grades a single Writing task response using whichever AI provider is currently active in
+**Admin → AI Configurations**. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)
+for the full behavior, system prompt, and per-provider request shape.
 
 **Input:**
 
@@ -56,8 +58,6 @@ AI-grades a single Writing task response. See [Writing Module & AI Grading](../f
   prompt: string;
   user_response: string;
   session_id?: string;
-  ai_api_key: string;
-  ai_gateway_url: string;
 }
 ```
 
@@ -98,7 +98,5 @@ const result = await gradeWriting({
   task_type: "task2",
   prompt: essayPrompt,
   user_response: candidateEssay,
-  ai_api_key: import.meta.env.VITE_AI_API_KEY,
-  ai_gateway_url: import.meta.env.VITE_AI_GATEWAY_URL,
 });
 ```
