@@ -69,13 +69,22 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
     }
 }
 
-pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
-    let db_url = resolve_database_url()?;
+/// Extracts the filesystem path from a `sqlite://...` connection URL (stripping any
+/// trailing `?mode=...` query string). Shared by [`init`] and by callers that need the
+/// database's directory without opening a connection (e.g. to locate sibling files like
+/// the AI credentials encryption key).
+pub fn resolve_db_path(db_url: &str) -> PathBuf {
     let db_path = db_url
         .strip_prefix("sqlite://")
         .and_then(|s| s.split('?').next())
-        .unwrap_or(&db_url);
-    if let Some(parent) = std::path::Path::new(db_path).parent() {
+        .unwrap_or(db_url);
+    PathBuf::from(db_path)
+}
+
+pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
+    let db_url = resolve_database_url()?;
+    let db_path = resolve_db_path(&db_url);
+    if let Some(parent) = db_path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| AppError::Validation(e.to_string()))?;
     }
     let pool = SqlitePoolOptions::new()

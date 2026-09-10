@@ -1,9 +1,11 @@
 pub mod commands;
+pub mod crypto;
 pub mod database;
 pub mod error;
 pub mod models;
 pub mod repositories;
 pub mod services;
+pub mod state;
 
 use tauri::Manager;
 
@@ -18,12 +20,23 @@ pub fn run() {
                     window.open_devtools();
                 }
             }
+            let db_url = database::resolve_database_url()?;
+            let db_path = database::resolve_db_path(&db_url);
+            if let Some(parent) = db_path.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            let ai_config_key = crypto::load_or_create_key(&db_path)?;
+            app.manage(state::AiConfigKey(ai_config_key));
+
             let pool = tauri::async_runtime::block_on(database::init(app.handle()))?;
             app.manage(pool);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::grade_writing::grade_writing,
+            commands::ai_configurations::list_ai_configurations,
+            commands::ai_configurations::save_ai_configuration,
+            commands::ai_configurations::delete_ai_configuration,
             commands::profiles::get_profiles,
             commands::profiles::list_profiles,
             commands::profiles::create_profiles,
