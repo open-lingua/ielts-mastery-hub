@@ -57,7 +57,8 @@ pub async fn complete(
     match provider_id {
         "chatgpt" => {
             let api_key = get_required(credentials, "apiKey")?;
-            openai_compatible_completion(OPENAI_CHAT_COMPLETIONS_URL, Some(api_key), OPENAI_MODEL, system_prompt, user_content).await
+            let model = get_optional_model(credentials, OPENAI_MODEL);
+            openai_compatible_completion(OPENAI_CHAT_COMPLETIONS_URL, Some(api_key), model, system_prompt, user_content).await
         }
         "claude" => {
             let api_key = get_required(credentials, "apiKey")?;
@@ -303,6 +304,18 @@ mod tests {
         let credentials = HashMap::new();
         assert_eq!(get_optional_model(&credentials, GEMINI_MODEL), GEMINI_MODEL);
         assert_eq!(get_optional_model(&credentials, OPENAI_MODEL), OPENAI_MODEL);
+    }
+
+    #[test]
+    fn it_resolves_the_default_openai_model_for_chatgpt_when_no_model_credential_is_set() {
+        let credentials = creds(&[("apiKey", "sk-test")]);
+        assert_eq!(get_optional_model(&credentials, OPENAI_MODEL), OPENAI_MODEL);
+    }
+
+    #[test]
+    fn it_uses_the_configured_model_credential_for_chatgpt_over_the_default() {
+        let credentials = creds(&[("apiKey", "sk-test"), ("model", "gpt-4o")]);
+        assert_eq!(get_optional_model(&credentials, OPENAI_MODEL), "gpt-4o");
     }
 
     #[test]

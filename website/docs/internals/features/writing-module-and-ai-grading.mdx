@@ -88,7 +88,7 @@ The exact HTTP request/response shape and default model are provider-specific, i
 
 | Provider | Endpoint | Default model | Auth |
 |---|---|---|---|
-| `chatgpt` | `POST https://api.openai.com/v1/chat/completions` | `gpt-4o-mini` | API key sent via the HTTP `Authorization` request header |
+| `chatgpt` | `POST https://api.openai.com/v1/chat/completions` | `gpt-4o-mini` (overridable via an optional `model` credential, like `local`/`general`/`gemini`) | API key sent via the HTTP `Authorization` request header |
 | `claude` | `POST https://api.anthropic.com/v1/messages` | `claude-3-5-sonnet-latest` | `x-api-key` header + `anthropic-version: 2023-06-01` |
 | `gemini` | `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` | `gemini-2.5-flash` (overridable via an optional `model` credential, like `local`/`general`) | API key as a `?key=` query parameter |
 | `local` | `POST <endpoint>/chat/completions` | (whatever the local runtime serves) | none |
@@ -111,7 +111,28 @@ You must return ONLY a valid JSON object with this exact structure (no markdown,
   "feedback": {
     "strengths": ["<string>", "<string>"],
     "weaknesses": ["<string>", "<string>"],
-    "improvements": "<string with specific actionable advice>"
+    "improvemegit add src/core/src/services/ai_provider_client.rs \
+        src/core/src/services/ai_configuration_service.rs \
+        src/ui/pages/admin/AiConfigurations.tsx \
+        website/docs/internals/features/writing-module-and-ai-grading.mdx
+git commit -m "feat: make Gemini model name configurable; update default to gemini-2.5-flash
+
+The hardcoded gemini-1.5-flash URL is replaced with a template so the model
+is injectable at runtime, matching the existing local/general pattern:
+
+- ai_provider_client: replace GEMINI_MODEL_URL constant with a
+  GEMINI_MODEL_URL_TEMPLATE + gemini_model_url(model) builder; add
+  GEMINI_MODEL = 'gemini-2.5-flash' default; update get_optional_model to
+  accept a caller-supplied default rather than always falling back to
+  OPENAI_MODEL; pass the resolved model into gemini_completion
+- ai_configuration_service: add comment noting model is optional for gemini
+- AiConfigurations.tsx: add optional Model Name field to the Gemini provider
+  form (placeholder gemini-2.5-flash, defaults note in hint)
+- docs: update provider table to show the templated URL and new default
+
+Unit tests added for gemini_model_url (default and override) and
+get_optional_model (no credential falls back to supplied default,
+configured credential wins over default)."cific actionable advice>"
   }
 }
 

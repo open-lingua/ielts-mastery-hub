@@ -108,6 +108,14 @@ const PROVIDERS: Provider[] = [
         required: true,
         hint: "Found under platform.openai.com → API keys.",
       },
+      {
+        key: "model",
+        label: "Model Name",
+        type: "text",
+        placeholder: "gpt-4o-mini",
+        required: false,
+        hint: "Defaults to gpt-4o-mini if left blank. Override with e.g. gpt-4o or gpt-4.1-mini if needed.",
+      },
     ],
   },
   {
