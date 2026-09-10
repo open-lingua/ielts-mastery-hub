@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import TestStartOverlay from "../TestStartOverlay";
 
 const defaultProps = {
@@ -13,9 +15,11 @@ const defaultProps = {
   durationMinutes: 60,
 };
 
+const renderOverlay = (ui: React.ReactElement) => render(<TooltipProvider>{ui}</TooltipProvider>);
+
 describe("TestStartOverlay", () => {
   it("renders overlay with title when not started", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps}>
         <div>Test Content</div>
       </TestStartOverlay>
@@ -24,7 +28,7 @@ describe("TestStartOverlay", () => {
   });
 
   it("renders metadata badges", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps}>
         <div>X</div>
       </TestStartOverlay>
@@ -35,7 +39,7 @@ describe("TestStartOverlay", () => {
   });
 
   it("renders default instructions for reading", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps}>
         <div>X</div>
       </TestStartOverlay>
@@ -44,7 +48,7 @@ describe("TestStartOverlay", () => {
   });
 
   it("renders Start Now button", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps}>
         <div>X</div>
       </TestStartOverlay>
@@ -55,7 +59,7 @@ describe("TestStartOverlay", () => {
   it("calls onStart when button clicked", async () => {
     const onStart = vi.fn();
     const user = userEvent.setup();
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps} onStart={onStart}>
         <div>X</div>
       </TestStartOverlay>
@@ -65,7 +69,7 @@ describe("TestStartOverlay", () => {
   });
 
   it("hides overlay when isStarted is true", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps} isStarted={true}>
         <div>Test Content</div>
       </TestStartOverlay>
@@ -75,7 +79,7 @@ describe("TestStartOverlay", () => {
   });
 
   it("blurs children when not started", () => {
-    const { container } = render(
+    const { container } = renderOverlay(
       <TestStartOverlay {...defaultProps}>
         <div>X</div>
       </TestStartOverlay>
@@ -85,12 +89,69 @@ describe("TestStartOverlay", () => {
   });
 
   it("renders custom instructions when provided", () => {
-    render(
+    renderOverlay(
       <TestStartOverlay {...defaultProps} instructions={["Custom rule 1", "Custom rule 2"]}>
         <div>X</div>
       </TestStartOverlay>
     );
     expect(screen.getByText("Custom rule 1")).toBeInTheDocument();
     expect(screen.getByText("Custom rule 2")).toBeInTheDocument();
+  });
+
+  describe("locked state", () => {
+    it("disables the Start button and shows the lock banner when locked", () => {
+      renderOverlay(
+        <TestStartOverlay
+          {...defaultProps}
+          locked
+          lockTitle="AI configuration required"
+          lockMessage="Set up an active AI configuration first."
+        >
+          <div>X</div>
+        </TestStartOverlay>
+      );
+      expect(screen.getByText("Start Now").closest("button")).toBeDisabled();
+      expect(screen.getByText("AI configuration required")).toBeInTheDocument();
+      expect(screen.getByText("Set up an active AI configuration first.")).toBeInTheDocument();
+    });
+
+    it("does not show the lock banner when unlocked", () => {
+      renderOverlay(
+        <TestStartOverlay {...defaultProps}>
+          <div>X</div>
+        </TestStartOverlay>
+      );
+      expect(screen.getByText("Start Now").closest("button")).not.toBeDisabled();
+      expect(screen.queryByText("Action required")).not.toBeInTheDocument();
+    });
+
+    it("does not call onStart when the disabled Start button is clicked", async () => {
+      const onStart = vi.fn();
+      const user = userEvent.setup();
+      renderOverlay(
+        <TestStartOverlay {...defaultProps} onStart={onStart} locked>
+          <div>X</div>
+        </TestStartOverlay>
+      );
+      await user.click(screen.getByText("Start Now"));
+      expect(onStart).not.toHaveBeenCalled();
+    });
+
+    it("calls onLockAction when the banner action button is clicked", async () => {
+      const onLockAction = vi.fn();
+      const user = userEvent.setup();
+      renderOverlay(
+        <TestStartOverlay
+          {...defaultProps}
+          locked
+          lockActionLabel="Go to AI Configurations"
+          onLockAction={onLockAction}
+        >
+          <div>X</div>
+        </TestStartOverlay>
+      );
+      await user.click(screen.getByText("Go to AI Configurations"));
+      expect(onLockAction).toHaveBeenCalledTimes(1);
+    });
   });
 });
