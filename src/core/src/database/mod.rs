@@ -68,7 +68,7 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
     }
 }
 
-pub async fn init(_app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
+pub async fn init(app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
     let db_url = resolve_database_url()?;
     let db_path = db_url
         .strip_prefix("sqlite://")
@@ -93,7 +93,7 @@ pub async fn init(_app_handle: &tauri::AppHandle) -> Result<Db, AppError> {
         .set_ignore_missing(true)
         .run(&pool)
         .await?;
-    writing_assets_migration::sync_writing_assets_to_local_storage(&pool).await?;
-    listening_assets_migration::sync_listening_assets_to_local_storage(&pool).await?;
+    writing_assets_migration::sync_writing_assets_to_local_storage(&pool, app_handle).await?;
+    listening_assets_migration::sync_listening_assets_to_local_storage(&pool, app_handle).await?;
     Ok(pool)
 }
