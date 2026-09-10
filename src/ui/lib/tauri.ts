@@ -675,10 +675,36 @@ export async function gradeWriting(input: {
   prompt: string;
   user_response: string;
   session_id?: string;
-  ai_api_key: string;
-  ai_gateway_url: string;
 }): Promise<GradingResult> {
   return invoke<GradingResult>("grade_writing", { input });
+}
+
+// ── ai_configurations ──────────────────────────────────────────────────────
+// Rust struct uses `rename_all = "camelCase"` — fields below are camelCase,
+// unlike most other types in this file.
+
+export interface AiConfigurationSummary {
+  providerId: string;
+  isActive: boolean;
+  configured: boolean;
+  updatedAt: string;
+}
+
+export async function listAiConfigurations(): Promise<AiConfigurationSummary[]> {
+  return invoke<AiConfigurationSummary[]>("list_ai_configurations");
+}
+
+export async function saveAiConfiguration(
+  providerId: string,
+  credentials: Record<string, string>
+): Promise<AiConfigurationSummary> {
+  return invoke<AiConfigurationSummary>("save_ai_configuration", {
+    input: { provider_id: providerId, credentials },
+  });
+}
+
+export async function deleteAiConfiguration(providerId: string): Promise<void> {
+  return invoke<void>("delete_ai_configuration", { providerId });
 }
 
 // ── update check ───────────────────────────────────────────────────────────

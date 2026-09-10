@@ -1,4 +1,5 @@
 import {
+  AlertCircle,
   Bot,
   Check,
   Eye,
@@ -12,14 +13,16 @@ import {
   Zap,
 } from "lucide-react";
 import type React from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { fetchAiConfigurations, saveAiConfiguration } from "@/services/aiConfigurationService";
 
 // ── Types ──────────────────────────────────────────────────
 type ProviderId = "gemini" | "chatgpt" | "claude" | "local" | "general";
@@ -256,10 +259,38 @@ const ConfigField: React.FC<ConfigFieldProps> = ({ field, value, onChange }) => 
 // ── Main page ───────────────────────────────────────────────
 const AiConfigurations: React.FC = () => {
   const [selectedId, setSelectedId] = useState<ProviderId>("claude");
-  const [activeId, setActiveId] = useState<ProviderId>("claude");
+  const [activeId, setActiveId] = useState<ProviderId | null>(null);
   const [drafts, setDrafts] = useState<Record<string, DraftValues>>({});
-  const [configured, setConfigured] = useState<Partial<Record<ProviderId, boolean>>>({ claude: true });
+  const [configured, setConfigured] = useState<Partial<Record<ProviderId, boolean>>>({});
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      try {
+        const { configuredMap, activeProviderId } = await fetchAiConfigurations();
+        if (cancelled) return;
+        setConfigured(configuredMap as Partial<Record<ProviderId, boolean>>);
+        setActiveId((activeProviderId as ProviderId | null) ?? null);
+      } catch (err) {
+        if (cancelled) return;
+        setLoadError(err instanceof Error ? err.message : String(err));
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const provider = useMemo(() => PROVIDERS.find((p) => p.id === selectedId) ?? PROVIDERS[0], [selectedId]);
   const currentValues = drafts[selectedId] ?? {};
@@ -276,27 +307,34 @@ const AiConfigurations: React.FC = () => {
       [selectedId]: { ...(prev[selectedId] ?? {}), [key]: value },
     }));
     if (saveState === "saved") setSaveState("idle");
+    if (saveError) setSaveError(null);
   };
 
   const handleSelect = (id: ProviderId) => {
     setSelectedId(id);
     setSaveState("idle");
+    setSaveError(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isValid) return;
     setSaveState("saving");
-    // Frontend-only mock: backend persistence will be wired up later.
-    setTimeout(() => {
-      setConfigured((prev) => ({ ...prev, [selectedId]: true }));
-      setActiveId(selectedId);
+    setSaveError(null);
+    try {
+      const result = await saveAiConfiguration(selectedId, currentValues);
+      setConfigured((prev) => ({ ...prev, [selectedId]: result.configured }));
+      if (result.isActive) setActiveId(selectedId);
       setSaveState("saved");
-    }, 500);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : String(err));
+      setSaveState("idle");
+    }
   };
 
   const handleReset = () => {
     setDrafts((prev) => ({ ...prev, [selectedId]: {} }));
     setSaveState("idle");
+    setSaveError(null);
   };
 
   const isActiveProvider = activeId === selectedId;
@@ -319,7 +357,22 @@ const AiConfigurations: React.FC = () => {
           </Badge>
         </div>
 
-        {/* Split pane */}
+        {loadError && (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 flex items-center gap-2 text-sm text-destructive">
+            <AlertCircle size={16} className="shrink-0" />
+            Failed to load AI configurations: {loadError}
+          </div>
+        )}
+
+        {isLoading ? (
+          <Card className="overflow-hidden">
+            <CardContent className="p-8 space-y-4">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-72" />
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        ) : (
         <Card className="overflow-hidden">
           <CardContent className="p-0">
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
@@ -382,6 +435,13 @@ const AiConfigurations: React.FC = () => {
                   ))}
                 </div>
 
+                {saveError && (
+                  <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-2 text-xs text-destructive">
+                    <AlertCircle size={14} className="shrink-0" />
+                    Failed to save configuration: {saveError}
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between pt-6 border-t border-border">
                   <div className="text-xs text-muted-foreground">
                     {saveState === "saved"
@@ -427,6 +487,7 @@ const AiConfigurations: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </AdminLayout>
   );
