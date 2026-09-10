@@ -14,7 +14,7 @@ fn required_fields(provider_id: &str) -> Option<&'static [&'static str]> {
         "gemini" => Some(&["apiKey"]),
         "chatgpt" => Some(&["apiKey"]),
         "claude" => Some(&["apiKey"]),
-        "local" => Some(&["endpoint"]),
+        "local" => Some(&["endpoint", "model"]),
         "general" => Some(&["endpoint", "headerName"]),
         _ => None,
     }
@@ -164,6 +164,7 @@ mod tests {
     fn it_recognizes_known_providers_and_their_required_fields() {
         assert_eq!(required_fields("gemini"), Some(&["apiKey"][..]));
         assert_eq!(required_fields("general"), Some(&["endpoint", "headerName"][..]));
+        assert_eq!(required_fields("local"), Some(&["endpoint", "model"][..]));
         assert_eq!(required_fields("unknown"), None);
     }
 

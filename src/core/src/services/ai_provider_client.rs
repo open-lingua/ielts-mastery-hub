@@ -23,6 +23,18 @@ fn get_required<'a>(
         .ok_or_else(|| AppError::Validation(format!("missing required credential field `{field}`")))
 }
 
+/// `local`/`general` providers let the admin optionally override the model name (e.g. a
+/// locally-pulled Ollama model like `llama3.1`). Falls back to `OPENAI_MODEL` only as a last
+/// resort — that default almost never matches a real local model name, so configuring one
+/// explicitly is strongly recommended for the `local`/`general` providers.
+fn get_optional_model(credentials: &HashMap<String, String>) -> &str {
+    credentials
+        .get("model")
+        .map(|s| s.as_str())
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or(OPENAI_MODEL)
+}
+
 /// Dispatches an AI grading completion request to the appropriate provider, isolating
 /// every provider-specific request/response shape from `grade_writing`. Returns the raw
 /// completion text (still containing whatever markdown/JSON wrapping the model chose to
@@ -49,13 +61,15 @@ pub async fn complete(
         "local" => {
             let endpoint = get_required(credentials, "endpoint")?;
             let url = format!("{}/chat/completions", endpoint.trim_end_matches('/'));
-            openai_compatible_completion(&url, None, OPENAI_MODEL, system_prompt, user_content).await
+            let model = get_optional_model(credentials);
+            openai_compatible_completion(&url, None, model, system_prompt, user_content).await
         }
         "general" => {
             let endpoint = get_required(credentials, "endpoint")?;
             let header_name = get_required(credentials, "headerName")?;
             let api_key = credentials.get("apiKey").map(|s| s.as_str()).filter(|s| !s.trim().is_empty());
-            general_completion(endpoint, header_name, api_key, system_prompt, user_content).await
+            let model = get_optional_model(credentials);
+            general_completion(endpoint, header_name, api_key, model, system_prompt, user_content).await
         }
         other => Err(AppError::Validation(format!("unknown AI provider: {other}"))),
     }
@@ -89,7 +103,7 @@ async fn openai_compatible_completion(
         .map_err(|e| AppError::Validation(format!("AI request failed: {e}")))?;
 
     if !response.status().is_success() {
-        return Err(AppError::Validation("AI grading failed".to_string()));
+        return Err(failure_error(response).await);
     }
 
     let data: serde_json::Value = response
@@ -128,7 +142,7 @@ async fn claude_completion(
         .map_err(|e| AppError::Validation(format!("AI request failed: {e}")))?;
 
     if !response.status().is_success() {
-        return Err(AppError::Validation("AI grading failed".to_string()));
+        return Err(failure_error(response).await);
     }
 
     let data: serde_json::Value = response
@@ -141,6 +155,24 @@ async fn claude_completion(
 
 fn urlencode(value: &str) -> String {
     url::form_urlencoded::byte_serialize(value.as_bytes()).collect()
+}
+
+/// Builds a descriptive validation error for a non-2xx provider response, including the
+/// HTTP status and (truncated) response body so failures are actionable instead of a bare
+/// "AI grading failed" — e.g. a 404 from Ollama because the model name isn't pulled locally,
+/// or a 401 from a cloud provider because the API key is invalid.
+async fn failure_error(response: reqwest::Response) -> AppError {
+    let status = response.status();
+    let body = response.text().await.unwrap_or_default();
+    let snippet: String = body.chars().take(300).collect();
+    AppError::Validation(format!(
+        "AI grading failed: provider responded with {status}{}",
+        if snippet.trim().is_empty() {
+            String::new()
+        } else {
+            format!(" — {snippet}")
+        }
+    ))
 }
 
 async fn gemini_completion(
@@ -168,7 +200,7 @@ async fn gemini_completion(
         .map_err(|e| AppError::Validation(format!("AI request failed: {e}")))?;
 
     if !response.status().is_success() {
-        return Err(AppError::Validation("AI grading failed".to_string()));
+        return Err(failure_error(response).await);
     }
 
     let data: serde_json::Value = response
@@ -186,11 +218,12 @@ async fn general_completion(
     endpoint: &str,
     header_name: &str,
     api_key: Option<&str>,
+    model: &str,
     system_prompt: &str,
     user_content: &str,
 ) -> Result<String, AppError> {
     let body = serde_json::json!({
-        "model": OPENAI_MODEL,
+        "model": model,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_content}
@@ -210,7 +243,7 @@ async fn general_completion(
         .map_err(|e| AppError::Validation(format!("AI request failed: {e}")))?;
 
     if !response.status().is_success() {
-        return Err(AppError::Validation("AI grading failed".to_string()));
+        return Err(failure_error(response).await);
     }
 
     let data: serde_json::Value = response
@@ -265,6 +298,44 @@ mod tests {
         let result = complete("local", &credentials, "sys", "user").await.expect("complete");
 
         assert_eq!(result, "local-response");
+    }
+
+    #[tokio::test]
+    async fn it_uses_the_configured_model_for_the_local_provider() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/chat/completions"))
+            .and(wiremock::matchers::body_string_contains("\"model\":\"llama3.1\""))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "choices": [{"message": {"content": "local-response"}}]
+            })))
+            .mount(&server)
+            .await;
+
+        let credentials = creds(&[("endpoint", &server.uri()), ("model", "llama3.1")]);
+        let result = complete("local", &credentials, "sys", "user").await.expect("complete");
+
+        assert_eq!(result, "local-response");
+    }
+
+    #[tokio::test]
+    async fn it_includes_the_status_and_body_in_the_failure_error() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .respond_with(ResponseTemplate::new(404).set_body_string("model \"gpt-4o-mini\" not found"))
+            .mount(&server)
+            .await;
+
+        let credentials = creds(&[("endpoint", &server.uri())]);
+        let result = complete("local", &credentials, "sys", "user").await;
+
+        match result {
+            Err(AppError::Validation(message)) => {
+                assert!(message.contains("404"), "message was: {message}");
+                assert!(message.contains("not found"), "message was: {message}");
+            }
+            other => panic!("expected a Validation error, got: {other:?}"),
+        }
     }
 
     #[tokio::test]
