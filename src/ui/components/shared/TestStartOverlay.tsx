@@ -26,6 +26,12 @@ interface TestStartOverlayProps {
   /** Custom instructions */
   instructions?: string[];
   /**
+   * Extra content rendered between the Instructions block and the lock
+   * banner/Start button (e.g. a "take unscored" checkbox). Optional — has
+   * no effect on callers that don't provide it.
+   */
+  preStartContent?: React.ReactNode;
+  /**
    * When true, the Start button is disabled and a warning banner is shown
    * instead of allowing the test to begin (e.g. missing prerequisite state).
    */
@@ -78,6 +84,7 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
   questions,
   durationMinutes,
   instructions,
+  preStartContent,
   locked = false,
   lockTitle = "Action required",
   lockMessage = "This action is currently unavailable.",
@@ -165,6 +172,8 @@ const TestStartOverlay: React.FC<TestStartOverlayProps> = ({
                     ))}
                   </ul>
                 </div>
+
+                {preStartContent}
 
                 {/* Lock banner — shown when a prerequisite is missing */}
                 {locked && (
