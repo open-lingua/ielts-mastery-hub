@@ -7,14 +7,12 @@ title: Environment Variables Reference
 
 | Variable | Required? | Default | Consumed in | Purpose |
 |---|---|---|---|---|
-| `VITE_AI_API_KEY` | Required for AI grading | none | `src/ui/services/aiGradingService.ts` | Bearer token sent to the AI grading gateway |
-| `VITE_AI_GATEWAY_URL` | Required for AI grading | none | `src/ui/services/aiGradingService.ts` | URL of the AI grading gateway endpoint (chat-completions style API) |
 | `OPEN_DEVTOOLS` | Optional | unset (devtools closed) | `src/core/src/lib.rs` (`setup` hook) | Set to `"true"` to auto-open the webview devtools window on launch |
 | `DATABASE_URL` | Optional (only for `sqlx` CLI usage) | none | Not read by the app itself; only used by the `sqlx` CLI for migrations/CLI tooling | Points `sqlx migrate`/`sqlx database` commands at the real `imh.db` file — see [Troubleshooting](../desktop/troubleshooting.mdx) |
 
 ## Notes
 
 - Frontend variables **must** be prefixed with `VITE_` to be exposed to the Vite/React bundle; anything without that prefix is invisible to `import.meta.env`.
-- `.env.example` at the repository root documents the `VITE_AI_API_KEY`/`VITE_AI_GATEWAY_URL` variables consumed by the Writing module's AI grading. See [Installation & Local Setup](../getting-started/installation.mdx).
+- The Writing module's AI grading feature needs no environment variables — credentials are configured at runtime from **Admin → AI Configurations** and stored encrypted in the local SQLite database. See [Installation & Local Setup](../getting-started/installation.mdx).
 - `OPEN_DEVTOOLS` and `DATABASE_URL` are shell environment variables (not `VITE_`-prefixed), since they're consumed by the Rust process / CLI tooling, not the frontend bundle.
 - No secrets should ever be committed — use `.env.local` (gitignored), never `.env` or source-controlled config, for real API keys.

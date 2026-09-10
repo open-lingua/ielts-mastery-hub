@@ -52,20 +52,26 @@ export interface GradingResult {
 
 (Rust field names are `snake_case` internally but each field carries an explicit `#[serde(rename = "...")]` to camelCase for this particular struct — an exception to the general snake_case wire convention described in [IPC Contract](../architecture/ipc-contract.mdx).)
 
-## Required environment variables
+## Configuring an AI provider
 
-The frontend requires:
+`grade_writing` no longer takes credentials from the frontend. Instead, an admin configures
+one or more providers from **Admin → AI Configurations** (`src/ui/pages/admin/AiConfigurations.tsx`):
 
-```bash
-VITE_AI_API_KEY="..."
-VITE_AI_GATEWAY_URL="https://your-gateway.example.com/v1/chat/completions"
-```
+- Supported providers: `chatgpt` (OpenAI), `claude` (Anthropic), `gemini` (Google), `local`
+  (any OpenAI-compatible local runtime, e.g. Ollama/LM Studio), and `general` (any other
+  OpenAI-compatible endpoint).
+- Saving a provider's credentials makes it the sole **active** provider — only one provider
+  is active at a time, matching the previous single-gateway design's simplicity.
+- Credentials are encrypted (AES-256-GCM) before being written to the `ai_configurations`
+  SQLite table (`src/core/src/crypto.rs`); the encryption key is a separate file stored next
+  to `imh.db`. They are only decrypted in-process, transiently, when `grade_writing` needs to
+  call the provider — never returned to the frontend (see
+  [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx)).
+- `grade_writing` loads the active provider's decrypted credentials via
+  `ai_configuration_service::get_active_credentials` and fails with `"No AI provider is
+  configured"` if none is active.
 
-Read in `src/ui/services/aiGradingService.ts`; if either is missing, grading throws before any Tauri call is made:
-
-```
-AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)
-```
+No `.env`/`VITE_`-prefixed environment variables are involved in AI grading anymore.
 
 ## `grade_writing` command constraints
 
@@ -74,9 +80,19 @@ AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL
 | Max `user_response` length | 10,000 characters (`MAX_RESPONSE_LEN`) |
 | Max `prompt` length | 5,000 characters (`MAX_PROMPT_LEN`) |
 | Allowed `task_type` | `"task1"` or `"task2"` only |
-| Model | `google/gemini-2.5-flash`, called through the configured gateway |
-| Auth | Bearer token (`ai_api_key`) sent as `Authorization: Bearer <key>` |
+| Model / request shape | Depends on the active provider — see table below |
 | Temperature | `0.3` |
+
+The exact HTTP request/response shape and default model are provider-specific, isolated in
+`src/core/src/services/ai_provider_client.rs`:
+
+| Provider | Endpoint | Default model | Auth |
+|---|---|---|---|
+| `chatgpt` | `POST https://api.openai.com/v1/chat/completions` | `gpt-4o-mini` | API key sent via the HTTP `Authorization` request header |
+| `claude` | `POST https://api.anthropic.com/v1/messages` | `claude-3-5-sonnet-latest` | `x-api-key` header + `anthropic-version: 2023-06-01` |
+| `gemini` | `POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent` | `gemini-1.5-flash` | API key as a `?key=` query parameter |
+| `local` | `POST <endpoint>/chat/completions` | (whatever the local runtime serves) | none |
+| `general` | `POST <endpoint>` | (provider-defined) | optional custom header, both admin-configured |
 
 ## System prompt
 
@@ -107,27 +123,35 @@ Rules:
 - improvements should be 2-3 sentences of actionable advice.
 ```
 
-The Rust command builds the gateway request as:
+The Rust command dispatches this system prompt (unchanged regardless of provider) plus the
+prompt/response as user content to
+`ai_provider_client::complete(provider_id, credentials, system_prompt, user_content)`
+(`src/core/src/services/ai_provider_client.rs`), which builds the right HTTP request for
+whichever provider is active (see the endpoint/model table above) and returns the raw
+completion text.
+
+The returned text is parsed as `GradingResult` JSON, stripping any Markdown code fences first:
 
 ```rust
-let request_body = serde_json::json!({
-    "model": "google/gemini-2.5-flash",
-    "messages": [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_content}
-    ],
-    "temperature": 0.3
-});
+fn extract_json(content: &str) -> String {
+    if let Some(start) = content.find("```") {
+        let after = &content[start + 3..];
+        let after = after.trim_start_matches("json").trim_start_matches('\n');
+        if let Some(end) = after.find("```") {
+            return after[..end].trim().to_string();
+        }
+    }
+    content.trim().to_string()
+}
 ```
-
-and extracts the model's JSON reply from `choices[0].message.content`, stripping any Markdown code fences before parsing.
 
 ## Error handling
 
 | Condition | Error returned |
 |---|---|
-| Gateway responds with a non-2xx status | `"AI grading failed"` |
-| Gateway response body isn't valid `GradingResult` JSON | `"Invalid AI response format"` |
+| No provider is configured/active | `"No AI provider is configured"` |
+| Active provider's API call fails | The underlying HTTP/validation error message (e.g. a non-2xx response) |
+| Provider response body isn't valid `GradingResult` JSON | `"Invalid AI response format"` |
 | `task_type` not `"task1"`/`"task2"` | `"taskType must be 'task1' or 'task2'"` |
 | `user_response` over 10,000 chars | `"userResponse must be under 10000 characters"` |
 | `prompt` over 5,000 chars | `"prompt must be under 5000 characters"` |
@@ -135,5 +159,5 @@ and extracts the model's JSON reply from `choices[0].message.content`, stripping
 See [Error Handling Conventions](../api-reference/error-handling.mdx) for how these surface in the UI.
 
 :::warning Requires network access
-AI grading calls an external gateway over the network and requires valid `VITE_AI_API_KEY`/`VITE_AI_GATEWAY_URL` credentials. **It does not work offline** — unlike Reading and Listening, which are fully local. See [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx) for the privacy implications of sending writing submissions to a third-party gateway.
+AI grading calls the configured active AI provider over the network. **It does not work offline** — unlike Reading and Listening, which are fully local. See [Local Data Storage & Privacy](../desktop/data-storage-and-privacy.mdx) for the privacy implications of sending writing submissions to a third-party provider.
 :::

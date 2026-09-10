@@ -34,7 +34,7 @@ export interface UserTestSession {
 }
 ```
 
-The exceptions are a handful of hand-picked fields inside the `grade_writing` response (`GradingResult`/`GradingCriteria`) which use explicit `#[serde(rename = "...")]` annotations for camelCase (`overallBand`, `taskAchievement`, etc.) and the `ExportResult`/`ImportAudioFile` shapes used by export/import — those are documented per-command below and in [Import & Export Commands](../api-reference/import-export-commands.mdx).
+The exceptions are a handful of hand-picked fields inside the `grade_writing` response (`GradingResult`/`GradingCriteria`) which use explicit `#[serde(rename = "...")]` annotations for camelCase (`overallBand`, `taskAchievement`, etc.), the `AiConfigurationSummary` shape returned by the AI Configurations commands (`#[serde(rename_all = "camelCase")]`), and the `ExportResult`/`ImportAudioFile` shapes used by export/import — those are documented per-command below and in [Import & Export Commands](../api-reference/import-export-commands.mdx).
 
 :::note Discrepancy with template docs
 Some generic template files in this repo (`AGENTS.md` at the root and in `src/core/`/`src/ui/`) describe a blanket "Rust `snake_case` → TS `camelCase` via `serde(rename_all = "camelCase")`" convention. That is **not what the code does** for the majority of structs — verify wire format directly in `src/ui/lib/tauri.ts` and the corresponding Rust struct before assuming camelCase.
@@ -53,8 +53,6 @@ export async function gradeWriting(input: {
   prompt: string;
   user_response: string;
   session_id?: string;
-  ai_api_key: string;
-  ai_gateway_url: string;
 }): Promise<GradingResult> {
   return invoke<GradingResult>("grade_writing", { input });
 }

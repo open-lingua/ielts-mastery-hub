@@ -20,10 +20,10 @@ Uploaded media (writing task images, listening audio) is stored under `$HOME/.im
 
 ## The one outbound network call
 
-The **only** network request the app makes is the AI grading gateway call in `grade_writing` (`src/core/src/commands/grade_writing.rs`), which sends the Writing prompt and the candidate's response text to the URL configured in `VITE_AI_GATEWAY_URL`, authenticated with `VITE_AI_API_KEY`. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx) for the exact request/response shape.
+The **only** network request the app makes is the AI grading call in `grade_writing` (`src/core/src/commands/grade_writing.rs`), which sends the Writing prompt and the candidate's response text to whichever AI provider is currently marked **active** in the `ai_configurations` table — configured from **Admin → AI Configurations** (`src/ui/pages/admin/AiConfigurations.tsx`). Credentials for each provider are encrypted (AES-256-GCM) before being stored; there are no `VITE_`-prefixed environment variables involved. See [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx) for the per-provider request/response shape.
 
 :::warning Writing submissions leave the device for AI grading
-Because Writing responses and prompts are sent to an external gateway for grading, admins configuring `VITE_AI_GATEWAY_URL`/`VITE_AI_API_KEY` should ensure the gateway endpoint and credentials are trusted and kept private — anyone with the API key can send requests through it, and the gateway operator sees the raw text of every graded submission. This is the one place candidate-authored content is not fully local.
+Because Writing responses and prompts are sent to an external AI provider for grading, admins configuring a provider in **AI Configurations** should ensure its endpoint and credentials are trusted and kept private — anyone with the credentials can send requests through that account, and the provider sees the raw text of every graded submission. Credentials are encrypted at rest, but the encryption key file lives alongside `imh.db`, so this isn't a substitute for not sharing the machine or its data directory. This is the one place candidate-authored content is not fully local.
 :::
 
 ## Anonymous identity, not accounts

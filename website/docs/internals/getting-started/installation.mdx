@@ -27,22 +27,16 @@ See [Full Technology Stack Reference](../reference/tech-stack-reference.mdx) and
 
 ## Environment variables
 
-Frontend environment variables must be prefixed with `VITE_` to be exposed to the Vite/React app. Create a `.env.local` file at the repository root (or under `src/ui/`, depending on your Vite working directory) with:
-
-```bash
-VITE_AI_API_KEY="your-gateway-api-key"
-VITE_AI_GATEWAY_URL="https://your-ai-gateway.example.com/v1/chat/completions"
-```
-
-These two variables are read directly in `src/ui/services/aiGradingService.ts` and are required for the Writing module's AI grading feature (see [Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)). If either is unset, the app throws a clear error:
+AI grading needs **no environment variables** — credentials for the Writing module's AI
+grading feature are configured at runtime from **Admin → AI Configurations**
+(`src/ui/pages/admin/AiConfigurations.tsx`), stored encrypted in the local SQLite database
+rather than in `.env`/`VITE_`-prefixed variables (see
+[Writing Module & AI Grading](../features/writing-module-and-ai-grading.mdx)). If no provider
+is configured/active, `grade_writing` throws a clear error:
 
 ```
-AI grading credentials are not configured (VITE_AI_API_KEY / VITE_AI_GATEWAY_URL)
+No AI provider is configured
 ```
-
-:::warning Never commit real API keys
-Use `.env.local` (already gitignored) rather than committing secrets into `.env` or source-controlled config.
-:::
 
 Backend-only secrets (if any are introduced) belong in `src/core/.env` and must never be exposed to the frontend — see [`CONTRIBUTING.md`](https://github.com/open-lingua/ielts-mastery-hub/blob/main/CONTRIBUTING.md).
 
@@ -50,7 +44,7 @@ Backend-only secrets (if any are introduced) belong in `src/core/.env` and must 
 
 1. Complete [Prerequisites](./prerequisites.mdx).
 2. `npm install` at the repo root.
-3. Add your `.env.local` with the AI grading variables above (optional if you only want to test Reading/Listening).
+3. (Optional) Once the app is running, configure an AI provider from **Admin → AI Configurations** to enable Writing AI grading — not required to use Reading/Listening.
 4. Continue to [Running the App in Development](./running-the-app.mdx).
 
 ## Troubleshooting missing native dependencies
