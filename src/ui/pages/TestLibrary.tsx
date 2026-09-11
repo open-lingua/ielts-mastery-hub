@@ -62,12 +62,14 @@ const dotColors: Record<SessionStatus, string> = {
   completed: "bg-[hsl(var(--success))]",
   in_progress: "bg-primary",
   not_started: "bg-muted-foreground/30",
+  aborted: "bg-muted-foreground/30",
 };
 
 const cardBorderColors: Record<SessionStatus, string> = {
   completed: "border-[hsl(var(--success))]/30",
   in_progress: "border-primary/30",
   not_started: "border-border",
+  aborted: "border-border",
 };
 
 const TestCardSkeleton = () => (
