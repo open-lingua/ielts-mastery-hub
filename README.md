@@ -46,6 +46,22 @@ Most IELTS prep tools are either paid, gated behind subscriptions, or don't refl
 
 ## Getting Started
 
+### Install
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+**Windows:**
+
+```powershell
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+### Build from source
+
 ```bash
 # Clone the repo
 git clone https://github.com/open-lingua/ielts-mastery-hub.git
