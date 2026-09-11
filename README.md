@@ -19,6 +19,10 @@ This is an independent, non-commercial, open-source project for educational purp
 
 **IELTS** and **International English Language Testing System** are registered trademarks of their respective owners. All practice content in this repository is AI-generated for educational and demonstration purposes only — no official IELTS test material is used or reproduced.
 
+This application is still a **work in progress** and may contain bugs or issues. If you encounter any problems, please report them here: [https://github.com/open-lingua/ielts-mastery-hub/issues](https://github.com/open-lingua/ielts-mastery-hub/issues).
+
+The practice tests in this application are **generated using AI**, and therefore may not be 100% accurate. Their purpose is primarily educational, allowing users to practice in a realistic but non-official test environment.
+
 This software is provided **"as is"** without warranty of any kind. The authors are not liable for any damages arising from its use.
 
 ## What it is
