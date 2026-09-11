@@ -161,6 +161,36 @@ INSERT INTO listening_questions (id, group_id, question_order, text, options, an
 ('e4cdb7fb-f1d3-4587-8b70-5ac6e300c30b', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 20,
  'Multipurpose Sports Hall', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'D');
 
+INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
+('c8f22ef5-4498-47f6-9551-c01e09c7ef39', 'cf6fef41-c800-4a92-a5c3-7919dcff1516', 2,
+ 'matching', 'Match each facility with its correct location in the recreation center. Choose the correct letter, A-G, for questions 16-20.', 1);
+
+INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
+('fa52b659-7c44-4a8c-b93f-c2a454a11e37', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 16,
+ 'Free Weights and Cardio Gym', 
+ '["A. Immediately left of the Central Atrium", "B. Right side of the Central Atrium", "C. Entire rear section of the ground floor", "D. First door on the right in the left corridor", "E. At the very end of the right-hand corridor", "F. Next to the main entrance hall", "G. Located on the roof"]', 
+ 'A'),
+
+('266ce980-27e7-405c-9787-52b9a1b601cc', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 17,
+ 'Mind and Body Studio', 
+ '["A. Immediately left of the Central Atrium", "B. Right side of the Central Atrium", "C. Entire rear section of the ground floor", "D. First door on the right in the left corridor", "E. At the very end of the right-hand corridor", "F. Next to the main entrance hall", "G. Located on the roof"]', 
+ 'B'),
+
+('0a79af62-7584-4c57-ae3f-29bc11fc3563', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 18,
+ 'Aquatic Center', 
+ '["A. Immediately left of the Central Atrium", "B. Right side of the Central Atrium", "C. Entire rear section of the ground floor", "D. First door on the right in the left corridor", "E. At the very end of the right-hand corridor", "F. Next to the main entrance hall", "G. Located on the roof"]', 
+ 'C'),
+
+('b2e5d59c-6ee4-4aac-967b-900ae66b3208', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 19,
+ 'Childcare Facility', 
+ '["A. Immediately left of the Central Atrium", "B. Right side of the Central Atrium", "C. Entire rear section of the ground floor", "D. First door on the right in the left corridor", "E. At the very end of the right-hand corridor", "F. Next to the main entrance hall", "G. Located on the roof"]', 
+ 'D'),
+
+('e4cdb7fb-f1d3-4587-8b70-5ac6e300c30b', 'c8f22ef5-4498-47f6-9551-c01e09c7ef39', 20,
+ 'Multipurpose Sports Hall', 
+ '["A. Immediately left of the Central Atrium", "B. Right side of the Central Atrium", "C. Entire rear section of the ground floor", "D. First door on the right in the left corridor", "E. At the very end of the right-hand corridor", "F. Next to the main entrance hall", "G. Located on the roof"]', 
+ 'E');
+
 -- ══════════════════════════════════════════════════════════════
 -- ██  SECTION 3: Academic Dialogue (Urban Planning Project)   ██
 -- ══════════════════════════════════════════════════════════════
