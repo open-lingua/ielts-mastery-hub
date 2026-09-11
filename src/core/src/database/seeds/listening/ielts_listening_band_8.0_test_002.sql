@@ -136,22 +136,6 @@ INSERT INTO listening_questions (id, group_id, question_order, text, options, an
 
 INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
 ('b5be7be8-08d5-491c-a9c5-1f96bab20f25', '0ffa5277-c135-4674-accb-b4f2584219ef', 2,
- 'matching', 'Label the map below. Write the correct letter, A-H, next to Questions 16-20.', true);
-
-INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
-('8521c574-1c11-4e17-99d8-2eb7b898dd7c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 16,
- 'Digital Media Lab', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'C'),
-('2f52961d-35a8-4369-a151-cfb1cb4bf691', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 17,
- 'Children''s Interactive Zone', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'E'),
-('136f6aa3-10ef-4fa3-93d4-05871a49e497', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 18,
- 'Heritage Reading Room', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'A'),
-('3cf28eb7-ac71-40a1-9fa7-25d0c18b7e3c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 19,
- 'Podcast Studio', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'D'),
-('22b9c702-fbc3-47fe-a4c4-996cf84be53b', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 20,
- 'Community Workshop Space', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'B');
-
-INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
-('b5be7be8-08d5-491c-a9c5-1f96bab20f25', '0ffa5277-c135-4674-accb-b4f2584219ef', 2,
  'matching', 'Match each library facility with its correct location. Choose the correct letter, A-G, for questions 16-20.', true);
 
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
