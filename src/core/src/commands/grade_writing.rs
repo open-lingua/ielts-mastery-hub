@@ -106,9 +106,10 @@ pub async fn grade_writing(
         .map_err(|e| e.to_string())?
         .ok_or_else(|| "No AI provider is configured".to_string())?;
 
-    let content = ai_provider_client::complete(&provider_id, &credentials, SYSTEM_PROMPT, &user_content)
-        .await
-        .map_err(|e| e.to_string())?;
+    let content =
+        ai_provider_client::complete(&provider_id, &credentials, SYSTEM_PROMPT, &user_content)
+            .await
+            .map_err(|e| e.to_string())?;
 
     let json_str = extract_json(&content);
     serde_json::from_str::<GradingResult>(&json_str)

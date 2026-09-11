@@ -51,9 +51,12 @@ pub async fn upsert_and_activate(
     let now = chrono::Utc::now().to_rfc3339();
     let mut tx = pool.begin().await?;
 
-    sqlx::query!("UPDATE ai_configurations SET is_active = 0 WHERE provider_id != ?", provider_id)
-        .execute(&mut *tx)
-        .await?;
+    sqlx::query!(
+        "UPDATE ai_configurations SET is_active = 0 WHERE provider_id != ?",
+        provider_id
+    )
+    .execute(&mut *tx)
+    .await?;
 
     sqlx::query!(
         "INSERT INTO ai_configurations (provider_id, is_active, credentials_json, created_at, updated_at)
@@ -83,9 +86,12 @@ pub async fn activate(pool: &Db, provider_id: &str) -> Result<(), AppError> {
     let now = chrono::Utc::now().to_rfc3339();
     let mut tx = pool.begin().await?;
 
-    sqlx::query!("UPDATE ai_configurations SET is_active = 0 WHERE provider_id != ?", provider_id)
-        .execute(&mut *tx)
-        .await?;
+    sqlx::query!(
+        "UPDATE ai_configurations SET is_active = 0 WHERE provider_id != ?",
+        provider_id
+    )
+    .execute(&mut *tx)
+    .await?;
 
     let result = sqlx::query!(
         "UPDATE ai_configurations SET is_active = 1, updated_at = ? WHERE provider_id = ?",

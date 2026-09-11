@@ -3,7 +3,9 @@ use std::collections::HashMap;
 use crate::crypto;
 use crate::database::Db;
 use crate::error::AppError;
-use crate::models::ai_configurations::{AiConfiguration, AiConfigurationSummary, SaveAiConfiguration};
+use crate::models::ai_configurations::{
+    AiConfiguration, AiConfigurationSummary, SaveAiConfiguration,
+};
 use crate::repositories::ai_configurations as repo;
 use crate::state::AiConfigKey;
 
@@ -166,7 +168,10 @@ mod tests {
     #[test]
     fn it_recognizes_known_providers_and_their_required_fields() {
         assert_eq!(required_fields("gemini"), Some(&["apiKey"][..]));
-        assert_eq!(required_fields("general"), Some(&["endpoint", "headerName"][..]));
+        assert_eq!(
+            required_fields("general"),
+            Some(&["endpoint", "headerName"][..])
+        );
         assert_eq!(required_fields("local"), Some(&["endpoint", "model"][..]));
         assert_eq!(required_fields("unknown"), None);
     }

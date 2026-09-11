@@ -58,7 +58,14 @@ pub async fn complete(
         "chatgpt" => {
             let api_key = get_required(credentials, "apiKey")?;
             let model = get_optional_model(credentials, OPENAI_MODEL);
-            openai_compatible_completion(OPENAI_CHAT_COMPLETIONS_URL, Some(api_key), model, system_prompt, user_content).await
+            openai_compatible_completion(
+                OPENAI_CHAT_COMPLETIONS_URL,
+                Some(api_key),
+                model,
+                system_prompt,
+                user_content,
+            )
+            .await
         }
         "claude" => {
             let api_key = get_required(credentials, "apiKey")?;
@@ -79,11 +86,24 @@ pub async fn complete(
         "general" => {
             let endpoint = get_required(credentials, "endpoint")?;
             let header_name = get_required(credentials, "headerName")?;
-            let api_key = credentials.get("apiKey").map(|s| s.as_str()).filter(|s| !s.trim().is_empty());
+            let api_key = credentials
+                .get("apiKey")
+                .map(|s| s.as_str())
+                .filter(|s| !s.trim().is_empty());
             let model = get_optional_model(credentials, OPENAI_MODEL);
-            general_completion(endpoint, header_name, api_key, model, system_prompt, user_content).await
+            general_completion(
+                endpoint,
+                header_name,
+                api_key,
+                model,
+                system_prompt,
+                user_content,
+            )
+            .await
         }
-        other => Err(AppError::Validation(format!("unknown AI provider: {other}"))),
+        other => Err(AppError::Validation(format!(
+            "unknown AI provider: {other}"
+        ))),
     }
 }
 
@@ -163,7 +183,10 @@ async fn claude_completion(
         .await
         .map_err(|e| AppError::Validation(format!("AI response was not valid JSON: {e}")))?;
 
-    Ok(data["content"][0]["text"].as_str().unwrap_or("").to_string())
+    Ok(data["content"][0]["text"]
+        .as_str()
+        .unwrap_or("")
+        .to_string())
 }
 
 fn urlencode(value: &str) -> String {
@@ -328,14 +351,23 @@ mod tests {
 
     #[test]
     fn it_uses_the_configured_model_credential_for_claude_over_the_default() {
-        let credentials = creds(&[("apiKey", "sk-ant-test"), ("model", "claude-3-7-sonnet-latest")]);
-        assert_eq!(get_optional_model(&credentials, CLAUDE_MODEL), "claude-3-7-sonnet-latest");
+        let credentials = creds(&[
+            ("apiKey", "sk-ant-test"),
+            ("model", "claude-3-7-sonnet-latest"),
+        ]);
+        assert_eq!(
+            get_optional_model(&credentials, CLAUDE_MODEL),
+            "claude-3-7-sonnet-latest"
+        );
     }
 
     #[test]
     fn it_uses_the_configured_model_credential_over_the_default() {
         let credentials = creds(&[("model", "gemini-2.5-pro")]);
-        assert_eq!(get_optional_model(&credentials, GEMINI_MODEL), "gemini-2.5-pro");
+        assert_eq!(
+            get_optional_model(&credentials, GEMINI_MODEL),
+            "gemini-2.5-pro"
+        );
     }
 
     #[tokio::test]
@@ -362,7 +394,9 @@ mod tests {
             .await;
 
         let credentials = creds(&[("endpoint", &server.uri())]);
-        let result = complete("local", &credentials, "sys", "user").await.expect("complete");
+        let result = complete("local", &credentials, "sys", "user")
+            .await
+            .expect("complete");
 
         assert_eq!(result, "local-response");
     }
@@ -372,7 +406,9 @@ mod tests {
         let server = MockServer::start().await;
         Mock::given(method("POST"))
             .and(path("/chat/completions"))
-            .and(wiremock::matchers::body_string_contains("\"model\":\"llama3.1\""))
+            .and(wiremock::matchers::body_string_contains(
+                "\"model\":\"llama3.1\"",
+            ))
             .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
                 "choices": [{"message": {"content": "local-response"}}]
             })))
@@ -380,7 +416,9 @@ mod tests {
             .await;
 
         let credentials = creds(&[("endpoint", &server.uri()), ("model", "llama3.1")]);
-        let result = complete("local", &credentials, "sys", "user").await.expect("complete");
+        let result = complete("local", &credentials, "sys", "user")
+            .await
+            .expect("complete");
 
         assert_eq!(result, "local-response");
     }
@@ -389,7 +427,9 @@ mod tests {
     async fn it_includes_the_status_and_body_in_the_failure_error() {
         let server = MockServer::start().await;
         Mock::given(method("POST"))
-            .respond_with(ResponseTemplate::new(404).set_body_string("model \"gpt-4o-mini\" not found"))
+            .respond_with(
+                ResponseTemplate::new(404).set_body_string("model \"gpt-4o-mini\" not found"),
+            )
             .mount(&server)
             .await;
 
@@ -421,7 +461,9 @@ mod tests {
             ("headerName", "X-Custom-Auth"),
             ("apiKey", "secret-value"),
         ]);
-        let result = complete("general", &credentials, "sys", "user").await.expect("complete");
+        let result = complete("general", &credentials, "sys", "user")
+            .await
+            .expect("complete");
 
         assert_eq!(result, "general-response");
     }
@@ -437,7 +479,9 @@ mod tests {
             .await;
 
         let credentials = creds(&[("endpoint", &server.uri()), ("headerName", "X-Custom-Auth")]);
-        let result = complete("general", &credentials, "sys", "user").await.expect("complete");
+        let result = complete("general", &credentials, "sys", "user")
+            .await
+            .expect("complete");
 
         assert_eq!(result, "no-auth-response");
     }

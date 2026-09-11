@@ -46,6 +46,9 @@ mod save_ai_configuration {
 
         // Assert
         assert_eq!(parsed.provider_id, "gemini");
-        assert_eq!(parsed.credentials.get("apiKey"), Some(&"sk-test".to_string()));
+        assert_eq!(
+            parsed.credentials.get("apiKey"),
+            Some(&"sk-test".to_string())
+        );
     }
 }
