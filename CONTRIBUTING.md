@@ -17,6 +17,7 @@ Thanks for your interest in contributing. This guide covers what you need to set
 ```bash
 git clone https://github.com/open-lingua/ielts-mastery-hub.git
 cd ielts-mastery-hub
+export DATABASE_URL="sqlite:///<SOME_PATH>/imh.db"
 bun install
 bun run tauri dev
 ```
