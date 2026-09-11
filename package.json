@@ -1,7 +1,7 @@
 {
   "name": "@open-lingua/ielts-mastery-hub",
   "private": true,
-  "version": "1.7.2-rc.2",
+  "version": "1.7.3-rc.2",
   "type": "module",
   "scripts": {
     "dev": "vite --config src/ui/vite.config.ts",
