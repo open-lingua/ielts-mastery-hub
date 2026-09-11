@@ -1,0 +1,49 @@
+---
+title: "Shipped a real-world Tauri app: cross-platform IELTS exam prep (open source, MIT)"
+date: 2026-09-11
+tags: [tauri, rust, typescript, desktop-app, open-source]
+description: "A Reddit post for r/tauri about IELTS Mastery Hub — an MIT-licensed Tauri desktop app with a Rust core, covering IPC design, audio playback, webview quirks, and cross-platform CI packaging."
+---
+
+**Shipped a real-world Tauri app: cross-platform IELTS exam prep (open source, MIT)**
+
+Hey r/tauri,
+
+Wanted to share a Tauri app I actually shipped rather than another todo demo: **IELTS Mastery Hub**, a desktop app for practicing the IELTS English exam. TypeScript frontend, Rust core, MIT licensed, running on Windows, Linux, and macOS.
+
+**Demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+
+**What it does:** timed reading sections in a split-screen layout with auto-scoring, listening sections with audio playback, a dual-pane writing editor with AI evaluation against the official scoring criteria, and a dashboard tracking scores over time. Free, no account, runs locally.
+
+**Tauri-specific notes, since that's why you're here:**
+
+- **Why Tauri:** users keep this open for 2–3 hour mock exam sessions. An Electron-sized footprint for a study tool was a non-starter — the system webview approach won on both bundle size and memory.
+- **What lives in Rust vs. the frontend:** exam session state, timers, scoring, and persistence are all in the Rust core. The timer being owned by Rust rather than a JS interval was a deliberate call — no drift, no pausing when a render stalls, and scoring logic isn't sitting in devtools waiting to be edited. The frontend is basically a view layer over commands.
+- **IPC granularity was the hardest design decision.** Started chatty (a command per interaction), which got noisy fast. Ended up event-driven: Rust emits state transitions, the frontend subscribes. Much cleaner, and it made the "resume an in-progress exam" feature almost free.
+- **Audio in the listening section** is where webview differences bit hardest — WebKitGTK vs. WebView2 behavior around playback and preloading needed real workarounds.
+- **CI packaging for three targets** (plus signing) took longer to get right than several features did. Happy to share the workflow config if anyone's fighting that.
+
+**Install:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+Or build from source:
+```
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+```
+
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Disclaimer:** independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.
+
+The codebase is open if you want to poke at how the command/event layer or the bundling config is set up. Would genuinely welcome feedback on the IPC design — I suspect there's a more idiomatic pattern I've missed. AMA about the Tauri side in the comments.
