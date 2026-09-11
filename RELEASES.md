@@ -89,6 +89,35 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.7.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.6.0-rc.2...1.7.0-rc.2) (2026-09-11)
+
+
+### Features
+
+* **db:** add migration to allow 'aborted' user_test_session status ([b2b3cec](https://github.com/open-lingua/ielts-mastery-hub/commit/b2b3cece0a62fcaed837a15627d10f98bf4092ff))
+* handle aborted session status in TestLibrary card styles ([8d1fb0a](https://github.com/open-lingua/ielts-mastery-hub/commit/8d1fb0af76085bb9210a505178c3f44e461c7f88))
+* replace deleteUserTestSession with abortSession in all test modules ([1844234](https://github.com/open-lingua/ielts-mastery-hub/commit/1844234ee528b1053a8c3b6292852aa21160562a))
+
+
+### Documentation
+
+* add one-line install commands for macOS/Linux and Windows ([4193fe2](https://github.com/open-lingua/ielts-mastery-hub/commit/4193fe2886ebe49041a5d96365fcd04a5c4ce568))
+* add work-in-progress disclaimer and remove stale DATABASE_URL step ([02bd993](https://github.com/open-lingua/ielts-mastery-hub/commit/02bd9930a9d83291ea8e667cb48ce1a66e7fac2e))
+* replace docs site build instructions with link to published docs ([92f71c4](https://github.com/open-lingua/ielts-mastery-hub/commit/92f71c431bf61c2de12e656a9705ee344ba50542))
+
+
+### Tests
+
+* add practiceLibraryService unit tests ([19bd127](https://github.com/open-lingua/ielts-mastery-hub/commit/19bd127aa63bd6a33b0b8a1b6a62840aa95b46d9))
+* add repo test for marking an abandoned session as aborted ([4903765](https://github.com/open-lingua/ielts-mastery-hub/commit/4903765f37a1675049419856cf968d3b30268721))
+* add WritingSimulator abort tests ([156a2fa](https://github.com/open-lingua/ielts-mastery-hub/commit/156a2fa7e5d5f40bed7c7e9d0761c7b73ce54eae))
+
+
+### Chores
+
+* bump vitest to 4.1.11 ([e29c17d](https://github.com/open-lingua/ielts-mastery-hub/commit/e29c17d25d459a66a3b36e9b9271453a6af995be))
+* bump website deps (js-yaml, svgo, fast-uri, qs) via overrides ([3ea81c0](https://github.com/open-lingua/ielts-mastery-hub/commit/3ea81c0d2dbe6e8cb0c10ba9d353d38f00a0e734))
+
 ## [1.6.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.5.0-rc.2...1.6.0-rc.2) (2026-09-10)
 
 
