@@ -37,7 +37,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteUserTestSession } from "@/lib/tauri";
 import WritingGradingLoader from "@/components/writing/WritingGradingLoader";
 import WritingResultsDashboard from "@/components/writing/WritingResultsDashboard";
 import { useAutoSaveAnswers } from "@/hooks/useAutoSaveAnswers";
@@ -45,7 +44,7 @@ import { useAiConfigurationStatus } from "@/hooks/useAiConfigurationStatus";
 import { usePersistedTimer } from "@/hooks/usePersistedTimer";
 import { getAnonId } from "@/lib/anonId";
 import { gradeWritingTest, persistFeedback, type WritingGradingResult } from "@/services/aiGradingService";
-import { fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
+import { abortSession, fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
 import {
   fetchWritingTestForPractice,
   submitWritingTest,
@@ -407,8 +406,9 @@ const WritingSimulator: React.FC = () => {
   const handleAbort = async () => {
     if (sessionId) {
       try {
-        await deleteUserTestSession(sessionId, getAnonId());
-      } catch {
+        await abortSession(sessionId, getAnonId());
+      } catch (err) {
+        console.error("Failed to abort session:", err);
         toast.error("Failed to clear session");
       }
     }
