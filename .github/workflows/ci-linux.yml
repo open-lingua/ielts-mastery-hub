@@ -66,12 +66,15 @@ jobs:
             sqlite3
       - uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
+          components: clippy, rustfmt
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "src/core -> target"
           shared-key: "backend-${{ runner.os }}-${{ hashFiles('src/core/Cargo.lock') }}"
           cache-on-failure: true
+      - name: Check formatting (cargo fmt)
+        working-directory: src/core
+        run: cargo fmt --check
       - name: Prepare SQLite database
         working-directory: src/core
         run: |
