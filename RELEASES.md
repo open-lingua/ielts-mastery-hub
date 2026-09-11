@@ -89,6 +89,29 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.7.4-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.3-rc.2...1.7.4-rc.2) (2026-09-11)
+
+
+### Bug Fixes
+
+* correct question order and remove duplicate group insert in band 9.0 listening seed ([93641a6](https://github.com/open-lingua/ielts-mastery-hub/commit/93641a682949e6630ffb566a15ae713d59ed0303))
+* correct question order in band 8.0 Section 2 matching questions ([c091d26](https://github.com/open-lingua/ielts-mastery-hub/commit/c091d266745e28fe7817d916ea0a31b276a771d4))
+* correct Section 2 matching question options and answers in band 8.0 listening seed ([8715c74](https://github.com/open-lingua/ielts-mastery-hub/commit/8715c7428115eb674cba3196ba147f337448b9e6))
+* correct Section 2 matching question options and answers in band 9.0 listening seed ([d997a7e](https://github.com/open-lingua/ielts-mastery-hub/commit/d997a7e11bf420b1e41ad0e65f720d11d8bb33b7))
+* correct Section 2 matching question options and answers in listening seed ([57c0a27](https://github.com/open-lingua/ielts-mastery-hub/commit/57c0a27e518591ed458f22164372ca44e1cbb469))
+* remove duplicate group/question inserts from band 7.0 and 8.0 listening seeds ([daea642](https://github.com/open-lingua/ielts-mastery-hub/commit/daea64274539e7e1a9decc06747aa614c9abb907))
+
+
+### Documentation
+
+* add DATABASE_URL export to quick-start setup steps ([6aef990](https://github.com/open-lingua/ielts-mastery-hub/commit/6aef99092d61143b531de6e2a6d5d3ca1d51248b))
+* add demo video to intro page ([1c8ee79](https://github.com/open-lingua/ielts-mastery-hub/commit/1c8ee796fdfdf572253c2bb42798ef7d9fbe56f1))
+
+
+### CI/CD
+
+* add GitHub Pages docs deployment workflow ([642c95d](https://github.com/open-lingua/ielts-mastery-hub/commit/642c95daad7bdbed74b43d8a187d0529ea4f2ad8))
+
 ## [1.7.3-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.2-rc.2...1.7.3-rc.2) (2026-09-11)
 
 
