@@ -28,7 +28,8 @@ INSTRUCTIONS:
 5. Respect known character/length limits of {{PLATFORM}} (e.g., 280 characters for Twitter/X, concise titles for Hacker News, appropriate post length for Reddit/LinkedIn/dev.to).
 6. Use markdown, headings, bold text, emojis, or platform-specific tags/hashtags only if {{PLATFORM}} supports and commonly uses them.
 7. Mention that it's free, open-source (MIT licensed), and cross-platform (Windows/Linux/macOS) where relevant, and include the disclaimer about non-affiliation with IELTS/British Council/IDP/Cambridge where appropriate for credibility and compliance, without letting it dominate the message.
-8. Output ONLY the final message, ready to copy and paste — no explanations, no notes, no preamble, no meta-commentary.
+8. Output ONLY the filename list (step 9) followed by the final message, ready to copy and paste — no explanations, no notes, no preamble, no meta-commentary.
+9. Before the post content, output a labeled list of 3 suggested filenames for `website/blog/*.mdx` following Docusaurus naming conventions (e.g., `YYYY-MM-DD-descriptive-slug.mdx`), then output the post content wrapped in a Docusaurus MDX frontmatter block with `title`, `date`, `tags`, and `description` fields.
 
 <PLATFORM>
 PLATFORM_HERE
