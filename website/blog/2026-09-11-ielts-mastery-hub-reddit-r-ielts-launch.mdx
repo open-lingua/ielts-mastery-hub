@@ -1,0 +1,48 @@
+---
+title: "I built a free, open-source desktop app for IELTS practice (Reading, Listening & AI-graded Writing)"
+date: 2026-09-11
+tags: [ielts, open-source, reddit, community, study-tools]
+description: "A Reddit post for r/IELTS introducing IELTS Mastery Hub — a free, MIT-licensed desktop app with timed Reading and Listening practice, AI-graded Writing, and progress tracking for Windows, Linux, and macOS."
+---
+
+**I built a free, open-source desktop app for IELTS practice (Reading, Listening & AI-graded Writing)**
+
+Hey everyone 👋
+
+While prepping for IELTS I got frustrated that almost every decent practice tool is either behind a subscription, locked to a few free tests, or just doesn't look/feel like the actual exam. So I ended up building my own — and I'm putting it out there free for anyone who wants it.
+
+It's called **IELTS Mastery Hub**. It's a desktop app (Windows, Linux, macOS), completely free, and open source under the MIT license. No account, no paywall, no "upgrade to see your score."
+
+**Quick demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+**What's in it right now:**
+
+- 📖 **Reading** — split-screen layout like the real thing, covering the official question types, with auto-scoring
+- 🎧 **Listening** — audio sections with progressive difficulty
+- ✍️ **Writing** — dual-pane editor with AI feedback based on the official IELTS scoring criteria (Task Achievement, Coherence, Lexical Resource, Grammar)
+- 📊 **Dashboard** — tracks your scores over time so you can actually see if you're improving
+
+The Writing feedback has honestly been the most useful part for me personally — getting *some* structured feedback on band criteria beats writing essays into the void while waiting for a tutor.
+
+**Install:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+Or build from source: `git clone https://github.com/open-lingua/ielts-mastery-hub.git`
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Important disclaimer:** this is an independent, non-commercial educational project. It is **not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English** — IELTS is a registered trademark of its respective owners. The practice content is AI-generated for study purposes, so treat it as practice material, not as official past papers. It won't be 100% accurate, and your real band score is decided by real examiners.
+
+I'd really love feedback from people actually sitting the test — especially on whether the Reading/Listening timing and question formats feel close enough to the real exam, and whether the Writing feedback is actually helpful or just generic. If you find something wrong or missing, open an issue (or a PR, if that's your thing).
+
+Happy to answer questions in the comments. Good luck to everyone testing soon 🍀
