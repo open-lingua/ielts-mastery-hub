@@ -136,17 +136,31 @@ INSERT INTO listening_question_groups (id, section_id, group_order, question_typ
 ('5659b055-b933-4a9d-971d-73c6022968e5', '46330733-dcde-494e-a59d-3878a421f992', 2,
  'multiple-choice', 'Look at the map of the Aetheris cultivation floor. Match the locations (16-20) to the correct letter (A-G) on the map.', true);
 
+INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
+('5659b055-b933-4a9d-971d-73c6022968e5', '46330733-dcde-494e-a59d-3878a421f992', 2,
+ 'matching', 'Match each facility zone to its correct location on the cultivation floor. Choose the correct letter, A-G for questions (16-20).', true);
+
 INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
 ('faca4b9d-0e58-422b-bb2e-4da543b9268c', '5659b055-b933-4a9d-971d-73c6022968e5', 16,
- 'Nutrient Mixing Matrix', '["A", "B", "C", "D", "E", "F", "G"]', 'D'),
+ 'Nutrient Mixing Matrix', 
+ '["A. Immediately to the right of the Central Corridor", "B. First left off the Central Corridor", "C. Upper right path from the northern intersection", "D. Straight ahead at the very end of the main corridor", "E. Upper left path from the northern intersection", "F. Next to the primary airlock in the Briefing Atrium", "G. Outside the facility near the community centre"]', 
+ 'A'),
 ('0875b7a5-5d82-4bbf-bed0-899bddd166b2', '5659b055-b933-4a9d-971d-73c6022968e5', 17,
- 'Mycology Cell', '["A", "B", "C", "D", "E", "F", "G"]', 'A'),
+ 'Mycology Cell', 
+ '["A. Immediately to the right of the Central Corridor", "B. First left off the Central Corridor", "C. Upper right path from the northern intersection", "D. Straight ahead at the very end of the main corridor", "E. Upper left path from the northern intersection", "F. Next to the primary airlock in the Briefing Atrium", "G. Outside the facility near the community centre"]', 
+ 'B'),
 ('c09198e1-be3f-453a-ac9f-539d5abcc352', '5659b055-b933-4a9d-971d-73c6022968e5', 18,
- 'Pollination Sector', '["A", "B", "C", "D", "E", "F", "G"]', 'E'),
+ 'Pollination Sector', 
+ '["A. Immediately to the right of the Central Corridor", "B. First left off the Central Corridor", "C. Upper right path from the northern intersection", "D. Straight ahead at the very end of the main corridor", "E. Upper left path from the northern intersection", "F. Next to the primary airlock in the Briefing Atrium", "G. Outside the facility near the community centre"]', 
+ 'C'),
 ('2a5b1938-3a04-4c44-aafd-98c212746883', '5659b055-b933-4a9d-971d-73c6022968e5', 19,
- 'Harvesting Hub', '["A", "B", "C", "D", "E", "F", "G"]', 'G'),
+ 'Harvesting Hub', 
+ '["A. Immediately to the right of the Central Corridor", "B. First left off the Central Corridor", "C. Upper right path from the northern intersection", "D. Straight ahead at the very end of the main corridor", "E. Upper left path from the northern intersection", "F. Next to the primary airlock in the Briefing Atrium", "G. Outside the facility near the community centre"]', 
+ 'D'),
 ('11cef828-99ee-4e7c-8581-3df9964bf137', '5659b055-b933-4a9d-971d-73c6022968e5', 20,
- 'Germination Vault', '["A", "B", "C", "D", "E", "F", "G"]', 'B');
+ 'Germination Vault', 
+ '["A. Immediately to the right of the Central Corridor", "B. First left off the Central Corridor", "C. Upper right path from the northern intersection", "D. Straight ahead at the very end of the main corridor", "E. Upper left path from the northern intersection", "F. Next to the primary airlock in the Briefing Atrium", "G. Outside the facility near the community centre"]', 
+ 'E');
 
 -- ══════════════════════════════════════════════════════════════
 -- ██  SECTION 3: Academic Dialogue (Marine Geoengineering)    ██
