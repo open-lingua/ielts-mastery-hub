@@ -1,0 +1,49 @@
+---
+title: "IELTS Mastery Hub — MIT-licensed desktop app for IELTS exam prep (Tauri + Rust + TypeScript)"
+date: 2026-09-11
+tags: [open-source, self-hosted, tauri, rust, typescript, desktop-app]
+description: "A Reddit post for r/opensource and r/selfhosted introducing IELTS Mastery Hub — a free, MIT-licensed Tauri desktop app for IELTS reading, listening, and AI-graded writing practice on Windows, Linux, and macOS."
+---
+
+**IELTS Mastery Hub — MIT-licensed desktop app for IELTS exam prep (Tauri + Rust + TypeScript)**
+
+Hey folks,
+
+Sharing a project I've been working on: **IELTS Mastery Hub**, a desktop app for practicing the IELTS English exam. MIT licensed, no account required, no telemetry, no subscription — just a native binary you run locally on Windows, Linux, or macOS.
+
+**Demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+**Why I built it:** basically every IELTS prep tool out there is SaaS. You get two free mock tests, then a paywall, and your essays and progress data live on someone else's server. That felt like an obviously solvable problem with a local-first app.
+
+**What it does:**
+
+- 📖 **Reading** — split-screen timed practice covering the official question types, auto-scored
+- 🎧 **Listening** — audio sections with progressive difficulty
+- ✍️ **Writing** — dual-pane editor with AI evaluation across the official IELTS scoring criteria
+- 📊 **Dashboard** — score history and progress tracking over time
+
+**Stack:** TypeScript frontend with a Rust core, packaged with **Tauri**. Went with Tauri over Electron mainly for the binary size and memory footprint — it's a study tool you leave open for hours, so a 200MB Chromium process per session felt wrong. Happy to talk through the architecture if anyone's curious about Tauri for real-world apps; the IPC boundary between the TS side and the Rust core was the most interesting design decision.
+
+**Install:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+If you (reasonably) don't want to pipe curl into a shell, just build it from source:
+```
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+```
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Disclaimer:** independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational use and may not be 100% accurate.
+
+Contributions welcome — issues, PRs, packaging help (AUR/Flatpak/winget in particular), and content review from anyone who's actually taken the exam. Would love feedback on the UX and on the Tauri setup. AMA in the comments.
