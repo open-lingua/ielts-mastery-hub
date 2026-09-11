@@ -8,37 +8,17 @@
 //! `services::import_service::build_listening_assets_dir`). Because
 //! `std::env::set_var`/`remove_var` mutate global process state and Rust runs
 //! tests on multiple threads by default, every test that mutates an env var
-//! serializes on `ENV_LOCK` and restores the previous value before
-//! returning.
+//! serializes on the shared `common::env::ENV_LOCK` and restores the
+//! previous value before returning (see `common::env` for the shared
+//! helper).
 
+use crate::common::env::{with_env_var, ENV_LOCK};
 use app_lib::database::{default_db_path, resolve_database_url, APP_IDENTIFIER};
 use std::path::PathBuf;
-use std::sync::Mutex;
-
-static ENV_LOCK: Mutex<()> = Mutex::new(());
 
 const CUSTOM_DATABASE_URL: &str = "sqlite://custom/path.db?mode=rwc";
 const MACOS_HOME: &str = "/Users/alice";
 const LINUX_HOME: &str = "/home/bob";
-
-/// Sets `var` to `value` for the duration of `f`, restoring the previous
-/// value (or removing the var if it was previously unset) afterwards.
-/// Callers must hold `ENV_LOCK` before invoking this.
-fn with_env_var<T>(var: &str, value: Option<&str>, f: impl FnOnce() -> T) -> T {
-    let previous = std::env::var(var).ok();
-    match value {
-        Some(v) => std::env::set_var(var, v),
-        None => std::env::remove_var(var),
-    }
-
-    let result = f();
-
-    match previous {
-        Some(v) => std::env::set_var(var, v),
-        None => std::env::remove_var(var),
-    }
-    result
-}
 
 mod resolve_database_url_test {
     use super::*;

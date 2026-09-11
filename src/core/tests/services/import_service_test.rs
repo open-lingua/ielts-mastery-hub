@@ -6,6 +6,7 @@ use app_lib::services::import_service::{
     ImportError,
 };
 use serde_json::json;
+use uuid::Uuid;
 
 use crate::common::builders::{CreateReadingTestBuilder, CreateWritingTestBuilder};
 use crate::common::fixtures::test_pool;
@@ -472,13 +473,22 @@ mod import_writing_fn {
 
 mod import_listening_fn {
     use super::*;
+    use crate::common::env::ENV_LOCK;
 
-    /// `import_listening` persists audio to a real `$HOME/.imh/...`
-    /// directory (there is no injectable filesystem seam). This test cleans
-    /// up everything it writes so no artifacts are left behind.
+    /// `import_listening` persists audio to a real `<home>/.imh/...`
+    /// directory (there is no injectable filesystem seam), so this test
+    /// injects a temporary `HOME` pointing at a fresh temp dir (rather than
+    /// depending on the ambient environment, which may not have `HOME` set
+    /// at all, e.g. on native Windows shells) and cleans up everything it
+    /// writes so no artifacts are left behind.
     #[tokio::test]
     async fn it_persists_the_test_and_writes_its_assigned_audio_to_disk() {
         // Arrange
+        let _guard = ENV_LOCK.lock().unwrap();
+        let fake_home = std::env::temp_dir().join(format!("imh-test-home-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&fake_home).expect("create fake home dir");
+        let fake_home_str = fake_home.to_string_lossy().into_owned();
+
         let pool = test_pool().await;
         let raw = json!({ "title": "Disk Audio Test", "sections": good_listening_sections() });
         let audios_meta = good_listening_audios();
@@ -491,14 +501,21 @@ mod import_listening_fn {
             })
             .collect();
 
-        // Act
+        // Act — set HOME for the duration of the async call and restore it
+        // afterwards; `with_env_var` can't be used here since it only wraps
+        // synchronous closures, not futures.
+        let previous_home = std::env::var("HOME").ok();
+        std::env::set_var("HOME", &fake_home_str);
         let test_id = import_listening(&pool, OWNER_ID, data, assignments)
             .await
             .expect("import_listening");
+        match previous_home {
+            Some(v) => std::env::set_var("HOME", v),
+            None => std::env::remove_var("HOME"),
+        }
 
         // Assert
-        let home = std::env::var("HOME").expect("HOME must be set");
-        let dir = std::path::Path::new(&home)
+        let dir = fake_home
             .join(".imh")
             .join("listening-assets")
             .join(&test_id);
@@ -507,7 +524,7 @@ mod import_listening_fn {
             "expected a directory named exactly after the test id for the imported test's audio files"
         );
 
-        // Cleanup: remove the directory this test created so no real-disk artifacts remain.
-        let _ = std::fs::remove_dir_all(&dir);
+        // Cleanup: remove the temp home directory this test created so no artifacts remain.
+        let _ = std::fs::remove_dir_all(&fake_home);
     }
 }

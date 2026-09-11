@@ -169,16 +169,21 @@ mod build_export {
 
 mod default_export_dir {
     use super::*;
+    use crate::common::env::{with_env_var, ENV_LOCK};
 
     #[test]
     fn it_appends_downloads_to_the_home_directory() {
         // Arrange
-        let home = std::env::var("HOME").expect("HOME must be set for this test to be meaningful");
+        let _guard = ENV_LOCK.lock().unwrap();
+        const FAKE_HOME: &str = "/home/test-user";
 
         // Act
-        let dir = export_service::default_export_dir();
+        let dir = with_env_var("HOME", Some(FAKE_HOME), export_service::default_export_dir);
 
         // Assert
-        assert_eq!(dir, Some(std::path::PathBuf::from(home).join("Downloads")));
+        assert_eq!(
+            dir,
+            Some(std::path::PathBuf::from(FAKE_HOME).join("Downloads"))
+        );
     }
 }
