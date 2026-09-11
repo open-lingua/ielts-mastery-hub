@@ -1,5 +1,6 @@
 import {
   createUserTestSession,
+  deleteUserTestSession,
   getListeningTest,
   getReadingTest,
   getWritingTest,
@@ -10,7 +11,20 @@ import {
 import type { PaginatedResponse } from "@/types/pagination";
 
 export type TestModule = "reading" | "writing" | "listening";
-export type SessionStatus = "not_started" | "in_progress" | "completed";
+export type SessionStatus = "not_started" | "in_progress" | "completed" | "aborted";
+
+/** Hours of inactivity after which an "in_progress" session is treated as
+ * abandoned (e.g. the app crashed or was force-closed) and no longer blocks
+ * starting a new test, even though its DB row was never explicitly closed. */
+export const EXPIRE_AFTER_HOURS = 3;
+
+/** Returns true when an "in_progress" session's last_active_at is older than
+ * `hours` and should no longer be considered the user's active session. */
+export function isSessionExpired(lastActiveAt: string, hours: number = EXPIRE_AFTER_HOURS): boolean {
+  const lastActive = new Date(lastActiveAt).getTime();
+  if (Number.isNaN(lastActive)) return false;
+  return Date.now() - lastActive > hours * 60 * 60 * 1000;
+}
 
 export interface PracticeTestCard {
   id: string;
@@ -135,7 +149,7 @@ export interface ActiveSessionInfo {
 export async function fetchActiveSession(userId: string): Promise<ActiveSessionInfo | null> {
   const sessions = await listUserTestSessions(userId);
   const active = sessions
-    .filter((s) => s.status === "in_progress")
+    .filter((s) => s.status === "in_progress" && !isSessionExpired(s.last_active_at))
     .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())[0];
 
   if (!active) return null;
@@ -146,6 +160,30 @@ export async function fetchActiveSession(userId: string): Promise<ActiveSessionI
     started_at: active.started_at,
     status: active.status,
   };
+}
+
+/**
+ * Aborts an in-progress test session. Tries to delete the session outright;
+ * if that fails (e.g. IPC error, stale session id), falls back to marking it
+ * with a terminal "aborted" status via update so it can never be left stuck
+ * as "in_progress" and block future tests. Rethrows only if both paths fail.
+ */
+export async function abortSession(sessionId: string, userId: string): Promise<void> {
+  try {
+    await deleteUserTestSession(sessionId, userId);
+    return;
+  } catch (deleteError) {
+    try {
+      await updateUserTestSession(sessionId, userId, {
+        status: "aborted",
+        last_active_at: new Date().toISOString(),
+      });
+    } catch (updateError) {
+      console.error("Failed to delete session:", deleteError);
+      console.error("Failed to mark session as aborted:", updateError);
+      throw updateError;
+    }
+  }
 }
 
 export async function fetchTestTitle(testId: string, testType: TestModule): Promise<string> {
