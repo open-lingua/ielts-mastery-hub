@@ -13,6 +13,10 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-yellow)  [![](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue.svg)](https://github.com/open-lingua/ielts-mastery-hub)
 
+## Documentation
+
+Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](https://open-lingua.github.io/ielts-mastery-hub/docs/intro/).
+
 ## Disclaimer
 
 This is an independent, non-commercial, open-source project for educational purposes. It is **not affiliated with or endorsed by** the British Council, IDP Education, or Cambridge Assessment English.
@@ -53,34 +57,3 @@ npm install
 # Run the app
 npm run tauri dev
 ```
-
-## Documentation Site
-
-The docs site (this repo's `website/` folder) is a separate [Docusaurus](https://docusaurus.io/) project with its own `package.json`. Always `cd website/` first:
-
-```bash
-cd website/
-
-# Install dependencies
-npm install
-
-# Build the static site
-npm run build
-
-# Deploy to GitHub Pages
-USE_SSH=true npm run deploy
-# or: GIT_USER=<your-github-username> npm run deploy
-```
-
-> **Note:** `npm run deploy` requires the `gh-pages` branch to already exist on the remote (and to be non-empty). On a brand-new repo, create it once before the first deploy:
-> ```bash
-> git checkout --orphan gh-pages
-> git rm -rf .
-> touch .nojekyll
-> git add .nojekyll
-> git commit -m "Init gh-pages branch"
-> git push origin gh-pages
-> git checkout -
-> ```
-
-See `website/README.md` for more details.
