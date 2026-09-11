@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
 🎥 Full video with audio available at [`assets/preview.mp4`](assets/preview.mp4)
 ## Documentation
 
-Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](IELTS Mastery Hub Docs).
+Full documentation is available at [IELTS Mastery Hub Docs](https://open-lingua.github.io/ielts-mastery-hub/docs/intro/)..
 
 ## Disclaimer
 
@@ -30,7 +30,7 @@ This is an independent, non-commercial, open-source project for educational purp
 
 **IELTS** and **International English Language Testing System** are registered trademarks of their respective owners. All practice content in this repository is AI-generated for educational and demonstration purposes only — no official IELTS test material is used or reproduced.
 
-This application is still a **work in progress** and may contain bugs or issues. If you encounter any problems, please report them here: please report them on [https://github.com/open-lingua/ielts-mastery-hub/issues](GitHub Issues).
+This application is still a **work in progress** and may contain bugs or issues. If you encounter any problems, please report them here: please report them on [GitHub Issues](https://github.com/open-lingua/ielts-mastery-hub/issues).
 
 The practice tests in this application are **generated using AI**, and therefore may not be 100% accurate. Their purpose is primarily educational, allowing users to practice in a realistic but non-official test environment.
 
@@ -66,6 +66,8 @@ curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | 
 ```powershell
 irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
 ```
+
+> 💡 To update to the latest version, just run the same command again.
 
 ### Build from source
 
