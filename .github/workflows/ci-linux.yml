@@ -12,31 +12,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/krypton
-          cache: npm
-          cache-dependency-path: package-lock.json
-      - run: npm install
+          bun-version: latest
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - run: bun install --frozen-lockfile
       - name: Verify version strings agree across tracked files
-        run: node scripts/check-version-consistency.mjs
+        run: bun scripts/check-version-consistency.mjs
       - name: Run scripts/ unit tests (e.g. MSI version derivation)
-        run: npm run test:scripts
+        run: bun run test:scripts
 
   frontend:
     name: Frontend - Lint, Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/krypton
-          cache: npm
-          cache-dependency-path: package-lock.json
-      - run: npm install
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
+          bun-version: latest
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test
+      - run: bun run build
 
   backend:
     name: Backend - Rust Tests
