@@ -150,6 +150,32 @@ INSERT INTO listening_questions (id, group_id, question_order, text, options, an
 ('22b9c702-fbc3-47fe-a4c4-996cf84be53b', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 20,
  'Community Workshop Space', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'B');
 
+INSERT INTO listening_question_groups (id, section_id, group_order, question_type, instructions, sequential_order) VALUES
+('b5be7be8-08d5-491c-a9c5-1f96bab20f25', '0ffa5277-c135-4674-accb-b4f2584219ef', 2,
+ 'matching', 'Match each library facility with its correct location. Choose the correct letter, A-G, for questions 16-20.', true);
+
+INSERT INTO listening_questions (id, group_id, question_order, text, options, answer) VALUES
+('8521c574-1c11-4e17-99d8-2eb7b898dd7c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 16,
+ 'Digital Media Lab', 
+ '["A. Immediately to the left of the Central Atrium", "B. Directly across the Central Atrium, on the right-hand side", "C. At the very back of the building, past the Central Atrium", "D. Halfway down the left corridor, on the right side", "E. At the very end of the right-hand corridor", "F. Right next to the automatic entrance doors", "G. On the roof, next to the solar panels"]', 
+ 'A'),
+('2f52961d-35a8-4369-a151-cfb1cb4bf691', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 17,
+ 'Children''s Interactive Zone', 
+ '["A. Immediately to the left of the Central Atrium", "B. Directly across the Central Atrium, on the right-hand side", "C. At the very back of the building, past the Central Atrium", "D. Halfway down the left corridor, on the right side", "E. At the very end of the right-hand corridor", "F. Right next to the automatic entrance doors", "G. On the roof, next to the solar panels"]', 
+ 'B'),
+('136f6aa3-10ef-4fa3-93d4-05871a49e497', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 18,
+ 'Heritage Reading Room', 
+ '["A. Immediately to the left of the Central Atrium", "B. Directly across the Central Atrium, on the right-hand side", "C. At the very back of the building, past the Central Atrium", "D. Halfway down the left corridor, on the right side", "E. At the very end of the right-hand corridor", "F. Right next to the automatic entrance doors", "G. On the roof, next to the solar panels"]', 
+ 'C'),
+('3cf28eb7-ac71-40a1-9fa7-25d0c18b7e3c', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 19,
+ 'Podcast Studio', 
+ '["A. Immediately to the left of the Central Atrium", "B. Directly across the Central Atrium, on the right-hand side", "C. At the very back of the building, past the Central Atrium", "D. Halfway down the left corridor, on the right side", "E. At the very end of the right-hand corridor", "F. Right next to the automatic entrance doors", "G. On the roof, next to the solar panels"]', 
+ 'D'),
+('22b9c702-fbc3-47fe-a4c4-996cf84be53b', 'b5be7be8-08d5-491c-a9c5-1f96bab20f25', 20,
+ 'Community Workshop Space', 
+ '["A. Immediately to the left of the Central Atrium", "B. Directly across the Central Atrium, on the right-hand side", "C. At the very back of the building, past the Central Atrium", "D. Halfway down the left corridor, on the right side", "E. At the very end of the right-hand corridor", "F. Right next to the automatic entrance doors", "G. On the roof, next to the solar panels"]', 
+ 'E');
+
 -- ══════════════════════════════════════════════════════════════
 -- ██  SECTION 3: Academic Dialogue (Urban Heat Islands)       ██
 -- ══════════════════════════════════════════════════════════════
