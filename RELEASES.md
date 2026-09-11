@@ -89,6 +89,25 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.7.1-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.0-rc.2...1.7.1-rc.2) (2026-09-11)
+
+
+### Documentation
+
+* replace npm/node references with bun across all docs ([dd193ef](https://github.com/open-lingua/ielts-mastery-hub/commit/dd193effc2bf208de7dfa05ece74b860a170fde2))
+
+
+### CI/CD
+
+* add cargo fmt --check step to backend CI job ([3bac947](https://github.com/open-lingua/ielts-mastery-hub/commit/3bac947956ff650dad84025c3e7190dbd6639762))
+* migrate all workflows from node/npm to bun ([e901875](https://github.com/open-lingua/ielts-mastery-hub/commit/e901875e6ae7923cd5051f633b2c2311e8b5accc))
+
+
+### Chores
+
+* update bun.lock for vitest 4.1.11 ([3e6bee7](https://github.com/open-lingua/ielts-mastery-hub/commit/3e6bee7a47dc61dd4ee8e01c8cbf0b8748e092c9))
+* update website/bun.lock for dep bumps (js-yaml, svgo, fast-uri, qs) ([c880410](https://github.com/open-lingua/ielts-mastery-hub/commit/c8804106dc6935b8918a8938f1889495f77b26b6))
+
 ## [1.7.0-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.6.0-rc.2...1.7.0-rc.2) (2026-09-11)
 
 
