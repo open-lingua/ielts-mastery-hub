@@ -64,4 +64,4 @@ done
 ## Notes
 
 - Make sure the `DATABASE_URL` path matches the same location the Tauri app reads from (`app_data_dir()`), otherwise the app will not see the reset data.
-- Migrations also run automatically on app startup (`sqlx::migrate!` in `src/core/src/database/mod.rs`), so simply relaunching the app with `npm run tauri dev` after step 1 will also recreate the schema, though the seed files still need to be applied manually as shown in step 6.
+- Migrations also run automatically on app startup (`sqlx::migrate!` in `src/core/src/database/mod.rs`), so simply relaunching the app with `bun run tauri dev` after step 1 will also recreate the schema, though the seed files still need to be applied manually as shown in step 6.

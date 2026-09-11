@@ -4,7 +4,7 @@
 
 ```bash
 # From the repo root
-npm tauri dev
+bun tauri dev
 ```
 
 Do not run the binary directly with `cargo run`. Tauri manages the build.

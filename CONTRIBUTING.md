@@ -4,7 +4,7 @@ Thanks for your interest in contributing. This guide covers what you need to set
 
 ## Prerequisites
 
-- Node.js (LTS) and npm
+- [Bun](https://bun.sh) (latest)
 - Rust (stable toolchain) and Cargo
 - [Tauri CLI prerequisites](https://tauri.app/start/prerequisites/) for your OS (required to build/run the desktop app)
 - `sqlx-cli` (only if you're adding database migrations):
@@ -17,8 +17,8 @@ Thanks for your interest in contributing. This guide covers what you need to set
 ```bash
 git clone https://github.com/open-lingua/ielts-mastery-hub.git
 cd ielts-mastery-hub
-npm install
-npm run tauri dev
+bun install
+bun run tauri dev
 ```
 
 > If you need to run `sqlx` CLI commands, set `DATABASE_URL` first — see [Environment Variables](#environment-variables) below.
@@ -38,15 +38,15 @@ See `src/core/README.md` for backend-specific details (module layout, adding com
 ### Frontend (`src/ui`)
 
 ```bash
-npm run lint       # check
-npm run lint:fix    # auto-fix
-npm run format      # format with Biome
-npm run check       # lint + format, write mode
-npm run test         # run tests once
-npm run test:watch   # watch mode
+bun run lint       # check
+bun run lint:fix    # auto-fix
+bun run format      # format with Biome
+bun run check       # lint + format, write mode
+bun run test         # run tests once
+bun run test:watch   # watch mode
 ```
 
-Run `npm run check` before opening a PR.
+Run `bun run check` before opening a PR.
 
 ### Backend (`src/core`)
 
@@ -85,6 +85,6 @@ Keep commits focused and messages in the imperative mood (e.g. `Add reading time
 ## Pull Requests
 
 - Open PRs against `main`.
-- Ensure `npm run check`, `npm run test`, and (if you touched Rust code) `cargo clippy -- -D warnings` and `cargo fmt` all pass before requesting review.
+- Ensure `bun run check`, `bun run test`, and (if you touched Rust code) `cargo clippy -- -D warnings` and `cargo fmt` all pass before requesting review.
 - Describe what changed and why; link related issues if applicable.
 - Keep PRs scoped to a single change — avoid bundling unrelated fixes or refactors.
