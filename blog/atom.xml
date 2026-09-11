@@ -8,6 +8,164 @@
     <subtitle>IELTS Mastery Hub Blog</subtitle>
     <icon>https://open-lingua.github.io/ielts-mastery-hub/img/favicon.ico</icon>
     <entry>
+        <title type="html"><![CDATA[IELTS Mastery Hub on Threads — free, open-source IELTS practice]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-meta-threads-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-meta-threads-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Threads post announcing IELTS Mastery Hub — a free, MIT-licensed desktop app for IELTS reading, listening, and AI-graded writing practice on Windows, Linux, and macOS.]]></summary>
+        <content type="html"><![CDATA[<p><strong>1/</strong></p>
+<p>Every IELTS prep app gives you two free tests and then asks for your credit card 💸</p>
+<p>The test is already expensive. The practice shouldn't be.</p>
+<p>So I built a free one and open-sourced it 👇</p>
+<p>🎥 [attach demo video]</p>
+<hr>
+<p><strong>2/</strong></p>
+<p><strong>IELTS Mastery Hub</strong> — a desktop app for Windows, Linux &amp; macOS. Free, MIT licensed, no account, no ads.</p>
+<p>📖 Reading — timed, split-screen, auto-scored
+🎧 Listening — audio sections, progressive difficulty
+✍️ Writing — AI feedback on the official scoring criteria
+📊 Dashboard — see if you're actually improving</p>
+<hr>
+<p><strong>3/</strong></p>
+<p>The writing part is the one I'm most proud of.</p>
+<p>Writing is the hardest skill to self-study because you need someone to read what you wrote. Getting structured feedback on <em>why</em> a paragraph is weak beats writing essays into the void.</p>
+<hr>
+<p><strong>4/</strong></p>
+<p>Built with Tauri — TypeScript + a Rust core. Mock exams run 3 hours, so it had to be a small, fast native app rather than a browser tab pretending to be one 🦀</p>
+<p>github.com/open-lingua/ielts-mastery-hub</p>
+<hr>
+<p><strong>5/</strong></p>
+<p>Heads up: independent, non-commercial educational project. Not affiliated with or endorsed by the British Council, IDP or Cambridge — IELTS is a trademark of its owners. Practice content is AI-generated for study purposes and may not be 100% accurate.</p>
+<hr>
+<p><strong>6/</strong></p>
+<p>If you're prepping for IELTS I'd genuinely love to know whether the formats feel close to the real thing.</p>
+<p>And if you know someone studying right now — send it their way 🍀</p>
+<p>Try it, break it, tell me what's wrong.</p>]]></content>
+        <category label="threads" term="threads"/>
+        <category label="launch" term="launch"/>
+        <category label="open-source" term="open-source"/>
+        <category label="ielts" term="ielts"/>
+        <category label="learn-english" term="learn-english"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[IELTS Mastery Hub on X — free, open-source IELTS practice]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-on-x-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-on-x-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Twitter/X thread announcing IELTS Mastery Hub — a free, MIT-licensed Tauri desktop app for IELTS reading, listening, and AI-graded writing practice on Windows, Linux, and macOS.]]></summary>
+        <content type="html"><![CDATA[<p><strong>1/</strong></p>
+<p>IELTS prep tools: 2 free tests, then a paywall 💸</p>
+<p>So I built a free one. Open source, MIT.</p>
+<p>📖 Reading (auto-scored)
+🎧 Listening
+✍️ Writing w/ AI feedback
+📊 Progress dashboard</p>
+<p>Desktop app — Win/Linux/macOS 🦀</p>
+<p>github.com/open-lingua/ielts-mastery-hub</p>
+<p>🎥👇</p>
+<hr>
+<p><strong>2/</strong></p>
+<p>Built with Tauri: TypeScript frontend + Rust core.</p>
+<p>Mock exams run 3 hrs — shipping a whole Chromium for that felt wrong. Small native binary instead.</p>
+<p>Timers + scoring live in Rust, so no drift, no devtools cheating.</p>
+<p>#RustLang #Tauri #BuildInPublic</p>
+<hr>
+<p><strong>3/</strong></p>
+<p>One line to install:</p>
+<p>macOS/Linux
+<code>curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</code></p>
+<p>Windows
+<code>irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</code></p>
+<p>Docs: open-lingua.github.io/ielts-mastery-hub/docs/intro/</p>
+<hr>
+<p><strong>4/</strong></p>
+<p>Independent, non-commercial educational project. Not affiliated with or endorsed by the British Council, IDP or Cambridge. IELTS is a trademark of its owners. Practice content is AI-generated — may not be 100% accurate.</p>
+<hr>
+<p><strong>5/</strong></p>
+<p>If you're prepping for IELTS, I'd love to know if the formats feel realistic.</p>
+<p>If you're a dev, the Tauri/Rust side is open to poke at.</p>
+<p>Try it, break it, tell me what's wrong 🙏
+⭐ if it's useful</p>
+<p>#IELTS #OpenSource #LearnEnglish</p>]]></content>
+        <category label="twitter" term="twitter"/>
+        <category label="launch" term="launch"/>
+        <category label="open-source" term="open-source"/>
+        <category label="ielts" term="ielts"/>
+        <category label="tauri" term="tauri"/>
+        <category label="rust" term="rust"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[IELTS Mastery Hub — Free, open-source IELTS practice on your desktop]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-product-hunt-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-product-hunt-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Product Hunt launch post for IELTS Mastery Hub — a free, MIT-licensed desktop app with timed reading and listening practice, AI-graded writing, and progress tracking for Windows, Linux, and macOS.]]></summary>
+        <content type="html"><![CDATA[<p><strong>IELTS Mastery Hub</strong></p>
+<p><em>Free, open-source IELTS practice — reading, listening &amp; AI-graded writing</em></p>
+<hr>
+<p>👋 Hey Product Hunt!</p>
+<p>I built <strong>IELTS Mastery Hub</strong> because IELTS preparation has a frustrating pattern: two free mock tests, then a paywall — and half the tools don't even match the real exam format. For a test that's already expensive to sit, that felt like the wrong place to put a subscription.</p>
+<p>So this is the opposite of that. A native desktop app, <strong>completely free</strong>, <strong>open source under MIT</strong>, and running on <strong>Windows, Linux, and macOS</strong>. No account, no trial, no upsell.</p>
+<p><strong>🎥 Demo:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p><strong>What's inside:</strong></p>
+<p>📖 <strong>Reading</strong> — split-screen timed practice covering the official question types, auto-scored instantly</p>
+<p>🎧 <strong>Listening</strong> — audio-driven sections with progressive difficulty</p>
+<p>✍️ <strong>Writing</strong> — a dual-pane editor with AI evaluation across the official IELTS scoring criteria, so you get structured feedback instead of writing essays into the void</p>
+<p>📊 <strong>Dashboard</strong> — track your scores and see whether you're actually improving over time</p>
+<p><strong>Under the hood:</strong> TypeScript frontend with a Rust core, built with Tauri — so it's a small, fast native binary rather than a browser tab pretending to be an app. Important when you're sitting a 3-hour mock exam.</p>
+<p><strong>Get it in one line:</strong></p>
+<p>macOS / Linux — <code>curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</code></p>
+<p>Windows — <code>irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</code></p>
+<p>Prefer to build it yourself? The whole thing is on GitHub: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a></p>
+<p>📚 Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<hr>
+<p><em>Disclaimer: this is an independent, non-commercial educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English. IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.</em></p>
+<hr>
+<p>I'd love to hear from anyone who's prepared for IELTS (or any English exam) — what did you wish existed while you were studying? And if you're a dev curious about Tauri, the codebase is open and contributions are very welcome.</p>
+<p>I'll be around all day answering questions in the comments 🙌</p>]]></content>
+        <category label="product-hunt" term="product-hunt"/>
+        <category label="launch" term="launch"/>
+        <category label="open-source" term="open-source"/>
+        <category label="ielts" term="ielts"/>
+        <category label="desktop-app" term="desktop-app"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[I made a free, open-source desktop app for English exam practice (reading, listening & AI-graded writing)]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-english-learning-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-english-learning-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Reddit post for r/EnglishLearning and r/languagelearning introducing IELTS Mastery Hub — a free, MIT-licensed, cross-platform desktop app for timed reading and listening practice, AI-graded writing feedback, and progress tracking.]]></summary>
+        <content type="html"><![CDATA[<p><strong>I made a free, open-source desktop app for English exam practice (reading, listening &amp; AI-graded writing)</strong></p>
+<p>Hey everyone 👋</p>
+<p>I've been self-studying English for a while, and the thing that kept tripping me up was practice material. Most of the good stuff is behind a subscription, gives you two free tests and then asks for your card, or just doesn't match the format of the exam you're actually preparing for.</p>
+<p>So I built my own tool and made it free for everyone. It's called <strong>IELTS Mastery Hub</strong> — a desktop app for Windows, Linux, and macOS, open source under the MIT license. No account, no paywall, no ads.</p>
+<p><strong>Quick demo video:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p><strong>What it does:</strong></p>
+<ul>
+<li class="">📖 <strong>Reading</strong> — timed, split-screen passages with the standard question types, auto-scored so you get instant feedback</li>
+<li class="">🎧 <strong>Listening</strong> — audio sections that get progressively harder</li>
+<li class="">✍️ <strong>Writing</strong> — a dual-pane editor that gives you AI feedback across the official scoring criteria (task response, coherence, vocabulary range, grammar)</li>
+<li class="">📊 <strong>Dashboard</strong> — tracks your results over time so you can actually see whether you're improving or plateauing</li>
+</ul>
+<p>Even if you're not sitting IELTS specifically, the reading/listening drills and the writing feedback work fine as general B2–C1 practice. Writing is usually the hardest skill to self-study because you need someone to read what you wrote — getting structured feedback on <em>why</em> a paragraph is weak has been the most useful part for me by far.</p>
+<p><strong>Try it:</strong></p>
+<p>macOS / Linux:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</span><br></div></code></pre></div></div>
+<p>Windows (PowerShell):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</span><br></div></code></pre></div></div>
+<p>Or build it yourself: <code>git clone https://github.com/open-lingua/ielts-mastery-hub.git</code></p>
+<p>Repo: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a>
+Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<p><strong>Disclaimer:</strong> this is an independent, non-commercial educational project. It's <strong>not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English</strong> — IELTS is a registered trademark of its respective owners. The practice content is AI-generated for study purposes, so use it as practice, not as official material, and don't treat the scores as a real band prediction.</p>
+<p>I'd genuinely love feedback from other learners here — especially on whether the writing feedback feels useful or too generic, and what other skills or languages you'd want to see added. Bug reports and ideas are welcome on GitHub, and I'm happy to answer anything in the comments.</p>
+<p>Good luck with your studying 🍀</p>]]></content>
+        <category label="english-learning" term="english-learning"/>
+        <category label="language-learning" term="language-learning"/>
+        <category label="open-source" term="open-source"/>
+        <category label="reddit" term="reddit"/>
+        <category label="study-tools" term="study-tools"/>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[I built a free, open-source desktop app for IELTS practice (Reading, Listening & AI-graded Writing)]]></title>
         <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-ielts-launch/</id>
         <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-ielts-launch/"/>
@@ -44,23 +202,148 @@ Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" targ
         <category label="study-tools" term="study-tools"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[First Blog Post]]></title>
-        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/first-blog-post/</id>
-        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/first-blog-post/"/>
-        <updated>2019-05-28T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Lorem ipsum dolor sit amet...]]></summary>
-        <content type="html"><![CDATA[<p>Lorem ipsum dolor sit amet...</p>
-<!-- -->
-<p>...consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>]]></content>
-        <author>
-            <name>Sébastien Lorber</name>
-            <uri>https://sebastienlorber.com</uri>
-        </author>
-        <author>
-            <name>Yangshun Tay</name>
-            <uri>https://linkedin.com/in/yangshun</uri>
-        </author>
-        <category label="Hola" term="Hola"/>
-        <category label="Docusaurus" term="Docusaurus"/>
+        <title type="html"><![CDATA[I scratched my own itch and built a desktop app for IELTS exam prep — here's what I learned]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-learnprogramming-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-learnprogramming-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Reddit post for r/learnprogramming about building IELTS Mastery Hub — lessons from shipping a real cross-platform desktop app, and an invitation for first-time open-source contributors.]]></summary>
+        <content type="html"><![CDATA[<p><strong>I scratched my own itch and built a desktop app for IELTS exam prep — here's what I learned</strong></p>
+<p>Hey everyone,</p>
+<p>The advice that finally got me past tutorial hell was "build something you personally need." For me that was IELTS prep — every decent practice tool is a subscription, and the free ones give you two mock tests and then a paywall. So I built my own, and it turned into a much bigger learning experience than I expected.</p>
+<p>It's called <strong>IELTS Mastery Hub</strong>: a free, open source (MIT) desktop app for Windows, Linux, and macOS. Timed reading and listening practice with auto-scoring, a writing editor with AI feedback, and a dashboard that tracks your scores over time.</p>
+<p><strong>Demo video:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p>Repo: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a></p>
+<p><strong>Things I actually learned building it:</strong></p>
+<ul>
+<li class=""><strong>Picking the stack is less important than finishing.</strong> I went with TypeScript + Rust via Tauri, and I burned an embarrassing amount of time researching that decision before writing a line of code. In hindsight, almost any stack would have taught me the same lessons.</li>
+<li class=""><strong>State management is the real hard part.</strong> Not the UI, not the styling — deciding <em>where</em> the exam timer and score state live, and who owns it. I rewrote that layer twice. If you've ever wondered why people make such a fuss about architecture, build something with a timer and persistence and you'll find out.</li>
+<li class=""><strong>"Works on my machine" is a whole discipline.</strong> Getting it to build and package for three operating systems in CI took longer than several actual features. Nobody warns you about this in tutorials.</li>
+<li class=""><strong>Shipping &gt; perfect.</strong> v1 was ugly. Real users found bugs I never would have.</li>
+</ul>
+<p>If you're looking for a first open-source contribution, the repo is genuinely beginner-friendly — there are UI tweaks, docs improvements, and small bug fixes that don't require touching the Rust core. I'm happy to walk anyone through their first PR.</p>
+<p><strong>Try it:</strong></p>
+<p>macOS / Linux:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</span><br></div></code></pre></div></div>
+<p>Windows (PowerShell):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</span><br></div></code></pre></div></div>
+<p>Or clone and build it yourself (good exercise in itself):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">git clone https://github.com/open-lingua/ielts-mastery-hub.git</span><br></div></code></pre></div></div>
+<p>Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<p><strong>Disclaimer:</strong> independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.</p>
+<p>Happy to answer questions about any of it — the code, the mistakes, or how to get started contributing. Ask away in the comments.</p>]]></content>
+        <category label="learning" term="learning"/>
+        <category label="open-source" term="open-source"/>
+        <category label="tauri" term="tauri"/>
+        <category label="rust" term="rust"/>
+        <category label="typescript" term="typescript"/>
+        <category label="side-project" term="side-project"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[IELTS Mastery Hub — MIT-licensed desktop app for IELTS exam prep (Tauri + Rust + TypeScript)]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-opensource-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-opensource-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Reddit post for r/opensource and r/selfhosted introducing IELTS Mastery Hub — a free, MIT-licensed Tauri desktop app for IELTS reading, listening, and AI-graded writing practice on Windows, Linux, and macOS.]]></summary>
+        <content type="html"><![CDATA[<p><strong>IELTS Mastery Hub — MIT-licensed desktop app for IELTS exam prep (Tauri + Rust + TypeScript)</strong></p>
+<p>Hey folks,</p>
+<p>Sharing a project I've been working on: <strong>IELTS Mastery Hub</strong>, a desktop app for practicing the IELTS English exam. MIT licensed, no account required, no telemetry, no subscription — just a native binary you run locally on Windows, Linux, or macOS.</p>
+<p><strong>Demo video:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p><strong>Why I built it:</strong> basically every IELTS prep tool out there is SaaS. You get two free mock tests, then a paywall, and your essays and progress data live on someone else's server. That felt like an obviously solvable problem with a local-first app.</p>
+<p><strong>What it does:</strong></p>
+<ul>
+<li class="">📖 <strong>Reading</strong> — split-screen timed practice covering the official question types, auto-scored</li>
+<li class="">🎧 <strong>Listening</strong> — audio sections with progressive difficulty</li>
+<li class="">✍️ <strong>Writing</strong> — dual-pane editor with AI evaluation across the official IELTS scoring criteria</li>
+<li class="">📊 <strong>Dashboard</strong> — score history and progress tracking over time</li>
+</ul>
+<p><strong>Stack:</strong> TypeScript frontend with a Rust core, packaged with <strong>Tauri</strong>. Went with Tauri over Electron mainly for the binary size and memory footprint — it's a study tool you leave open for hours, so a 200MB Chromium process per session felt wrong. Happy to talk through the architecture if anyone's curious about Tauri for real-world apps; the IPC boundary between the TS side and the Rust core was the most interesting design decision.</p>
+<p><strong>Install:</strong></p>
+<p>macOS / Linux:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</span><br></div></code></pre></div></div>
+<p>Windows (PowerShell):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</span><br></div></code></pre></div></div>
+<p>If you (reasonably) don't want to pipe curl into a shell, just build it from source:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">git clone https://github.com/open-lingua/ielts-mastery-hub.git</span><br></div></code></pre></div></div>
+<p>Repo: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a>
+Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<p><strong>Disclaimer:</strong> independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational use and may not be 100% accurate.</p>
+<p>Contributions welcome — issues, PRs, packaging help (AUR/Flatpak/winget in particular), and content review from anyone who's actually taken the exam. Would love feedback on the UX and on the Tauri setup. AMA in the comments.</p>]]></content>
+        <category label="open-source" term="open-source"/>
+        <category label="self-hosted" term="self-hosted"/>
+        <category label="tauri" term="tauri"/>
+        <category label="rust" term="rust"/>
+        <category label="typescript" term="typescript"/>
+        <category label="desktop-app" term="desktop-app"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Built a cross-platform IELTS exam prep desktop app with Tauri + a Rust core (MIT licensed)]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-rust-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-rust-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Reddit post for r/rust about IELTS Mastery Hub — an MIT-licensed Tauri desktop app with a Rust core for timed exam practice, AI-graded writing, and progress tracking on Windows, Linux, and macOS.]]></summary>
+        <content type="html"><![CDATA[<p><strong>Built a cross-platform IELTS exam prep desktop app with Tauri + a Rust core (MIT licensed)</strong></p>
+<p>Hey r/rust,</p>
+<p>Sharing something I've been building for the last while: <strong>IELTS Mastery Hub</strong>, a desktop app for practicing the IELTS English exam. TypeScript frontend, Rust core, packaged with <strong>Tauri</strong>. MIT licensed, runs on Windows, Linux, and macOS.</p>
+<p><strong>Demo video:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p>Repo: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a></p>
+<p><strong>The problem it solves (non-Rust part, briefly):</strong> IELTS prep tools are almost all subscription SaaS, and a lot of them don't even match the real exam format. This one is free, runs locally, and does timed reading/listening sections with auto-scoring, plus a writing editor with AI evaluation against the official scoring criteria and a dashboard for progress over time.</p>
+<p><strong>The Rust part, which is why I'm posting here:</strong></p>
+<ul>
+<li class=""><strong>Why Tauri over Electron:</strong> it's a study tool people leave open for 2–3 hour mock exam sessions. Shipping a whole Chromium runtime for that felt indefensible on both binary size and RSS. Tauri's system-webview approach made the tradeoff easy, at the cost of dealing with WebView2/WebKitGTK differences.</li>
+<li class=""><strong>Where the Rust core actually earns its keep:</strong> exam session state, timers, scoring, and persistence all live on the Rust side rather than in the frontend. That means the timer can't drift or be paused by a stalled render, and scoring logic isn't something a user can trivially poke at from devtools. The frontend is essentially a view layer over commands.</li>
+<li class=""><strong>The IPC boundary was the main design question.</strong> Getting the granularity right — chatty per-keystroke commands vs. coarse batched state syncs — took a couple of rewrites. Ended up with an event-driven model where Rust emits state transitions and the frontend subscribes, rather than polling.</li>
+<li class=""><strong>Cross-platform pain points:</strong> webview inconsistencies (as always), audio playback behavior for the listening sections, and signing/packaging for three targets in CI. Happy to go into detail on any of these.</li>
+</ul>
+<p><strong>Try it:</strong></p>
+<p>macOS / Linux:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</span><br></div></code></pre></div></div>
+<p>Windows (PowerShell):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</span><br></div></code></pre></div></div>
+<p>Or just build it:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">git clone https://github.com/open-lingua/ielts-mastery-hub.git</span><br></div></code></pre></div></div>
+<p>Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<p><strong>Disclaimer:</strong> independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.</p>
+<p>Would really appreciate a critical eye on the Rust side — crate structure, error handling, and the command/event layer especially. Issues and PRs welcome, and happy to answer anything about the Tauri setup in the comments.</p>]]></content>
+        <category label="rust" term="rust"/>
+        <category label="tauri" term="tauri"/>
+        <category label="desktop-app" term="desktop-app"/>
+        <category label="open-source" term="open-source"/>
+        <category label="typescript" term="typescript"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Shipped a real-world Tauri app: cross-platform IELTS exam prep (open source, MIT)]]></title>
+        <id>https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-tauri-launch/</id>
+        <link href="https://open-lingua.github.io/ielts-mastery-hub/blog/2026/09/11/ielts-mastery-hub-reddit-r-tauri-launch/"/>
+        <updated>2026-09-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A Reddit post for r/tauri about IELTS Mastery Hub — an MIT-licensed Tauri desktop app with a Rust core, covering IPC design, audio playback, webview quirks, and cross-platform CI packaging.]]></summary>
+        <content type="html"><![CDATA[<p><strong>Shipped a real-world Tauri app: cross-platform IELTS exam prep (open source, MIT)</strong></p>
+<p>Hey r/tauri,</p>
+<p>Wanted to share a Tauri app I actually shipped rather than another todo demo: <strong>IELTS Mastery Hub</strong>, a desktop app for practicing the IELTS English exam. TypeScript frontend, Rust core, MIT licensed, running on Windows, Linux, and macOS.</p>
+<p><strong>Demo video:</strong> <a href="https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f" target="_blank" rel="noopener noreferrer" class="">https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f</a></p>
+<p>Repo: <a href="https://github.com/open-lingua/ielts-mastery-hub" target="_blank" rel="noopener noreferrer" class="">https://github.com/open-lingua/ielts-mastery-hub</a></p>
+<p><strong>What it does:</strong> timed reading sections in a split-screen layout with auto-scoring, listening sections with audio playback, a dual-pane writing editor with AI evaluation against the official scoring criteria, and a dashboard tracking scores over time. Free, no account, runs locally.</p>
+<p><strong>Tauri-specific notes, since that's why you're here:</strong></p>
+<ul>
+<li class=""><strong>Why Tauri:</strong> users keep this open for 2–3 hour mock exam sessions. An Electron-sized footprint for a study tool was a non-starter — the system webview approach won on both bundle size and memory.</li>
+<li class=""><strong>What lives in Rust vs. the frontend:</strong> exam session state, timers, scoring, and persistence are all in the Rust core. The timer being owned by Rust rather than a JS interval was a deliberate call — no drift, no pausing when a render stalls, and scoring logic isn't sitting in devtools waiting to be edited. The frontend is basically a view layer over commands.</li>
+<li class=""><strong>IPC granularity was the hardest design decision.</strong> Started chatty (a command per interaction), which got noisy fast. Ended up event-driven: Rust emits state transitions, the frontend subscribes. Much cleaner, and it made the "resume an in-progress exam" feature almost free.</li>
+<li class=""><strong>Audio in the listening section</strong> is where webview differences bit hardest — WebKitGTK vs. WebView2 behavior around playback and preloading needed real workarounds.</li>
+<li class=""><strong>CI packaging for three targets</strong> (plus signing) took longer to get right than several features did. Happy to share the workflow config if anyone's fighting that.</li>
+</ul>
+<p><strong>Install:</strong></p>
+<p>macOS / Linux:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh</span><br></div></code></pre></div></div>
+<p>Windows (PowerShell):</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex</span><br></div></code></pre></div></div>
+<p>Or build from source:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">git clone https://github.com/open-lingua/ielts-mastery-hub.git</span><br></div></code></pre></div></div>
+<p>Docs: <a href="https://open-lingua.github.io/ielts-mastery-hub/docs/intro/" target="_blank" rel="noopener noreferrer" class="">https://open-lingua.github.io/ielts-mastery-hub/docs/intro/</a></p>
+<p><strong>Disclaimer:</strong> independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.</p>
+<p>The codebase is open if you want to poke at how the command/event layer or the bundling config is set up. Would genuinely welcome feedback on the IPC design — I suspect there's a more idiomatic pattern I've missed. AMA about the Tauri side in the comments.</p>]]></content>
+        <category label="tauri" term="tauri"/>
+        <category label="rust" term="rust"/>
+        <category label="typescript" term="typescript"/>
+        <category label="desktop-app" term="desktop-app"/>
+        <category label="open-source" term="open-source"/>
     </entry>
 </feed>
