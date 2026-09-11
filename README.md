@@ -13,6 +13,12 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-yellow)  [![](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue.svg)](https://github.com/open-lingua/ielts-mastery-hub)
 
+## Preview
+
+Watch a quick demo of IELTS Mastery Hub in action:
+
+![Demo](assets/preview.gif)
+
 ## Documentation
 
 Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](IELTS Mastery Hub Docs).
