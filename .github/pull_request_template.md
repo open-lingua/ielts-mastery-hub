@@ -8,7 +8,7 @@
 
 ## How to test
 
-<!-- Steps to verify the change manually (e.g. which screen/flow to check in `npm run tauri dev`) -->
+<!-- Steps to verify the change manually (e.g. which screen/flow to check in `bun run tauri dev`) -->
 
 ## Notes
 

@@ -15,7 +15,7 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 
 ## Documentation
 
-Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](https://open-lingua.github.io/ielts-mastery-hub/docs/intro/).
+Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](IELTS Mastery Hub Docs).
 
 ## Disclaimer
 
@@ -23,7 +23,7 @@ This is an independent, non-commercial, open-source project for educational purp
 
 **IELTS** and **International English Language Testing System** are registered trademarks of their respective owners. All practice content in this repository is AI-generated for educational and demonstration purposes only — no official IELTS test material is used or reproduced.
 
-This application is still a **work in progress** and may contain bugs or issues. If you encounter any problems, please report them here: [https://github.com/open-lingua/ielts-mastery-hub/issues](https://github.com/open-lingua/ielts-mastery-hub/issues).
+This application is still a **work in progress** and may contain bugs or issues. If you encounter any problems, please report them here: please report them on [https://github.com/open-lingua/ielts-mastery-hub/issues](GitHub Issues).
 
 The practice tests in this application are **generated using AI**, and therefore may not be 100% accurate. Their purpose is primarily educational, allowing users to practice in a realistic but non-official test environment.
 
@@ -68,8 +68,8 @@ git clone https://github.com/open-lingua/ielts-mastery-hub.git
 cd ielts-mastery-hub
 
 # Install dependencies
-npm install
+bun install
 
 # Run the app
-npm run tauri dev
+bun run tauri dev
 ```
