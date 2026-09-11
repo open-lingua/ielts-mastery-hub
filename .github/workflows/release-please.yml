@@ -57,9 +57,9 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/krypton
+          bun-version: latest
 
       - name: Refresh Cargo.lock for the bumped core crate version
         # Only resolves the dependency graph (no compilation needed), so this
@@ -73,7 +73,7 @@ jobs:
         # transformation the msi/WiX bundle target requires, so it's
         # regenerated here instead. See scripts/sync-msi-version.mjs and
         # RELEASES.md's version automation section.
-        run: node scripts/sync-msi-version.mjs
+        run: bun scripts/sync-msi-version.mjs
 
       - name: Commit and push if Cargo.lock or the MSI overlay changed
         # A single commit/push for both files avoids a race between separate
