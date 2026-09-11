@@ -1,0 +1,92 @@
+name: CI (Windows)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  version-consistency:
+    name: Version Consistency Check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - run: bun install --frozen-lockfile
+      - name: Verify version strings agree across tracked files
+        run: bun scripts/check-version-consistency.mjs
+      - name: Run scripts/ unit tests (e.g. MSI version derivation)
+        run: bun run test:scripts
+
+  frontend:
+    name: Frontend - Lint, Test & Build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test
+      - run: bun run build
+
+  backend:
+    name: Backend - Rust Tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies (Tauri 2 / Windows)
+        run: choco install sqlite --no-progress -y
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src/core -> target"
+          shared-key: "backend-${{ runner.os }}-${{ hashFiles('src/core/Cargo.lock') }}"
+          cache-on-failure: true
+      - name: Check formatting (cargo fmt)
+        working-directory: src/core
+        run: cargo fmt --check
+      - name: Prepare SQLite database
+        working-directory: src/core
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "src/database/migrations" -Filter *.sql |
+            Sort-Object Name |
+            ForEach-Object {
+              Get-Content -Raw $_.FullName | sqlite3 dev.db
+            }
+      - name: Lint Rust (clippy)
+        working-directory: src/core
+        env:
+          DATABASE_URL: sqlite:dev.db
+        run: cargo clippy -- -D warnings
+      - name: Build test binaries
+        working-directory: src/core
+        env:
+          DATABASE_URL: sqlite:dev.db
+        run: cargo test --no-run
+      - name: Run Rust tests
+        working-directory: src/core
+        env:
+          DATABASE_URL: sqlite:dev.db
+        run: cargo test --no-fail-fast
