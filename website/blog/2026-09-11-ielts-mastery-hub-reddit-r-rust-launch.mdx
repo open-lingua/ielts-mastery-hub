@@ -1,0 +1,48 @@
+---
+title: "Built a cross-platform IELTS exam prep desktop app with Tauri + a Rust core (MIT licensed)"
+date: 2026-09-11
+tags: [rust, tauri, desktop-app, open-source, typescript]
+description: "A Reddit post for r/rust about IELTS Mastery Hub — an MIT-licensed Tauri desktop app with a Rust core for timed exam practice, AI-graded writing, and progress tracking on Windows, Linux, and macOS."
+---
+
+**Built a cross-platform IELTS exam prep desktop app with Tauri + a Rust core (MIT licensed)**
+
+Hey r/rust,
+
+Sharing something I've been building for the last while: **IELTS Mastery Hub**, a desktop app for practicing the IELTS English exam. TypeScript frontend, Rust core, packaged with **Tauri**. MIT licensed, runs on Windows, Linux, and macOS.
+
+**Demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+
+**The problem it solves (non-Rust part, briefly):** IELTS prep tools are almost all subscription SaaS, and a lot of them don't even match the real exam format. This one is free, runs locally, and does timed reading/listening sections with auto-scoring, plus a writing editor with AI evaluation against the official scoring criteria and a dashboard for progress over time.
+
+**The Rust part, which is why I'm posting here:**
+
+- **Why Tauri over Electron:** it's a study tool people leave open for 2–3 hour mock exam sessions. Shipping a whole Chromium runtime for that felt indefensible on both binary size and RSS. Tauri's system-webview approach made the tradeoff easy, at the cost of dealing with WebView2/WebKitGTK differences.
+- **Where the Rust core actually earns its keep:** exam session state, timers, scoring, and persistence all live on the Rust side rather than in the frontend. That means the timer can't drift or be paused by a stalled render, and scoring logic isn't something a user can trivially poke at from devtools. The frontend is essentially a view layer over commands.
+- **The IPC boundary was the main design question.** Getting the granularity right — chatty per-keystroke commands vs. coarse batched state syncs — took a couple of rewrites. Ended up with an event-driven model where Rust emits state transitions and the frontend subscribes, rather than polling.
+- **Cross-platform pain points:** webview inconsistencies (as always), audio playback behavior for the listening sections, and signing/packaging for three targets in CI. Happy to go into detail on any of these.
+
+**Try it:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+Or just build it:
+```
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+```
+
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Disclaimer:** independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.
+
+Would really appreciate a critical eye on the Rust side — crate structure, error handling, and the command/event layer especially. Issues and PRs welcome, and happy to answer anything about the Tauri setup in the comments.
