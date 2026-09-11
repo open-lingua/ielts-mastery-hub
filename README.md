@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
 🎥 Full video with audio available at [`assets/preview.mp4`](assets/preview.mp4)
 ## Documentation
 
-Full documentation is available at [IELTS Mastery Hub Docs](https://open-lingua.github.io/ielts-mastery-hub/docs/intro/)..
+Full documentation is available at [IELTS Mastery Hub Docs](https://open-lingua.github.io/ielts-mastery-hub/docs/intro/).
 
 ## Disclaimer
 
