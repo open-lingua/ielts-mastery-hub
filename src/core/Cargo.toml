@@ -1,6 +1,6 @@
 [package]
 name = "open-lingua-ielts-mastery-hub-core"
-version = "1.7.1-rc.2"
+version = "1.7.2-rc.2"
 edition = "2021"
 
 [lib]

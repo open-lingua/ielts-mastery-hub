@@ -89,6 +89,17 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.7.2-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.1-rc.2...1.7.2-rc.2) (2026-09-11)
+
+
+### Documentation
+
+* add preview GIF and demo video to README ([5aa8dd9](https://github.com/open-lingua/ielts-mastery-hub/commit/5aa8dd93b98e6a8daf1761911e913207d0061c0d))
+* fix markdown link syntax, add update tip to install section ([e10b4df](https://github.com/open-lingua/ielts-mastery-hub/commit/e10b4df345fd748ccba3dd7d3fd1d0fe7ce7dc58))
+* update preview GIF asset URL ([c4c0f3c](https://github.com/open-lingua/ielts-mastery-hub/commit/c4c0f3cde066025921fbe8bd40b400aa1c977cf7))
+* use uploaded GIF asset URL and link to preview.mp4 for audio ([beea43f](https://github.com/open-lingua/ielts-mastery-hub/commit/beea43f09fa7c8f05b5151b1958cc7504c879ddc))
+* use uploaded GIF asset URL and link to preview.mp4 for audio ([43e34c8](https://github.com/open-lingua/ielts-mastery-hub/commit/43e34c86c8a1fce56a60833d75b7c0b0317709f2))
+
 ## [1.7.1-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.0-rc.2...1.7.1-rc.2) (2026-09-11)
 
 
