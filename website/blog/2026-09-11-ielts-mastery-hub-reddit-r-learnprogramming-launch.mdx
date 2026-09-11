@@ -1,0 +1,50 @@
+---
+title: "I scratched my own itch and built a desktop app for IELTS exam prep — here's what I learned"
+date: 2026-09-11
+tags: [learning, open-source, tauri, rust, typescript, side-project]
+description: "A Reddit post for r/learnprogramming about building IELTS Mastery Hub — lessons from shipping a real cross-platform desktop app, and an invitation for first-time open-source contributors."
+---
+
+**I scratched my own itch and built a desktop app for IELTS exam prep — here's what I learned**
+
+Hey everyone,
+
+The advice that finally got me past tutorial hell was "build something you personally need." For me that was IELTS prep — every decent practice tool is a subscription, and the free ones give you two mock tests and then a paywall. So I built my own, and it turned into a much bigger learning experience than I expected.
+
+It's called **IELTS Mastery Hub**: a free, open source (MIT) desktop app for Windows, Linux, and macOS. Timed reading and listening practice with auto-scoring, a writing editor with AI feedback, and a dashboard that tracks your scores over time.
+
+**Demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+
+**Things I actually learned building it:**
+
+- **Picking the stack is less important than finishing.** I went with TypeScript + Rust via Tauri, and I burned an embarrassing amount of time researching that decision before writing a line of code. In hindsight, almost any stack would have taught me the same lessons.
+- **State management is the real hard part.** Not the UI, not the styling — deciding *where* the exam timer and score state live, and who owns it. I rewrote that layer twice. If you've ever wondered why people make such a fuss about architecture, build something with a timer and persistence and you'll find out.
+- **"Works on my machine" is a whole discipline.** Getting it to build and package for three operating systems in CI took longer than several actual features. Nobody warns you about this in tutorials.
+- **Shipping > perfect.** v1 was ugly. Real users found bugs I never would have.
+
+If you're looking for a first open-source contribution, the repo is genuinely beginner-friendly — there are UI tweaks, docs improvements, and small bug fixes that don't require touching the Rust core. I'm happy to walk anyone through their first PR.
+
+**Try it:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+Or clone and build it yourself (good exercise in itself):
+```
+git clone https://github.com/open-lingua/ielts-mastery-hub.git
+```
+
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Disclaimer:** independent, non-commercial, educational project. Not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English — IELTS is a registered trademark of its respective owners. Practice content is AI-generated for educational purposes and may not be 100% accurate.
+
+Happy to answer questions about any of it — the code, the mistakes, or how to get started contributing. Ask away in the comments.
