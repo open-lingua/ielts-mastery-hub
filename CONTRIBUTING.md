@@ -18,7 +18,6 @@ Thanks for your interest in contributing. This guide covers what you need to set
 git clone https://github.com/open-lingua/ielts-mastery-hub.git
 cd ielts-mastery-hub
 npm install
-export DATABASE_URL=...
 npm run tauri dev
 ```
 
