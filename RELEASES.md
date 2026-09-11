@@ -89,6 +89,30 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [1.7.3-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.2-rc.2...1.7.3-rc.2) (2026-09-11)
+
+
+### Bug Fixes
+
+* use HOME/USERPROFILE fallback for Windows compatibility ([ad5a292](https://github.com/open-lingua/ielts-mastery-hub/commit/ad5a292bfad2c933fda10f2ad06cd0105eb5004b))
+
+
+### Documentation
+
+* add social post generator prompt for IELTS Mastery Hub ([a7124c7](https://github.com/open-lingua/ielts-mastery-hub/commit/a7124c7d8a5b701d7d12b44ee76f041c9e92042b))
+* fix double period in docs link ([9e0bf0a](https://github.com/open-lingua/ielts-mastery-hub/commit/9e0bf0ae1b4315056b3a0fdc0303ab558825d18e))
+* update social post prompt to output Docusaurus MDX format with filename suggestions ([ee91387](https://github.com/open-lingua/ielts-mastery-hub/commit/ee913876d33254b744e8e06c339530945dd1af6d))
+
+
+### CI/CD
+
+* add macOS and Windows CI workflows ([a9984ba](https://github.com/open-lingua/ielts-mastery-hub/commit/a9984ba1f5afa617ec2ffd41392c483ab0ebcc65))
+
+
+### Tests
+
+* extract shared ENV_LOCK/with_env_var helper; fix HOME assumptions in tests ([71f9905](https://github.com/open-lingua/ielts-mastery-hub/commit/71f9905983b679c7e0076a1c813acdb3ecc0190b))
+
 ## [1.7.2-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.1-rc.2...1.7.2-rc.2) (2026-09-11)
 
 
