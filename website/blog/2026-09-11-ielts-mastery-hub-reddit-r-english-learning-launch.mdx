@@ -1,0 +1,48 @@
+---
+title: "I made a free, open-source desktop app for English exam practice (reading, listening & AI-graded writing)"
+date: 2026-09-11
+tags: [english-learning, language-learning, open-source, reddit, study-tools]
+description: "A Reddit post for r/EnglishLearning and r/languagelearning introducing IELTS Mastery Hub — a free, MIT-licensed, cross-platform desktop app for timed reading and listening practice, AI-graded writing feedback, and progress tracking."
+---
+
+**I made a free, open-source desktop app for English exam practice (reading, listening & AI-graded writing)**
+
+Hey everyone 👋
+
+I've been self-studying English for a while, and the thing that kept tripping me up was practice material. Most of the good stuff is behind a subscription, gives you two free tests and then asks for your card, or just doesn't match the format of the exam you're actually preparing for.
+
+So I built my own tool and made it free for everyone. It's called **IELTS Mastery Hub** — a desktop app for Windows, Linux, and macOS, open source under the MIT license. No account, no paywall, no ads.
+
+**Quick demo video:** https://github.com/user-attachments/assets/0a68fb14-e7cd-4cd2-8774-1c6bc53cae0f
+
+**What it does:**
+
+- 📖 **Reading** — timed, split-screen passages with the standard question types, auto-scored so you get instant feedback
+- 🎧 **Listening** — audio sections that get progressively harder
+- ✍️ **Writing** — a dual-pane editor that gives you AI feedback across the official scoring criteria (task response, coherence, vocabulary range, grammar)
+- 📊 **Dashboard** — tracks your results over time so you can actually see whether you're improving or plateauing
+
+Even if you're not sitting IELTS specifically, the reading/listening drills and the writing feedback work fine as general B2–C1 practice. Writing is usually the hardest skill to self-study because you need someone to read what you wrote — getting structured feedback on *why* a paragraph is weak has been the most useful part for me by far.
+
+**Try it:**
+
+macOS / Linux:
+```
+curl -fsSL https://open-lingua.github.io/ielts-mastery-hub/install/install.sh | sh
+```
+
+Windows (PowerShell):
+```
+irm https://open-lingua.github.io/ielts-mastery-hub/install/install.ps1 | iex
+```
+
+Or build it yourself: `git clone https://github.com/open-lingua/ielts-mastery-hub.git`
+
+Repo: https://github.com/open-lingua/ielts-mastery-hub
+Docs: https://open-lingua.github.io/ielts-mastery-hub/docs/intro/
+
+**Disclaimer:** this is an independent, non-commercial educational project. It's **not affiliated with or endorsed by the British Council, IDP Education, or Cambridge Assessment English** — IELTS is a registered trademark of its respective owners. The practice content is AI-generated for study purposes, so use it as practice, not as official material, and don't treat the scores as a real band prediction.
+
+I'd genuinely love feedback from other learners here — especially on whether the writing feedback feels useful or too generic, and what other skills or languages you'd want to see added. Bug reports and ideas are welcome on GitHub, and I'm happy to answer anything in the comments.
+
+Good luck with your studying 🍀
