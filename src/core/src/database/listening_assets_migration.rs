@@ -41,13 +41,14 @@ const SEED_LISTENING_ASSETS_RESOURCE_PATH: &str = "seeds/listening/listening-ass
 /// it's logged loudly with `log::warn!` (including the exact resolved path)
 /// so it's visible in both `tauri dev` and packaged-build logs, but never
 /// blocks startup, since a build may legitimately ship without seed assets.
-/// Only a missing `$HOME` is propagated as `Err`.
+/// Only a missing `$HOME`/`%USERPROFILE%` is propagated as `Err`.
 pub async fn sync_listening_assets_to_local_storage(
     pool: &Db,
     app_handle: &tauri::AppHandle,
 ) -> Result<AssetSyncOutcome, AppError> {
-    let home = std::env::var("HOME")
-        .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
+    let home = crate::database::home_dir().ok_or_else(|| {
+        AppError::Validation("HOME/USERPROFILE environment variable is not set".to_string())
+    })?;
     let dest_root = Path::new(&home)
         .join(".imh")
         .join(LISTENING_ASSETS_DIR_NAME);

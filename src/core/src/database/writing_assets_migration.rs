@@ -95,14 +95,15 @@ pub fn to_asset_url(path: &Path) -> String {
 /// seed source directory is also non-fatal (see [`AssetSyncOutcome::SourceMissing`]):
 /// it's logged loudly with `log::warn!` (including the exact resolved path) so it's
 /// visible in both `tauri dev` and packaged-build logs, but never blocks startup,
-/// since a build may legitimately ship without seed assets. Only a missing `$HOME`
-/// is propagated as `Err`.
+/// since a build may legitimately ship without seed assets. Only a missing
+/// `$HOME`/`%USERPROFILE%` is propagated as `Err`.
 pub async fn sync_writing_assets_to_local_storage(
     pool: &Db,
     app_handle: &tauri::AppHandle,
 ) -> Result<AssetSyncOutcome, AppError> {
-    let home = std::env::var("HOME")
-        .map_err(|_| AppError::Validation("HOME environment variable is not set".to_string()))?;
+    let home = crate::database::home_dir().ok_or_else(|| {
+        AppError::Validation("HOME/USERPROFILE environment variable is not set".to_string())
+    })?;
     let source_dir = app_handle
         .path()
         .resolve(

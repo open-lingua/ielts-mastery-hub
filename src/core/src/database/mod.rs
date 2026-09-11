@@ -70,6 +70,21 @@ pub fn default_db_path(os: &str) -> Result<PathBuf, AppError> {
     }
 }
 
+/// Resolves the current user's home directory across platforms, for callers
+/// that store data under a fixed `<home>/.imh/...` layout regardless of OS
+/// (unlike [`default_db_path`], which branches per OS).
+///
+/// Prefers `$HOME` (always set on Linux/macOS, and also set on Windows in
+/// some environments, e.g. Git Bash/MSYS or CI runners that export it),
+/// falling back to Windows' `%USERPROFILE%` when `HOME` isn't set — native
+/// Windows shells (`cmd.exe`, PowerShell) don't set `HOME` by default.
+/// Returns `None` if neither variable is set.
+pub fn home_dir() -> Option<String> {
+    std::env::var("HOME")
+        .ok()
+        .or_else(|| std::env::var("USERPROFILE").ok())
+}
+
 /// Extracts the filesystem path from a `sqlite://...` connection URL (stripping any
 /// trailing `?mode=...` query string). Shared by [`init`] and by callers that need the
 /// database's directory without opening a connection (e.g. to locate sibling files like

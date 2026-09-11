@@ -476,9 +476,10 @@ pub(crate) fn slugify(title: &str) -> String {
 }
 
 /// Best-effort `~/Downloads` path used only to seed the save dialog's initial directory.
-/// Returns `None` if `$HOME` can't be resolved — the dialog will fall back to its own default.
+/// Returns `None` if `$HOME`/`%USERPROFILE%` can't be resolved — the dialog will fall
+/// back to its own default.
 pub fn default_export_dir() -> Option<PathBuf> {
-    let home = std::env::var("HOME").ok()?;
+    let home = crate::database::home_dir()?;
     Some(Path::new(&home).join("Downloads"))
 }
 
