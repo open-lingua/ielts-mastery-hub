@@ -17,10 +17,9 @@ An open-source desktop IELTS preparation platform offering timed reading, listen
 
 Watch a quick demo of IELTS Mastery Hub in action:
 
-![Demo](https://github.com/user-attachments/assets/b7f83657-4ea3-4c20-afce-fa3374f2c0b1)
+https://github.com/user-attachments/assets/b7f83657-4ea3-4c20-afce-fa3374f2c0b1
 
 🎥 Full video with audio available at [`assets/preview.mp4`](assets/preview.mp4)
-
 ## Documentation
 
 Full documentation is available at [https://open-lingua.github.io/ielts-mastery-hub/docs/intro/](IELTS Mastery Hub Docs).
