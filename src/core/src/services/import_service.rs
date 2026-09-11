@@ -802,7 +802,9 @@ async fn insert_writing_task(
 }
 
 fn build_listening_assets_dir(test_id: &str) -> Result<PathBuf, AppError> {
-    let home = std::env::var("HOME").map_err(|e| AppError::Validation(e.to_string()))?;
+    let home = crate::database::home_dir().ok_or_else(|| {
+        AppError::Validation("HOME/USERPROFILE environment variable is not set".to_string())
+    })?;
     Ok(Path::new(&home)
         .join(".imh")
         .join(crate::database::listening_assets_migration::LISTENING_ASSETS_DIR_NAME)
