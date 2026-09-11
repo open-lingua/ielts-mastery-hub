@@ -55,7 +55,8 @@ mod save_configuration {
         let key = test_key();
 
         // Act
-        let result = service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "   ")])).await;
+        let result =
+            service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "   ")])).await;
 
         // Assert
         assert_matches!(result, Err(app_lib::error::AppError::Validation(_)));
@@ -68,9 +69,10 @@ mod save_configuration {
         let key = test_key();
 
         // Act
-        let summary = service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "sk-real")]))
-            .await
-            .expect("save");
+        let summary =
+            service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "sk-real")]))
+                .await
+                .expect("save");
 
         // Assert
         assert_eq!(summary.provider_id, "gemini");
@@ -93,7 +95,9 @@ mod save_configuration {
             .expect("save claude");
 
         // Assert
-        let all = service::list_configurations(&pool, &key).await.expect("list");
+        let all = service::list_configurations(&pool, &key)
+            .await
+            .expect("list");
         let active: Vec<_> = all.iter().filter(|c| c.is_active).collect();
         assert_eq!(active.len(), 1);
         assert_eq!(active[0].provider_id, "claude");
@@ -162,11 +166,18 @@ mod delete_configuration {
             .expect("save");
 
         // Act
-        service::delete_configuration(&pool, "gemini").await.expect("delete");
+        service::delete_configuration(&pool, "gemini")
+            .await
+            .expect("delete");
 
         // Assert
-        let all = service::list_configurations(&pool, &key).await.expect("list");
-        let gemini = all.iter().find(|c| c.provider_id == "gemini").expect("present");
+        let all = service::list_configurations(&pool, &key)
+            .await
+            .expect("list");
+        let gemini = all
+            .iter()
+            .find(|c| c.provider_id == "gemini")
+            .expect("present");
         assert!(!gemini.configured);
         assert!(!gemini.is_active);
     }
@@ -226,7 +237,9 @@ mod activate_configuration {
         service::save_configuration(&pool, &key, &input("gemini", &[("apiKey", "sk-real")]))
             .await
             .expect("save gemini");
-        service::delete_configuration(&pool, "gemini").await.expect("clear gemini");
+        service::delete_configuration(&pool, "gemini")
+            .await
+            .expect("clear gemini");
 
         // Act
         let result = service::activate_configuration(&pool, &key, "gemini").await;
@@ -257,7 +270,9 @@ mod activate_configuration {
         assert!(summary.is_active);
         assert!(summary.configured);
 
-        let all = service::list_configurations(&pool, &key).await.expect("list");
+        let all = service::list_configurations(&pool, &key)
+            .await
+            .expect("list");
         let active: Vec<_> = all.iter().filter(|c| c.is_active).collect();
         assert_eq!(active.len(), 1);
         assert_eq!(active[0].provider_id, "gemini");

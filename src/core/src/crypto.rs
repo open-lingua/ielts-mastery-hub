@@ -86,8 +86,8 @@ pub fn decrypt(key: &[u8; KEY_LEN], encoded: &str) -> Result<String, AppError> {
         .decrypt(&nonce, ciphertext)
         .map_err(|_| AppError::Validation("failed to decrypt credentials".into()))?;
 
-
-    String::from_utf8(plaintext).map_err(|_| AppError::Validation("decrypted data was not valid UTF-8".into()))
+    String::from_utf8(plaintext)
+        .map_err(|_| AppError::Validation("decrypted data was not valid UTF-8".into()))
 }
 
 #[cfg(test)]

@@ -10,7 +10,9 @@ pub async fn list_ai_configurations(
     db: State<'_, Db>,
     key: State<'_, AiConfigKey>,
 ) -> Result<Vec<AiConfigurationSummary>, String> {
-    service::list_configurations(&db, &key).await.map_err(Into::into)
+    service::list_configurations(&db, &key)
+        .await
+        .map_err(Into::into)
 }
 
 #[tauri::command]

@@ -99,7 +99,9 @@ mod activate {
             .expect("upsert claude (deactivates gemini)");
 
         // Act
-        ai_configurations::activate(&pool, "gemini").await.expect("activate");
+        ai_configurations::activate(&pool, "gemini")
+            .await
+            .expect("activate");
 
         // Assert
         let gemini = ai_configurations::find_by_provider(&pool, "gemini")
@@ -248,7 +250,9 @@ mod clear {
             .expect("upsert");
 
         // Act
-        ai_configurations::clear(&pool, "gemini").await.expect("clear");
+        ai_configurations::clear(&pool, "gemini")
+            .await
+            .expect("clear");
 
         // Assert
         let row = ai_configurations::find_by_provider(&pool, "gemini")
