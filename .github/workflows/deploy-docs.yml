@@ -1,0 +1,52 @@
+name: Deploy Docs
+
+# Builds the Docusaurus site under website/* and deploys it to GitHub Pages
+# whenever a GitHub Release is published. Independent from release.yml
+# (desktop binaries) and release-please.yml (version bumps/changelog) — see
+# RELEASES.md for the overall release process.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Avoid overlapping Pages deployments; let an in-flight run finish before the
+# next one starts rather than cancelling it mid-deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install website dependencies
+        working-directory: website
+        run: bun install --frozen-lockfile
+
+      - name: Build website
+        working-directory: website
+        run: bun run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
