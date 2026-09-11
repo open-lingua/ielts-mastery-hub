@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { gradeWritingTest, persistFeedback } from "@/services/aiGradingService";
 import { fetchAiConfigurations } from "@/services/aiConfigurationService";
-import { fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
+import { abortSession, fetchActiveSession, fetchExistingSession, startTestSession } from "@/services/practiceLibraryService";
 import { fetchWritingTestForPractice, submitWritingTest } from "@/services/writingPracticeService";
 
 vi.mock("@/services/aiConfigurationService", () => ({
@@ -18,6 +18,7 @@ vi.mock("@/services/writingPracticeService", () => ({
 }));
 
 vi.mock("@/services/practiceLibraryService", () => ({
+  abortSession: vi.fn(),
   fetchActiveSession: vi.fn(),
   fetchExistingSession: vi.fn(),
   startTestSession: vi.fn(),
@@ -44,6 +45,7 @@ const mockFetchWritingTestForPractice = vi.mocked(fetchWritingTestForPractice);
 const mockFetchActiveSession = vi.mocked(fetchActiveSession);
 const mockFetchExistingSession = vi.mocked(fetchExistingSession);
 const mockStartTestSession = vi.mocked(startTestSession);
+const mockAbortSession = vi.mocked(abortSession);
 const mockSubmitWritingTest = vi.mocked(submitWritingTest);
 const mockGradeWritingTest = vi.mocked(gradeWritingTest);
 const mockPersistFeedback = vi.mocked(persistFeedback);
@@ -161,5 +163,54 @@ describe("WritingSimulator — AI configuration gate", () => {
     expect(mockGradeWritingTest).not.toHaveBeenCalled();
     expect(mockPersistFeedback).not.toHaveBeenCalled();
     expect(screen.getByText(/You chose to skip AI scoring/)).toBeInTheDocument();
+  });
+});
+
+describe("WritingSimulator — Abort", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetchWritingTestForPractice.mockResolvedValue(mockTestData);
+    mockFetchExistingSession.mockResolvedValue(null);
+    mockFetchActiveSession.mockResolvedValue(null);
+    mockFetchAiConfigurations.mockResolvedValue({ configuredMap: { claude: true }, activeProviderId: "claude" });
+    mockStartTestSession.mockResolvedValue({
+      id: "session-1",
+      started_at: new Date().toISOString(),
+      status: "in_progress",
+      progress_percent: 0,
+      score_band: null,
+      attempt_number: 1,
+    });
+  });
+
+  const startAndAbort = async (user: ReturnType<typeof userEvent.setup>) => {
+    renderPage();
+    await waitFor(() => expect(screen.getByText("Start Now").closest("button")).not.toBeDisabled());
+    await user.click(screen.getByText("Start Now"));
+    await waitFor(() => expect(screen.getByPlaceholderText("Begin your response here...")).toBeInTheDocument());
+
+    await user.click(screen.getAllByRole("button", { name: "Abort" })[0]);
+    const confirmButtons = await screen.findAllByRole("button", { name: "Abort" });
+    await user.click(confirmButtons[confirmButtons.length - 1]);
+  };
+
+  it("navigates back to the tests list once abortSession resolves", async () => {
+    mockAbortSession.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+
+    await startAndAbort(user);
+
+    await waitFor(() => expect(mockAbortSession).toHaveBeenCalledWith("session-1", expect.any(String)));
+    await waitFor(() => expect(screen.queryByPlaceholderText("Begin your response here...")).not.toBeInTheDocument());
+  });
+
+  it("still clears local state and navigates away even when abortSession rejects", async () => {
+    mockAbortSession.mockRejectedValue(new Error("network error"));
+    const user = userEvent.setup();
+
+    await startAndAbort(user);
+
+    await waitFor(() => expect(mockAbortSession).toHaveBeenCalledWith("session-1", expect.any(String)));
+    await waitFor(() => expect(screen.queryByPlaceholderText("Begin your response here...")).not.toBeInTheDocument());
   });
 });
