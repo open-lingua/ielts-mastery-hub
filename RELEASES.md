@@ -89,6 +89,18 @@ for more detail on the changelog format and versioning scheme.
   attacker-supplied user uploads, so real-world exploitability for this internal docs site is low.
   Accepted as a tracked risk; revisit once `image-size` ships a patched release.
 
+## [2.0.0](https://github.com/open-lingua/ielts-mastery-hub/compare/1.8.0...2.0.0) (2026-09-12)
+
+
+### Documentation
+
+* collapse 1.8.0 changelog entries into release header ([5bee7fb](https://github.com/open-lingua/ielts-mastery-hub/commit/5bee7fbb84ad1376629c073ee8a44efd9c3f5478))
+
+
+### Chores
+
+* release 2.0.0 ([857b739](https://github.com/open-lingua/ielts-mastery-hub/commit/857b739e6c113a3467db9d299d220fe45c764b3e))
+
 ## [1.8.0](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.4...1.8.0) (2026-09-12)
 
 ## [1.7.4-rc.2](https://github.com/open-lingua/ielts-mastery-hub/compare/1.7.3-rc.2...1.7.4-rc.2) (2026-09-11)
